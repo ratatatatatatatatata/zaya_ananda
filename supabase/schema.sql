@@ -53,3 +53,5 @@ alter table cms_items add column if not exists views         integer;
 alter table cms_items add column if not exists teacher_name  text;
 alter table cms_items add column if not exists teacher_image text;
 alter table cms_items add column if not exists teacher_info  text;
+
+alter table cms_items add column if not exists lessons jsonb;

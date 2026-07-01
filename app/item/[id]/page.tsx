@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getCmsById } from "@/lib/repo";
 import { T } from "@/components/T";
 import { PurchaseBox } from "@/components/PurchaseBox";
+import { CourseLessons } from "@/components/CourseLessons";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +37,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
           <h1 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl">{item.title}</h1>
           {isCourse && (
             <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-muted">
-              {typeof item.videoLessons === "number" && <span>🎬 {item.videoLessons} видео хичээл</span>}
+              {((item.lessons?.length ?? 0) > 0 || typeof item.videoLessons === "number") && <span>🎬 {item.lessons?.length ?? item.videoLessons} видео хичээл</span>}
               {typeof item.students === "number" && <span>👤 {item.students} суралцагч</span>}
               {typeof item.views === "number" && <span>👁 {item.views.toLocaleString()} үзсэн</span>}
               {item.mode && <span className="font-semibold text-primary-700">{modeLabel[item.mode]}</span>}
@@ -49,6 +50,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
               <div className="mt-3 whitespace-pre-line leading-relaxed text-muted">{item.body}</div>
             </>
           )}
+          {isCourse && <CourseLessons id={item.id} />}
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">

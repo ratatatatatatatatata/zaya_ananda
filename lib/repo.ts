@@ -144,7 +144,7 @@ export async function getCmsById(id: string): Promise<CmsItem | null> {
 
 export async function createCmsItem(input: {
   kind: CmsItem["kind"]; title: string; summary?: string; body?: string; price?: number; category?: string; mode?: CmsItem["mode"];
-  image?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherInfo?: string; accessDays?: number;
+  image?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherInfo?: string; accessDays?: number; lessons?: { title: string; url: string }[];
 }): Promise<CmsItem> {
   return sbInsert<CmsItem>("cms_items", {
     id: randomUUID(), kind: input.kind, title: input.title.trim(), summary: (input.summary || "").trim(),
@@ -153,13 +153,14 @@ export async function createCmsItem(input: {
     category: input.category?.trim() || null,
     mode: input.kind === "course" ? input.mode || "online" : null,
     image: input.image || null,
-    videoLessons: numOrNull(input.videoLessons),
+    videoLessons: input.lessons && input.lessons.length ? input.lessons.length : numOrNull(input.videoLessons),
     students: numOrNull(input.students),
     views: numOrNull(input.views),
     teacherName: input.teacherName?.trim() || null,
     teacherImage: input.teacherImage || null,
     teacherInfo: input.teacherInfo?.trim() || null,
     accessDays: numOrNull(input.accessDays),
+    lessons: input.lessons && input.lessons.length ? input.lessons : null,
     createdAt: new Date().toISOString(),
   });
 }

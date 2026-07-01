@@ -35,6 +35,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
   const [form, setForm] = useState(EMPTY);
+  const [lessons, setLessons] = useState<{ title: string; url: string }[]>([]);
   const set = (k: keyof typeof EMPTY, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
   const load = useCallback(() => {
@@ -58,10 +59,10 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
     try {
       const res = await fetch("/api/admin/content", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind, ...form, mode: kind === "course" ? form.mode : undefined }),
+        body: JSON.stringify({ kind, ...form, mode: kind === "course" ? form.mode : undefined, lessons: kind === "course" ? lessons.filter((l) => l.title.trim() && l.url.trim()) : undefined }),
       });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
-      setForm(EMPTY); setOpen(false); load();
+      setForm(EMPTY); setLessons([]); setOpen(false); load();
     } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Алдаа гарлаа."); } finally { setSaving(false); }
   }
   async function del(id: string) {
@@ -103,12 +104,31 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
           </div>
 
           {isCourse && (
+            <>
             <div className="grid gap-3 sm:grid-cols-3">
-              <div><label className="field-label">Видео хичээлийн тоо</label><input className="input" type="number" value={form.videoLessons} onChange={(e) => set("videoLessons", e.target.value)} /></div>
               <div><label className="field-label">Суралцагчийн тоо</label><input className="input" type="number" value={form.students} onChange={(e) => set("students", e.target.value)} /></div>
               <div><label className="field-label">Үзсэн тоо</label><input className="input" type="number" value={form.views} onChange={(e) => set("views", e.target.value)} /></div>
               <div><label className="field-label">Хандах хугацаа (хоног)</label><input className="input" type="number" value={form.accessDays} onChange={(e) => set("accessDays", e.target.value)} placeholder="жишээ: 30" /></div>
             </div>
+            <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="font-display font-semibold text-ink">Видео хичээлүүд <span className="text-sm font-normal text-muted">({lessons.length})</span></p>
+                <button type="button" onClick={() => setLessons((ls) => [...ls, { title: "", url: "" }])} className="btn btn-outline btn-sm">+ Хичээл нэмэх</button>
+              </div>
+              <p className="mb-3 text-xs leading-relaxed text-muted">Хичээл бүр гарчигтай байх ёстой. Видеоны холбоос: YouTube/Vimeo холбоос эсвэл .mp4 линк. Эдгээр видео зөвхөн төлбөр баталгаажсан хэрэглэгчид харагдана.</p>
+              <div className="space-y-2">
+                {lessons.map((l, idx) => (
+                  <div key={idx} className="flex flex-col gap-2 rounded-xl border border-line bg-white p-3 sm:flex-row sm:items-center">
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-100 text-xs font-bold text-primary-700">{idx + 1}</span>
+                    <input className="input flex-1" placeholder="Хичээлийн гарчиг" value={l.title} onChange={(e) => setLessons((ls) => ls.map((x, i) => i === idx ? { ...x, title: e.target.value } : x))} />
+                    <input className="input flex-1" placeholder="Видео холбоос (https://...)" value={l.url} onChange={(e) => setLessons((ls) => ls.map((x, i) => i === idx ? { ...x, url: e.target.value } : x))} />
+                    <button type="button" onClick={() => setLessons((ls) => ls.filter((_, i) => i !== idx))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
+                  </div>
+                ))}
+                {lessons.length === 0 && <p className="text-sm text-muted">Одоогоор хичээл алга. “+ Хичээл нэмэх” дарж видео хичээл нэмнэ үү.</p>}
+              </div>
+            </div>
+            </>
           )}
 
           <div><label className="field-label">Товч тайлбар</label><input className="input" value={form.summary} onChange={(e) => set("summary", e.target.value)} /></div>

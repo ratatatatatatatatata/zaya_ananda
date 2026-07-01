@@ -164,5 +164,6 @@ export interface CmsItem {
   teacherImage?: string;
   teacherInfo?: string;
   accessDays?: number;
+  lessons?: { title: string; url: string }[];
   createdAt: string;
 }
