@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   if (!name || !email || !message)
     return NextResponse.json({ error: "Нэр, имэйл, зурвасаа бүрэн бичнэ үү." }, { status: 400 });
 
-  const msg = createMessage({
+  const msg = await createMessage({
     name: String(name),
     email: String(email),
     phone: phone ? String(phone) : undefined,

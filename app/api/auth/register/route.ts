@@ -18,10 +18,13 @@ export async function POST(req: Request) {
   if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(email)))
     return NextResponse.json({ error: "Имэйл хаяг буруу байна." }, { status: 400 });
 
-  const { user, error } = createUser({ name: String(name), email: email ? String(email) : undefined, password, phone: phone ? String(phone) : undefined });
-  if (error || !user)
-    return NextResponse.json({ error: error || "Бүртгэл амжилтгүй боллоо." }, { status: 409 });
-
-  await createSession(user.id);
-  return NextResponse.json({ user: toPublicUser(user) });
+  try {
+    const { user, error } = await createUser({ name: String(name), email: email ? String(email) : undefined, password, phone: phone ? String(phone) : undefined });
+    if (error || !user)
+      return NextResponse.json({ error: error || "Бүртгэл амжилтгүй боллоо." }, { status: 409 });
+    await createSession(user.id);
+    return NextResponse.json({ user: toPublicUser(user) });
+  } catch (e) {
+    return NextResponse.json({ error: "Серверийн алдаа: " + (e instanceof Error ? e.message : String(e)) }, { status: 500 });
+  }
 }

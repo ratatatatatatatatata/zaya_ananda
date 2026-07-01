@@ -6,8 +6,8 @@ import { T } from "@/components/T";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Зөвлөгөө, мэдээлэл" };
 
-export default function ResourcesPage() {
-  const items = listCms("resource");
+export default async function ResourcesPage() {
+  const items = await listCms("resource");
   return (
     <>
       <PageHeader title={<T k="nav.resources" />} crumb={<T k="nav.resources" />} />

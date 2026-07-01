@@ -1,215 +1,135 @@
 import { randomUUID } from "crypto";
-import { db, persist } from "./db";
 import { hashPassword, verifyPassword } from "./auth";
+import { sbSelect, sbInsert, sbUpdate, sbDelete, enc } from "./supabase";
 import { services, courses, products } from "@/data/content";
-import type {
-  User,
-  PublicUser,
-  Order,
-  OrderItem,
-  ContactMessage,
-  CmsItem,
-} from "./types";
+import type { User, PublicUser, Order, OrderItem, ContactMessage, CmsItem } from "./types";
 
 export const catalog = { services, courses, products };
-
-export function findService(slug: string) {
-  return services.find((s) => s.slug === slug) || null;
-}
-export function findCourse(slug: string) {
-  return courses.find((c) => c.slug === slug) || null;
-}
-export function findProduct(slug: string) {
-  return products.find((p) => p.slug === slug) || null;
-}
+export function findService(slug: string) { return services.find((s) => s.slug === slug) || null; }
+export function findCourse(slug: string) { return courses.find((c) => c.slug === slug) || null; }
+export function findProduct(slug: string) { return products.find((p) => p.slug === slug) || null; }
 
 export function toPublicUser(u: User): PublicUser {
-  const { passwordHash, ...rest } = u;
+  const { passwordHash: _pw, ...rest } = u;
+  void _pw;
   return rest;
 }
 
-export function getUserByEmail(email: string): User | null {
-  return (
-    db().users.find((u) => u.email.toLowerCase() === email.toLowerCase()) ||
-    null
-  );
+export async function getUserByEmail(email: string): Promise<User | null> {
+  const e = (email || "").trim().toLowerCase();
+  if (!e) return null;
+  const rows = await sbSelect<User>("users", `email=eq.${enc(e)}&limit=1`);
+  return rows[0] || null;
 }
-
-export function getUserById(id: string): User | null {
-  return db().users.find((u) => u.id === id) || null;
+export async function getUserById(id: string): Promise<User | null> {
+  const rows = await sbSelect<User>("users", `id=eq.${enc(id)}&limit=1`);
+  return rows[0] || null;
 }
-
-export function getUserByPhone(phone: string): User | null {
+export async function getUserByPhone(phone: string): Promise<User | null> {
   const p = (phone || "").trim();
   if (!p) return null;
-  return db().users.find((u) => (u.phone || "").trim() === p) || null;
+  const rows = await sbSelect<User>("users", `phone=eq.${enc(p)}&limit=1`);
+  return rows[0] || null;
 }
-
-export function getUserByEmailOrPhone(identifier: string): User | null {
+export async function getUserByEmailOrPhone(identifier: string): Promise<User | null> {
   const v = (identifier || "").trim();
   if (!v) return null;
   if (v.includes("@")) return getUserByEmail(v);
-  return getUserByPhone(v) || getUserByEmail(v);
+  return (await getUserByPhone(v)) || (await getUserByEmail(v));
 }
-
-export function getOrCreateSocialUser(provider: string): User {
+export async function getOrCreateSocialUser(provider: string): Promise<User> {
   const email = provider.toLowerCase() + ".demo@zaya.local";
-  const existing = getUserByEmail(email);
+  const existing = await getUserByEmail(email);
   if (existing) return existing;
-  const user: User = {
+  return sbInsert<User>("users", {
     id: randomUUID(),
     name: provider === "facebook" ? "Facebook хэрэглэгч" : "Хэрэглэгч",
-    email,
-    phone: undefined,
-    passwordHash: hashPassword(randomUUID()),
-    createdAt: new Date().toISOString(),
-  };
-  db().users.push(user);
-  persist();
-  return user;
+    email, phone: null, passwordHash: hashPassword(randomUUID()), createdAt: new Date().toISOString(),
+  });
 }
-
-export function createUser(input: {
-  name: string;
-  email?: string;
-  password: string;
-  phone?: string;
-}): { user?: User; error?: string } {
+export async function createUser(input: { name: string; email?: string; password: string; phone?: string }): Promise<{ user?: User; error?: string }> {
   const email = (input.email || "").trim().toLowerCase();
   const phone = (input.phone || "").trim();
-  if (!email && !phone) {
-    return { error: "Имэйл эсвэл утасны дугаараа оруулна уу." };
-  }
-  if (email && getUserByEmail(email)) {
-    return { error: "Энэ имэйл хаягаар бүртгэл аль хэдийн үүссэн байна." };
-  }
-  if (phone && getUserByPhone(phone)) {
-    return { error: "Энэ утасны дугаараар бүртгэл аль хэдийн үүссэн байна." };
-  }
-  const user: User = {
-    id: randomUUID(),
-    name: input.name.trim(),
-    email,
-    phone: phone || undefined,
-    passwordHash: hashPassword(input.password),
-    createdAt: new Date().toISOString(),
-  };
-  db().users.push(user);
-  persist();
+  if (!email && !phone) return { error: "Имэйл эсвэл утасны дугаараа оруулна уу." };
+  if (email && (await getUserByEmail(email))) return { error: "Энэ имэйл хаягаар бүртгэл аль хэдийн үүссэн байна." };
+  if (phone && (await getUserByPhone(phone))) return { error: "Энэ утасны дугаараар бүртгэл аль хэдийн үүссэн байна." };
+  const user = await sbInsert<User>("users", {
+    id: randomUUID(), name: input.name.trim(), email: email || null, phone: phone || null,
+    passwordHash: hashPassword(input.password), createdAt: new Date().toISOString(),
+  });
   return { user };
 }
-
-export function authenticate(identifier: string, password: string): User | null {
-  const user = getUserByEmailOrPhone(identifier);
+export async function authenticate(identifier: string, password: string): Promise<User | null> {
+  const user = await getUserByEmailOrPhone(identifier);
   if (!user) return null;
   if (!verifyPassword(password, user.passwordHash)) return null;
   return user;
 }
-
-export function createOrder(input: {
-  userId: string | null;
-  items: OrderItem[];
-  customer: Order["customer"];
-}): Order {
-  const total = input.items.reduce((sum, i) => sum + i.price * i.qty, 0);
-  const order: Order = {
-    id: randomUUID(),
-    userId: input.userId,
-    items: input.items,
-    total,
-    status: "paid",
-    customer: input.customer,
-    createdAt: new Date().toISOString(),
-  };
-  db().orders.unshift(order);
-  persist();
-  return order;
-}
-
-export function getOrdersByUser(userId: string): Order[] {
-  return db().orders.filter((o) => o.userId === userId);
-}
-
-export function createMessage(input: {
-  name: string;
-  email: string;
-  phone?: string;
-  subject: string;
-  message: string;
-}): ContactMessage {
-  const msg: ContactMessage = {
-    id: randomUUID(),
-    name: input.name.trim(),
-    email: input.email.trim(),
-    phone: input.phone?.trim() || undefined,
-    subject: input.subject.trim(),
-    message: input.message.trim(),
-    createdAt: new Date().toISOString(),
-  };
-  db().messages.unshift(msg);
-  persist();
-  return msg;
-}
-
-export function updateUser(
-  id: string,
-  patch: { name?: string; phone?: string; email?: string }
-): { user?: User; error?: string } {
-  const u = getUserById(id);
+export async function updateUser(id: string, patch: { name?: string; phone?: string; email?: string }): Promise<{ user?: User; error?: string }> {
+  const u = await getUserById(id);
   if (!u) return { error: "Хэрэглэгч олдсонгүй." };
+  const p: Record<string, unknown> = {};
   if (patch.email !== undefined) {
     const email = String(patch.email).trim().toLowerCase();
     if (email && email !== u.email) {
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { error: "Имэйл хаяг буруу байна." };
-      const exists = getUserByEmail(email);
+      const exists = await getUserByEmail(email);
       if (exists && exists.id !== id) return { error: "Энэ имэйл хаягаар бүртгэл аль хэдийн үүссэн байна." };
-      u.email = email;
+      p.email = email;
     }
   }
-  if (patch.name !== undefined && String(patch.name).trim()) u.name = String(patch.name).trim();
-  if (patch.phone !== undefined) u.phone = String(patch.phone).trim() || undefined;
-  persist();
-  return { user: u };
+  if (patch.name !== undefined && String(patch.name).trim()) p.name = String(patch.name).trim();
+  if (patch.phone !== undefined) p.phone = String(patch.phone).trim() || null;
+  const user = Object.keys(p).length ? await sbUpdate<User>("users", id, p) : u;
+  return { user: user || u };
+}
+export async function createOrder(input: { userId: string | null; items: OrderItem[]; customer: Order["customer"] }): Promise<Order> {
+  const total = input.items.reduce((sum, i) => sum + i.price * i.qty, 0);
+  return sbInsert<Order>("orders", {
+    id: randomUUID(), userId: input.userId, items: input.items, total, status: "paid", customer: input.customer, createdAt: new Date().toISOString(),
+  });
+}
+export async function getOrdersByUser(userId: string): Promise<Order[]> {
+  return sbSelect<Order>("orders", `user_id=eq.${enc(userId)}&order=created_at.desc`);
+}
+export async function createMessage(input: { name: string; email: string; phone?: string; subject: string; message: string }): Promise<ContactMessage> {
+  return sbInsert<ContactMessage>("messages", {
+    id: randomUUID(), name: input.name.trim(), email: input.email.trim(), phone: input.phone?.trim() || null,
+    subject: input.subject.trim(), message: input.message.trim(), createdAt: new Date().toISOString(),
+  });
 }
 
-// ---------- CMS (admin-managed content) ----------
-export function listCms(kind: CmsItem["kind"]): CmsItem[] {
-  return db()
-    .cmsItems.filter((i) => i.kind === kind)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+// ---------- CMS ----------
+export async function listCms(kind: CmsItem["kind"]): Promise<CmsItem[]> {
+  return sbSelect<CmsItem>("cms_items", `kind=eq.${enc(kind)}&order=created_at.desc`);
 }
-export function allCms(): CmsItem[] {
-  return [...db().cmsItems].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+export async function allCms(): Promise<CmsItem[]> {
+  return sbSelect<CmsItem>("cms_items", "order=created_at.desc");
 }
-export function createCmsItem(input: {
-  kind: CmsItem["kind"];
-  title: string;
-  summary?: string;
-  body?: string;
-  price?: number;
-  category?: string;
-  mode?: CmsItem["mode"];
-}): CmsItem {
-  const item: CmsItem = {
-    id: randomUUID(),
-    kind: input.kind,
-    title: input.title.trim(),
-    summary: (input.summary || "").trim(),
-    body: input.body?.trim() || undefined,
-    price: typeof input.price === "number" && !Number.isNaN(input.price) ? input.price : undefined,
-    category: input.category?.trim() || undefined,
-    mode: input.kind === "course" ? input.mode || "online" : undefined,
+export async function createCmsItem(input: { kind: CmsItem["kind"]; title: string; summary?: string; body?: string; price?: number; category?: string; mode?: CmsItem["mode"] }): Promise<CmsItem> {
+  return sbInsert<CmsItem>("cms_items", {
+    id: randomUUID(), kind: input.kind, title: input.title.trim(), summary: (input.summary || "").trim(),
+    body: input.body?.trim() || null,
+    price: typeof input.price === "number" && !Number.isNaN(input.price) ? input.price : null,
+    category: input.category?.trim() || null,
+    mode: input.kind === "course" ? input.mode || "online" : null,
     createdAt: new Date().toISOString(),
-  };
-  db().cmsItems.push(item);
-  persist();
-  return item;
+  });
 }
-export function deleteCmsItem(id: string): boolean {
-  const d = db();
-  const i = d.cmsItems.findIndex((x) => x.id === id);
-  if (i < 0) return false;
-  d.cmsItems.splice(i, 1);
-  persist();
+export async function deleteCmsItem(id: string): Promise<boolean> {
+  await sbDelete("cms_items", id);
   return true;
+}
+
+export async function adminStats(): Promise<{ users: number; orders: number; revenue: number; messages: number; usersList: PublicUser[]; ordersList: Order[] }> {
+  const [users, orders, messages] = await Promise.all([
+    sbSelect<User>("users", "order=created_at.desc"),
+    sbSelect<Order>("orders", "order=created_at.desc"),
+    sbSelect<{ id: string }>("messages", ""),
+  ]);
+  return {
+    users: users.length, orders: orders.length,
+    revenue: orders.reduce((s, o) => s + o.total, 0), messages: messages.length,
+    usersList: users.map(toPublicUser), ordersList: orders,
+  };
 }

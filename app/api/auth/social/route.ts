@@ -11,7 +11,11 @@ export async function POST(req: Request) {
   const provider = String(body?.provider || "facebook").toLowerCase();
   if (provider !== "facebook")
     return NextResponse.json({ error: "Дэмжигдэхгүй нэвтрэлт." }, { status: 400 });
-  const user = getOrCreateSocialUser(provider);
-  await createSession(user.id);
-  return NextResponse.json({ user: toPublicUser(user) });
+  try {
+    const user = await getOrCreateSocialUser(provider);
+    await createSession(user.id);
+    return NextResponse.json({ user: toPublicUser(user) });
+  } catch (e) {
+    return NextResponse.json({ error: "Серверийн алдаа: " + (e instanceof Error ? e.message : String(e)) }, { status: 500 });
+  }
 }

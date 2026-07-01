@@ -10,7 +10,7 @@ const KINDS = ["service", "course", "product", "resource"] as const;
 async function guard() {
   const uid = await getSessionUserId();
   if (!uid) return { ok: false as const, res: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
-  const me = getUserById(uid);
+  const me = await getUserById(uid);
   const adminEmail = process.env.ADMIN_EMAIL;
   if (adminEmail && me?.email !== adminEmail)
     return { ok: false as const, res: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
@@ -20,7 +20,7 @@ async function guard() {
 export async function GET() {
   const g = await guard();
   if (!g.ok) return g.res;
-  return NextResponse.json({ items: allCms() });
+  return NextResponse.json({ items: await allCms() });
 }
 
 export async function POST(req: Request) {
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Төрөл буруу байна." }, { status: 400 });
   if (!body.title || !String(body.title).trim())
     return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
-  const item = createCmsItem({
+  const item = await createCmsItem({
     kind: body.kind,
     title: String(body.title),
     summary: body.summary ? String(body.summary) : "",
@@ -48,6 +48,6 @@ export async function DELETE(req: Request) {
   if (!g.ok) return g.res;
   const id = new URL(req.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
-  deleteCmsItem(id);
+  await deleteCmsItem(id);
   return NextResponse.json({ ok: true });
 }

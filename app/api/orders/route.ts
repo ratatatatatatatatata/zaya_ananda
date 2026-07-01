@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const uid = await getSessionUserId();
   if (!uid) return NextResponse.json({ orders: [] });
-  return NextResponse.json({ orders: getOrdersByUser(uid) });
+  return NextResponse.json({ orders: await getOrdersByUser(uid) });
 }
 
 export async function POST(req: Request) {
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
   if (resolved.length === 0)
     return NextResponse.json({ error: "No matching items." }, { status: 400 });
 
-  const order = createOrder({
+  const order = await createOrder({
     userId: uid,
     items: resolved,
     customer: {
