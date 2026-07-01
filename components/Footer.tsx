@@ -16,6 +16,7 @@ export function Footer() {
       { href: "/about", label: t("nav.about") },
       { href: "/contact", label: t("nav.contact") },
       { href: "/account", label: t("nav.account") },
+      { href: "/admin", label: t("admin.title") },
     ] },
   ];
 
@@ -49,9 +50,9 @@ export function Footer() {
         <div>
           <h3 className="font-display text-base font-semibold text-ink">{t("nav.contact")}</h3>
           <ul className="mt-4 space-y-2.5 text-sm text-muted">
-            <li>📞 {siteConfig.phone}</li>
-            <li>✉️ {siteConfig.email}</li>
-            <li>📍 {tr(siteConfig.address)}</li>
+            <li>📞 <a href={"tel:" + siteConfig.phone.replace(/\D/g, "")} className="transition hover:text-primary-700">{siteConfig.phone}</a></li>
+            <li>✉️ <a href={"mailto:" + siteConfig.email} className="transition hover:text-primary-700">{siteConfig.email}</a></li>
+            <li>📍 <a href={"https://www.google.com/maps?q=" + encodeURIComponent(siteConfig.mapQuery)} target="_blank" rel="noreferrer" className="transition hover:text-primary-700">{tr(siteConfig.address)}</a></li>
             <li>🕒 {tr(siteConfig.workingHours)}</li>
           </ul>
         </div>

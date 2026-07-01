@@ -16,6 +16,9 @@ export interface Service {
   glyph: string;
   tone: Tone;
   highlights: LA;
+  instructor?: string;
+  deliveryType?: L;
+  tags?: string[];
   featured?: boolean;
 }
 
@@ -30,11 +33,16 @@ export interface Course {
   lessons: number;
   duration: L;
   format: L;
+  mode?: "online" | "tankhim" | "both";
   category: L;
   glyph: string;
   tone: Tone;
   highlights: LA;
   outcomes: LA;
+  instructor?: string;
+  students?: number;
+  certificate?: boolean;
+  startDate?: string;
   featured?: boolean;
 }
 
@@ -51,6 +59,8 @@ export interface Product {
   tone: Tone;
   inStock: boolean;
   badge?: L;
+  material?: L;
+  meaning?: L;
   featured?: boolean;
 }
 
@@ -125,5 +135,24 @@ export interface ContactMessage {
   phone?: string;
   subject: string;
   message: string;
+  createdAt: string;
+}
+
+export interface EventItem {
+  id: string;
+  type: L;
+  title: L;
+  date: string;
+}
+
+export interface CmsItem {
+  id: string;
+  kind: "service" | "course" | "product" | "resource";
+  title: string;
+  summary: string;
+  body?: string;
+  price?: number;
+  category?: string;
+  mode?: "online" | "tankhim" | "both";
   createdAt: string;
 }

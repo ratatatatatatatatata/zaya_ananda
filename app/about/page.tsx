@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/PageHeader";
 import { CtaBand } from "@/components/CtaBand";
+import { CalmBand } from "@/components/CalmBand";
 import { SectionHeading } from "@/components/ui";
 import { GlyphTile } from "@/components/GlyphTile";
 import { Reveal } from "@/components/Reveal";
@@ -85,6 +86,7 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <CalmBand />
       <CtaBand />
     </>
   );

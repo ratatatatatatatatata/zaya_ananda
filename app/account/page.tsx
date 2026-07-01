@@ -9,11 +9,21 @@ import { formatMNT } from "@/lib/format";
 import type { Order } from "@/lib/types";
 
 export default function AccountPage() {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout, updateProfile } = useAuth();
   const { t } = useI18n();
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
+
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({ name: "", phone: "", email: "" });
+  const [saving, setSaving] = useState(false);
+  const [saveErr, setSaveErr] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    if (user) setForm({ name: user.name, phone: user.phone || "", email: user.email });
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -23,6 +33,28 @@ export default function AccountPage() {
       .catch(() => setOrders([]))
       .finally(() => setOrdersLoading(false));
   }, [user]);
+
+  async function onSave(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setSaveErr("");
+    try {
+      await updateProfile(form);
+      setEditing(false);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      setSaveErr(err instanceof Error ? err.message : "Error");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function cancelEdit() {
+    if (user) setForm({ name: user.name, phone: user.phone || "", email: user.email });
+    setSaveErr("");
+    setEditing(false);
+  }
 
   if (loading) {
     return (
@@ -68,12 +100,45 @@ export default function AccountPage() {
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_2fr]">
           <div className="card h-fit p-6">
-            <h2 className="font-display text-lg font-semibold text-ink">{t("account.profile")}</h2>
-            <dl className="mt-4 space-y-3 border-t border-line pt-4 text-sm">
-              <div className="flex justify-between"><dt className="text-muted">{t("form.name")}</dt><dd className="font-medium text-ink">{user.name}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted">{t("form.email")}</dt><dd className="font-medium text-ink">{user.email}</dd></div>
-              {user.phone && <div className="flex justify-between"><dt className="text-muted">{t("form.phone")}</dt><dd className="font-medium text-ink">{user.phone}</dd></div>}
-            </dl>
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-lg font-semibold text-ink">{editing ? t("account.editTitle") : t("account.profile")}</h2>
+              {!editing && (
+                <button onClick={() => setEditing(true)} className="text-sm font-semibold text-primary-700 transition hover:underline">
+                  ✎ {t("account.edit")}
+                </button>
+              )}
+            </div>
+
+            {editing ? (
+              <form onSubmit={onSave} className="mt-4 space-y-3 border-t border-line pt-4">
+                <div>
+                  <label className="field-label" htmlFor="pname">{t("form.name")}</label>
+                  <input id="pname" required className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="pphone">{t("form.phone")}</label>
+                  <input id="pphone" className="input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="9900 0000" />
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="pemail">{t("form.email")}</label>
+                  <input id="pemail" type="email" required className="input" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                </div>
+                {saveErr && <p className="rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-600">{saveErr}</p>}
+                <div className="flex gap-2 pt-1">
+                  <button type="submit" disabled={saving} className="btn btn-primary btn-sm flex-1">{saving ? t("account.saving") : t("account.save")}</button>
+                  <button type="button" onClick={cancelEdit} className="btn btn-outline btn-sm">{t("account.cancel")}</button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <dl className="mt-4 space-y-3 border-t border-line pt-4 text-sm">
+                  <div className="flex justify-between"><dt className="text-muted">{t("form.name")}</dt><dd className="font-medium text-ink">{user.name}</dd></div>
+                  <div className="flex justify-between"><dt className="text-muted">{t("form.email")}</dt><dd className="font-medium text-ink">{user.email}</dd></div>
+                  <div className="flex justify-between"><dt className="text-muted">{t("form.phone")}</dt><dd className="font-medium text-ink">{user.phone || "—"}</dd></div>
+                </dl>
+                {saved && <p className="mt-3 text-sm font-medium text-jade-600">{t("account.saved")}</p>}
+              </>
+            )}
           </div>
 
           <div className="card p-6">

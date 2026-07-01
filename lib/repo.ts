@@ -8,6 +8,7 @@ import type {
   Order,
   OrderItem,
   ContactMessage,
+  CmsItem,
 } from "./types";
 
 export const catalog = { services, courses, products };
@@ -38,20 +39,58 @@ export function getUserById(id: string): User | null {
   return db().users.find((u) => u.id === id) || null;
 }
 
+export function getUserByPhone(phone: string): User | null {
+  const p = (phone || "").trim();
+  if (!p) return null;
+  return db().users.find((u) => (u.phone || "").trim() === p) || null;
+}
+
+export function getUserByEmailOrPhone(identifier: string): User | null {
+  const v = (identifier || "").trim();
+  if (!v) return null;
+  if (v.includes("@")) return getUserByEmail(v);
+  return getUserByPhone(v) || getUserByEmail(v);
+}
+
+export function getOrCreateSocialUser(provider: string): User {
+  const email = provider.toLowerCase() + ".demo@zaya.local";
+  const existing = getUserByEmail(email);
+  if (existing) return existing;
+  const user: User = {
+    id: randomUUID(),
+    name: provider === "facebook" ? "Facebook хэрэглэгч" : "Хэрэглэгч",
+    email,
+    phone: undefined,
+    passwordHash: hashPassword(randomUUID()),
+    createdAt: new Date().toISOString(),
+  };
+  db().users.push(user);
+  persist();
+  return user;
+}
+
 export function createUser(input: {
   name: string;
-  email: string;
+  email?: string;
   password: string;
   phone?: string;
 }): { user?: User; error?: string } {
-  if (getUserByEmail(input.email)) {
+  const email = (input.email || "").trim().toLowerCase();
+  const phone = (input.phone || "").trim();
+  if (!email && !phone) {
+    return { error: "Имэйл эсвэл утасны дугаараа оруулна уу." };
+  }
+  if (email && getUserByEmail(email)) {
     return { error: "Энэ имэйл хаягаар бүртгэл аль хэдийн үүссэн байна." };
+  }
+  if (phone && getUserByPhone(phone)) {
+    return { error: "Энэ утасны дугаараар бүртгэл аль хэдийн үүссэн байна." };
   }
   const user: User = {
     id: randomUUID(),
     name: input.name.trim(),
-    email: input.email.trim().toLowerCase(),
-    phone: input.phone?.trim() || undefined,
+    email,
+    phone: phone || undefined,
     passwordHash: hashPassword(input.password),
     createdAt: new Date().toISOString(),
   };
@@ -60,8 +99,8 @@ export function createUser(input: {
   return { user };
 }
 
-export function authenticate(email: string, password: string): User | null {
-  const user = getUserByEmail(email);
+export function authenticate(identifier: string, password: string): User | null {
+  const user = getUserByEmailOrPhone(identifier);
   if (!user) return null;
   if (!verifyPassword(password, user.passwordHash)) return null;
   return user;
@@ -110,4 +149,67 @@ export function createMessage(input: {
   db().messages.unshift(msg);
   persist();
   return msg;
+}
+
+export function updateUser(
+  id: string,
+  patch: { name?: string; phone?: string; email?: string }
+): { user?: User; error?: string } {
+  const u = getUserById(id);
+  if (!u) return { error: "Хэрэглэгч олдсонгүй." };
+  if (patch.email !== undefined) {
+    const email = String(patch.email).trim().toLowerCase();
+    if (email && email !== u.email) {
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { error: "Имэйл хаяг буруу байна." };
+      const exists = getUserByEmail(email);
+      if (exists && exists.id !== id) return { error: "Энэ имэйл хаягаар бүртгэл аль хэдийн үүссэн байна." };
+      u.email = email;
+    }
+  }
+  if (patch.name !== undefined && String(patch.name).trim()) u.name = String(patch.name).trim();
+  if (patch.phone !== undefined) u.phone = String(patch.phone).trim() || undefined;
+  persist();
+  return { user: u };
+}
+
+// ---------- CMS (admin-managed content) ----------
+export function listCms(kind: CmsItem["kind"]): CmsItem[] {
+  return db()
+    .cmsItems.filter((i) => i.kind === kind)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+export function allCms(): CmsItem[] {
+  return [...db().cmsItems].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+export function createCmsItem(input: {
+  kind: CmsItem["kind"];
+  title: string;
+  summary?: string;
+  body?: string;
+  price?: number;
+  category?: string;
+  mode?: CmsItem["mode"];
+}): CmsItem {
+  const item: CmsItem = {
+    id: randomUUID(),
+    kind: input.kind,
+    title: input.title.trim(),
+    summary: (input.summary || "").trim(),
+    body: input.body?.trim() || undefined,
+    price: typeof input.price === "number" && !Number.isNaN(input.price) ? input.price : undefined,
+    category: input.category?.trim() || undefined,
+    mode: input.kind === "course" ? input.mode || "online" : undefined,
+    createdAt: new Date().toISOString(),
+  };
+  db().cmsItems.push(item);
+  persist();
+  return item;
+}
+export function deleteCmsItem(id: string): boolean {
+  const d = db();
+  const i = d.cmsItems.findIndex((x) => x.id === id);
+  if (i < 0) return false;
+  d.cmsItems.splice(i, 1);
+  persist();
+  return true;
 }

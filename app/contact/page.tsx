@@ -30,11 +30,14 @@ export default function ContactPage() {
     }
   }
 
+  const digits = siteConfig.phone.replace(/\D/g, "");
+  const mapUrl = "https://www.google.com/maps?q=" + encodeURIComponent(siteConfig.mapQuery);
+  const mapEmbed = mapUrl + "&z=17&output=embed";
   const info = [
-    { icon: "📞", label: t("form.phone"), value: siteConfig.phone },
-    { icon: "✉️", label: t("form.email"), value: siteConfig.email },
-    { icon: "📍", label: t("contact.address"), value: tr(siteConfig.address) },
-    { icon: "🕒", label: t("contact.hours"), value: tr(siteConfig.workingHours) },
+    { icon: "📞", label: t("form.phone"), value: siteConfig.phone, href: "tel:" + digits },
+    { icon: "✉️", label: t("form.email"), value: siteConfig.email, href: "mailto:" + siteConfig.email },
+    { icon: "📍", label: t("contact.address"), value: tr(siteConfig.address), href: mapUrl },
+    { icon: "🕒", label: t("contact.hours"), value: tr(siteConfig.workingHours), href: "" },
   ];
 
   return (
@@ -48,7 +51,7 @@ export default function ContactPage() {
                 <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary-50 text-xl">{i.icon}</div>
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wide text-muted">{i.label}</p>
-                  <p className="font-semibold text-ink">{i.value}</p>
+                  {i.href ? <a href={i.href} target={i.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="font-semibold text-ink transition hover:text-primary-700">{i.value}</a> : <p className="font-semibold text-ink">{i.value}</p>}
                 </div>
               </div>
             ))}
@@ -95,6 +98,11 @@ export default function ContactPage() {
                 </button>
               </form>
             )}
+          </div>
+        </div>
+        <div className="container-px mt-12">
+          <div className="overflow-hidden rounded-3xl border border-line shadow-card">
+            <iframe title="Zaya&apos;s Ananda" src={mapEmbed} className="h-[380px] w-full" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
           </div>
         </div>
       </section>

@@ -17,11 +17,13 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   register: (input: {
     name: string;
-    email: string;
+    email?: string;
     password: string;
     phone?: string;
   }) => Promise<void>;
+  social: (provider: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (input: { name?: string; phone?: string; email?: string }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -67,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const register = useCallback(
-    async (input: { name: string; email: string; password: string; phone?: string }) => {
+    async (input: { name: string; email?: string; password: string; phone?: string }) => {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,13 +82,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const social = useCallback(async (provider: string) => {
+    const res = await fetch("/api/auth/social", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ provider }),
+    });
+    if (!res.ok) throw new Error(await readError(res));
+    const data = await res.json();
+    setUser(data.user);
+  }, []);
+
   const logout = useCallback(async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     setUser(null);
   }, []);
 
+  const updateProfile = useCallback(
+    async (input: { name?: string; phone?: string; email?: string }) => {
+      const res = await fetch("/api/account", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) throw new Error(await readError(res));
+      const data = await res.json();
+      setUser(data.user);
+    },
+    []
+  );
+
   return (
-    <AuthContext.Provider value={{ user, loading, refresh, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, refresh, login, register, social, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

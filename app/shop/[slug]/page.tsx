@@ -4,6 +4,7 @@ import { products } from "@/data/content";
 import { GlyphTile } from "@/components/GlyphTile";
 import { AddToCart } from "@/components/AddToCart";
 import { ProductCard } from "@/components/Cards";
+import { EnergyWaves } from "@/components/EnergyWaves";
 import { T, Tr } from "@/components/T";
 import { formatMNT } from "@/lib/format";
 import { pick } from "@/lib/i18n-core";
@@ -32,9 +33,10 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           </nav>
 
           <div className="grid gap-10 lg:grid-cols-2">
-            <div className="relative flex items-center justify-center overflow-hidden rounded-4xl border border-line bg-gradient-to-br from-cream to-primary-50 p-10">
-              <GlyphTile glyph={p.glyph} tone={p.tone} size="xl" className="h-52 w-52 text-8xl" />
-              {p.badge && (<span className="absolute left-6 top-6 rounded-full bg-ink px-3 py-1 text-xs font-bold text-white"><Tr v={p.badge} /></span>)}
+            <div className="relative isolate flex items-center justify-center overflow-hidden rounded-4xl border border-line bg-gradient-to-br from-aqua to-primary-50 p-10">
+              <EnergyWaves />
+              <GlyphTile glyph={p.glyph} tone={p.tone} size="xl" className="relative z-10 h-52 w-52 text-8xl animate-floaty" />
+              {p.badge && (<span className="absolute left-6 top-6 z-10 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-ink"><Tr v={p.badge} /></span>)}
             </div>
 
             <div className="flex flex-col">

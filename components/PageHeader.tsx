@@ -1,23 +1,17 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { T } from "./T";
+import { EnergyWaves } from "./EnergyWaves";
+import { MeditationFigure } from "./MeditationFigure";
 
-export function PageHeader({
-  title,
-  desc,
-  crumb,
-}: {
-  title: ReactNode;
-  desc?: ReactNode;
-  crumb?: ReactNode;
-}) {
+export function PageHeader({ title, desc, crumb }: { title: ReactNode; desc?: ReactNode; crumb?: ReactNode }) {
   return (
-    <section className="relative overflow-hidden border-b border-line bg-aurora">
-      <div className="container-px py-14 sm:py-20">
+    <section className="relative isolate overflow-hidden border-b border-line bg-aurora">
+      <EnergyWaves />
+      <MeditationFigure tone="jade" showAura={false} className="pointer-events-none absolute -right-2 bottom-0 hidden w-44 opacity-30 lg:block" />
+      <div className="relative z-10 container-px py-16 sm:py-20">
         <nav className="mb-4 flex items-center gap-2 text-sm text-muted">
-          <Link href="/" className="transition hover:text-primary-700">
-            <T k="nav.home" />
-          </Link>
+          <Link href="/" className="transition hover:text-primary-700"><T k="nav.home" /></Link>
           <span>/</span>
           <span className="font-medium text-ink">{crumb ?? title}</span>
         </nav>

@@ -3,3 +3,9 @@ node_modules
 out
 *.log
 install.done
+.env
+.env.local
+.env*.local
+/data/db.json
+.DS_Store
+.vercel

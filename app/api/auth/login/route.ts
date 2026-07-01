@@ -8,11 +8,12 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Буруу хүсэлт." }, { status: 400 });
-  const { email, password } = body;
-  if (!email || !password)
-    return NextResponse.json({ error: "Имэйл болон нууц үгээ оруулна уу." }, { status: 400 });
+  const { email, identifier, password } = body;
+  const id = identifier || email;
+  if (!id || !password)
+    return NextResponse.json({ error: "Имэйл/утас болон нууц үгээ оруулна уу." }, { status: 400 });
 
-  const user = authenticate(String(email), String(password));
+  const user = authenticate(String(id), String(password));
   if (!user)
     return NextResponse.json({ error: "Имэйл эсвэл нууц үг буруу байна." }, { status: 401 });
 

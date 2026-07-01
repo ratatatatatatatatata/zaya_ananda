@@ -1,18 +1,19 @@
 import fs from "fs";
 import path from "path";
-import type { User, Order, ContactMessage } from "@/lib/types";
+import type { User, Order, ContactMessage, CmsItem } from "@/lib/types";
 
 interface DBShape {
   users: User[];
   orders: Order[];
   messages: ContactMessage[];
+  cmsItems: CmsItem[];
 }
 
 const DB_DIR = path.join(process.cwd(), "data");
 const DB_FILE = path.join(DB_DIR, "db.json");
 
 function initial(): DBShape {
-  return { users: [], orders: [], messages: [] };
+  return { users: [], orders: [], messages: [], cmsItems: [] };
 }
 
 function load(): DBShape {
