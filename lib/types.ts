@@ -154,5 +154,12 @@ export interface CmsItem {
   price?: number;
   category?: string;
   mode?: "online" | "tankhim" | "both";
+  image?: string;
+  videoLessons?: number;
+  students?: number;
+  views?: number;
+  teacherName?: string;
+  teacherImage?: string;
+  teacherInfo?: string;
   createdAt: string;
 }

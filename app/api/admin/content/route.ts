@@ -31,14 +31,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Төрөл буруу байна." }, { status: 400 });
   if (!body.title || !String(body.title).trim())
     return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
+  const num = (v: unknown) => (v !== undefined && v !== null && v !== "" ? Number(v) : undefined);
   const item = await createCmsItem({
     kind: body.kind,
     title: String(body.title),
     summary: body.summary ? String(body.summary) : "",
     body: body.body ? String(body.body) : undefined,
-    price: body.price !== undefined && body.price !== "" ? Number(body.price) : undefined,
+    price: num(body.price),
     category: body.category ? String(body.category) : undefined,
     mode: body.mode,
+    image: body.image ? String(body.image) : undefined,
+    videoLessons: num(body.videoLessons),
+    students: num(body.students),
+    views: num(body.views),
+    teacherName: body.teacherName ? String(body.teacherName) : undefined,
+    teacherImage: body.teacherImage ? String(body.teacherImage) : undefined,
+    teacherInfo: body.teacherInfo ? String(body.teacherInfo) : undefined,
   });
   return NextResponse.json({ item });
 }

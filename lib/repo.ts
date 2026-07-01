@@ -106,13 +106,30 @@ export async function listCms(kind: CmsItem["kind"]): Promise<CmsItem[]> {
 export async function allCms(): Promise<CmsItem[]> {
   return sbSelect<CmsItem>("cms_items", "order=created_at.desc");
 }
-export async function createCmsItem(input: { kind: CmsItem["kind"]; title: string; summary?: string; body?: string; price?: number; category?: string; mode?: CmsItem["mode"] }): Promise<CmsItem> {
+const numOrNull = (v: unknown) => (typeof v === "number" && !Number.isNaN(v) ? v : null);
+
+export async function getCmsById(id: string): Promise<CmsItem | null> {
+  const rows = await sbSelect<CmsItem>("cms_items", `id=eq.${enc(id)}&limit=1`);
+  return rows[0] || null;
+}
+
+export async function createCmsItem(input: {
+  kind: CmsItem["kind"]; title: string; summary?: string; body?: string; price?: number; category?: string; mode?: CmsItem["mode"];
+  image?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherInfo?: string;
+}): Promise<CmsItem> {
   return sbInsert<CmsItem>("cms_items", {
     id: randomUUID(), kind: input.kind, title: input.title.trim(), summary: (input.summary || "").trim(),
     body: input.body?.trim() || null,
-    price: typeof input.price === "number" && !Number.isNaN(input.price) ? input.price : null,
+    price: numOrNull(input.price),
     category: input.category?.trim() || null,
     mode: input.kind === "course" ? input.mode || "online" : null,
+    image: input.image || null,
+    videoLessons: numOrNull(input.videoLessons),
+    students: numOrNull(input.students),
+    views: numOrNull(input.views),
+    teacherName: input.teacherName?.trim() || null,
+    teacherImage: input.teacherImage || null,
+    teacherInfo: input.teacherInfo?.trim() || null,
     createdAt: new Date().toISOString(),
   });
 }

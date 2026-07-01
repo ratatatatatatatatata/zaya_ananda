@@ -44,3 +44,12 @@ create table if not exists messages (
 
 create index if not exists cms_items_kind_idx on cms_items(kind);
 create index if not exists orders_user_idx on orders(user_id);
+
+-- Rich content fields (image, counts, teacher) — run these in Supabase SQL Editor:
+alter table cms_items add column if not exists image         text;
+alter table cms_items add column if not exists video_lessons integer;
+alter table cms_items add column if not exists students      integer;
+alter table cms_items add column if not exists views         integer;
+alter table cms_items add column if not exists teacher_name  text;
+alter table cms_items add column if not exists teacher_image text;
+alter table cms_items add column if not exists teacher_info  text;
