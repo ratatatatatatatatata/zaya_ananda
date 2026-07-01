@@ -27,7 +27,7 @@ function compressImage(file: File, maxW = 900, quality = 0.82): Promise<string> 
   });
 }
 
-const EMPTY = { title: "", category: "", summary: "", body: "", price: "", mode: "online", image: "", videoLessons: "", students: "", views: "", teacherName: "", teacherImage: "", teacherInfo: "" };
+const EMPTY = { title: "", category: "", summary: "", body: "", price: "", mode: "online", image: "", videoLessons: "", students: "", views: "", teacherName: "", teacherImage: "", teacherInfo: "", accessDays: "" };
 
 export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
   const [items, setItems] = useState<CmsItem[]>([]);
@@ -107,6 +107,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
               <div><label className="field-label">Видео хичээлийн тоо</label><input className="input" type="number" value={form.videoLessons} onChange={(e) => set("videoLessons", e.target.value)} /></div>
               <div><label className="field-label">Суралцагчийн тоо</label><input className="input" type="number" value={form.students} onChange={(e) => set("students", e.target.value)} /></div>
               <div><label className="field-label">Үзсэн тоо</label><input className="input" type="number" value={form.views} onChange={(e) => set("views", e.target.value)} /></div>
+              <div><label className="field-label">Хандах хугацаа (хоног)</label><input className="input" type="number" value={form.accessDays} onChange={(e) => set("accessDays", e.target.value)} placeholder="жишээ: 30" /></div>
             </div>
           )}
 

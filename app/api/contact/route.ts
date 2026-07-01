@@ -8,12 +8,12 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Буруу хүсэлт." }, { status: 400 });
   const { name, email, phone, subject, message } = body;
-  if (!name || !email || !message)
-    return NextResponse.json({ error: "Нэр, имэйл, зурвасаа бүрэн бичнэ үү." }, { status: 400 });
+  if (!name || !message || (!email && !phone))
+    return NextResponse.json({ error: "Нэр, зурвас, имэйл эсвэл утсаа бичнэ үү." }, { status: 400 });
 
   const msg = await createMessage({
     name: String(name),
-    email: String(email),
+    email: email ? String(email) : "",
     phone: phone ? String(phone) : undefined,
     subject: subject ? String(subject) : "Холбоо барих хүсэлт",
     message: String(message),

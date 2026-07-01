@@ -8,7 +8,7 @@ import { useI18n } from "@/lib/i18n";
 import { formatMNT, cx } from "@/lib/format";
 import { Icon } from "@/components/Icon";
 import { AdminContentManager } from "@/components/AdminContentManager";
-import type { Order, PublicUser } from "@/lib/types";
+import type { Order, PublicUser, ContactMessage } from "@/lib/types";
 
 const nav = [
   { id: "overview", k: "admin.overview", icon: "sparkles" },
@@ -19,13 +19,14 @@ const nav = [
   { id: "products", k: "admin.productsM", icon: "laptop" },
   { id: "events", k: "admin.eventsM", icon: "calendar" },
   { id: "reviews", k: "admin.reviews", icon: "star" },
+  { id: "messages", k: "nav.contact", icon: "user" },
 ];
 
 export default function AdminPage() {
   const { user, loading } = useAuth();
   const { t, tr, lang } = useI18n();
   const [tab, setTab] = useState("overview");
-  const [data, setData] = useState<{ stats: any; users: PublicUser[]; orders: Order[] } | null>(null);
+  const [data, setData] = useState<{ stats: any; users: PublicUser[]; orders: Order[]; messages: ContactMessage[] } | null>(null);
   const [denied, setDenied] = useState(false);
   const [cmsCount, setCmsCount] = useState(0);
 
@@ -154,6 +155,13 @@ export default function AdminPage() {
             {tab === "courses" && <AdminContentManager kind="course" />}
             {tab === "products" && <AdminContentManager kind="product" />}
             {tab === "events" && <AdminContentManager kind="resource" />}
+            {tab === "messages" && (
+              <div className="card overflow-x-auto"><table className="w-full min-w-[680px]">
+                <thead className="border-b border-line bg-aqua"><tr><Th>{t("admin.colName")}</Th><Th>{t("admin.colEmail")}</Th><Th>{t("form.phone")}</Th><Th>{t("contact.subject")}</Th><Th>{t("contact.message")}</Th><Th>{t("admin.colDate")}</Th></tr></thead>
+                <tbody>{(data?.messages ?? []).map((m) => (<tr key={m.id} className="border-b border-line last:border-0"><Td className="font-medium text-ink">{m.name}</Td><Td>{m.email || "—"}</Td><Td>{m.phone || "—"}</Td><Td>{m.subject}</Td><Td className="max-w-md truncate">{m.message}</Td><Td>{m.createdAt.slice(0, 10)}</Td></tr>))}
+                {(!data || data.messages.length === 0) && <tr><Td className="text-muted">{t("admin.empty")}</Td></tr>}</tbody>
+              </table></div>
+            )}
             {tab === "reviews" && (
               <div className="card overflow-x-auto"><table className="w-full min-w-[480px]">
                 <thead className="border-b border-line bg-aqua"><tr><Th>{t("admin.colName")}</Th><Th>★</Th><Th>{t("admin.reviews")}</Th></tr></thead>

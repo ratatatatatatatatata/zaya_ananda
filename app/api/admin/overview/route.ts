@@ -16,5 +16,6 @@ export async function GET() {
     stats: { users: s.users, orders: s.orders, revenue: s.revenue, messages: s.messages },
     users: s.usersList,
     orders: s.ordersList,
+    messages: s.messagesList,
   });
 }

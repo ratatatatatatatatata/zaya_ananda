@@ -93,6 +93,15 @@ export async function updateOrderStatus(id: string, status: Order["status"]): Pr
   return sbUpdate<Order>("orders", id, { status });
 }
 
+export async function getOrderById(id: string): Promise<Order | null> {
+  const rows = await sbSelect<Order>("orders", `id=eq.${enc(id)}&limit=1`);
+  return rows[0] || null;
+}
+
+export async function updateOrder(id: string, patch: { status?: Order["status"]; expiresAt?: string | null }): Promise<Order | null> {
+  return sbUpdate<Order>("orders", id, patch as Record<string, unknown>);
+}
+
 export async function getOrdersByUser(userId: string): Promise<Order[]> {
   return sbSelect<Order>("orders", `user_id=eq.${enc(userId)}&order=created_at.desc`);
 }
@@ -119,7 +128,7 @@ export async function getCmsById(id: string): Promise<CmsItem | null> {
 
 export async function createCmsItem(input: {
   kind: CmsItem["kind"]; title: string; summary?: string; body?: string; price?: number; category?: string; mode?: CmsItem["mode"];
-  image?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherInfo?: string;
+  image?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherInfo?: string; accessDays?: number;
 }): Promise<CmsItem> {
   return sbInsert<CmsItem>("cms_items", {
     id: randomUUID(), kind: input.kind, title: input.title.trim(), summary: (input.summary || "").trim(),
@@ -134,6 +143,7 @@ export async function createCmsItem(input: {
     teacherName: input.teacherName?.trim() || null,
     teacherImage: input.teacherImage || null,
     teacherInfo: input.teacherInfo?.trim() || null,
+    accessDays: numOrNull(input.accessDays),
     createdAt: new Date().toISOString(),
   });
 }
@@ -142,15 +152,15 @@ export async function deleteCmsItem(id: string): Promise<boolean> {
   return true;
 }
 
-export async function adminStats(): Promise<{ users: number; orders: number; revenue: number; messages: number; usersList: PublicUser[]; ordersList: Order[] }> {
+export async function adminStats(): Promise<{ users: number; orders: number; revenue: number; messages: number; usersList: PublicUser[]; ordersList: Order[]; messagesList: ContactMessage[] }> {
   const [users, orders, messages] = await Promise.all([
     sbSelect<User>("users", "order=created_at.desc"),
     sbSelect<Order>("orders", "order=created_at.desc"),
-    sbSelect<{ id: string }>("messages", ""),
+    sbSelect<ContactMessage>("messages", "order=created_at.desc"),
   ]);
   return {
     users: users.length, orders: orders.length,
     revenue: orders.reduce((s, o) => s + o.total, 0), messages: messages.length,
-    usersList: users.map(toPublicUser), ordersList: orders,
+    usersList: users.map(toPublicUser), ordersList: orders, messagesList: messages,
   };
 }

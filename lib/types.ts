@@ -124,6 +124,7 @@ export interface Order {
   items: OrderItem[];
   total: number;
   status: "pending" | "paid" | "cancelled";
+  expiresAt?: string;
   customer: { name: string; email: string; phone: string; note?: string };
   createdAt: string;
 }
@@ -161,5 +162,6 @@ export interface CmsItem {
   teacherName?: string;
   teacherImage?: string;
   teacherInfo?: string;
+  accessDays?: number;
   createdAt: string;
 }

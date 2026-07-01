@@ -32,8 +32,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         setLangState(saved);
         return;
       }
-      const nav = (navigator.language || "").slice(0, 2).toLowerCase();
-      if (messages[nav as Locale]) setLangState(nav as Locale);
     } catch {
       /* ignore */
     }

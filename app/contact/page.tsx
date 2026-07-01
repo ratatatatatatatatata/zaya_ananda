@@ -14,6 +14,7 @@ export default function ContactPage() {
     e.preventDefault();
     const form = e.currentTarget;
     const payload = Object.fromEntries(new FormData(form).entries());
+    if (!payload.email && !payload.phone) { setStatus("error"); setError("Имэйл эсвэл утасны дугаараа оруулна уу."); return; }
     setStatus("sending");
     setError("");
     try {
@@ -81,8 +82,8 @@ export default function ContactPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="field-label" htmlFor="email">{t("form.email")} *</label>
-                  <input id="email" name="email" type="email" required className="input" placeholder="name@email.com" />
+                  <label className="field-label" htmlFor="email">{t("form.email")}</label>
+                  <input id="email" name="email" type="email" className="input" placeholder="name@email.com" />
                 </div>
                 <div>
                   <label className="field-label" htmlFor="subject">{t("contact.subject")}</label>

@@ -48,6 +48,7 @@ export async function POST(req: Request) {
     teacherName: body.teacherName ? String(body.teacherName) : undefined,
     teacherImage: body.teacherImage ? String(body.teacherImage) : undefined,
     teacherInfo: body.teacherInfo ? String(body.teacherInfo) : undefined,
+    accessDays: num(body.accessDays),
   });
     return NextResponse.json({ item });
   } catch (e) {
