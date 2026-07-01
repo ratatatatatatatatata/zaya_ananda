@@ -102,6 +102,16 @@ export async function updateOrder(id: string, patch: { status?: Order["status"];
   return sbUpdate<Order>("orders", id, patch as Record<string, unknown>);
 }
 
+export async function deleteOrder(id: string): Promise<boolean> {
+  await sbDelete("orders", id);
+  return true;
+}
+
+export async function deleteMessage(id: string): Promise<boolean> {
+  await sbDelete("messages", id);
+  return true;
+}
+
 export async function getOrdersByUser(userId: string): Promise<Order[]> {
   return sbSelect<Order>("orders", `user_id=eq.${enc(userId)}&order=created_at.desc`);
 }
