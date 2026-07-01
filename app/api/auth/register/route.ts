@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createUser, toPublicUser } from "@/lib/repo";
+import { createUser, toPublicUser, isAdminEmail } from "@/lib/repo";
 import { createSession } from "@/lib/auth";
 
 export const runtime = "nodejs";
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     if (error || !user)
       return NextResponse.json({ error: error || "Бүртгэл амжилтгүй боллоо." }, { status: 409 });
     await createSession(user.id);
-    return NextResponse.json({ user: toPublicUser(user) });
+    return NextResponse.json({ user: { ...toPublicUser(user), isAdmin: isAdminEmail(user.email) } });
   } catch (e) {
     return NextResponse.json({ error: "Серверийн алдаа: " + (e instanceof Error ? e.message : String(e)) }, { status: 500 });
   }

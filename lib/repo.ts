@@ -15,6 +15,12 @@ export function toPublicUser(u: User): PublicUser {
   return rest;
 }
 
+export function isAdminEmail(email?: string): boolean {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) return true;
+  return (email || "").toLowerCase() === adminEmail.toLowerCase();
+}
+
 export async function getUserByEmail(email: string): Promise<User | null> {
   const e = (email || "").trim().toLowerCase();
   if (!e) return null;

@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { siteConfig } from "@/data/content";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/lib/auth-context";
 
 export function Footer() {
   const { t, tr } = useI18n();
+  const { user } = useAuth();
   const cols = [
     { title: t("nav.services"), links: [
       { href: "/services", label: t("common.allServices") },
@@ -16,7 +18,7 @@ export function Footer() {
       { href: "/about", label: t("nav.about") },
       { href: "/contact", label: t("nav.contact") },
       { href: "/account", label: t("nav.account") },
-      { href: "/admin", label: t("admin.title") },
+      ...(user?.isAdmin ? [{ href: "/admin", label: t("admin.title") }] : []),
     ] },
   ];
 

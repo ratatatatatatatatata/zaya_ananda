@@ -104,6 +104,7 @@ export interface PublicUser {
   email: string;
   phone?: string;
   createdAt: string;
+  isAdmin?: boolean;
 }
 
 export interface User extends PublicUser {

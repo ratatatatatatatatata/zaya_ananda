@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getOrCreateSocialUser, toPublicUser } from "@/lib/repo";
+import { getOrCreateSocialUser, toPublicUser, isAdminEmail } from "@/lib/repo";
 import { createSession } from "@/lib/auth";
 
 export const runtime = "nodejs";
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   try {
     const user = await getOrCreateSocialUser(provider);
     await createSession(user.id);
-    return NextResponse.json({ user: toPublicUser(user) });
+    return NextResponse.json({ user: { ...toPublicUser(user), isAdmin: isAdminEmail(user.email) } });
   } catch (e) {
     return NextResponse.json({ error: "Серверийн алдаа: " + (e instanceof Error ? e.message : String(e)) }, { status: 500 });
   }
