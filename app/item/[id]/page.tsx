@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getCmsById } from "@/lib/repo";
-import { formatMNT } from "@/lib/format";
 import { T } from "@/components/T";
+import { PurchaseBox } from "@/components/PurchaseBox";
 
 export const dynamic = "force-dynamic";
 
@@ -52,13 +52,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
-          <div className="card p-6 text-center">
-            {typeof item.price === "number"
-              ? <p className="price text-3xl">{formatMNT(item.price)}</p>
-              : <p className="font-display text-lg font-semibold text-ink">{item.title}</p>}
-            <Link href="/contact" className="btn btn-primary btn-lg mt-5 w-full">Холбоо барих</Link>
-            <p className="mt-3 text-xs leading-relaxed text-muted">Захиалгын дараа бид тантай холбогдож, тохиромжтой цагийг тохирно.</p>
-          </div>
+          <PurchaseBox id={item.id} title={item.title} price={item.price} />
 
           {(item.teacherName || item.teacherImage || lines.length > 0) && (
             <div className="card p-6">

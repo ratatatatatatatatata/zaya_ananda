@@ -32,6 +32,7 @@ export async function POST(req: Request) {
   if (!body.title || !String(body.title).trim())
     return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
   const num = (v: unknown) => (v !== undefined && v !== null && v !== "" ? Number(v) : undefined);
+  try {
   const item = await createCmsItem({
     kind: body.kind,
     title: String(body.title),
@@ -48,7 +49,10 @@ export async function POST(req: Request) {
     teacherImage: body.teacherImage ? String(body.teacherImage) : undefined,
     teacherInfo: body.teacherInfo ? String(body.teacherInfo) : undefined,
   });
-  return NextResponse.json({ item });
+    return NextResponse.json({ item });
+  } catch (e) {
+    return NextResponse.json({ error: "Хадгалах үед алдаа: " + (e instanceof Error ? e.message : String(e)) }, { status: 500 });
+  }
 }
 
 export async function DELETE(req: Request) {
