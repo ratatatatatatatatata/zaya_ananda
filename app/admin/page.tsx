@@ -45,6 +45,12 @@ export default function AdminPage() {
       .catch(() => {});
   }, [user]);
 
+  async function setOrderStatus(id: string, status: string) {
+    await fetch("/api/admin/orders", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status }) });
+    const r = await fetch("/api/admin/overview", { cache: "no-store" });
+    if (r.ok) setData(await r.json());
+  }
+
   if (loading) return <div className="section"><div className="container-px flex min-h-[40vh] items-center justify-center"><div className="h-10 w-10 animate-spinSlow rounded-full border-2 border-primary-200 border-t-primary-600" /></div></div>;
   if (!user) {
     return <div className="section"><div className="container-px"><div className="mx-auto max-w-md rounded-4xl border border-line bg-white p-10 text-center shadow-card">
@@ -136,7 +142,7 @@ export default function AdminPage() {
                   <thead className="border-b border-line bg-aqua"><tr><Th>#</Th><Th>{t("admin.colName")}</Th><Th>{t("admin.colEmail")}</Th><Th>{t("form.phone")}</Th><Th>{t("admin.colItems")}</Th><Th>{t("admin.colAmount")}</Th><Th>{t("admin.colStatus")}</Th></tr></thead>
                   <tbody>
                     {(data?.orders ?? []).map((o) => (
-                      <tr key={o.id} className="border-b border-line last:border-0"><Td className="font-mono text-xs text-primary-700">{o.id.slice(0, 6).toUpperCase()}</Td><Td>{o.customer.name}</Td><Td>{o.customer.email}</Td><Td>{o.customer.phone || "—"}</Td><Td>{o.items.map((i) => i.title).join(", ")}</Td><Td className="font-semibold text-ink">{formatMNT(o.total)}</Td><Td><span className="rounded-full bg-jade-400/10 px-2.5 py-1 text-xs font-semibold text-jade-600">{t("status." + o.status)}</span></Td></tr>
+                      <tr key={o.id} className="border-b border-line last:border-0"><Td className="font-mono text-xs text-primary-700">{o.id.slice(0, 6).toUpperCase()}</Td><Td>{o.customer.name}</Td><Td>{o.customer.email}</Td><Td>{o.customer.phone || "—"}</Td><Td>{o.items.map((i) => i.title).join(", ")}</Td><Td className="font-semibold text-ink">{formatMNT(o.total)}</Td><Td><div className="flex flex-col gap-1.5"><span className={cx("w-fit rounded-full px-2.5 py-1 text-xs font-semibold", o.status === "paid" ? "bg-jade-400/15 text-jade-600" : o.status === "cancelled" ? "bg-rose-100 text-rose-500" : "bg-amber-100 text-amber-600")}>{t("status." + o.status)}</span>{o.status === "pending" && <div className="flex gap-1.5"><button onClick={() => setOrderStatus(o.id, "paid")} className="rounded-md bg-jade-400/15 px-2 py-1 text-xs font-semibold text-jade-600 hover:bg-jade-400/25">Баталгаажуулах</button><button onClick={() => setOrderStatus(o.id, "cancelled")} className="rounded-md bg-rose-100 px-2 py-1 text-xs font-semibold text-rose-500 hover:bg-rose-200">Цуцлах</button></div>}</div></Td></tr>
                     ))}
                     {(!data || data.orders.length === 0) && <tr><Td className="text-muted">{t("admin.empty")}</Td></tr>}
                   </tbody>

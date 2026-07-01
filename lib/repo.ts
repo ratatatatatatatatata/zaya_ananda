@@ -83,12 +83,16 @@ export async function updateUser(id: string, patch: { name?: string; phone?: str
   const user = Object.keys(p).length ? await sbUpdate<User>("users", id, p) : u;
   return { user: user || u };
 }
-export async function createOrder(input: { userId: string | null; items: OrderItem[]; customer: Order["customer"] }): Promise<Order> {
+export async function createOrder(input: { userId: string | null; items: OrderItem[]; customer: Order["customer"]; status?: Order["status"] }): Promise<Order> {
   const total = input.items.reduce((sum, i) => sum + i.price * i.qty, 0);
   return sbInsert<Order>("orders", {
-    id: randomUUID(), userId: input.userId, items: input.items, total, status: "paid", customer: input.customer, createdAt: new Date().toISOString(),
+    id: randomUUID(), userId: input.userId, items: input.items, total, status: input.status || "pending", customer: input.customer, createdAt: new Date().toISOString(),
   });
 }
+export async function updateOrderStatus(id: string, status: Order["status"]): Promise<Order | null> {
+  return sbUpdate<Order>("orders", id, { status });
+}
+
 export async function getOrdersByUser(userId: string): Promise<Order[]> {
   return sbSelect<Order>("orders", `user_id=eq.${enc(userId)}&order=created_at.desc`);
 }
