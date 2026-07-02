@@ -49,13 +49,18 @@ async function uploadVideo(file: File, onProgress: (p: number) => void): Promise
   return path;
 }
 
+function srtToVtt(s: string): string {
+  const body = s.replace(/\r+/g, "").replace(/(\d\d:\d\d:\d\d),(\d{1,3})/g, "$1.$2");
+  return /^WEBVTT/.test(body.trim()) ? body : "WEBVTT\n\n" + body;
+}
+
 export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
   const [items, setItems] = useState<CmsItem[]>([]);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
   const [form, setForm] = useState(EMPTY);
-  const [lessons, setLessons] = useState<{ title: string; path: string; quality: string; filename?: string; uploading?: boolean; progress?: number }[]>([]);
+  const [lessons, setLessons] = useState<{ title: string; path: string; quality: string; subtitles?: string; filename?: string; uploading?: boolean; progress?: number }[]>([]);
   const set = (k: keyof typeof EMPTY, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
   const load = useCallback(() => {
@@ -72,7 +77,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
     catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
   }
 
-  const updLesson = (idx: number, patch: Partial<{ title: string; path: string; quality: string; filename: string; uploading: boolean; progress: number }>) =>
+  const updLesson = (idx: number, patch: Partial<{ title: string; path: string; quality: string; subtitles: string; filename: string; uploading: boolean; progress: number }>) =>
     setLessons((ls) => ls.map((x, i) => (i === idx ? { ...x, ...patch } : x)));
   async function onPickVideo(e: React.ChangeEvent<HTMLInputElement>, idx: number) {
     const file = e.target.files?.[0]; if (!file) return;
@@ -82,6 +87,14 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
       updLesson(idx, { path, uploading: false, progress: 100 });
     } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Видео байршуулахад алдаа."); updLesson(idx, { uploading: false }); }
   }
+  async function onPickSub(e: React.ChangeEvent<HTMLInputElement>, idx: number) {
+    const file = e.target.files?.[0]; if (!file) return;
+    try {
+      let text = await file.text();
+      if (/\.srt$/i.test(file.name) || !/^WEBVTT/.test(text.trim())) text = srtToVtt(text);
+      updLesson(idx, { subtitles: text });
+    } catch { setErr("Хадмал файл уншихад алдаа."); }
+  }
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
@@ -90,7 +103,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
     try {
       const res = await fetch("/api/admin/content", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind, ...form, mode: kind === "course" ? form.mode : undefined, lessons: kind === "course" ? lessons.filter((l) => l.title.trim() && l.path).map((l) => ({ title: l.title.trim(), path: l.path, quality: l.quality })) : undefined }),
+        body: JSON.stringify({ kind, ...form, mode: kind === "course" ? form.mode : undefined, lessons: kind === "course" ? lessons.filter((l) => l.title.trim() && l.path).map((l) => ({ title: l.title.trim(), path: l.path, quality: l.quality, subtitles: l.subtitles || "" })) : undefined }),
       });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
       setForm(EMPTY); setLessons([]); setOpen(false); load();
@@ -165,6 +178,12 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
                         ? <span className="shrink-0 text-sm font-medium text-primary-700">Байршуулж байна… {l.progress ?? 0}%</span>
                         : <input type="file" accept="video/*" className="text-sm" onChange={(e) => onPickVideo(e, idx)} />}
                       {l.uploading && <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-line"><div className="h-full bg-primary-500 transition-all" style={{ width: (l.progress ?? 0) + "%" }} /></div>}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 pl-9">
+                      <span className="shrink-0 text-xs font-medium text-muted">English хадмал (.vtt/.srt):</span>
+                      {l.subtitles && <span className="text-sm font-medium text-jade-600">✓ Орсон</span>}
+                      <input type="file" accept=".vtt,.srt,text/vtt" className="text-sm" onChange={(e) => onPickSub(e, idx)} />
+                      {l.subtitles && <button type="button" onClick={() => updLesson(idx, { subtitles: "" })} className="text-xs font-semibold text-rose-500 hover:underline">Устгах</button>}
                     </div>
                   </div>
                 ))}

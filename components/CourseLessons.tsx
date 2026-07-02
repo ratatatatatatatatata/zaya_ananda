@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type Lesson = { title: string; url: string; quality?: string };
+type Lesson = { title: string; url: string; quality?: string; subtitles?: string };
 type Data = { status: "none" | "pending" | "active" | "expired"; lessons: Lesson[] };
 
 function embed(url: string): { type: "iframe" | "video"; src: string } {
@@ -53,25 +53,44 @@ export function CourseLessons({ id }: { id: string }) {
               </div>
             );
           }
-          const e = embed(l.url);
-          return (
-            <div key={i} className="overflow-hidden rounded-2xl border border-line bg-white shadow-card">
-              <div className="flex items-center gap-3 border-b border-line px-4 py-3">
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-100 text-sm font-bold text-primary-700">{i + 1}</span>
-                <span className="font-display font-semibold text-ink">{l.title}</span>
-              </div>
-              <div className="relative aspect-video w-full bg-black">
-                {l.quality && <span className="absolute right-2 top-2 z-10 rounded-md bg-black/70 px-2 py-0.5 text-xs font-bold text-white">{l.quality}</span>}
-                {e.type === "iframe" ? (
-                  <iframe src={e.src} title={l.title} className="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-                ) : (
-                  <video src={e.src} controls className="h-full w-full" controlsList="nodownload" />
-                )}
-              </div>
-            </div>
-          );
+          return <LessonVideo key={i} lesson={l} index={i} />;
         })}
       </div>
+    </div>
+  );
+}
+
+function LessonVideo({ lesson, index }: { lesson: Lesson; index: number }) {
+  const [subUrl, setSubUrl] = useState<string | undefined>();
+  useEffect(() => {
+    if (!lesson.subtitles) { setSubUrl(undefined); return; }
+    const blob = new Blob([lesson.subtitles], { type: "text/vtt" });
+    const u = URL.createObjectURL(blob);
+    setSubUrl(u);
+    return () => URL.revokeObjectURL(u);
+  }, [lesson.subtitles]);
+  const e = embed(lesson.url);
+  return (
+    <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-card">
+      <div className="flex items-center gap-3 border-b border-line px-4 py-3">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-100 text-sm font-bold text-primary-700">{index + 1}</span>
+        <span className="font-display font-semibold text-ink">{lesson.title}</span>
+        {lesson.subtitles && <span className="ml-auto rounded-md bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">CC</span>}
+      </div>
+      <div className="relative aspect-video w-full bg-black">
+        {lesson.quality && <span className="absolute right-2 top-2 z-10 rounded-md bg-black/70 px-2 py-0.5 text-xs font-bold text-white">{lesson.quality}</span>}
+        {e.type === "iframe" ? (
+          <iframe src={e.src} title={lesson.title} className="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+        ) : (
+          <video controls className="h-full w-full" controlsList="nodownload">
+            <source src={e.src} />
+            {subUrl && <track kind="subtitles" srcLang="en" label="English" src={subUrl} default />}
+          </video>
+        )}
+      </div>
+      {lesson.subtitles && e.type !== "iframe" && (
+        <p className="px-4 py-2 text-xs text-muted">English хадмал бэлэн — тоглуулагчийн хадмал (CC) товчоор асаана/унтраана.</p>
+      )}
     </div>
   );
 }

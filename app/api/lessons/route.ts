@@ -33,7 +33,7 @@ export async function GET(req: Request) {
         if (l.path) { try { url = await signedDownloadUrl(BUCKET, l.path); } catch { url = ""; } }
         else if (l.url) url = l.url;
       }
-      return { title: l.title, url, quality: l.quality || "" };
+      return { title: l.title, url, quality: l.quality || "", subtitles: status === "active" ? (l.subtitles || "") : "" };
     }));
     return NextResponse.json({ status, lessons: out });
   } catch {

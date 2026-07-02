@@ -144,7 +144,7 @@ export async function getCmsById(id: string): Promise<CmsItem | null> {
 
 export async function createCmsItem(input: {
   kind: CmsItem["kind"]; title: string; summary?: string; body?: string; price?: number; category?: string; mode?: CmsItem["mode"];
-  image?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherInfo?: string; accessDays?: number; lessons?: { title: string; path?: string; url?: string; quality?: string }[];
+  image?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherInfo?: string; accessDays?: number; lessons?: { title: string; path?: string; url?: string; quality?: string; subtitles?: string }[];
 }): Promise<CmsItem> {
   return sbInsert<CmsItem>("cms_items", {
     id: randomUUID(), kind: input.kind, title: input.title.trim(), summary: (input.summary || "").trim(),
