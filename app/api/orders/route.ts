@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth";
-import { findService, findCourse, findProduct, createOrder, getOrdersByUser } from "@/lib/repo";
+import { findService, findCourse, findProduct, createOrder, getOrdersByUser, getCmsById } from "@/lib/repo";
 import { pick } from "@/lib/i18n-core";
 import type { Locale, OrderItem } from "@/lib/types";
 
@@ -33,8 +33,15 @@ export async function POST(req: Request) {
       : it.kind === "course" ? findCourse(String(it.slug))
       : it.kind === "product" ? findProduct(String(it.slug))
       : null;
-    if (!found) continue;
-    resolved.push({ kind: it.kind, slug: found.slug, title: pick(found.title, locale), price: found.price, qty });
+    if (found) {
+      resolved.push({ kind: it.kind, slug: found.slug, title: pick(found.title, locale), price: found.price, qty });
+      continue;
+    }
+    // CMS-ээс нэмсэн бүтээгдэхүүн/контент (slug = cms id)
+    const cms = await getCmsById(String(it.slug)).catch(() => null);
+    if (cms && ["service", "course", "product"].includes(it.kind)) {
+      resolved.push({ kind: it.kind, slug: cms.id, title: cms.title, price: typeof cms.price === "number" ? cms.price : 0, qty });
+    }
   }
   if (resolved.length === 0)
     return NextResponse.json({ error: "No matching items." }, { status: 400 });

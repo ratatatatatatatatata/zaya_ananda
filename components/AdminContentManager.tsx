@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { formatMNT } from "@/lib/format";
-import type { CmsItem } from "@/lib/types";
+import { RichTextEditor } from "@/components/RichTextEditor";
+import type { CmsItem, TeacherPreset } from "@/lib/types";
 
 function compressImage(file: File, maxW = 1200, quality = 0.82): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -27,12 +28,7 @@ function compressImage(file: File, maxW = 1200, quality = 0.82): Promise<string>
   });
 }
 
-const EMPTY = { title: "", category: "", summary: "", body: "", price: "", mode: "online", image: "", link: "", videoLessons: "", students: "", views: "", teacherName: "", teacherImage: "", teacherInfo: "", accessDays: "" };
-
-const CAT_OPTS: Record<string, string[]> = {
-  service: ["Оношилгоо", "Эмчилгээ"],
-  resource: ["Зөвлөгөө", "Видео зөвлөгөө"],
-};
+const EMPTY = { title: "", category: "", summary: "", body: "", price: "", mode: "online", link: "", videoLessons: "", students: "", views: "", teacherName: "", teacherImage: "", teacherInfo: "", accessDays: "" };
 
 const SB_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
@@ -61,13 +57,17 @@ function srtToVtt(s: string): string {
 
 type LessonRow = { title: string; path: string; quality: string; subtitles?: string; filename?: string; uploading?: boolean; progress?: number };
 
+const MAX_IMAGES = 3;
+
 export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
   const [items, setItems] = useState<CmsItem[]>([]);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
   const [form, setForm] = useState(EMPTY);
+  const [images, setImages] = useState<string[]>([]);
   const [lessons, setLessons] = useState<LessonRow[]>([]);
+  const [teachers, setTeachers] = useState<TeacherPreset[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const set = (k: keyof typeof EMPTY, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -78,10 +78,28 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
       .catch(() => {});
   }, [kind]);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    fetch("/api/settings", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (Array.isArray(d?.settings?.teachers)) setTeachers(d.settings.teachers); })
+      .catch(() => {});
+  }, [open]);
 
-  async function pickImage(e: React.ChangeEvent<HTMLInputElement>, field: "image" | "teacherImage") {
+  const multiImage = kind === "product";
+
+  async function addImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    try {
+      const datas: string[] = [];
+      for (const f of files.slice(0, MAX_IMAGES)) datas.push(await compressImage(f));
+      setImages((prev) => (multiImage ? [...prev, ...datas].slice(0, MAX_IMAGES) : [datas[0]]));
+    } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
+    e.target.value = "";
+  }
+  async function pickTeacherImage(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]; if (!file) return;
-    try { const data = await compressImage(file); set(field, data); }
+    try { const data = await compressImage(file); set("teacherImage", data); }
     catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
   }
 
@@ -104,17 +122,24 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
     } catch { setErr("Хадмал файл уншихад алдаа."); }
   }
 
-  function resetForm() { setForm(EMPTY); setLessons([]); setEditingId(null); setErr(""); setOpen(false); }
-  function startNew() { setForm(EMPTY); setLessons([]); setEditingId(null); setErr(""); setOpen(true); }
+  function applyTeacher(name: string) {
+    const t = teachers.find((x) => x.name === name);
+    if (!t) return;
+    setForm((f) => ({ ...f, teacherName: t.name, teacherImage: t.image || "", teacherInfo: t.info || "" }));
+  }
+
+  function resetForm() { setForm(EMPTY); setImages([]); setLessons([]); setEditingId(null); setErr(""); setOpen(false); }
+  function startNew() { setForm(EMPTY); setImages([]); setLessons([]); setEditingId(null); setErr(""); setOpen(true); }
   function startEdit(it: CmsItem) {
     setForm({
       title: it.title || "", category: it.category || "", summary: it.summary || "", body: it.body || "",
-      price: it.price != null ? String(it.price) : "", mode: it.mode || "online", image: it.image || "", link: it.link || "",
+      price: it.price != null ? String(it.price) : "", mode: it.mode || "online", link: it.link || "",
       videoLessons: it.videoLessons != null ? String(it.videoLessons) : "",
       students: it.students != null ? String(it.students) : "", views: it.views != null ? String(it.views) : "",
       teacherName: it.teacherName || "", teacherImage: it.teacherImage || "", teacherInfo: it.teacherInfo || "",
       accessDays: it.accessDays != null ? String(it.accessDays) : "",
     });
+    setImages(it.images && it.images.length ? it.images.slice(0, MAX_IMAGES) : it.image ? [it.image] : []);
     setLessons((it.lessons || []).map((l) => ({ title: l.title || "", path: l.path || "", quality: l.quality || "1080p", subtitles: l.subtitles || "" })));
     setEditingId(it.id); setErr(""); setOpen(true);
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
@@ -126,8 +151,10 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
     setSaving(true); setErr("");
     const payload = {
       kind, ...form,
+      image: images[0] || "",
+      images,
       mode: kind === "course" ? form.mode : undefined,
-      lessons: kind !== "promo" ? lessons.filter((l) => l.title.trim() && l.path).map((l) => ({ title: l.title.trim(), path: l.path, quality: l.quality, subtitles: l.subtitles || "" })) : undefined,
+      lessons: lessons.filter((l) => l.title.trim() && l.path).map((l) => ({ title: l.title.trim(), path: l.path, quality: l.quality, subtitles: l.subtitles || "" })),
     };
     try {
       const res = await fetch("/api/admin/content", {
@@ -159,15 +186,65 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
         <form onSubmit={save} className="card space-y-4 p-5">
           {editingId && <p className="rounded-lg bg-amber-50 px-3 py-1.5 text-sm font-semibold text-amber-700">Засварлаж байна</p>}
 
-          <div>
-            <label className="field-label">{isPromo ? "Баннер зураг" : "Нүүр зураг"}</label>
-            <div className="flex items-center gap-3">
-              {form.image
-                ? <img src={form.image} alt="" className={"rounded-xl object-cover " + (isPromo ? "h-20 w-40" : "h-20 w-28")} />
-                : <div className={"grid place-items-center rounded-xl border border-dashed border-line text-2xl text-muted " + (isPromo ? "h-20 w-40" : "h-20 w-28")}>🖼</div>}
-              <div className="flex flex-col gap-1">
-                <input type="file" accept="image/*" onChange={(e) => pickImage(e, "image")} className="text-sm" />
-                {form.image && <button type="button" onClick={() => set("image", "")} className="text-left text-xs font-semibold text-rose-500">Устгах</button>}
+          {/* Зураг + видео зэрэгцээ */}
+          <div className="grid gap-3 lg:grid-cols-2">
+            <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+              <p className="mb-2 font-display font-semibold text-ink">
+                {isPromo ? "Баннер зураг" : multiImage ? "Зураг (1–3 ширхэг)" : "Нүүр зураг"}
+              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                {images.map((img, i) => (
+                  <div key={i} className="relative">
+                    <img src={img} alt="" className={"rounded-xl object-cover " + (isPromo ? "h-20 w-40" : "h-24 w-32")} />
+                    <button type="button" onClick={() => setImages((arr) => arr.filter((_, x) => x !== i))}
+                      className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs font-bold text-white shadow">✕</button>
+                    {i === 0 && images.length > 1 && <span className="absolute bottom-1 left-1 rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-bold text-primary-700">Нүүр</span>}
+                  </div>
+                ))}
+                {(multiImage ? images.length < MAX_IMAGES : images.length === 0) && (
+                  <label className={"grid cursor-pointer place-items-center rounded-xl border border-dashed border-line text-2xl text-muted hover:bg-white " + (isPromo ? "h-20 w-40" : "h-24 w-32")}>
+                    🖼+
+                    <input type="file" accept="image/*" multiple={multiImage} onChange={addImage} className="hidden" />
+                  </label>
+                )}
+              </div>
+              {multiImage && <p className="mt-2 text-xs text-muted">Эхний зураг нүүр зураг болно. Дэлгэрэнгүй хуудсанд бүх зураг харагдаж, дарахад томорно.</p>}
+            </div>
+
+            <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="font-display font-semibold text-ink">{isCourse ? "Видео хичээлүүд" : "Видео"} <span className="text-sm font-normal text-muted">({lessons.length})</span></p>
+                <button type="button" onClick={() => setLessons((ls) => [...ls, { title: "", path: "", quality: "1080p" }])} className="btn btn-outline btn-sm">{isCourse ? "+ Хичээл нэмэх" : "+ Видео нэмэх"}</button>
+              </div>
+              <p className="mb-3 text-xs leading-relaxed text-muted">{isCourse ? "Видео зөвхөн төлбөр баталгаажсан хэрэглэгчид харагдана." : "Видео дэлгэрэнгүй хуудсанд нээлттэй харагдана."}</p>
+              <div className="space-y-2">
+                {lessons.map((l, idx) => (
+                  <div key={idx} className="space-y-2 rounded-xl border border-line bg-white p-3">
+                    <div className="flex items-center gap-2">
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-100 text-xs font-bold text-primary-700">{idx + 1}</span>
+                      <input className="input flex-1" placeholder={isCourse ? "Хичээлийн гарчиг" : "Видеоны гарчиг"} value={l.title} onChange={(e) => updLesson(idx, { title: e.target.value })} />
+                      <select className="input w-28 shrink-0" value={l.quality} onChange={(e) => updLesson(idx, { quality: e.target.value })}>
+                        <option value="480p">480p</option><option value="720p">720p</option><option value="1080p">1080p</option><option value="1440p">1440p (2K)</option><option value="4K">4K</option>
+                      </select>
+                      <button type="button" onClick={() => setLessons((ls) => ls.filter((_, i) => i !== idx))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
+                    </div>
+                    <div className="flex items-center gap-3 pl-9">
+                      {l.path
+                        ? <span className="text-sm font-medium text-jade-600">✓ Видео байршсан{l.filename ? " — " + l.filename : ""}</span>
+                        : l.uploading
+                        ? <span className="shrink-0 text-sm font-medium text-primary-700">Байршуулж байна… {l.progress ?? 0}%</span>
+                        : <input type="file" accept="video/*" className="text-sm" onChange={(e) => onPickVideo(e, idx)} />}
+                      {l.uploading && <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-line"><div className="h-full bg-primary-500 transition-all" style={{ width: (l.progress ?? 0) + "%" }} /></div>}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 pl-9">
+                      <span className="shrink-0 text-xs font-medium text-muted">English хадмал (.vtt/.srt):</span>
+                      {l.subtitles && <span className="text-sm font-medium text-jade-600">✓ Орсон</span>}
+                      <input type="file" accept=".vtt,.srt,text/vtt" className="text-sm" onChange={(e) => onPickSub(e, idx)} />
+                      {l.subtitles && <button type="button" onClick={() => updLesson(idx, { subtitles: "" })} className="text-xs font-semibold text-rose-500 hover:underline">Устгах</button>}
+                    </div>
+                  </div>
+                ))}
+                {lessons.length === 0 && <p className="text-sm text-muted">Одоогоор видео алга. {isCourse ? "“+ Хичээл нэмэх”" : "“+ Видео нэмэх”"} дарж нэмнэ үү.</p>}
               </div>
             </div>
           </div>
@@ -175,19 +252,10 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
           <div><label className="field-label">Гарчиг *</label><input className="input" value={form.title} onChange={(e) => set("title", e.target.value)} /></div>
 
           {isPromo ? (
-            <>
-              <div><label className="field-label">Холбоос (заавал биш)</label><input className="input" value={form.link} onChange={(e) => set("link", e.target.value)} placeholder="https://... эсвэл /courses" /></div>
-              <div><label className="field-label">Богино тайлбар (заавал биш)</label><input className="input" value={form.summary} onChange={(e) => set("summary", e.target.value)} /></div>
-            </>
+            <div><label className="field-label">Холбоос (заавал биш)</label><input className="input" value={form.link} onChange={(e) => set("link", e.target.value)} placeholder="https://... эсвэл /courses" /></div>
           ) : (
             <>
               <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="field-label">Ангилал</label>
-                  {CAT_OPTS[kind]
-                    ? <select className="input" value={form.category} onChange={(e) => set("category", e.target.value)}><option value="">— Сонгох —</option>{CAT_OPTS[kind].map((c) => <option key={c} value={c}>{c}</option>)}</select>
-                    : <input className="input" value={form.category} onChange={(e) => set("category", e.target.value)} />}
-                </div>
                 {kind !== "resource" && <div><label className="field-label">Үнэ (₮)</label><input className="input" type="number" value={form.price} onChange={(e) => set("price", e.target.value)} /></div>}
                 {isCourse && <div><label className="field-label">Хэлбэр</label><select className="input" value={form.mode} onChange={(e) => set("mode", e.target.value)}><option value="online">Онлайн сургалт</option><option value="tankhim">Танхимын сургалт</option><option value="both">Онлайн + Танхим</option></select></div>}
               </div>
@@ -199,60 +267,35 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
                   <div><label className="field-label">Хандах хугацаа (хоног)</label><input className="input" type="number" value={form.accessDays} onChange={(e) => set("accessDays", e.target.value)} placeholder="жишээ: 30" /></div>
                 </div>
               )}
-              <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
-                    <div className="mb-2 flex items-center justify-between">
-                      <p className="font-display font-semibold text-ink">{isCourse ? "Видео хичээлүүд" : "Видео"} <span className="text-sm font-normal text-muted">({lessons.length})</span></p>
-                      <button type="button" onClick={() => setLessons((ls) => [...ls, { title: "", path: "", quality: "1080p" }])} className="btn btn-outline btn-sm">{isCourse ? "+ Хичээл нэмэх" : "+ Видео нэмэх"}</button>
-                    </div>
-                    <p className="mb-3 text-xs leading-relaxed text-muted">{isCourse ? "Хичээл бүр гарчигтай байх ёстой. Видео файлаа компьютерээсээ шууд байршуулж, чанарын шошго (1080p/4K) сонгоно. Эдгээр видео зөвхөн төлбөр баталгаажсан хэрэглэгчид харагдана." : "Видео бүр гарчигтай байх ёстой. Видео файлаа компьютерээсээ шууд байршуулна. Эдгээр видео дэлгэрэнгүй хуудсанд нээлттэй харагдана."}</p>
-                    <div className="space-y-2">
-                      {lessons.map((l, idx) => (
-                        <div key={idx} className="space-y-2 rounded-xl border border-line bg-white p-3">
-                          <div className="flex items-center gap-2">
-                            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-100 text-xs font-bold text-primary-700">{idx + 1}</span>
-                            <input className="input flex-1" placeholder={isCourse ? "Хичээлийн гарчиг" : "Видеоны гарчиг"} value={l.title} onChange={(e) => updLesson(idx, { title: e.target.value })} />
-                            <select className="input w-32 shrink-0" value={l.quality} onChange={(e) => updLesson(idx, { quality: e.target.value })}>
-                              <option value="480p">480p</option><option value="720p">720p</option><option value="1080p">1080p</option><option value="1440p">1440p (2K)</option><option value="4K">4K</option>
-                            </select>
-                            <button type="button" onClick={() => setLessons((ls) => ls.filter((_, i) => i !== idx))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
-                          </div>
-                          <div className="flex items-center gap-3 pl-9">
-                            {l.path
-                              ? <span className="text-sm font-medium text-jade-600">✓ Видео байршсан{l.filename ? " — " + l.filename : ""}</span>
-                              : l.uploading
-                              ? <span className="shrink-0 text-sm font-medium text-primary-700">Байршуулж байна… {l.progress ?? 0}%</span>
-                              : <input type="file" accept="video/*" className="text-sm" onChange={(e) => onPickVideo(e, idx)} />}
-                            {l.uploading && <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-line"><div className="h-full bg-primary-500 transition-all" style={{ width: (l.progress ?? 0) + "%" }} /></div>}
-                          </div>
-                          <div className="flex flex-wrap items-center gap-2 pl-9">
-                            <span className="shrink-0 text-xs font-medium text-muted">English хадмал (.vtt/.srt):</span>
-                            {l.subtitles && <span className="text-sm font-medium text-jade-600">✓ Орсон</span>}
-                            <input type="file" accept=".vtt,.srt,text/vtt" className="text-sm" onChange={(e) => onPickSub(e, idx)} />
-                            {l.subtitles && <button type="button" onClick={() => updLesson(idx, { subtitles: "" })} className="text-xs font-semibold text-rose-500 hover:underline">Устгах</button>}
-                          </div>
-                        </div>
-                      ))}
-                      {lessons.length === 0 && <p className="text-sm text-muted">{isCourse ? "Одоогоор хичээл алга. “+ Хичээл нэмэх” дарж видео хичээл нэмнэ үү." : "Одоогоор видео алга. “+ Видео нэмэх” дарж нэмнэ үү."}</p>}
-                    </div>
-              </div>
 
-              <div><label className="field-label">Товч тайлбар</label><input className="input" value={form.summary} onChange={(e) => set("summary", e.target.value)} /></div>
-              <div><label className="field-label">Дэлгэрэнгүй тайлбар</label><textarea className="textarea" value={form.body} onChange={(e) => set("body", e.target.value)} /></div>
+              <div>
+                <label className="field-label">Дэлгэрэнгүй мэдээлэл</label>
+                <RichTextEditor value={form.body} onChange={(html) => set("body", html)} />
+              </div>
 
               {hasTeacher && (
                 <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
-                  <p className="mb-3 font-display font-semibold text-ink">Заах багшийн мэдээлэл</p>
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <p className="font-display font-semibold text-ink">Заах багшийн мэдээлэл</p>
+                    {teachers.length > 0 && (
+                      <select className="input w-56" value="" onChange={(e) => applyTeacher(e.target.value)}>
+                        <option value="">— Өмнөх багш сонгох —</option>
+                        {teachers.map((t) => <option key={t.name} value={t.name}>{t.name}</option>)}
+                      </select>
+                    )}
+                  </div>
                   <div className="flex items-center gap-3">
                     {form.teacherImage
                       ? <img src={form.teacherImage} alt="" className="h-20 w-20 rounded-full object-cover" />
                       : <div className="grid h-20 w-20 place-items-center rounded-full border border-dashed border-line text-xl text-muted">👤</div>}
                     <div className="flex flex-col gap-1">
-                      <input type="file" accept="image/*" onChange={(e) => pickImage(e, "teacherImage")} className="text-sm" />
+                      <input type="file" accept="image/*" onChange={pickTeacherImage} className="text-sm" />
                       {form.teacherImage && <button type="button" onClick={() => set("teacherImage", "")} className="text-left text-xs font-semibold text-rose-500">Устгах</button>}
                     </div>
                   </div>
                   <div className="mt-3"><label className="field-label">Багшийн нэр</label><input className="input" value={form.teacherName} onChange={(e) => set("teacherName", e.target.value)} /></div>
                   <div className="mt-3"><label className="field-label">Мэдээлэл (мөр бүрд нэг мэдээлэл)</label><textarea className="textarea" rows={4} placeholder="Үүсгэн байгуулагч, Сургагч багш&#10;Далд ухамсрын шинжээч&#10;..." value={form.teacherInfo} onChange={(e) => set("teacherInfo", e.target.value)} /></div>
+                  <p className="mt-2 text-xs text-muted">Багшийн мэдээлэл автоматаар хадгалагдаж, дараагийн удаад дээрх жагсаалтаас сонгож болно.</p>
                 </div>
               )}
             </>
@@ -271,7 +314,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
           <thead className="border-b border-line bg-aqua"><tr>
             <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-muted">Зураг</th>
             <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-muted">Гарчиг</th>
-            <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-muted">{isPromo ? "Холбоос" : "Ангилал"}</th>
+            {isPromo && <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-muted">Холбоос</th>}
             {!isPromo && <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-muted">Үнэ</th>}
             <th className="px-4 py-3" />
           </tr></thead>
@@ -280,7 +323,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
               <tr key={i.id} className="border-b border-line last:border-0">
                 <td className="px-4 py-2">{i.image ? <img src={i.image} alt="" className="h-10 w-14 rounded-lg object-cover" /> : <span className="text-muted">—</span>}</td>
                 <td className="px-4 py-3 text-sm font-medium text-ink">{i.title}</td>
-                <td className="px-4 py-3 text-sm text-ink/80">{isPromo ? (i.link || "—") : (i.category || "—")}</td>
+                {isPromo && <td className="px-4 py-3 text-sm text-ink/80">{i.link || "—"}</td>}
                 {!isPromo && <td className="px-4 py-3 text-sm text-ink/80">{typeof i.price === "number" ? formatMNT(i.price) : "—"}</td>}
                 <td className="px-4 py-3 text-right"><div className="flex justify-end gap-3"><button onClick={() => startEdit(i)} className="text-sm font-semibold text-primary-700 hover:underline">Засах</button><button onClick={() => del(i.id)} className="text-sm font-semibold text-rose-500 hover:underline">Устгах</button></div></td>
               </tr>

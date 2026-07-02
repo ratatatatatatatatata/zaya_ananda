@@ -28,6 +28,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [logo, setLogo] = useState<string>();
+  const [customPages, setCustomPages] = useState<{ id: string; navLabel: string }[]>([]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -37,6 +38,7 @@ export function Header() {
   }, []);
   useEffect(() => { setMenuOpen(false); }, [pathname]);
   useEffect(() => { fetch("/api/settings", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((d) => { if (d?.settings?.logo) setLogo(d.settings.logo); }).catch(() => {}); }, []);
+  useEffect(() => { fetch("/api/pages", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((d) => { if (Array.isArray(d?.pages)) setCustomPages(d.pages); }).catch(() => {}); }, []);
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
@@ -50,6 +52,12 @@ export function Header() {
             <Link key={l.href} href={l.href}
               className={cx("nav-link relative whitespace-nowrap py-1 text-[14px] 2xl:text-[15px]", isActive(l.href) && "text-primary-700 after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:rounded-full after:bg-primary-grad")}>
               {t(l.key)}
+            </Link>
+          ))}
+          {customPages.map((p) => (
+            <Link key={p.id} href={"/p/" + p.id}
+              className={cx("nav-link relative whitespace-nowrap py-1 text-[14px] 2xl:text-[15px]", isActive("/p/" + p.id) && "text-primary-700 after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:rounded-full after:bg-primary-grad")}>
+              {p.navLabel}
             </Link>
           ))}
         </nav>
@@ -74,6 +82,12 @@ export function Header() {
             <Link key={l.href} href={l.href}
               className={cx("rounded-xl px-3 py-2.5 text-[15px] font-medium transition", isActive(l.href) ? "bg-primary-50 text-primary-700" : "text-ink/80 hover:bg-primary-50")}>
               {t(l.key)}
+            </Link>
+          ))}
+          {customPages.map((p) => (
+            <Link key={p.id} href={"/p/" + p.id}
+              className={cx("rounded-xl px-3 py-2.5 text-[15px] font-medium transition", isActive("/p/" + p.id) ? "bg-primary-50 text-primary-700" : "text-ink/80 hover:bg-primary-50")}>
+              {p.navLabel}
             </Link>
           ))}
           <div className="mt-2">

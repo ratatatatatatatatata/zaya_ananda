@@ -3,7 +3,7 @@ import { unstable_cache } from "next/cache";
 import { hashPassword, verifyPassword } from "./auth";
 import { sbSelect, sbInsert, sbUpdate, sbDelete, enc } from "./supabase";
 import { services, courses, products } from "@/data/content";
-import type { User, PublicUser, Order, OrderItem, ContactMessage, CmsItem, SiteSettings } from "./types";
+import type { User, PublicUser, Order, OrderItem, ContactMessage, CmsItem, SiteSettings, SitePage, TeacherPreset } from "./types";
 
 export const catalog = { services, courses, products };
 export function findService(slug: string) { return services.find((s) => s.slug === slug) || null; }
@@ -134,8 +134,27 @@ export async function getSettings(): Promise<SiteSettings> {
   try {
     const rows = await sbSelect<SiteSettings>("site_settings", "id=eq.main&limit=1");
     const r = (rows[0] || {}) as SiteSettings;
-    return { logo: r.logo, aboutTitle: r.aboutTitle, aboutBody: r.aboutBody, facebook: r.facebook, instagram: r.instagram, youtube: r.youtube };
+    return {
+      logo: r.logo, aboutTitle: r.aboutTitle, aboutBody: r.aboutBody, aboutVideo: r.aboutVideo,
+      facebook: r.facebook, instagram: r.instagram, youtube: r.youtube,
+      team: Array.isArray(r.team) ? r.team : [],
+      teachers: Array.isArray(r.teachers) ? r.teachers : [],
+      bank: r.bank && typeof r.bank === "object" ? r.bank : {},
+    };
   } catch { return {}; }
+}
+
+/** Багшийн мэдээллийг дараа дахин сонгож болохоор хадгална (нэрээр upsert). */
+export async function upsertTeacherPreset(t: TeacherPreset): Promise<void> {
+  if (!t.name?.trim()) return;
+  try {
+    const s = await getSettings();
+    const list = [...(s.teachers || [])];
+    const idx = list.findIndex((x) => x.name.trim().toLowerCase() === t.name.trim().toLowerCase());
+    const entry = { name: t.name.trim(), image: t.image || list[idx]?.image || "", info: t.info || list[idx]?.info || "" };
+    if (idx >= 0) list[idx] = entry; else list.push(entry);
+    await updateSettings({ teachers: list });
+  } catch { /* багш хадгалахад алдаа гарвал контентын хадгалалтыг зогсоохгүй */ }
 }
 export async function updateSettings(patch: Partial<SiteSettings>): Promise<SiteSettings> {
   const existing = await sbSelect<{ id: string }>("site_settings", "id=eq.main&limit=1");
@@ -159,6 +178,46 @@ export async function getCmsById(id: string): Promise<CmsItem | null> {
   return rows[0] || null;
 }
 
+// ---------- Custom pages (админ өөрөө үүсгэдэг хуудсууд) ----------
+export async function listPages(): Promise<SitePage[]> {
+  try { return await sbSelect<SitePage>("pages", "order=position.asc,created_at.asc"); } catch { return []; }
+}
+export async function getPageById(id: string): Promise<SitePage | null> {
+  const rows = await sbSelect<SitePage>("pages", `id=eq.${enc(id)}&limit=1`);
+  return rows[0] || null;
+}
+type PageInput = { title: string; navLabel?: string; body?: string; image?: string; video?: string; position?: number };
+function pageRow(input: PageInput): Record<string, unknown> {
+  return {
+    title: input.title.trim(), navLabel: input.navLabel?.trim() || null, body: input.body || null,
+    image: input.image || null, video: input.video || null,
+    position: typeof input.position === "number" && !Number.isNaN(input.position) ? input.position : 0,
+  };
+}
+export async function createPage(input: PageInput): Promise<SitePage> {
+  return sbInsert<SitePage>("pages", { id: randomUUID(), ...pageRow(input), createdAt: new Date().toISOString() });
+}
+export async function updatePage(id: string, input: PageInput): Promise<SitePage | null> {
+  return sbUpdate<SitePage>("pages", id, pageRow(input));
+}
+export async function deletePage(id: string): Promise<boolean> {
+  await sbDelete("pages", id); return true;
+}
+
+// ---------- Password helpers ----------
+export async function setUserPassword(id: string, password: string): Promise<boolean> {
+  const u = await getUserById(id);
+  if (!u) return false;
+  await sbUpdate("users", id, { passwordHash: hashPassword(password) });
+  return true;
+}
+export async function setResetCode(userId: string, codeHash: string, expiresAt: string): Promise<void> {
+  await sbUpdate("users", userId, { resetCodeHash: codeHash, resetExpires: expiresAt });
+}
+export async function clearResetCode(userId: string): Promise<void> {
+  await sbUpdate("users", userId, { resetCodeHash: null, resetExpires: null });
+}
+
 // ---------- Cached public reads (invalidated via revalidateTag in admin API routes) ----------
 export const listCmsCached = (kind: CmsItem["kind"]) =>
   unstable_cache(() => listCms(kind), ["cms-list", kind], { tags: ["cms"], revalidate: 300 })();
@@ -166,10 +225,14 @@ export const getCmsByIdCached = (id: string) =>
   unstable_cache(() => getCmsById(id), ["cms-item", id], { tags: ["cms"], revalidate: 300 })();
 export const getSettingsCached = () =>
   unstable_cache(() => getSettings(), ["site-settings"], { tags: ["settings"], revalidate: 300 })();
+export const listPagesCached = () =>
+  unstable_cache(() => listPages(), ["site-pages"], { tags: ["pages"], revalidate: 300 })();
+export const getPageByIdCached = (id: string) =>
+  unstable_cache(() => getPageById(id), ["site-page", id], { tags: ["pages"], revalidate: 300 })();
 
 type CmsInput = {
   kind: CmsItem["kind"]; title: string; summary?: string; body?: string; price?: number; category?: string; mode?: CmsItem["mode"];
-  image?: string; link?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherInfo?: string; accessDays?: number; lessons?: { title: string; path?: string; url?: string; quality?: string; subtitles?: string }[];
+  image?: string; images?: string[]; link?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherInfo?: string; accessDays?: number; lessons?: { title: string; path?: string; url?: string; quality?: string; subtitles?: string }[];
 };
 function cmsRow(input: CmsInput): Record<string, unknown> {
   return {
@@ -179,6 +242,7 @@ function cmsRow(input: CmsInput): Record<string, unknown> {
     category: input.category?.trim() || null,
     mode: input.kind === "course" ? input.mode || "online" : null,
     image: input.image || null,
+    images: input.images && input.images.length ? input.images : null,
     link: input.link?.trim() || null,
     videoLessons: input.lessons && input.lessons.length ? input.lessons.length : numOrNull(input.videoLessons),
     students: numOrNull(input.students),

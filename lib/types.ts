@@ -147,13 +147,47 @@ export interface EventItem {
   date: string;
 }
 
+export interface StaffMember {
+  image?: string;
+  name: string;
+  role?: string;
+  info?: string;
+}
+
+export interface TeacherPreset {
+  name: string;
+  image?: string;
+  info?: string;
+}
+
+export interface BankInfo {
+  bankName?: string;
+  account?: string;
+  holder?: string;
+}
+
 export interface SiteSettings {
   logo?: string;
   aboutTitle?: string;
   aboutBody?: string;
+  aboutVideo?: string;
   facebook?: string;
   instagram?: string;
   youtube?: string;
+  team?: StaffMember[];
+  teachers?: TeacherPreset[];
+  bank?: BankInfo;
+}
+
+export interface SitePage {
+  id: string;
+  title: string;
+  navLabel?: string;
+  body?: string;
+  image?: string;
+  video?: string;
+  position?: number;
+  createdAt?: string;
 }
 
 export interface CmsItem {
@@ -166,6 +200,7 @@ export interface CmsItem {
   category?: string;
   mode?: "online" | "tankhim" | "both";
   image?: string;
+  images?: string[];
   link?: string;
   videoLessons?: number;
   students?: number;

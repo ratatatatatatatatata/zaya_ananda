@@ -9,6 +9,7 @@ import { formatMNT, cx } from "@/lib/format";
 import { Icon } from "@/components/Icon";
 import { AdminContentManager } from "@/components/AdminContentManager";
 import { AdminSettings } from "@/components/AdminSettings";
+import { AdminPages } from "@/components/AdminPages";
 import type { Order, PublicUser, ContactMessage } from "@/lib/types";
 
 const nav: { id: string; k: string; label?: string; icon: string }[] = [
@@ -22,6 +23,7 @@ const nav: { id: string; k: string; label?: string; icon: string }[] = [
   { id: "promos", k: "admin.promosM", label: "Сурталчилгаа", icon: "star" },
   { id: "reviews", k: "admin.reviews", icon: "star" },
   { id: "messages", k: "nav.contact", icon: "user" },
+  { id: "pages", k: "admin.pagesM", label: "Ерөнхий тохиргоо (Цэс)", icon: "laptop" },
   { id: "settings", k: "admin.settingsM", label: "Тохиргоо", icon: "sparkles" },
 ];
 
@@ -65,6 +67,14 @@ export default function AdminPage() {
   async function deleteMessage(id: string) {
     if (!confirm("Энэ зурвасыг устгах уу?")) return;
     await fetch("/api/admin/messages?id=" + id, { method: "DELETE" }); reloadData();
+  }
+  async function resetUserPassword(id: string, name: string) {
+    const pw = prompt(`"${name}" хэрэглэгчийн шинэ нууц үгийг оруулна уу (6+ тэмдэгт):`);
+    if (!pw) return;
+    if (pw.length < 6) { alert("Нууц үг 6-аас дээш тэмдэгт байх ёстой."); return; }
+    const r = await fetch("/api/admin/users", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, password: pw }) });
+    if (r.ok) alert("Нууц үг шинэчлэгдлээ. Хэрэглэгчид шинэ нууц үгийг нь мэдэгдээрэй.");
+    else alert(((await r.json().catch(() => ({}))) as { error?: string }).error || "Алдаа гарлаа.");
   }
 
   if (loading) return <div className="section"><div className="container-px flex min-h-[40vh] items-center justify-center"><div className="h-10 w-10 animate-spinSlow rounded-full border-2 border-primary-200 border-t-primary-600" /></div></div>;
@@ -141,10 +151,10 @@ export default function AdminPage() {
             {tab === "users" && (
               <div className="card overflow-x-auto">
                 <table className="w-full min-w-[560px]">
-                  <thead className="border-b border-line bg-aqua"><tr><Th>{t("admin.colName")}</Th><Th>{t("admin.colEmail")}</Th><Th>{t("form.phone")}</Th><Th>{t("admin.colDate")}</Th></tr></thead>
+                  <thead className="border-b border-line bg-aqua"><tr><Th>{t("admin.colName")}</Th><Th>{t("admin.colEmail")}</Th><Th>{t("form.phone")}</Th><Th>{t("admin.colDate")}</Th><Th>Үйлдэл</Th></tr></thead>
                   <tbody>
                     {(data?.users ?? []).map((u) => (
-                      <tr key={u.id} className="border-b border-line last:border-0"><Td className="font-medium text-ink">{u.name}</Td><Td>{u.email}</Td><Td>{u.phone || "—"}</Td><Td>{u.createdAt.slice(0, 10)}</Td></tr>
+                      <tr key={u.id} className="border-b border-line last:border-0"><Td className="font-medium text-ink">{u.name}</Td><Td>{u.email}</Td><Td>{u.phone || "—"}</Td><Td>{u.createdAt.slice(0, 10)}</Td><Td><button onClick={() => resetUserPassword(u.id, u.name)} className="text-sm font-semibold text-primary-700 hover:underline">Нууц үг солих</button></Td></tr>
                     ))}
                     {(!data || data.users.length === 0) && <tr><Td className="text-muted">{t("admin.empty")}</Td></tr>}
                   </tbody>
@@ -181,6 +191,7 @@ export default function AdminPage() {
             {tab === "products" && <AdminContentManager kind="product" />}
             {tab === "events" && <AdminContentManager kind="resource" />}
             {tab === "promos" && <AdminContentManager kind="promo" />}
+            {tab === "pages" && <AdminPages />}
             {tab === "settings" && <AdminSettings />}
             {tab === "messages" && (
               <div className="card overflow-x-auto"><table className="w-full min-w-[680px]">

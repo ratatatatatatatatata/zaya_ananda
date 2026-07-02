@@ -1,10 +1,14 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getCmsByIdCached } from "@/lib/repo";
+import { getCmsByIdCached, listCmsCached } from "@/lib/repo";
 import { T } from "@/components/T";
 import { PurchaseBox } from "@/components/PurchaseBox";
+import { ProductBuyBox } from "@/components/ProductBuyBox";
 import { CourseLessons } from "@/components/CourseLessons";
 import { ItemVideos } from "@/components/ItemVideos";
+import { ImageGallery } from "@/components/ImageGallery";
+import { RichBody } from "@/components/RichBody";
+import { CmsCard } from "@/components/CmsCard";
 import { signedDownloadUrl } from "@/lib/supabase";
 
 export const revalidate = 300;
@@ -23,6 +27,8 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
   const nav = kindNav[item.kind] || kindNav.service;
   const lines = (item.teacherInfo || "").split("\n").map((s) => s.trim()).filter(Boolean);
   const isCourse = item.kind === "course";
+  const isProduct = item.kind === "product";
+  const gallery = item.images && item.images.length ? item.images : item.image ? [item.image] : [];
   const publicVideos = !isCourse && item.lessons?.length
     ? await Promise.all(item.lessons.map(async (l) => {
         let url = "";
@@ -30,6 +36,9 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
         else if (l.url) url = l.url;
         return { title: l.title, url, quality: l.quality || "", subtitles: l.subtitles || "" };
       }))
+    : [];
+  const related = isProduct
+    ? (await listCmsCached("product")).filter((p) => p.id !== item.id).slice(0, 4)
     : [];
 
   return (
@@ -42,7 +51,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
 
       <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr]">
         <div>
-          {item.image && <img src={item.image} alt="" className="mb-6 max-h-[420px] w-full rounded-3xl object-cover" />}
+          <ImageGallery images={gallery} alt={item.title} />
           {item.category && <span className="chip">{item.category}</span>}
           <h1 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl">{item.title}</h1>
           {isCourse && (
@@ -57,7 +66,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
           {item.body && (
             <>
               <h2 className="mt-8 font-display text-xl font-semibold text-ink">Дэлгэрэнгүй</h2>
-              <div className="mt-3 whitespace-pre-line leading-relaxed text-muted">{item.body}</div>
+              <RichBody html={item.body} className="mt-3 leading-relaxed text-muted" />
             </>
           )}
           {isCourse && <CourseLessons id={item.id} />}
@@ -65,7 +74,9 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
-          <PurchaseBox id={item.id} title={item.title} price={item.price} />
+          {isProduct
+            ? <ProductBuyBox id={item.id} title={item.title} price={item.price} />
+            : <PurchaseBox id={item.id} title={item.title} price={item.price} />}
 
           {(item.teacherName || item.teacherImage || lines.length > 0) && (
             <div className="card p-6">
@@ -85,6 +96,15 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
           )}
         </aside>
       </div>
+
+      {related.length > 0 && (
+        <section className="mt-14">
+          <h2 className="font-display text-2xl font-semibold text-ink">Санал болгох бүтээгдэхүүн</h2>
+          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {related.map((p) => <CmsCard key={p.id} item={p} />)}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

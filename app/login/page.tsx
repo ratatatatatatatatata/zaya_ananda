@@ -64,7 +64,10 @@ export default function LoginPage() {
               <input id="email" type="text" required className="input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@email.com / 9900 0000" />
             </div>
             <div className="mt-4">
-              <label className="field-label" htmlFor="password">{t("auth.password")}</label>
+              <div className="flex items-center justify-between">
+                <label className="field-label" htmlFor="password">{t("auth.password")}</label>
+                <Link href="/reset" className="text-sm font-semibold text-primary-700 hover:underline">Нууц үг мартсан?</Link>
+              </div>
               <input id="password" type="password" required className="input" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
             </div>
             {error && <p className="mt-4 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</p>}

@@ -7,20 +7,28 @@ import { Reveal } from "@/components/Reveal";
 import { T, Tr } from "@/components/T";
 import { aboutContent, team, faqs, siteConfig } from "@/data/content";
 import { getSettingsCached } from "@/lib/repo";
+import { signedDownloadUrl } from "@/lib/supabase";
 
 export const metadata = { title: "Бидний тухай" };
 export const revalidate = 300;
 
 export default async function AboutPage() {
   const settings = await getSettingsCached();
+  let aboutVideoUrl = "";
+  if (settings.aboutVideo) {
+    if (/^https?:\/\//.test(settings.aboutVideo)) aboutVideoUrl = settings.aboutVideo;
+    else { try { aboutVideoUrl = await signedDownloadUrl("lesson-videos", settings.aboutVideo); } catch { aboutVideoUrl = ""; } }
+  }
+  const dynamicTeam = settings.team && settings.team.length > 0 ? settings.team : null;
   return (
     <>
       <PageHeader title={<T k="about.title" />} crumb={<T k="about.title" />} desc={<Tr v={siteConfig.tagline} />} />
 
-      {(settings.aboutTitle || settings.aboutBody) && (
+      {(settings.aboutTitle || settings.aboutBody || aboutVideoUrl) && (
         <section className="section"><div className="container-px max-w-3xl">
           {settings.aboutTitle && <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl">{settings.aboutTitle}</h2>}
           {settings.aboutBody && <div className="mt-4 whitespace-pre-line leading-relaxed text-muted">{settings.aboutBody}</div>}
+          {aboutVideoUrl && <video controls playsInline className="mt-6 w-full rounded-3xl bg-black" src={aboutVideoUrl} />}
         </div></section>
       )}
 
@@ -65,16 +73,29 @@ export default async function AboutPage() {
         <div className="container-px">
           <SectionHeading center eyebrow={<T k="about.teamEyebrow" />} title={<T k="about.teamTitle" />} />
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {team.map((m, i) => (
-              <Reveal key={m.id} delay={i * 80}>
-                <div className="card flex h-full flex-col items-center p-8 text-center">
-                  <GlyphTile glyph={m.glyph} tone={m.tone} size="lg" />
-                  <h3 className="mt-5 font-display text-xl font-semibold text-ink">{m.name}</h3>
-                  <p className="mt-1 text-sm font-medium text-primary-600"><Tr v={m.role} /></p>
-                  <p className="mt-3 text-sm leading-relaxed text-muted"><Tr v={m.bio} /></p>
-                </div>
-              </Reveal>
-            ))}
+            {dynamicTeam
+              ? dynamicTeam.map((m, i) => (
+                  <Reveal key={m.name + i} delay={i * 80}>
+                    <div className="card flex h-full flex-col items-center p-8 text-center">
+                      {m.image
+                        ? <img src={m.image} alt="" className="h-28 w-28 rounded-full object-cover shadow-card" />
+                        : <div className="grid h-28 w-28 place-items-center rounded-full bg-primary-50 text-3xl">👤</div>}
+                      <h3 className="mt-5 font-display text-xl font-semibold text-ink">{m.name}</h3>
+                      {m.role && <p className="mt-1 text-sm font-medium text-primary-600">{m.role}</p>}
+                      {m.info && <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted">{m.info}</p>}
+                    </div>
+                  </Reveal>
+                ))
+              : team.map((m, i) => (
+                  <Reveal key={m.id} delay={i * 80}>
+                    <div className="card flex h-full flex-col items-center p-8 text-center">
+                      <GlyphTile glyph={m.glyph} tone={m.tone} size="lg" />
+                      <h3 className="mt-5 font-display text-xl font-semibold text-ink">{m.name}</h3>
+                      <p className="mt-1 text-sm font-medium text-primary-600"><Tr v={m.role} /></p>
+                      <p className="mt-3 text-sm leading-relaxed text-muted"><Tr v={m.bio} /></p>
+                    </div>
+                  </Reveal>
+                ))}
           </div>
         </div>
       </section>

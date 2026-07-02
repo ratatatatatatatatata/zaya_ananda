@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidateTag, revalidatePath } from "next/cache";
 import { getSessionUserId } from "@/lib/auth";
-import { getUserById, allCms, createCmsItem, updateCmsItem, deleteCmsItem } from "@/lib/repo";
+import { getUserById, allCms, createCmsItem, updateCmsItem, deleteCmsItem, upsertTeacherPreset } from "@/lib/repo";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -42,6 +42,7 @@ function parseInput(body: any) {
     category: body.category ? String(body.category) : undefined,
     mode: body.mode,
     image: body.image ? String(body.image) : undefined,
+    images: Array.isArray(body.images) ? body.images.map((s: unknown) => String(s)).filter(Boolean).slice(0, 3) : undefined,
     link: body.link ? String(body.link) : undefined,
     videoLessons: num(body.videoLessons),
     students: num(body.students),
@@ -67,7 +68,9 @@ export async function POST(req: Request) {
   if (!body || !KINDS.includes(body.kind)) return NextResponse.json({ error: "Төрөл буруу байна." }, { status: 400 });
   if (!body.title || !String(body.title).trim()) return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
   try {
-    const item = await createCmsItem(parseInput(body));
+    const input = parseInput(body);
+    const item = await createCmsItem(input);
+    if (input.teacherName) { await upsertTeacherPreset({ name: input.teacherName, image: input.teacherImage, info: input.teacherInfo }); revalidateTag("settings"); }
     refreshPublic(item.id);
     return NextResponse.json({ item });
   } catch (e) {
@@ -83,7 +86,9 @@ export async function PUT(req: Request) {
   if (!KINDS.includes(body.kind)) return NextResponse.json({ error: "Төрөл буруу байна." }, { status: 400 });
   if (!body.title || !String(body.title).trim()) return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
   try {
-    const item = await updateCmsItem(String(body.id), parseInput(body));
+    const input = parseInput(body);
+    const item = await updateCmsItem(String(body.id), input);
+    if (input.teacherName) { await upsertTeacherPreset({ name: input.teacherName, image: input.teacherImage, info: input.teacherInfo }); revalidateTag("settings"); }
     refreshPublic(String(body.id));
     return NextResponse.json({ item });
   } catch (e) {

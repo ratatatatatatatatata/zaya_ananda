@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { formatMNT } from "@/lib/format";
 
-const BANK = { name: "Хаан банк", account: "5304611250", holder: "Заяа Бат-Эрдэнэ" };
+const DEFAULT_BANK = { name: "Хаан банк", account: "5304611250", holder: "Заяа Бат-Эрдэнэ" };
 const fnv = (s: string) => { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; };
 type Access = { status: "none" | "pending" | "active" | "expired"; daysLeft?: number | null; expiresAt?: string | null };
 
@@ -17,8 +17,17 @@ export function PurchaseBox({ id, price }: { id: string; title: string; price?: 
   const [copied, setCopied] = useState("");
   const [access, setAccess] = useState<Access | null>(null);
   const [loadingAccess, setLoadingAccess] = useState(true);
+  const [bank, setBank] = useState(DEFAULT_BANK);
   const amount = typeof price === "number" ? price : 0;
   const ref = user?.email || user?.phone || "";
+
+  useEffect(() => {
+    fetch("/api/settings", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((d) => {
+      const b = d?.settings?.bank;
+      if (b && (b.bankName || b.account || b.holder))
+        setBank({ name: b.bankName || DEFAULT_BANK.name, account: b.account || DEFAULT_BANK.account, holder: b.holder || DEFAULT_BANK.holder });
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!user) { setLoadingAccess(false); return; }
@@ -104,9 +113,9 @@ export function PurchaseBox({ id, price }: { id: string; title: string; price?: 
         <div className="space-y-3">
           <p className="text-center font-semibold text-ink">Банкны шилжүүлэг</p>
           <div className="divide-y divide-line rounded-2xl border border-line bg-white px-4">
-            <div className="flex items-center justify-between gap-3 py-2.5"><span className="text-sm text-muted">Банк</span><span className="font-semibold text-ink">{BANK.name}</span></div>
-            <div className="flex items-center justify-between gap-3 py-2.5"><span className="text-sm text-muted">Дансны дугаар</span><span className="flex items-center gap-2 font-semibold text-ink">{BANK.account}<CopyBtn text={BANK.account} k="acc" /></span></div>
-            <div className="flex items-center justify-between gap-3 py-2.5"><span className="text-sm text-muted">Хүлээн авагч</span><span className="font-semibold text-ink">{BANK.holder}</span></div>
+            <div className="flex items-center justify-between gap-3 py-2.5"><span className="text-sm text-muted">Банк</span><span className="font-semibold text-ink">{bank.name}</span></div>
+            <div className="flex items-center justify-between gap-3 py-2.5"><span className="text-sm text-muted">Дансны дугаар</span><span className="flex items-center gap-2 font-semibold text-ink">{bank.account}<CopyBtn text={bank.account} k="acc" /></span></div>
+            <div className="flex items-center justify-between gap-3 py-2.5"><span className="text-sm text-muted">Хүлээн авагч</span><span className="font-semibold text-ink">{bank.holder}</span></div>
             <div className="flex items-center justify-between gap-3 py-2.5"><span className="text-sm text-muted">Дүн</span><span className="flex items-center gap-2 font-semibold text-ink">{amount.toLocaleString()}₮<CopyBtn text={String(amount)} k="amt" /></span></div>
           </div>
           <div className="rounded-2xl bg-primary-50 p-3">

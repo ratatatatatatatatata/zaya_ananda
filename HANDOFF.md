@@ -33,6 +33,8 @@
 | `NEXT_PUBLIC_SUPABASE_URL` | Мөн адил (browser талд) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (browser талд видео байршуулахад хэрэглэнэ) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service_role key (зөвхөн сервер тал) |
+| `RESEND_API_KEY` | Resend.com имэйл API key — нууц үг сэргээх код илгээхэд (үнэгүй багц 100 имэйл/өдөр) |
+| `RESEND_FROM` | Илгээгч хаяг, жишээ: `Zaya's Ananda <no-reply@tanii-domain.mn>` (домэйн баталгаажуулаагүй үед `onboarding@resend.dev` — зөвхөн өөрийн имэйл рүү тест илгээнэ) |
 
 > ⚠️ **Аюулгүй байдал:** `service_role` key-г урьд нь чат дээр буулгаж байсан тул **Supabase дээр reset/rotate хийхийг зөвлөж байна**. Хэзээ ч git-д commit хийхгүй, зөвхөн env-ээр.
 
@@ -193,6 +195,48 @@ git add . && git commit -m "..." && git push
 - QPay нь одоогоор mock (жинхэнэ QPay интеграци хийгээгүй). Facebook нэвтрэлт demo.
 - Хүсвэл жинхэнэ олон-чанар (1080p/4K adaptive) видеонд Mux эсвэл Cloudflare Stream интеграци (тусдаа акаунт/төлбөр).
 - ✅ **Хурд сайжруулалт хийгдсэн (2026-07):** нийтийн хуудсууд (`/services`, `/courses`, `/shop`, `/resources`, `/about`, `/item/[id]`) одоо `force-dynamic` биш — ISR (`revalidate = 300`) + `unstable_cache` (таг: `cms`, `settings`, `lib/repo.ts`-ийн `listCmsCached/getCmsByIdCached/getSettingsCached`). Админ CMS нэмэх/засах/устгах болон Тохиргоо хадгалахад `revalidateTag`+`revalidatePath` дуудагдаж өөрчлөлт шууд харагдана. `/api/settings` GET мөн кэштэй. Анхаар: `npm run build` одоо build үед Supabase-руу ханддаг тул `.env.local` шаардлагатай.
+
+---
+
+## 10. 2026-07 нэмэлтүүд (Fable сессион)
+
+**Заавал ажиллуулах SQL (Supabase SQL Editor):**
+
+```sql
+-- Бүтээгдэхүүний олон зураг
+alter table cms_items add column if not exists images jsonb;
+
+-- Тохиргоо: видео, хамт олон, багш нар, данс
+alter table site_settings add column if not exists about_video text;
+alter table site_settings add column if not exists team jsonb;
+alter table site_settings add column if not exists teachers jsonb;
+alter table site_settings add column if not exists bank jsonb;
+
+-- Админ өөрөө үүсгэдэг цэсний хуудсууд
+create table if not exists pages (
+  id text primary key,
+  title text,
+  nav_label text,
+  body text,
+  image text,
+  video text,
+  position integer default 0,
+  created_at timestamptz default now()
+);
+
+-- Нууц үг сэргээх код
+alter table users add column if not exists reset_code_hash text;
+alter table users add column if not exists reset_expires timestamptz;
+```
+
+**Хийгдсэн боломжууд:**
+- Админ контент нэмэхэд зурагны хажууд видео хэсэг зэрэгцээ; ангилал болон товч тайлбар талбар хасагдсан; "Дэлгэрэнгүй мэдээлэл" нь Word маягийн rich text editor (фонт, хэмжээ, тод/доогуур, өнгө, байрлал, `components/RichTextEditor.tsx`) — HTML болж хадгалагдаад `RichBody`-оор харагдана.
+- Бүтээгдэхүүн 1–3 зурагтай (`images` багана); дэлгэрэнгүйд галерей + дарахад томруулах lightbox (`components/ImageGallery.tsx`); бүх картын зураг томорсон; дэлгүүрийн карт: зураг → нэр → үнэ.
+- Бүтээгдэхүүний дэлгэрэнгүйд тоо ширхэгтэй "Сагсанд нэмэх" + "Худалдаж авах" (`components/ProductBuyBox.tsx`), доор нь "Санал болгох бүтээгдэхүүн". `/api/orders` CMS бүтээгдэхүүнийг ID-гаар нь таньдаг болсон.
+- Багшийн мэдээлэл `site_settings.teachers`-д автоматаар хадгалагдаж, формд "Өмнөх багш сонгох" dropdown-оор бөглөгдөнө.
+- Тохиргоо: "Бидний тухай" видео, "Хамт олон" (зураг/нэр/албан тушаал/дэлгэрэнгүй — about хуудсанд гарна), дансны мэдээлэл (PurchaseBox үүнийг уншина).
+- "Ерөнхий тохиргоо (Цэс)" админ таб: шинэ хуудас үүсгэвэл Header цэсэнд автоматаар мөр нэмэгдэнэ (`/p/[id]`, `pages` хүснэгт, `components/AdminPages.tsx`).
+- Нууц үг: админ хэрэглэгчийн нууц үгийг шинэчилнэ (users таб); нэвтрэх хуудсанд "Нууц үг мартсан?" → `/reset` — имэйлээр 6 оронтой код (Resend, `lib/email.ts`). **RESEND_API_KEY тохируулаагүй бол код илгээгдэхгүй.**
 
 ---
 
