@@ -52,3 +52,40 @@ export async function sbUpdate<T>(table: string, id: string, patch: Record<strin
 export async function sbDelete(table: string, id: string): Promise<void> {
   await req(`${table}?id=eq.${enc(id)}`, { method: "DELETE" });
 }
+
+// ---- Storage (service-key; private bucket + signed URLs) ----
+const STORAGE = () => `${URL}/storage/v1`;
+async function storageReq(path: string, init?: RequestInit): Promise<unknown> {
+  assertEnv();
+  const res = await fetch(`${STORAGE()}/${path}`, {
+    ...init,
+    headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, ...(init?.headers || {}) },
+    cache: "no-store",
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`Storage ${res.status}: ${text.slice(0, 300)}`);
+  return text ? JSON.parse(text) : null;
+}
+
+export async function ensureBucket(id: string): Promise<void> {
+  try {
+    await storageReq("bucket", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, name: id, public: false }) });
+  } catch (e) {
+    if (!/already exists|Duplicate|409/i.test(String(e))) throw e;
+  }
+}
+
+function fullStorageUrl(u: string): string {
+  const rel = u.startsWith("/storage/v1") ? u : `/storage/v1${u.startsWith("/") ? "" : "/"}${u}`;
+  return `${URL}${rel}`;
+}
+
+export async function signedUploadUrl(bucket: string, path: string): Promise<string> {
+  const data = (await storageReq(`object/upload/sign/${bucket}/${path}`, { method: "POST" })) as { url?: string };
+  return fullStorageUrl(data?.url || "");
+}
+
+export async function signedDownloadUrl(bucket: string, path: string, expiresIn = 21600): Promise<string> {
+  const data = (await storageReq(`object/sign/${bucket}/${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expiresIn }) })) as { signedURL?: string };
+  return fullStorageUrl(data?.signedURL || "");
+}

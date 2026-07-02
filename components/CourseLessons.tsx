@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type Lesson = { title: string; url: string };
+type Lesson = { title: string; url: string; quality?: string };
 type Data = { status: "none" | "pending" | "active" | "expired"; lessons: Lesson[] };
 
 function embed(url: string): { type: "iframe" | "video"; src: string } {
@@ -60,7 +60,8 @@ export function CourseLessons({ id }: { id: string }) {
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-100 text-sm font-bold text-primary-700">{i + 1}</span>
                 <span className="font-display font-semibold text-ink">{l.title}</span>
               </div>
-              <div className="aspect-video w-full bg-black">
+              <div className="relative aspect-video w-full bg-black">
+                {l.quality && <span className="absolute right-2 top-2 z-10 rounded-md bg-black/70 px-2 py-0.5 text-xs font-bold text-white">{l.quality}</span>}
                 {e.type === "iframe" ? (
                   <iframe src={e.src} title={l.title} className="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
                 ) : (

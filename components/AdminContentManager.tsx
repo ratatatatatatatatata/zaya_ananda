@@ -29,13 +29,33 @@ function compressImage(file: File, maxW = 900, quality = 0.82): Promise<string> 
 
 const EMPTY = { title: "", category: "", summary: "", body: "", price: "", mode: "online", image: "", videoLessons: "", students: "", views: "", teacherName: "", teacherImage: "", teacherInfo: "", accessDays: "" };
 
+const SB_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+async function uploadVideo(file: File, onProgress: (p: number) => void): Promise<string> {
+  const r = await fetch("/api/admin/video-upload-url", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: file.name }) });
+  if (!r.ok) throw new Error(((await r.json().catch(() => ({}))) as { error?: string }).error || "Байршуулах URL авахад алдаа гарлаа.");
+  const { uploadUrl, path } = (await r.json()) as { uploadUrl: string; path: string };
+  await new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", uploadUrl);
+    if (SB_ANON) { xhr.setRequestHeader("apikey", SB_ANON); xhr.setRequestHeader("authorization", "Bearer " + SB_ANON); }
+    xhr.setRequestHeader("x-upsert", "true");
+    if (file.type) xhr.setRequestHeader("content-type", file.type);
+    xhr.upload.onprogress = (e) => { if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100)); };
+    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error("Байршуулалт амжилтгүй (" + xhr.status + "): " + String(xhr.responseText).slice(0, 160))));
+    xhr.onerror = () => reject(new Error("Сүлжээний алдаа. Дахин оролдоно уу."));
+    xhr.send(file);
+  });
+  return path;
+}
+
 export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
   const [items, setItems] = useState<CmsItem[]>([]);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
   const [form, setForm] = useState(EMPTY);
-  const [lessons, setLessons] = useState<{ title: string; url: string }[]>([]);
+  const [lessons, setLessons] = useState<{ title: string; path: string; quality: string; filename?: string; uploading?: boolean; progress?: number }[]>([]);
   const set = (k: keyof typeof EMPTY, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
   const load = useCallback(() => {
@@ -52,6 +72,17 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
     catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
   }
 
+  const updLesson = (idx: number, patch: Partial<{ title: string; path: string; quality: string; filename: string; uploading: boolean; progress: number }>) =>
+    setLessons((ls) => ls.map((x, i) => (i === idx ? { ...x, ...patch } : x)));
+  async function onPickVideo(e: React.ChangeEvent<HTMLInputElement>, idx: number) {
+    const file = e.target.files?.[0]; if (!file) return;
+    updLesson(idx, { uploading: true, progress: 0, filename: file.name });
+    try {
+      const path = await uploadVideo(file, (p) => updLesson(idx, { progress: p }));
+      updLesson(idx, { path, uploading: false, progress: 100 });
+    } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Видео байршуулахад алдаа."); updLesson(idx, { uploading: false }); }
+  }
+
   async function add(e: React.FormEvent) {
     e.preventDefault();
     if (!form.title.trim()) { setErr("Гарчиг оруулна уу."); return; }
@@ -59,7 +90,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
     try {
       const res = await fetch("/api/admin/content", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind, ...form, mode: kind === "course" ? form.mode : undefined, lessons: kind === "course" ? lessons.filter((l) => l.title.trim() && l.url.trim()) : undefined }),
+        body: JSON.stringify({ kind, ...form, mode: kind === "course" ? form.mode : undefined, lessons: kind === "course" ? lessons.filter((l) => l.title.trim() && l.path).map((l) => ({ title: l.title.trim(), path: l.path, quality: l.quality })) : undefined }),
       });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
       setForm(EMPTY); setLessons([]); setOpen(false); load();
@@ -113,16 +144,28 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
             <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
               <div className="mb-2 flex items-center justify-between">
                 <p className="font-display font-semibold text-ink">Видео хичээлүүд <span className="text-sm font-normal text-muted">({lessons.length})</span></p>
-                <button type="button" onClick={() => setLessons((ls) => [...ls, { title: "", url: "" }])} className="btn btn-outline btn-sm">+ Хичээл нэмэх</button>
+                <button type="button" onClick={() => setLessons((ls) => [...ls, { title: "", path: "", quality: "1080p" }])} className="btn btn-outline btn-sm">+ Хичээл нэмэх</button>
               </div>
-              <p className="mb-3 text-xs leading-relaxed text-muted">Хичээл бүр гарчигтай байх ёстой. Видеоны холбоос: YouTube/Vimeo холбоос эсвэл .mp4 линк. Эдгээр видео зөвхөн төлбөр баталгаажсан хэрэглэгчид харагдана.</p>
+              <p className="mb-3 text-xs leading-relaxed text-muted">Хичээл бүр гарчигтай байх ёстой. Видео файлаа компьютерээсээ шууд байршуулж, чанарын шошго (1080p/4K) сонгоно. Эдгээр видео зөвхөн төлбөр баталгаажсан хэрэглэгчид харагдана.</p>
               <div className="space-y-2">
                 {lessons.map((l, idx) => (
-                  <div key={idx} className="flex flex-col gap-2 rounded-xl border border-line bg-white p-3 sm:flex-row sm:items-center">
-                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-100 text-xs font-bold text-primary-700">{idx + 1}</span>
-                    <input className="input flex-1" placeholder="Хичээлийн гарчиг" value={l.title} onChange={(e) => setLessons((ls) => ls.map((x, i) => i === idx ? { ...x, title: e.target.value } : x))} />
-                    <input className="input flex-1" placeholder="Видео холбоос (https://...)" value={l.url} onChange={(e) => setLessons((ls) => ls.map((x, i) => i === idx ? { ...x, url: e.target.value } : x))} />
-                    <button type="button" onClick={() => setLessons((ls) => ls.filter((_, i) => i !== idx))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
+                  <div key={idx} className="space-y-2 rounded-xl border border-line bg-white p-3">
+                    <div className="flex items-center gap-2">
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-100 text-xs font-bold text-primary-700">{idx + 1}</span>
+                      <input className="input flex-1" placeholder="Хичээлийн гарчиг" value={l.title} onChange={(e) => updLesson(idx, { title: e.target.value })} />
+                      <select className="input w-32 shrink-0" value={l.quality} onChange={(e) => updLesson(idx, { quality: e.target.value })}>
+                        <option value="480p">480p</option><option value="720p">720p</option><option value="1080p">1080p</option><option value="1440p">1440p (2K)</option><option value="4K">4K</option>
+                      </select>
+                      <button type="button" onClick={() => setLessons((ls) => ls.filter((_, i) => i !== idx))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
+                    </div>
+                    <div className="flex items-center gap-3 pl-9">
+                      {l.path
+                        ? <span className="text-sm font-medium text-jade-600">✓ Видео байршсан{l.filename ? " — " + l.filename : ""}</span>
+                        : l.uploading
+                        ? <span className="shrink-0 text-sm font-medium text-primary-700">Байршуулж байна… {l.progress ?? 0}%</span>
+                        : <input type="file" accept="video/*" className="text-sm" onChange={(e) => onPickVideo(e, idx)} />}
+                      {l.uploading && <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-line"><div className="h-full bg-primary-500 transition-all" style={{ width: (l.progress ?? 0) + "%" }} /></div>}
+                    </div>
                   </div>
                 ))}
                 {lessons.length === 0 && <p className="text-sm text-muted">Одоогоор хичээл алга. “+ Хичээл нэмэх” дарж видео хичээл нэмнэ үү.</p>}

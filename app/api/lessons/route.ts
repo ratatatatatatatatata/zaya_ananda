@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth";
 import { getCmsById, getOrdersByUser } from "@/lib/repo";
+import { signedDownloadUrl } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,7 +26,15 @@ export async function GET(req: Request) {
       else if (mine.some((o) => o.status === "pending")) status = "pending";
     }
 
-    const out = lessons.map((l) => ({ title: l.title, url: status === "active" ? l.url : "" }));
+    const BUCKET = "lesson-videos";
+    const out = await Promise.all(lessons.map(async (l) => {
+      let url = "";
+      if (status === "active") {
+        if (l.path) { try { url = await signedDownloadUrl(BUCKET, l.path); } catch { url = ""; } }
+        else if (l.url) url = l.url;
+      }
+      return { title: l.title, url, quality: l.quality || "" };
+    }));
     return NextResponse.json({ status, lessons: out });
   } catch {
     return NextResponse.json({ status: "none", lessons: [] });

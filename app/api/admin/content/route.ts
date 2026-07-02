@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
   const num = (v: unknown) => (v !== undefined && v !== null && v !== "" ? Number(v) : undefined);
   const lessons = Array.isArray(body.lessons)
-    ? body.lessons.map((l: { title?: unknown; url?: unknown }) => ({ title: String(l?.title || "").trim(), url: String(l?.url || "").trim() })).filter((l: { title: string; url: string }) => l.title && l.url)
+    ? body.lessons.map((l: { title?: unknown; path?: unknown; url?: unknown; quality?: unknown }) => ({ title: String(l?.title || "").trim(), path: l?.path ? String(l.path) : "", url: l?.url ? String(l.url) : "", quality: l?.quality ? String(l.quality) : "" })).filter((l: { title: string; path: string; url: string }) => l.title && (l.path || l.url))
     : undefined;
   try {
   const item = await createCmsItem({
