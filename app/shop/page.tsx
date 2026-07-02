@@ -1,13 +1,13 @@
 import { PageHeader } from "@/components/PageHeader";
 import { CmsCard } from "@/components/CmsCard";
-import { listCms } from "@/lib/repo";
+import { listCmsCached } from "@/lib/repo";
 import { T } from "@/components/T";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 export const metadata = { title: "Дэлгүүр" };
 
 export default async function ShopPage() {
-  const items = await listCms("product");
+  const items = await listCmsCached("product");
   return (
     <>
       <PageHeader title={<T k="nav.shop" />} crumb={<T k="nav.shop" />} />

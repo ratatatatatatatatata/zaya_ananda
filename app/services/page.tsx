@@ -1,14 +1,14 @@
 import { PageHeader } from "@/components/PageHeader";
 import { CmsFilterGrid } from "@/components/CmsFilterGrid";
 import { PromoBanner } from "@/components/PromoBanner";
-import { listCms } from "@/lib/repo";
+import { listCmsCached } from "@/lib/repo";
 import { T } from "@/components/T";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 export const metadata = { title: "Үйлчилгээ" };
 
 export default async function ServicesPage() {
-  const [items, promos] = await Promise.all([listCms("service"), listCms("promo")]);
+  const [items, promos] = await Promise.all([listCmsCached("service"), listCmsCached("promo")]);
   return (
     <>
       <PromoBanner items={promos} />

@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
+import { revalidateTag, revalidatePath } from "next/cache";
 import { getSessionUserId } from "@/lib/auth";
-import { getUserById, getSettings, updateSettings } from "@/lib/repo";
+import { getUserById, getSettingsCached, updateSettings } from "@/lib/repo";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json({ settings: await getSettings() });
+  // Cached read ("settings" tag) — invalidated on PATCH below.
+  return NextResponse.json({ settings: await getSettingsCached() });
 }
 
 export async function PATCH(req: Request) {
@@ -26,6 +28,8 @@ export async function PATCH(req: Request) {
       instagram: str(body.instagram),
       youtube: str(body.youtube),
     });
+    revalidateTag("settings");
+    revalidatePath("/about");
     return NextResponse.json({ settings });
   } catch (e) {
     return NextResponse.json({ error: "Хадгалах үед алдаа: " + (e instanceof Error ? e.message : String(e)) }, { status: 500 });

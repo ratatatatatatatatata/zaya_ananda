@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { unstable_cache } from "next/cache";
 import { hashPassword, verifyPassword } from "./auth";
 import { sbSelect, sbInsert, sbUpdate, sbDelete, enc } from "./supabase";
 import { services, courses, products } from "@/data/content";
@@ -157,6 +158,14 @@ export async function getCmsById(id: string): Promise<CmsItem | null> {
   const rows = await sbSelect<CmsItem>("cms_items", `id=eq.${enc(id)}&limit=1`);
   return rows[0] || null;
 }
+
+// ---------- Cached public reads (invalidated via revalidateTag in admin API routes) ----------
+export const listCmsCached = (kind: CmsItem["kind"]) =>
+  unstable_cache(() => listCms(kind), ["cms-list", kind], { tags: ["cms"], revalidate: 300 })();
+export const getCmsByIdCached = (id: string) =>
+  unstable_cache(() => getCmsById(id), ["cms-item", id], { tags: ["cms"], revalidate: 300 })();
+export const getSettingsCached = () =>
+  unstable_cache(() => getSettings(), ["site-settings"], { tags: ["settings"], revalidate: 300 })();
 
 type CmsInput = {
   kind: CmsItem["kind"]; title: string; summary?: string; body?: string; price?: number; category?: string; mode?: CmsItem["mode"];

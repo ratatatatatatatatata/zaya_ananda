@@ -6,13 +6,13 @@ import { GlyphTile } from "@/components/GlyphTile";
 import { Reveal } from "@/components/Reveal";
 import { T, Tr } from "@/components/T";
 import { aboutContent, team, faqs, siteConfig } from "@/data/content";
-import { getSettings } from "@/lib/repo";
+import { getSettingsCached } from "@/lib/repo";
 
 export const metadata = { title: "Бидний тухай" };
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export default async function AboutPage() {
-  const settings = await getSettings();
+  const settings = await getSettingsCached();
   return (
     <>
       <PageHeader title={<T k="about.title" />} crumb={<T k="about.title" />} desc={<Tr v={siteConfig.tagline} />} />

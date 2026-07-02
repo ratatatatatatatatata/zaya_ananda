@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag, revalidatePath } from "next/cache";
 import { getSessionUserId } from "@/lib/auth";
 import { getUserById, allCms, createCmsItem, updateCmsItem, deleteCmsItem } from "@/lib/repo";
 
@@ -6,6 +7,13 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const KINDS = ["service", "course", "product", "resource", "promo"] as const;
+
+// Purge cached public pages/data so admin edits show up immediately.
+function refreshPublic(id?: string) {
+  revalidateTag("cms");
+  for (const p of ["/services", "/courses", "/shop", "/resources"]) revalidatePath(p);
+  if (id) revalidatePath(`/item/${id}`);
+}
 
 async function guard() {
   const uid = await getSessionUserId();
@@ -60,6 +68,7 @@ export async function POST(req: Request) {
   if (!body.title || !String(body.title).trim()) return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
   try {
     const item = await createCmsItem(parseInput(body));
+    refreshPublic(item.id);
     return NextResponse.json({ item });
   } catch (e) {
     return NextResponse.json({ error: "Хадгалах үед алдаа: " + (e instanceof Error ? e.message : String(e)) }, { status: 500 });
@@ -75,6 +84,7 @@ export async function PUT(req: Request) {
   if (!body.title || !String(body.title).trim()) return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
   try {
     const item = await updateCmsItem(String(body.id), parseInput(body));
+    refreshPublic(String(body.id));
     return NextResponse.json({ item });
   } catch (e) {
     return NextResponse.json({ error: "Засах үед алдаа: " + (e instanceof Error ? e.message : String(e)) }, { status: 500 });
@@ -87,5 +97,6 @@ export async function DELETE(req: Request) {
   const id = new URL(req.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
   await deleteCmsItem(id);
+  refreshPublic(id);
   return NextResponse.json({ ok: true });
 }

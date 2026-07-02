@@ -1,13 +1,13 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getCmsById } from "@/lib/repo";
+import { getCmsByIdCached } from "@/lib/repo";
 import { T } from "@/components/T";
 import { PurchaseBox } from "@/components/PurchaseBox";
 import { CourseLessons } from "@/components/CourseLessons";
 import { ItemVideos } from "@/components/ItemVideos";
 import { signedDownloadUrl } from "@/lib/supabase";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 const kindNav: Record<string, { href: string; key: string }> = {
   service: { href: "/services", key: "nav.services" },
@@ -18,7 +18,7 @@ const kindNav: Record<string, { href: string; key: string }> = {
 const modeLabel: Record<string, string> = { online: "Онлайн сургалт", tankhim: "Танхимын сургалт", both: "Онлайн + Танхим" };
 
 export default async function ItemPage({ params }: { params: { id: string } }) {
-  const item = await getCmsById(params.id);
+  const item = await getCmsByIdCached(params.id);
   if (!item) notFound();
   const nav = kindNav[item.kind] || kindNav.service;
   const lines = (item.teacherInfo || "").split("\n").map((s) => s.trim()).filter(Boolean);
