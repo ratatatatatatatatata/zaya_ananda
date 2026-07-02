@@ -1,6 +1,9 @@
-export function Logo({ withText = true, className = "" }: { withText?: boolean; className?: string }) {
+export function Logo({ withText = true, className = "", logoSrc }: { withText?: boolean; className?: string; logoSrc?: string }) {
   return (
     <span className={"inline-flex items-center gap-2.5 " + className}>
+      {logoSrc ? (
+        <img src={logoSrc} alt="Zaya's Ananda" className="h-10 w-10 shrink-0 rounded-xl object-cover" />
+      ) : (
       <svg viewBox="0 0 48 48" className="h-10 w-10 shrink-0" role="img" aria-label="Zaya's Ananda">
         <defs>
           <linearGradient id="logo-t" x1="0" y1="0" x2="1" y2="1">
@@ -18,6 +21,7 @@ export function Logo({ withText = true, className = "" }: { withText?: boolean; 
         </g>
         <circle cx="24" cy="31" r="1.7" fill="#B8912F" />
       </svg>
+      )}
       {withText && (
         <span className="flex flex-col leading-none">
           <span className="font-display text-lg font-semibold text-ink">Zaya&apos;s Ananda</span>

@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth";
-import { getUserById, allCms, createCmsItem, deleteCmsItem } from "@/lib/repo";
+import { getUserById, allCms, createCmsItem, updateCmsItem, deleteCmsItem } from "@/lib/repo";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const KINDS = ["service", "course", "product", "resource"] as const;
+const KINDS = ["service", "course", "product", "resource", "promo"] as const;
 
 async function guard() {
   const uid = await getSessionUserId();
@@ -15,6 +15,35 @@ async function guard() {
   if (adminEmail && me?.email !== adminEmail)
     return { ok: false as const, res: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
   return { ok: true as const };
+}
+
+const num = (v: unknown) => (v !== undefined && v !== null && v !== "" ? Number(v) : undefined);
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseInput(body: any) {
+  const lessons = Array.isArray(body.lessons)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ? body.lessons.map((l: any) => ({ title: String(l?.title || "").trim(), path: l?.path ? String(l.path) : "", url: l?.url ? String(l.url) : "", quality: l?.quality ? String(l.quality) : "", subtitles: l?.subtitles ? String(l.subtitles) : "" })).filter((l: { title: string; path: string; url: string }) => l.title && (l.path || l.url))
+    : undefined;
+  return {
+    kind: body.kind,
+    title: String(body.title),
+    summary: body.summary ? String(body.summary) : "",
+    body: body.body ? String(body.body) : undefined,
+    price: num(body.price),
+    category: body.category ? String(body.category) : undefined,
+    mode: body.mode,
+    image: body.image ? String(body.image) : undefined,
+    link: body.link ? String(body.link) : undefined,
+    videoLessons: num(body.videoLessons),
+    students: num(body.students),
+    views: num(body.views),
+    teacherName: body.teacherName ? String(body.teacherName) : undefined,
+    teacherImage: body.teacherImage ? String(body.teacherImage) : undefined,
+    teacherInfo: body.teacherInfo ? String(body.teacherInfo) : undefined,
+    accessDays: num(body.accessDays),
+    lessons,
+  };
 }
 
 export async function GET() {
@@ -27,36 +56,28 @@ export async function POST(req: Request) {
   const g = await guard();
   if (!g.ok) return g.res;
   const body = await req.json().catch(() => null);
-  if (!body || !KINDS.includes(body.kind))
-    return NextResponse.json({ error: "Төрөл буруу байна." }, { status: 400 });
-  if (!body.title || !String(body.title).trim())
-    return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
-  const num = (v: unknown) => (v !== undefined && v !== null && v !== "" ? Number(v) : undefined);
-  const lessons = Array.isArray(body.lessons)
-    ? body.lessons.map((l: { title?: unknown; path?: unknown; url?: unknown; quality?: unknown; subtitles?: unknown }) => ({ title: String(l?.title || "").trim(), path: l?.path ? String(l.path) : "", url: l?.url ? String(l.url) : "", quality: l?.quality ? String(l.quality) : "", subtitles: l?.subtitles ? String(l.subtitles) : "" })).filter((l: { title: string; path: string; url: string }) => l.title && (l.path || l.url))
-    : undefined;
+  if (!body || !KINDS.includes(body.kind)) return NextResponse.json({ error: "Төрөл буруу байна." }, { status: 400 });
+  if (!body.title || !String(body.title).trim()) return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
   try {
-  const item = await createCmsItem({
-    kind: body.kind,
-    title: String(body.title),
-    summary: body.summary ? String(body.summary) : "",
-    body: body.body ? String(body.body) : undefined,
-    price: num(body.price),
-    category: body.category ? String(body.category) : undefined,
-    mode: body.mode,
-    image: body.image ? String(body.image) : undefined,
-    videoLessons: num(body.videoLessons),
-    students: num(body.students),
-    views: num(body.views),
-    teacherName: body.teacherName ? String(body.teacherName) : undefined,
-    teacherImage: body.teacherImage ? String(body.teacherImage) : undefined,
-    teacherInfo: body.teacherInfo ? String(body.teacherInfo) : undefined,
-    accessDays: num(body.accessDays),
-    lessons,
-  });
+    const item = await createCmsItem(parseInput(body));
     return NextResponse.json({ item });
   } catch (e) {
     return NextResponse.json({ error: "Хадгалах үед алдаа: " + (e instanceof Error ? e.message : String(e)) }, { status: 500 });
+  }
+}
+
+export async function PUT(req: Request) {
+  const g = await guard();
+  if (!g.ok) return g.res;
+  const body = await req.json().catch(() => null);
+  if (!body || !body.id) return NextResponse.json({ error: "id required" }, { status: 400 });
+  if (!KINDS.includes(body.kind)) return NextResponse.json({ error: "Төрөл буруу байна." }, { status: 400 });
+  if (!body.title || !String(body.title).trim()) return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
+  try {
+    const item = await updateCmsItem(String(body.id), parseInput(body));
+    return NextResponse.json({ item });
+  } catch (e) {
+    return NextResponse.json({ error: "Засах үед алдаа: " + (e instanceof Error ? e.message : String(e)) }, { status: 500 });
   }
 }
 

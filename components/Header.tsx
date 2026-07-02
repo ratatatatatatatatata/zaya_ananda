@@ -27,6 +27,7 @@ export function Header() {
   const { t } = useI18n();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [logo, setLogo] = useState<string>();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -35,13 +36,14 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
   useEffect(() => { setMenuOpen(false); }, [pathname]);
+  useEffect(() => { fetch("/api/settings", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((d) => { if (d?.settings?.logo) setLogo(d.settings.logo); }).catch(() => {}); }, []);
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   return (
     <header className={cx("sticky top-0 z-40 transition-all duration-300", scrolled ? "glass border-b border-line shadow-sm" : "border-b border-transparent bg-white/60 backdrop-blur-sm")}>
       <div className="mx-auto flex h-16 w-full max-w-[1440px] items-center justify-between gap-3 px-5 lg:h-[72px] lg:px-8">
-        <Link href="/" aria-label="Zaya's Ananda"><Logo /></Link>
+        <Link href="/" aria-label="Zaya's Ananda"><Logo logoSrc={logo} /></Link>
 
         <nav className="hidden items-center gap-4 xl:flex 2xl:gap-6">
           {links.map((l) => (

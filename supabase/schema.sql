@@ -55,3 +55,16 @@ alter table cms_items add column if not exists teacher_image text;
 alter table cms_items add column if not exists teacher_info  text;
 
 alter table cms_items add column if not exists lessons jsonb;
+
+create table if not exists site_settings (
+  id text primary key,
+  logo text,
+  about_title text,
+  about_body text,
+  facebook text,
+  instagram text,
+  youtube text,
+  updated_at timestamptz default now()
+);
+
+alter table cms_items add column if not exists link text;

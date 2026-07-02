@@ -147,9 +147,18 @@ export interface EventItem {
   date: string;
 }
 
+export interface SiteSettings {
+  logo?: string;
+  aboutTitle?: string;
+  aboutBody?: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
+}
+
 export interface CmsItem {
   id: string;
-  kind: "service" | "course" | "product" | "resource";
+  kind: "service" | "course" | "product" | "resource" | "promo";
   title: string;
   summary: string;
   body?: string;
@@ -157,6 +166,7 @@ export interface CmsItem {
   category?: string;
   mode?: "online" | "tankhim" | "both";
   image?: string;
+  link?: string;
   videoLessons?: number;
   students?: number;
   views?: number;

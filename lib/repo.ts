@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { hashPassword, verifyPassword } from "./auth";
 import { sbSelect, sbInsert, sbUpdate, sbDelete, enc } from "./supabase";
 import { services, courses, products } from "@/data/content";
-import type { User, PublicUser, Order, OrderItem, ContactMessage, CmsItem } from "./types";
+import type { User, PublicUser, Order, OrderItem, ContactMessage, CmsItem, SiteSettings } from "./types";
 
 export const catalog = { services, courses, products };
 export function findService(slug: string) { return services.find((s) => s.slug === slug) || null; }
@@ -128,6 +128,22 @@ export async function createMessage(input: { name: string; email: string; phone?
   });
 }
 
+// ---------- Settings ----------
+export async function getSettings(): Promise<SiteSettings> {
+  try {
+    const rows = await sbSelect<SiteSettings>("site_settings", "id=eq.main&limit=1");
+    const r = (rows[0] || {}) as SiteSettings;
+    return { logo: r.logo, aboutTitle: r.aboutTitle, aboutBody: r.aboutBody, facebook: r.facebook, instagram: r.instagram, youtube: r.youtube };
+  } catch { return {}; }
+}
+export async function updateSettings(patch: Partial<SiteSettings>): Promise<SiteSettings> {
+  const existing = await sbSelect<{ id: string }>("site_settings", "id=eq.main&limit=1");
+  const row: Record<string, unknown> = { ...patch, updatedAt: new Date().toISOString() };
+  if (existing[0]) await sbUpdate("site_settings", "main", row);
+  else await sbInsert("site_settings", { id: "main", ...row });
+  return getSettings();
+}
+
 // ---------- CMS ----------
 export async function listCms(kind: CmsItem["kind"]): Promise<CmsItem[]> {
   return sbSelect<CmsItem>("cms_items", `kind=eq.${enc(kind)}&order=created_at.desc`);
@@ -142,17 +158,19 @@ export async function getCmsById(id: string): Promise<CmsItem | null> {
   return rows[0] || null;
 }
 
-export async function createCmsItem(input: {
+type CmsInput = {
   kind: CmsItem["kind"]; title: string; summary?: string; body?: string; price?: number; category?: string; mode?: CmsItem["mode"];
-  image?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherInfo?: string; accessDays?: number; lessons?: { title: string; path?: string; url?: string; quality?: string; subtitles?: string }[];
-}): Promise<CmsItem> {
-  return sbInsert<CmsItem>("cms_items", {
-    id: randomUUID(), kind: input.kind, title: input.title.trim(), summary: (input.summary || "").trim(),
+  image?: string; link?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherInfo?: string; accessDays?: number; lessons?: { title: string; path?: string; url?: string; quality?: string; subtitles?: string }[];
+};
+function cmsRow(input: CmsInput): Record<string, unknown> {
+  return {
+    kind: input.kind, title: input.title.trim(), summary: (input.summary || "").trim(),
     body: input.body?.trim() || null,
     price: numOrNull(input.price),
     category: input.category?.trim() || null,
     mode: input.kind === "course" ? input.mode || "online" : null,
     image: input.image || null,
+    link: input.link?.trim() || null,
     videoLessons: input.lessons && input.lessons.length ? input.lessons.length : numOrNull(input.videoLessons),
     students: numOrNull(input.students),
     views: numOrNull(input.views),
@@ -161,8 +179,13 @@ export async function createCmsItem(input: {
     teacherInfo: input.teacherInfo?.trim() || null,
     accessDays: numOrNull(input.accessDays),
     lessons: input.lessons && input.lessons.length ? input.lessons : null,
-    createdAt: new Date().toISOString(),
-  });
+  };
+}
+export async function createCmsItem(input: CmsInput): Promise<CmsItem> {
+  return sbInsert<CmsItem>("cms_items", { id: randomUUID(), ...cmsRow(input), createdAt: new Date().toISOString() });
+}
+export async function updateCmsItem(id: string, input: CmsInput): Promise<CmsItem | null> {
+  return sbUpdate<CmsItem>("cms_items", id, cmsRow(input));
 }
 export async function deleteCmsItem(id: string): Promise<boolean> {
   await sbDelete("cms_items", id);

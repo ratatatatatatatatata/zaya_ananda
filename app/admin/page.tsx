@@ -8,18 +8,21 @@ import { useI18n } from "@/lib/i18n";
 import { formatMNT, cx } from "@/lib/format";
 import { Icon } from "@/components/Icon";
 import { AdminContentManager } from "@/components/AdminContentManager";
+import { AdminSettings } from "@/components/AdminSettings";
 import type { Order, PublicUser, ContactMessage } from "@/lib/types";
 
-const nav = [
+const nav: { id: string; k: string; label?: string; icon: string }[] = [
   { id: "overview", k: "admin.overview", icon: "sparkles" },
   { id: "users", k: "admin.users", icon: "user" },
   { id: "orders", k: "admin.orders", icon: "calendar" },
   { id: "services", k: "admin.servicesM", icon: "star" },
   { id: "courses", k: "admin.coursesM", icon: "award" },
   { id: "products", k: "admin.productsM", icon: "laptop" },
-  { id: "events", k: "admin.eventsM", icon: "calendar" },
+  { id: "events", k: "admin.eventsM", label: "Зөвлөгөө", icon: "calendar" },
+  { id: "promos", k: "admin.promosM", label: "Сурталчилгаа", icon: "star" },
   { id: "reviews", k: "admin.reviews", icon: "star" },
   { id: "messages", k: "nav.contact", icon: "user" },
+  { id: "settings", k: "admin.settingsM", label: "Тохиргоо", icon: "sparkles" },
 ];
 
 export default function AdminPage() {
@@ -97,7 +100,7 @@ export default function AdminPage() {
             {nav.map((n) => (
               <button key={n.id} onClick={() => setTab(n.id)}
                 className={cx("flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-sm font-medium transition", tab === n.id ? "bg-primary-50 text-primary-700" : "text-ink/70 hover:bg-primary-50/60")}>
-                <Icon name={n.icon} className="h-4 w-4" /> {t(n.k)}
+                <Icon name={n.icon} className="h-4 w-4" /> {n.label ?? t(n.k)}
               </button>
             ))}
           </aside>
@@ -177,6 +180,8 @@ export default function AdminPage() {
             {tab === "courses" && <AdminContentManager kind="course" />}
             {tab === "products" && <AdminContentManager kind="product" />}
             {tab === "events" && <AdminContentManager kind="resource" />}
+            {tab === "promos" && <AdminContentManager kind="promo" />}
+            {tab === "settings" && <AdminSettings />}
             {tab === "messages" && (
               <div className="card overflow-x-auto"><table className="w-full min-w-[680px]">
                 <thead className="border-b border-line bg-aqua"><tr><Th>{t("admin.colName")}</Th><Th>{t("admin.colEmail")}</Th><Th>{t("form.phone")}</Th><Th>{t("contact.subject")}</Th><Th>{t("contact.message")}</Th><Th>{t("admin.colDate")}</Th><Th>Үйлдэл</Th></tr></thead>

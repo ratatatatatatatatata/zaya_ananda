@@ -6,13 +6,23 @@ import { GlyphTile } from "@/components/GlyphTile";
 import { Reveal } from "@/components/Reveal";
 import { T, Tr } from "@/components/T";
 import { aboutContent, team, faqs, siteConfig } from "@/data/content";
+import { getSettings } from "@/lib/repo";
 
 export const metadata = { title: "Бидний тухай" };
+export const dynamic = "force-dynamic";
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const settings = await getSettings();
   return (
     <>
       <PageHeader title={<T k="about.title" />} crumb={<T k="about.title" />} desc={<Tr v={siteConfig.tagline} />} />
+
+      {(settings.aboutTitle || settings.aboutBody) && (
+        <section className="section"><div className="container-px max-w-3xl">
+          {settings.aboutTitle && <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl">{settings.aboutTitle}</h2>}
+          {settings.aboutBody && <div className="mt-4 whitespace-pre-line leading-relaxed text-muted">{settings.aboutBody}</div>}
+        </div></section>
+      )}
 
       <section className="section">
         <div className="container-px grid items-center gap-12 lg:grid-cols-2">
