@@ -127,7 +127,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
     const payload = {
       kind, ...form,
       mode: kind === "course" ? form.mode : undefined,
-      lessons: kind === "course" ? lessons.filter((l) => l.title.trim() && l.path).map((l) => ({ title: l.title.trim(), path: l.path, quality: l.quality, subtitles: l.subtitles || "" })) : undefined,
+      lessons: kind !== "promo" ? lessons.filter((l) => l.title.trim() && l.path).map((l) => ({ title: l.title.trim(), path: l.path, quality: l.quality, subtitles: l.subtitles || "" })) : undefined,
     };
     try {
       const res = await fetch("/api/admin/content", {
@@ -193,24 +193,24 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
               </div>
 
               {isCourse && (
-                <>
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    <div><label className="field-label">Суралцагчийн тоо</label><input className="input" type="number" value={form.students} onChange={(e) => set("students", e.target.value)} /></div>
-                    <div><label className="field-label">Үзсэн тоо</label><input className="input" type="number" value={form.views} onChange={(e) => set("views", e.target.value)} /></div>
-                    <div><label className="field-label">Хандах хугацаа (хоног)</label><input className="input" type="number" value={form.accessDays} onChange={(e) => set("accessDays", e.target.value)} placeholder="жишээ: 30" /></div>
-                  </div>
-                  <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div><label className="field-label">Суралцагчийн тоо</label><input className="input" type="number" value={form.students} onChange={(e) => set("students", e.target.value)} /></div>
+                  <div><label className="field-label">Үзсэн тоо</label><input className="input" type="number" value={form.views} onChange={(e) => set("views", e.target.value)} /></div>
+                  <div><label className="field-label">Хандах хугацаа (хоног)</label><input className="input" type="number" value={form.accessDays} onChange={(e) => set("accessDays", e.target.value)} placeholder="жишээ: 30" /></div>
+                </div>
+              )}
+              <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
                     <div className="mb-2 flex items-center justify-between">
-                      <p className="font-display font-semibold text-ink">Видео хичээлүүд <span className="text-sm font-normal text-muted">({lessons.length})</span></p>
-                      <button type="button" onClick={() => setLessons((ls) => [...ls, { title: "", path: "", quality: "1080p" }])} className="btn btn-outline btn-sm">+ Хичээл нэмэх</button>
+                      <p className="font-display font-semibold text-ink">{isCourse ? "Видео хичээлүүд" : "Видео"} <span className="text-sm font-normal text-muted">({lessons.length})</span></p>
+                      <button type="button" onClick={() => setLessons((ls) => [...ls, { title: "", path: "", quality: "1080p" }])} className="btn btn-outline btn-sm">{isCourse ? "+ Хичээл нэмэх" : "+ Видео нэмэх"}</button>
                     </div>
-                    <p className="mb-3 text-xs leading-relaxed text-muted">Хичээл бүр гарчигтай байх ёстой. Видео файлаа компьютерээсээ шууд байршуулж, чанарын шошго (1080p/4K) сонгоно. Эдгээр видео зөвхөн төлбөр баталгаажсан хэрэглэгчид харагдана.</p>
+                    <p className="mb-3 text-xs leading-relaxed text-muted">{isCourse ? "Хичээл бүр гарчигтай байх ёстой. Видео файлаа компьютерээсээ шууд байршуулж, чанарын шошго (1080p/4K) сонгоно. Эдгээр видео зөвхөн төлбөр баталгаажсан хэрэглэгчид харагдана." : "Видео бүр гарчигтай байх ёстой. Видео файлаа компьютерээсээ шууд байршуулна. Эдгээр видео дэлгэрэнгүй хуудсанд нээлттэй харагдана."}</p>
                     <div className="space-y-2">
                       {lessons.map((l, idx) => (
                         <div key={idx} className="space-y-2 rounded-xl border border-line bg-white p-3">
                           <div className="flex items-center gap-2">
                             <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-100 text-xs font-bold text-primary-700">{idx + 1}</span>
-                            <input className="input flex-1" placeholder="Хичээлийн гарчиг" value={l.title} onChange={(e) => updLesson(idx, { title: e.target.value })} />
+                            <input className="input flex-1" placeholder={isCourse ? "Хичээлийн гарчиг" : "Видеоны гарчиг"} value={l.title} onChange={(e) => updLesson(idx, { title: e.target.value })} />
                             <select className="input w-32 shrink-0" value={l.quality} onChange={(e) => updLesson(idx, { quality: e.target.value })}>
                               <option value="480p">480p</option><option value="720p">720p</option><option value="1080p">1080p</option><option value="1440p">1440p (2K)</option><option value="4K">4K</option>
                             </select>
@@ -232,11 +232,9 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
                           </div>
                         </div>
                       ))}
-                      {lessons.length === 0 && <p className="text-sm text-muted">Одоогоор хичээл алга. “+ Хичээл нэмэх” дарж видео хичээл нэмнэ үү.</p>}
+                      {lessons.length === 0 && <p className="text-sm text-muted">{isCourse ? "Одоогоор хичээл алга. “+ Хичээл нэмэх” дарж видео хичээл нэмнэ үү." : "Одоогоор видео алга. “+ Видео нэмэх” дарж нэмнэ үү."}</p>}
                     </div>
-                  </div>
-                </>
-              )}
+              </div>
 
               <div><label className="field-label">Товч тайлбар</label><input className="input" value={form.summary} onChange={(e) => set("summary", e.target.value)} /></div>
               <div><label className="field-label">Дэлгэрэнгүй тайлбар</label><textarea className="textarea" value={form.body} onChange={(e) => set("body", e.target.value)} /></div>

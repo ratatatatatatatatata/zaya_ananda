@@ -4,6 +4,8 @@ import { getCmsById } from "@/lib/repo";
 import { T } from "@/components/T";
 import { PurchaseBox } from "@/components/PurchaseBox";
 import { CourseLessons } from "@/components/CourseLessons";
+import { ItemVideos } from "@/components/ItemVideos";
+import { signedDownloadUrl } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +23,14 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
   const nav = kindNav[item.kind] || kindNav.service;
   const lines = (item.teacherInfo || "").split("\n").map((s) => s.trim()).filter(Boolean);
   const isCourse = item.kind === "course";
+  const publicVideos = !isCourse && item.lessons?.length
+    ? await Promise.all(item.lessons.map(async (l) => {
+        let url = "";
+        if (l.path) { try { url = await signedDownloadUrl("lesson-videos", l.path); } catch { url = ""; } }
+        else if (l.url) url = l.url;
+        return { title: l.title, url, quality: l.quality || "", subtitles: l.subtitles || "" };
+      }))
+    : [];
 
   return (
     <div className="container-px py-10 sm:py-14">
@@ -51,6 +61,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
             </>
           )}
           {isCourse && <CourseLessons id={item.id} />}
+          {!isCourse && publicVideos.length > 0 && <ItemVideos videos={publicVideos} />}
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
