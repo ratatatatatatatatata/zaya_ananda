@@ -20,7 +20,6 @@ const links = [
   { href: "/mood", key: "nav.mood" },
   { href: "/gift", key: "nav.gift" },
   { href: "/about", key: "nav.about" },
-  { href: "/contact", key: "nav.contact" },
 ];
 
 export function Header() {
@@ -49,25 +48,25 @@ export function Header() {
 
   return (
     <header className={cx("sticky top-0 z-40 transition-all duration-300", scrolled ? "glass border-b border-line shadow-sm" : "border-b border-transparent bg-white/60 backdrop-blur-sm")}>
-      <div className="mx-auto flex h-16 w-full max-w-[1440px] items-center justify-between gap-3 px-5 lg:h-[72px] lg:px-8">
-        <Link href="/" aria-label="Zaya's Ananda"><Logo logoSrc={logo} /></Link>
+      <div className="flex h-16 w-full items-center justify-between gap-3 px-4 lg:h-[72px] lg:px-6">
+        <Link href="/" aria-label="Zaya's Ananda" className="shrink-0"><Logo logoSrc={logo} /></Link>
 
-        <nav className="hidden items-center gap-4 xl:flex 2xl:gap-6">
+        <nav className="hidden min-w-0 items-center gap-2.5 xl:flex 2xl:gap-4">
           {links.map((l) => (
             <Link key={l.href} href={l.href}
-              className={cx("nav-link relative whitespace-nowrap py-1 text-[14px] 2xl:text-[15px]", isActive(l.href) && "text-primary-700 after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:rounded-full after:bg-primary-grad")}>
+              className={cx("nav-link relative whitespace-nowrap py-1 text-[13px] 2xl:text-[14.5px]", isActive(l.href) && "text-primary-700 after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:rounded-full after:bg-primary-grad")}>
               {t(l.key)}
             </Link>
           ))}
           {customPages.map((p) => (
             <Link key={p.id} href={"/p/" + p.id}
-              className={cx("nav-link relative whitespace-nowrap py-1 text-[14px] 2xl:text-[15px]", isActive("/p/" + p.id) && "text-primary-700 after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:rounded-full after:bg-primary-grad")}>
+              className={cx("nav-link relative whitespace-nowrap py-1 text-[13px] 2xl:text-[14.5px]", isActive("/p/" + p.id) && "text-primary-700 after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:rounded-full after:bg-primary-grad")}>
               {pageLabel(p)}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <div className="hidden sm:block"><LanguageSwitcher /></div>
           <button onClick={open} className="relative grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-primary-50 hover:text-primary-700" aria-label="Cart">
             🛒

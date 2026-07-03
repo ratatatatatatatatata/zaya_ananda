@@ -10,21 +10,23 @@ import { Icon } from "@/components/Icon";
 import { AdminContentManager } from "@/components/AdminContentManager";
 import { AdminSettings } from "@/components/AdminSettings";
 import { AdminPages } from "@/components/AdminPages";
+import { AdminTeachers } from "@/components/AdminTeachers";
 import type { Order, PublicUser, ContactMessage } from "@/lib/types";
 
 const nav: { id: string; k: string; label?: string; icon: string }[] = [
   { id: "overview", k: "admin.overview", icon: "sparkles" },
   { id: "users", k: "admin.users", icon: "user" },
   { id: "orders", k: "admin.orders", icon: "calendar" },
-  { id: "services", k: "admin.servicesM", icon: "star" },
-  { id: "courses", k: "admin.coursesM", icon: "award" },
-  { id: "products", k: "admin.productsM", icon: "laptop" },
-  { id: "events", k: "admin.eventsM", label: "Зөвлөгөө", icon: "calendar" },
-  { id: "promos", k: "admin.promosM", label: "Сурталчилгаа", icon: "star" },
+  { id: "services", k: "admin.servicesM", label: "Энергийн засал", icon: "star" },
+  { id: "courses", k: "admin.coursesM", label: "Ариусахуйн үйл", icon: "award" },
+  { id: "products", k: "admin.productsM", label: "Энергийн хамгаалалт", icon: "laptop" },
+  { id: "events", k: "admin.eventsM", label: "Гэгээрлийн зам", icon: "calendar" },
+  { id: "teachers", k: "admin.teachersM", label: "Удирдагч багш нар", icon: "user" },
   { id: "gift", k: "admin.giftM", label: "Гэгээн бэлэг", icon: "award" },
+  { id: "promos", k: "admin.promosM", label: "Сурталчилгаа", icon: "star" },
   { id: "reviews", k: "admin.reviews", icon: "star" },
-  { id: "messages", k: "nav.contact", icon: "user" },
-  { id: "pages", k: "admin.pagesM", label: "Ерөнхий тохиргоо (Цэс)", icon: "laptop" },
+  { id: "messages", k: "nav.contact", label: "Зурвасууд", icon: "user" },
+  { id: "pages", k: "admin.pagesM", label: "Цэс / Шинэ хуудас", icon: "laptop" },
   { id: "settings", k: "admin.settingsM", label: "Тохиргоо", icon: "sparkles" },
 ];
 
@@ -193,6 +195,7 @@ export default function AdminPage() {
             {tab === "events" && <AdminContentManager kind="resource" />}
             {tab === "promos" && <AdminContentManager kind="promo" />}
             {tab === "gift" && <AdminContentManager kind="free" />}
+            {tab === "teachers" && <AdminTeachers />}
             {tab === "pages" && <AdminPages />}
             {tab === "settings" && <AdminSettings />}
             {tab === "messages" && (

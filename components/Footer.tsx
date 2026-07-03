@@ -19,7 +19,7 @@ export function Footer() {
     ] },
     { title: t("footer.centerCol"), links: [
       { href: "/about", label: t("nav.about") },
-      { href: "/contact", label: t("nav.contact") },
+      { href: "/about#contact", label: t("nav.contact") },
       { href: "/account", label: t("nav.account") },
       ...(user?.isAdmin ? [{ href: "/admin", label: t("admin.title") }] : []),
     ] },

@@ -8,6 +8,7 @@ import { T, Tr } from "@/components/T";
 import { aboutContent, team, faqs, siteConfig } from "@/data/content";
 import { getSettingsCached } from "@/lib/repo";
 import { signedDownloadUrl } from "@/lib/supabase";
+import { ContactSection } from "@/components/ContactSection";
 
 export const metadata = { title: "Бидний тухай" };
 export const revalidate = 300;
@@ -116,6 +117,8 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+
+      <ContactSection />
 
       <CalmBand />
       <CtaBand />

@@ -24,8 +24,8 @@ export function Logo({ withText = true, className = "", logoSrc }: { withText?: 
       )}
       {withText && (
         <span className="flex flex-col leading-none">
-          <span className="font-display text-lg font-semibold text-ink">Zaya&apos;s Ananda</span>
-          <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-primary-600">Ananda Center</span>
+          <span className="whitespace-nowrap font-display text-lg font-semibold text-ink">Zaya&apos;s Ananda</span>
+          <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.22em] text-primary-600">Ananda Center</span>
         </span>
       )}
     </span>
