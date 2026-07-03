@@ -20,7 +20,11 @@ export default async function AboutPage() {
     if (/^https?:\/\//.test(settings.aboutVideo)) aboutVideoUrl = settings.aboutVideo;
     else { try { aboutVideoUrl = await signedDownloadUrl("lesson-videos", settings.aboutVideo); } catch { aboutVideoUrl = ""; } }
   }
-  const dynamicTeam = settings.team && settings.team.length > 0 ? settings.team : null;
+  const mergedTeam = [
+    ...(settings.teachers || []),
+    ...(settings.team || []).filter((m) => !(settings.teachers || []).some((t) => t.name === m.name)),
+  ];
+  const dynamicTeam = mergedTeam.length > 0 ? mergedTeam : null;
   return (
     <>
       <PageHeader title={<T k="about.title" />} crumb={<T k="about.title" />} desc={<Tr v={siteConfig.tagline} />} />

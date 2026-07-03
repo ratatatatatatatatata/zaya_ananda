@@ -9,7 +9,8 @@ export const revalidate = 300;
 export default async function TeacherDetailPage({ params }: { params: { slug: string } }) {
   const name = decodeURIComponent(params.slug);
   const settings = await getSettingsCached();
-  const teacher = (settings.teachers || []).find((t) => t.name === name);
+  const all = [...(settings.teachers || []), ...(settings.team || [])];
+  const teacher = all.find((t) => t.name === name);
   if (!teacher) notFound();
 
   const [courses, services] = await Promise.all([listCmsCached("course"), listCmsCached("service")]);

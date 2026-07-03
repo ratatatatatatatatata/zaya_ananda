@@ -10,7 +10,11 @@ const slugOf = (name: string) => encodeURIComponent(name);
 
 export default async function TeachersPage() {
   const settings = await getSettingsCached();
-  const teachers = settings.teachers || [];
+  // «Хамт олон» таб (teachers) + хуучин Тохиргооны жагсаалт (team) — нэгтгэж харуулна
+  const teachers = [
+    ...(settings.teachers || []),
+    ...(settings.team || []).filter((m) => !(settings.teachers || []).some((t) => t.name === m.name)),
+  ];
   return (
     <>
       <PageHeader title={<T k="nav.teachers" />} crumb={<T k="nav.teachers" />} />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { StaffMember, BankInfo } from "@/lib/types";
+import type { BankInfo } from "@/lib/types";
 
 function compressImage(file: File, maxW = 800, quality = 0.85): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -50,7 +50,6 @@ const EMPTY_BANK: BankInfo = { bankName: "", account: "", holder: "" };
 
 export function AdminSettings() {
   const [form, setForm] = useState(EMPTY);
-  const [team, setTeam] = useState<StaffMember[]>([]);
   const [bank, setBank] = useState<BankInfo>(EMPTY_BANK);
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
@@ -68,7 +67,6 @@ export function AdminSettings() {
           logo: s.logo || "", aboutTitle: s.aboutTitle || "", aboutBody: s.aboutBody || "", aboutVideo: s.aboutVideo || "",
           facebook: s.facebook || "", instagram: s.instagram || "", youtube: s.youtube || "",
         });
-        if (Array.isArray(s.team)) setTeam(s.team);
         if (s.bank) setBank({ ...EMPTY_BANK, ...s.bank });
       })
       .catch(() => {});
@@ -85,17 +83,11 @@ export function AdminSettings() {
     catch (e2) { setErr(e2 instanceof Error ? e2.message : "Видео байршуулахад алдаа."); }
     finally { setVideoProgress(null); }
   }
-  const updMember = (i: number, patch: Partial<StaffMember>) => setTeam((t) => t.map((m, x) => (x === i ? { ...m, ...patch } : m)));
-  async function pickMemberImage(e: React.ChangeEvent<HTMLInputElement>, i: number) {
-    const file = e.target.files?.[0]; if (!file) return;
-    try { updMember(i, { image: await compressImage(file, 500) }); } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
-  }
-
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true); setErr(""); setMsg("");
     try {
-      const payload = { ...form, team: team.filter((m) => m.name?.trim()), bank };
+      const payload = { ...form, bank };
       const res = await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
       setMsg("Хадгаллаа. Шинэ мэдээлэл сайтад тусгагдана.");
@@ -134,35 +126,7 @@ export function AdminSettings() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <p className="font-display font-semibold text-ink">Хамт олон</p>
-          <button type="button" onClick={() => setTeam((t) => [...t, { name: "", role: "", info: "", image: "" }])} className="btn btn-outline btn-sm">+ Хүн нэмэх</button>
-        </div>
-        <div className="space-y-3">
-          {team.map((m, i) => (
-            <div key={i} className="rounded-xl border border-line bg-white p-3">
-              <div className="flex items-start gap-3">
-                <div className="flex flex-col items-center gap-1">
-                  {m.image
-                    ? <img src={m.image} alt="" className="h-16 w-16 rounded-full object-cover" />
-                    : <div className="grid h-16 w-16 place-items-center rounded-full border border-dashed border-line text-xl text-muted">👤</div>}
-                  <label className="cursor-pointer text-xs font-semibold text-primary-700 hover:underline">Зураг<input type="file" accept="image/*" className="hidden" onChange={(e) => pickMemberImage(e, i)} /></label>
-                </div>
-                <div className="flex-1 space-y-2">
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <input className="input" placeholder="Нэр" value={m.name} onChange={(e) => updMember(i, { name: e.target.value })} />
-                    <input className="input" placeholder="Албан тушаал" value={m.role || ""} onChange={(e) => updMember(i, { role: e.target.value })} />
-                  </div>
-                  <textarea className="textarea" rows={2} placeholder="Дэлгэрэнгүй мэдээлэл" value={m.info || ""} onChange={(e) => updMember(i, { info: e.target.value })} />
-                </div>
-                <button type="button" onClick={() => setTeam((t) => t.filter((_, x) => x !== i))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
-              </div>
-            </div>
-          ))}
-          {team.length === 0 && <p className="text-sm text-muted">Хамт олны мэдээлэл алга. “+ Хүн нэмэх” дарж нэмнэ үү. Эдгээр нь “Бидний тухай” хуудсанд харагдана.</p>}
-        </div>
-      </div>
+      <p className="rounded-xl bg-aqua px-4 py-2.5 text-sm text-muted">ℹ️ Хамт олны (багш нарын) мэдээллийг зүүн цэсний <b>«Хамт олон»</b> таб дээр удирдана — тэнд нэмсэн хүмүүс «Хамт олон» цэс болон «Бидний тухай» хуудсанд хамт гарна.</p>
 
       <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
         <p className="mb-3 font-display font-semibold text-ink">Дансны мэдээлэл (худалдан авалтад харагдана)</p>
