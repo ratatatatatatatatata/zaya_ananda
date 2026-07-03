@@ -21,6 +21,24 @@ function refresh(id?: string) {
   if (id) revalidatePath("/p/" + id);
 }
 
+const LANGS = ["en", "ko", "ja", "zh"] as const;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseI18n(raw: any) {
+  if (!raw || typeof raw !== "object") return undefined;
+  const out: Record<string, { title?: string; body?: string; navLabel?: string }> = {};
+  for (const l of LANGS) {
+    const v = raw[l];
+    if (!v || typeof v !== "object") continue;
+    const entry: { title?: string; body?: string; navLabel?: string } = {};
+    if (v.title && String(v.title).trim()) entry.title = String(v.title);
+    if (v.body && String(v.body).trim()) entry.body = String(v.body);
+    if (v.navLabel && String(v.navLabel).trim()) entry.navLabel = String(v.navLabel);
+    if (Object.keys(entry).length) out[l] = entry;
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseInput(body: any) {
   return {
@@ -30,6 +48,7 @@ function parseInput(body: any) {
     image: body.image ? String(body.image) : undefined,
     video: body.video ? String(body.video) : undefined,
     position: body.position !== undefined && body.position !== "" ? Number(body.position) : undefined,
+    i18n: parseI18n(body.i18n),
   };
 }
 

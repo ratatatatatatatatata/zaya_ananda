@@ -21,6 +21,7 @@ const nav: { id: string; k: string; label?: string; icon: string }[] = [
   { id: "products", k: "admin.productsM", icon: "laptop" },
   { id: "events", k: "admin.eventsM", label: "Зөвлөгөө", icon: "calendar" },
   { id: "promos", k: "admin.promosM", label: "Сурталчилгаа", icon: "star" },
+  { id: "gift", k: "admin.giftM", label: "Гэгээн бэлэг", icon: "award" },
   { id: "reviews", k: "admin.reviews", icon: "star" },
   { id: "messages", k: "nav.contact", icon: "user" },
   { id: "pages", k: "admin.pagesM", label: "Ерөнхий тохиргоо (Цэс)", icon: "laptop" },
@@ -191,6 +192,7 @@ export default function AdminPage() {
             {tab === "products" && <AdminContentManager kind="product" />}
             {tab === "events" && <AdminContentManager kind="resource" />}
             {tab === "promos" && <AdminContentManager kind="promo" />}
+            {tab === "gift" && <AdminContentManager kind="free" />}
             {tab === "pages" && <AdminPages />}
             {tab === "settings" && <AdminSettings />}
             {tab === "messages" && (

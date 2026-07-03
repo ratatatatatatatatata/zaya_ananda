@@ -1,13 +1,22 @@
+"use client";
+
 import Link from "next/link";
 import { formatMNT } from "@/lib/format";
+import { useI18n } from "@/lib/i18n";
+import { locText } from "@/lib/cms-i18n";
+import { catLabel } from "@/data/cms-taxonomy";
 import type { CmsItem } from "@/lib/types";
 
 const modeLabel: Record<string, string> = { online: "Онлайн сургалт", tankhim: "Танхимын сургалт", both: "Онлайн + Танхим" };
 
 export function CmsCard({ item }: { item: CmsItem }) {
+  const { lang } = useI18n();
   const isCourse = item.kind === "course";
   const isProduct = item.kind === "product";
   const hasCounts = typeof item.videoLessons === "number" || typeof item.students === "number" || typeof item.views === "number";
+  const title = locText(lang, item.title, item.i18n, "title");
+  const summary = locText(lang, item.summary, item.i18n, "summary");
+  const cat = catLabel(item.category, lang);
 
   // Бүтээгдэхүүн: зураг → нэр → үнэ гэсэн энгийн байрлал
   if (isProduct) {
@@ -19,7 +28,7 @@ export function CmsCard({ item }: { item: CmsItem }) {
           </div>
         )}
         <div className="flex flex-1 flex-col items-center p-5 text-center">
-          <h3 className="font-display text-lg font-semibold leading-snug text-ink transition group-hover:text-primary-700">{item.title}</h3>
+          <h3 className="font-display text-lg font-semibold leading-snug text-ink transition group-hover:text-primary-700">{title}</h3>
           {typeof item.price === "number" && <span className="price mt-2 text-lg">{formatMNT(item.price)}</span>}
         </div>
       </Link>
@@ -31,13 +40,13 @@ export function CmsCard({ item }: { item: CmsItem }) {
       {item.image && (
         <div className="relative h-56 w-full overflow-hidden">
           <img src={item.image} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-          {item.category && <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-primary-700 shadow-sm">{item.category}</span>}
+          {cat && <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-primary-700 shadow-sm">{cat}</span>}
         </div>
       )}
       <div className="flex flex-1 flex-col p-5">
-        {!item.image && item.category && <span className="chip mb-2 self-start">{item.category}</span>}
-        <h3 className="font-display text-xl font-semibold leading-snug text-ink transition group-hover:text-primary-700">{item.title}</h3>
-        {item.summary && <p className="mt-2 line-clamp-2 text-[1.02rem] leading-relaxed text-muted">{item.summary}</p>}
+        {!item.image && cat && <span className="chip mb-2 self-start">{cat}</span>}
+        <h3 className="font-display text-xl font-semibold leading-snug text-ink transition group-hover:text-primary-700">{title}</h3>
+        {summary && <p className="mt-2 line-clamp-2 text-[1.02rem] leading-relaxed text-muted">{summary}</p>}
         {isCourse && hasCounts && (
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
             {typeof item.videoLessons === "number" && <span>🎬 {item.videoLessons} видео хичээл</span>}

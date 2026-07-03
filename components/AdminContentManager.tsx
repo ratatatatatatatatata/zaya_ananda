@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { formatMNT } from "@/lib/format";
 import { RichTextEditor } from "@/components/RichTextEditor";
-import type { CmsItem, TeacherPreset } from "@/lib/types";
+import { SERVICE_GROUPS, COURSE_CATS, MOODS } from "@/data/cms-taxonomy";
+import type { CmsItem, TeacherPreset, CmsTranslations } from "@/lib/types";
 
 function compressImage(file: File, maxW = 1200, quality = 0.82): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -28,7 +29,16 @@ function compressImage(file: File, maxW = 1200, quality = 0.82): Promise<string>
   });
 }
 
-const EMPTY = { title: "", category: "", summary: "", body: "", price: "", mode: "online", link: "", videoLessons: "", students: "", views: "", teacherName: "", teacherImage: "", teacherInfo: "", accessDays: "" };
+const EMPTY = { title: "", category: "", summary: "", body: "", price: "", mode: "online", link: "", videoLessons: "", students: "", views: "", teacherName: "", teacherImage: "", teacherRole: "", teacherInfo: "", accessDays: "" };
+
+const LANG_TABS = [
+  { k: "mn" as const, l: "🇲🇳 Монгол" },
+  { k: "en" as const, l: "🇬🇧 English" },
+  { k: "ko" as const, l: "🇰🇷 한국어" },
+  { k: "ja" as const, l: "🇯🇵 日本語" },
+  { k: "zh" as const, l: "🇨🇳 中文" },
+];
+type TrLang = "en" | "ko" | "ja" | "zh";
 
 const SB_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
@@ -69,7 +79,12 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
   const [lessons, setLessons] = useState<LessonRow[]>([]);
   const [teachers, setTeachers] = useState<TeacherPreset[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [langTab, setLangTab] = useState<"mn" | TrLang>("mn");
+  const [i18n, setI18n] = useState<CmsTranslations>({});
+  const [moods, setMoods] = useState<string[]>([]);
   const set = (k: keyof typeof EMPTY, v: string) => setForm((f) => ({ ...f, [k]: v }));
+  const setTr = (l: TrLang, field: "title" | "body", v: string) =>
+    setI18n((prev) => ({ ...prev, [l]: { ...(prev[l] || {}), [field]: v } }));
 
   const load = useCallback(() => {
     fetch("/api/admin/content", { cache: "no-store" })
@@ -125,21 +140,25 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
   function applyTeacher(name: string) {
     const t = teachers.find((x) => x.name === name);
     if (!t) return;
-    setForm((f) => ({ ...f, teacherName: t.name, teacherImage: t.image || "", teacherInfo: t.info || "" }));
+    setForm((f) => ({ ...f, teacherName: t.name, teacherImage: t.image || "", teacherRole: t.role || "", teacherInfo: t.info || "" }));
   }
 
-  function resetForm() { setForm(EMPTY); setImages([]); setLessons([]); setEditingId(null); setErr(""); setOpen(false); }
-  function startNew() { setForm(EMPTY); setImages([]); setLessons([]); setEditingId(null); setErr(""); setOpen(true); }
+  function resetForm() { setForm(EMPTY); setImages([]); setLessons([]); setI18n({}); setMoods([]); setLangTab("mn"); setEditingId(null); setErr(""); setOpen(false); }
+  function startNew() { setForm(EMPTY); setImages([]); setLessons([]); setI18n({}); setMoods([]); setLangTab("mn"); setEditingId(null); setErr(""); setOpen(true); }
   function startEdit(it: CmsItem) {
     setForm({
       title: it.title || "", category: it.category || "", summary: it.summary || "", body: it.body || "",
       price: it.price != null ? String(it.price) : "", mode: it.mode || "online", link: it.link || "",
       videoLessons: it.videoLessons != null ? String(it.videoLessons) : "",
       students: it.students != null ? String(it.students) : "", views: it.views != null ? String(it.views) : "",
-      teacherName: it.teacherName || "", teacherImage: it.teacherImage || "", teacherInfo: it.teacherInfo || "",
+      teacherName: it.teacherName || "", teacherImage: it.teacherImage || "",
+      teacherRole: teachers.find((t) => t.name === it.teacherName)?.role || "", teacherInfo: it.teacherInfo || "",
       accessDays: it.accessDays != null ? String(it.accessDays) : "",
     });
     setImages(it.images && it.images.length ? it.images.slice(0, MAX_IMAGES) : it.image ? [it.image] : []);
+    setI18n(it.i18n || {});
+    setMoods(it.moods || []);
+    setLangTab("mn");
     setLessons((it.lessons || []).map((l) => ({ title: l.title || "", path: l.path || "", quality: l.quality || "1080p", subtitles: l.subtitles || "" })));
     setEditingId(it.id); setErr(""); setOpen(true);
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
@@ -153,6 +172,8 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
       kind, ...form,
       image: images[0] || "",
       images,
+      i18n,
+      moods,
       mode: kind === "course" ? form.mode : undefined,
       lessons: lessons.filter((l) => l.title.trim() && l.path).map((l) => ({ title: l.title.trim(), path: l.path, quality: l.quality, subtitles: l.subtitles || "" })),
     };
@@ -173,7 +194,14 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
 
   const isCourse = kind === "course";
   const isPromo = kind === "promo";
+  const isFree = kind === "free";
   const hasTeacher = kind === "course" || kind === "service";
+  const hasMoods = kind === "course" || kind === "resource" || kind === "free";
+  const catOptions: { group?: string; opts: string[] }[] =
+    kind === "service" ? SERVICE_GROUPS.map((g) => ({ group: g.group, opts: g.subs }))
+    : kind === "course" ? [{ opts: COURSE_CATS }]
+    : kind === "resource" ? [{ opts: ["Зөвлөгөө", "Видео зөвлөгөө"] }]
+    : [];
 
   return (
     <div className="space-y-5">
@@ -249,16 +277,61 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
             </div>
           </div>
 
-          <div><label className="field-label">Гарчиг *</label><input className="input" value={form.title} onChange={(e) => set("title", e.target.value)} /></div>
+          {/* Хэлний таб — гарчиг, дэлгэрэнгүй мэдээллийг хэл бүрээр оруулна */}
+          <div className="flex flex-wrap gap-1.5">
+            {LANG_TABS.map((lt) => (
+              <button key={lt.k} type="button" onClick={() => setLangTab(lt.k)}
+                className={"rounded-full px-3.5 py-1.5 text-sm font-semibold transition " + (langTab === lt.k ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white text-ink/60 hover:text-primary-700")}>
+                {lt.l}
+              </button>
+            ))}
+          </div>
+          {langTab !== "mn" && <p className="rounded-lg bg-aqua px-3 py-1.5 text-xs text-muted">Энэ хэл дээрх орчуулгаа оруулна уу. Хоосон орхивол монгол хувилбар нь харагдана.</p>}
+
+          <div>
+            <label className="field-label">Гарчиг {langTab === "mn" ? "*" : "(" + langTab.toUpperCase() + ")"}</label>
+            {langTab === "mn"
+              ? <input className="input" value={form.title} onChange={(e) => set("title", e.target.value)} />
+              : <input className="input" placeholder={form.title} value={i18n[langTab]?.title || ""} onChange={(e) => setTr(langTab, "title", e.target.value)} />}
+          </div>
 
           {isPromo ? (
             <div><label className="field-label">Холбоос (заавал биш)</label><input className="input" value={form.link} onChange={(e) => set("link", e.target.value)} placeholder="https://... эсвэл /courses" /></div>
           ) : (
             <>
               <div className="grid gap-3 sm:grid-cols-2">
-                {kind !== "resource" && <div><label className="field-label">Үнэ (₮)</label><input className="input" type="number" value={form.price} onChange={(e) => set("price", e.target.value)} /></div>}
+                {catOptions.length > 0 && (
+                  <div>
+                    <label className="field-label">Ангилал</label>
+                    <select className="input" value={form.category} onChange={(e) => set("category", e.target.value)}>
+                      <option value="">— Сонгох —</option>
+                      {catOptions.map((g, gi) =>
+                        g.group
+                          ? <optgroup key={gi} label={g.group}>{g.opts.map((c) => <option key={c} value={c}>{c}</option>)}</optgroup>
+                          : g.opts.map((c) => <option key={c} value={c}>{c}</option>)
+                      )}
+                    </select>
+                  </div>
+                )}
+                {kind !== "resource" && !isFree && <div><label className="field-label">Үнэ (₮)</label><input className="input" type="number" value={form.price} onChange={(e) => set("price", e.target.value)} /></div>}
                 {isCourse && <div><label className="field-label">Хэлбэр</label><select className="input" value={form.mode} onChange={(e) => set("mode", e.target.value)}><option value="online">Онлайн сургалт</option><option value="tankhim">Танхимын сургалт</option><option value="both">Онлайн + Танхим</option></select></div>}
               </div>
+
+              {hasMoods && (
+                <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+                  <p className="mb-1 font-display font-semibold text-ink">Сэтгэлийн туяа (мүүд)</p>
+                  <p className="mb-3 text-xs text-muted">Энэ контент ямар сэтгэл санаатай хүнд тохирохыг сонговол “Сэтгэлийн туяа” хуудсанд санал болгогдоно.</p>
+                  <div className="flex flex-wrap gap-2">
+                    {MOODS.map((m) => (
+                      <button key={m.key} type="button"
+                        onClick={() => setMoods((ms) => (ms.includes(m.key) ? ms.filter((x) => x !== m.key) : [...ms, m.key]))}
+                        className={"rounded-full px-3.5 py-1.5 text-sm font-medium transition " + (moods.includes(m.key) ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white text-ink/70 hover:border-primary-300")}>
+                        {m.emoji} {m.label.mn}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {isCourse && (
                 <div className="grid gap-3 sm:grid-cols-3">
@@ -269,8 +342,10 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
               )}
 
               <div>
-                <label className="field-label">Дэлгэрэнгүй мэдээлэл</label>
-                <RichTextEditor value={form.body} onChange={(html) => set("body", html)} />
+                <label className="field-label">Дэлгэрэнгүй мэдээлэл {langTab !== "mn" && "(" + langTab.toUpperCase() + ")"}</label>
+                {langTab === "mn"
+                  ? <RichTextEditor key="mn" value={form.body} onChange={(html) => set("body", html)} />
+                  : <RichTextEditor key={langTab} value={i18n[langTab]?.body || ""} onChange={(html) => setTr(langTab, "body", html)} />}
               </div>
 
               {hasTeacher && (
@@ -293,7 +368,10 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
                       {form.teacherImage && <button type="button" onClick={() => set("teacherImage", "")} className="text-left text-xs font-semibold text-rose-500">Устгах</button>}
                     </div>
                   </div>
-                  <div className="mt-3"><label className="field-label">Багшийн нэр</label><input className="input" value={form.teacherName} onChange={(e) => set("teacherName", e.target.value)} /></div>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <div><label className="field-label">Багшийн нэр</label><input className="input" value={form.teacherName} onChange={(e) => set("teacherName", e.target.value)} /></div>
+                    <div><label className="field-label">Албан тушаал / чиглэл</label><input className="input" value={form.teacherRole} onChange={(e) => set("teacherRole", e.target.value)} placeholder="Жишээ: Энерги засалч, Багш" /></div>
+                  </div>
                   <div className="mt-3"><label className="field-label">Мэдээлэл (мөр бүрд нэг мэдээлэл)</label><textarea className="textarea" rows={4} placeholder="Үүсгэн байгуулагч, Сургагч багш&#10;Далд ухамсрын шинжээч&#10;..." value={form.teacherInfo} onChange={(e) => set("teacherInfo", e.target.value)} /></div>
                   <p className="mt-2 text-xs text-muted">Багшийн мэдээлэл автоматаар хадгалагдаж, дараагийн удаад дээрх жагсаалтаас сонгож болно.</p>
                 </div>

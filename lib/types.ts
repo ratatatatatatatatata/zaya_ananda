@@ -157,8 +157,11 @@ export interface StaffMember {
 export interface TeacherPreset {
   name: string;
   image?: string;
+  role?: string;
   info?: string;
 }
+
+export type CmsTranslations = Partial<Record<Locale, { title?: string; summary?: string; body?: string; navLabel?: string }>>;
 
 export interface BankInfo {
   bankName?: string;
@@ -187,12 +190,13 @@ export interface SitePage {
   image?: string;
   video?: string;
   position?: number;
+  i18n?: CmsTranslations;
   createdAt?: string;
 }
 
 export interface CmsItem {
   id: string;
-  kind: "service" | "course" | "product" | "resource" | "promo";
+  kind: "service" | "course" | "product" | "resource" | "promo" | "free";
   title: string;
   summary: string;
   body?: string;
@@ -210,5 +214,7 @@ export interface CmsItem {
   teacherInfo?: string;
   accessDays?: number;
   lessons?: { title: string; path?: string; url?: string; quality?: string; subtitles?: string }[];
+  moods?: string[];
+  i18n?: CmsTranslations;
   createdAt: string;
 }

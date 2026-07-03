@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { cx } from "@/lib/format";
+import { useI18n } from "@/lib/i18n";
+import { locText } from "@/lib/cms-i18n";
 import type { CmsItem } from "@/lib/types";
 
 export function PromoBanner({ items }: { items: CmsItem[] }) {
+  const { lang } = useI18n();
   const [idx, setIdx] = useState(0);
   useEffect(() => {
     if (items.length <= 1) return;
@@ -13,15 +16,17 @@ export function PromoBanner({ items }: { items: CmsItem[] }) {
   }, [items.length]);
   if (items.length === 0) return null;
   const p = items[Math.min(idx, items.length - 1)];
+  const pTitle = locText(lang, p.title, p.i18n, "title");
+  const pSummary = locText(lang, p.summary, p.i18n, "summary");
   const inner = (
     <div className="relative w-full overflow-hidden rounded-3xl border border-line bg-primary-50 shadow-card">
       {p.image
-        ? <img src={p.image} alt={p.title} className="max-h-[340px] w-full object-cover" />
-        : <div className="grid h-40 w-full place-items-center bg-primary-grad px-6 text-center text-2xl font-display font-semibold text-white">{p.title}</div>}
-      {p.image && (p.title || p.summary) && (
+        ? <img src={p.image} alt={pTitle} className="max-h-[340px] w-full object-cover" />
+        : <div className="grid h-40 w-full place-items-center bg-primary-grad px-6 text-center text-2xl font-display font-semibold text-white">{pTitle}</div>}
+      {p.image && (pTitle || pSummary) && (
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent p-5 sm:p-7">
-          {p.title && <p className="font-display text-xl font-semibold text-white sm:text-3xl">{p.title}</p>}
-          {p.summary && <p className="mt-1 max-w-2xl text-sm text-white/90 sm:text-base">{p.summary}</p>}
+          {pTitle && <p className="font-display text-xl font-semibold text-white sm:text-3xl">{pTitle}</p>}
+          {pSummary && <p className="mt-1 max-w-2xl text-sm text-white/90 sm:text-base">{pSummary}</p>}
         </div>
       )}
     </div>

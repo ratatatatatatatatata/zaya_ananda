@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     const [user, item] = await Promise.all([getUserById(uid), getCmsById(itemId)]);
     if (!item) return NextResponse.json({ error: "Бараа олдсонгүй." }, { status: 404 });
     const price = typeof item.price === "number" ? item.price : 0;
-    const kind = item.kind === "resource" || item.kind === "promo" ? "service" : item.kind;
+    const kind = item.kind === "course" || item.kind === "product" ? item.kind : "service";
 
     const order = await createOrder({
       userId: uid,

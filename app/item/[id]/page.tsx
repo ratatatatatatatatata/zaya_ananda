@@ -8,6 +8,7 @@ import { CourseLessons } from "@/components/CourseLessons";
 import { ItemVideos } from "@/components/ItemVideos";
 import { ImageGallery } from "@/components/ImageGallery";
 import { RichBody } from "@/components/RichBody";
+import { CmsText, CatLabel } from "@/components/CmsText";
 import { CmsCard } from "@/components/CmsCard";
 import { signedDownloadUrl } from "@/lib/supabase";
 
@@ -18,6 +19,7 @@ const kindNav: Record<string, { href: string; key: string }> = {
   course: { href: "/courses", key: "nav.courses" },
   product: { href: "/shop", key: "nav.shop" },
   resource: { href: "/resources", key: "nav.resources" },
+  free: { href: "/gift", key: "nav.gift" },
 };
 const modeLabel: Record<string, string> = { online: "Онлайн сургалт", tankhim: "Танхимын сургалт", both: "Онлайн + Танхим" };
 
@@ -28,6 +30,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
   const lines = (item.teacherInfo || "").split("\n").map((s) => s.trim()).filter(Boolean);
   const isCourse = item.kind === "course";
   const isProduct = item.kind === "product";
+  const isFree = item.kind === "free";
   const gallery = item.images && item.images.length ? item.images : item.image ? [item.image] : [];
   const publicVideos = !isCourse && item.lessons?.length
     ? await Promise.all(item.lessons.map(async (l) => {
@@ -46,14 +49,14 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
       <nav className="mb-6 flex items-center gap-2 text-sm text-muted">
         <Link href="/" className="hover:text-primary-700"><T k="nav.home" /></Link><span>/</span>
         <Link href={nav.href} className="hover:text-primary-700"><T k={nav.key} /></Link><span>/</span>
-        <span className="line-clamp-1 font-medium text-ink">{item.title}</span>
+        <span className="line-clamp-1 font-medium text-ink"><CmsText mn={item.title} i18n={item.i18n} field="title" /></span>
       </nav>
 
       <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr]">
         <div>
           <ImageGallery images={gallery} alt={item.title} />
-          {item.category && <span className="chip">{item.category}</span>}
-          <h1 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl">{item.title}</h1>
+          {item.category && <span className="chip"><CatLabel cat={item.category} /></span>}
+          <h1 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><CmsText mn={item.title} i18n={item.i18n} field="title" /></h1>
           {isCourse && (
             <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-muted">
               {((item.lessons?.length ?? 0) > 0 || typeof item.videoLessons === "number") && <span>🎬 {item.lessons?.length ?? item.videoLessons} видео хичээл</span>}
@@ -62,11 +65,11 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
               {item.mode && <span className="font-semibold text-primary-700">{modeLabel[item.mode]}</span>}
             </div>
           )}
-          {item.summary && <p className="mt-5 text-lg leading-relaxed text-ink/80">{item.summary}</p>}
+          {item.summary && <p className="mt-5 text-lg leading-relaxed text-ink/80"><CmsText mn={item.summary} i18n={item.i18n} field="summary" /></p>}
           {item.body && (
             <>
               <h2 className="mt-8 font-display text-xl font-semibold text-ink">Дэлгэрэнгүй</h2>
-              <RichBody html={item.body} className="mt-3 leading-relaxed text-muted" />
+              <RichBody html={item.body} i18n={item.i18n} className="mt-3 leading-relaxed text-muted" />
             </>
           )}
           {isCourse && <CourseLessons id={item.id} />}
@@ -76,6 +79,8 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
           {isProduct
             ? <ProductBuyBox id={item.id} title={item.title} price={item.price} />
+            : isFree
+            ? <div className="card p-6 text-center"><p className="text-3xl">🎁</p><p className="mt-2 font-display text-lg font-semibold text-jade-600">Нээлттэй хичээл</p><p className="mt-1 text-sm text-muted">Энэ хичээл танд бэлэг — чөлөөтэй үзээрэй.</p></div>
             : <PurchaseBox id={item.id} title={item.title} price={item.price} />}
 
           {(item.teacherName || item.teacherImage || lines.length > 0) && (

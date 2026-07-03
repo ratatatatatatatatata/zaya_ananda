@@ -3,7 +3,7 @@ import { unstable_cache } from "next/cache";
 import { hashPassword, verifyPassword } from "./auth";
 import { sbSelect, sbInsert, sbUpdate, sbDelete, enc } from "./supabase";
 import { services, courses, products } from "@/data/content";
-import type { User, PublicUser, Order, OrderItem, ContactMessage, CmsItem, SiteSettings, SitePage, TeacherPreset } from "./types";
+import type { User, PublicUser, Order, OrderItem, ContactMessage, CmsItem, SiteSettings, SitePage, TeacherPreset, CmsTranslations } from "./types";
 
 export const catalog = { services, courses, products };
 export function findService(slug: string) { return services.find((s) => s.slug === slug) || null; }
@@ -151,7 +151,7 @@ export async function upsertTeacherPreset(t: TeacherPreset): Promise<void> {
     const s = await getSettings();
     const list = [...(s.teachers || [])];
     const idx = list.findIndex((x) => x.name.trim().toLowerCase() === t.name.trim().toLowerCase());
-    const entry = { name: t.name.trim(), image: t.image || list[idx]?.image || "", info: t.info || list[idx]?.info || "" };
+    const entry = { name: t.name.trim(), image: t.image || list[idx]?.image || "", role: t.role || list[idx]?.role || "", info: t.info || list[idx]?.info || "" };
     if (idx >= 0) list[idx] = entry; else list.push(entry);
     await updateSettings({ teachers: list });
   } catch { /* багш хадгалахад алдаа гарвал контентын хадгалалтыг зогсоохгүй */ }
@@ -186,12 +186,13 @@ export async function getPageById(id: string): Promise<SitePage | null> {
   const rows = await sbSelect<SitePage>("pages", `id=eq.${enc(id)}&limit=1`);
   return rows[0] || null;
 }
-type PageInput = { title: string; navLabel?: string; body?: string; image?: string; video?: string; position?: number };
+type PageInput = { title: string; navLabel?: string; body?: string; image?: string; video?: string; position?: number; i18n?: CmsTranslations };
 function pageRow(input: PageInput): Record<string, unknown> {
   return {
     title: input.title.trim(), navLabel: input.navLabel?.trim() || null, body: input.body || null,
     image: input.image || null, video: input.video || null,
     position: typeof input.position === "number" && !Number.isNaN(input.position) ? input.position : 0,
+    i18n: input.i18n && Object.keys(input.i18n).length ? input.i18n : null,
   };
 }
 export async function createPage(input: PageInput): Promise<SitePage> {
@@ -232,7 +233,8 @@ export const getPageByIdCached = (id: string) =>
 
 type CmsInput = {
   kind: CmsItem["kind"]; title: string; summary?: string; body?: string; price?: number; category?: string; mode?: CmsItem["mode"];
-  image?: string; images?: string[]; link?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherInfo?: string; accessDays?: number; lessons?: { title: string; path?: string; url?: string; quality?: string; subtitles?: string }[];
+  image?: string; images?: string[]; link?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherRole?: string; teacherInfo?: string; accessDays?: number; lessons?: { title: string; path?: string; url?: string; quality?: string; subtitles?: string }[];
+  moods?: string[]; i18n?: CmsTranslations;
 };
 function cmsRow(input: CmsInput): Record<string, unknown> {
   return {
@@ -252,6 +254,8 @@ function cmsRow(input: CmsInput): Record<string, unknown> {
     teacherInfo: input.teacherInfo?.trim() || null,
     accessDays: numOrNull(input.accessDays),
     lessons: input.lessons && input.lessons.length ? input.lessons : null,
+    moods: input.moods && input.moods.length ? input.moods : null,
+    i18n: input.i18n && Object.keys(input.i18n).length ? input.i18n : null,
   };
 }
 export async function createCmsItem(input: CmsInput): Promise<CmsItem> {

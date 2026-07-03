@@ -2,7 +2,16 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { RichTextEditor } from "@/components/RichTextEditor";
-import type { SitePage } from "@/lib/types";
+import type { SitePage, CmsTranslations } from "@/lib/types";
+
+const LANG_TABS = [
+  { k: "mn" as const, l: "🇲🇳 Монгол" },
+  { k: "en" as const, l: "🇬🇧 English" },
+  { k: "ko" as const, l: "🇰🇷 한국어" },
+  { k: "ja" as const, l: "🇯🇵 日本語" },
+  { k: "zh" as const, l: "🇨🇳 中文" },
+];
+type TrLang = "en" | "ko" | "ja" | "zh";
 
 function compressImage(file: File, maxW = 1200, quality = 0.82): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -57,7 +66,11 @@ export function AdminPages() {
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
+  const [langTab, setLangTab] = useState<"mn" | TrLang>("mn");
+  const [i18n, setI18n] = useState<CmsTranslations>({});
   const set = (k: keyof typeof EMPTY, v: string) => setForm((f) => ({ ...f, [k]: v }));
+  const setTr = (l: TrLang, field: "title" | "navLabel" | "body", v: string) =>
+    setI18n((prev) => ({ ...prev, [l]: { ...(prev[l] || {}), [field]: v } }));
 
   const load = useCallback(() => {
     fetch("/api/admin/pages", { cache: "no-store" })
@@ -79,9 +92,10 @@ export function AdminPages() {
     finally { setVideoProgress(null); }
   }
 
-  function resetForm() { setForm(EMPTY); setEditingId(null); setErr(""); setOpen(false); }
+  function resetForm() { setForm(EMPTY); setI18n({}); setLangTab("mn"); setEditingId(null); setErr(""); setOpen(false); }
   function startEdit(p: SitePage) {
     setForm({ title: p.title || "", navLabel: p.navLabel || "", body: p.body || "", image: p.image || "", video: p.video || "", position: String(p.position ?? 0) });
+    setI18n(p.i18n || {}); setLangTab("mn");
     setEditingId(p.id); setErr(""); setOpen(true);
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -94,7 +108,7 @@ export function AdminPages() {
       const res = await fetch("/api/admin/pages", {
         method: editingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editingId ? { id: editingId, ...form } : form),
+        body: JSON.stringify(editingId ? { id: editingId, ...form, i18n } : { ...form, i18n }),
       });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
       resetForm(); load();
@@ -118,9 +132,28 @@ export function AdminPages() {
       {open && (
         <form onSubmit={save} className="card space-y-4 p-5">
           {editingId && <p className="rounded-lg bg-amber-50 px-3 py-1.5 text-sm font-semibold text-amber-700">Засварлаж байна</p>}
+          <div className="flex flex-wrap gap-1.5">
+            {LANG_TABS.map((lt) => (
+              <button key={lt.k} type="button" onClick={() => setLangTab(lt.k)}
+                className={"rounded-full px-3.5 py-1.5 text-sm font-semibold transition " + (langTab === lt.k ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white text-ink/60 hover:text-primary-700")}>
+                {lt.l}
+              </button>
+            ))}
+          </div>
+          {langTab !== "mn" && <p className="rounded-lg bg-aqua px-3 py-1.5 text-xs text-muted">Энэ хэл дээрх орчуулгаа оруулна уу. Хоосон орхивол монгол хувилбар нь харагдана.</p>}
           <div className="grid gap-3 sm:grid-cols-3">
-            <div className="sm:col-span-2"><label className="field-label">Хуудасны гарчиг *</label><input className="input" value={form.title} onChange={(e) => set("title", e.target.value)} /></div>
-            <div><label className="field-label">Цэсэнд харагдах нэр</label><input className="input" value={form.navLabel} onChange={(e) => set("navLabel", e.target.value)} placeholder="Хоосон бол гарчиг" /></div>
+            <div className="sm:col-span-2">
+              <label className="field-label">Хуудасны гарчиг {langTab === "mn" ? "*" : "(" + langTab.toUpperCase() + ")"}</label>
+              {langTab === "mn"
+                ? <input className="input" value={form.title} onChange={(e) => set("title", e.target.value)} />
+                : <input className="input" placeholder={form.title} value={i18n[langTab]?.title || ""} onChange={(e) => setTr(langTab, "title", e.target.value)} />}
+            </div>
+            <div>
+              <label className="field-label">Цэсэнд харагдах нэр {langTab !== "mn" && "(" + langTab.toUpperCase() + ")"}</label>
+              {langTab === "mn"
+                ? <input className="input" value={form.navLabel} onChange={(e) => set("navLabel", e.target.value)} placeholder="Хоосон бол гарчиг" />
+                : <input className="input" placeholder={form.navLabel || form.title} value={i18n[langTab]?.navLabel || ""} onChange={(e) => setTr(langTab, "navLabel", e.target.value)} />}
+            </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
             <div><label className="field-label">Дараалал (цэсэнд)</label><input className="input" type="number" value={form.position} onChange={(e) => set("position", e.target.value)} /></div>
@@ -140,8 +173,10 @@ export function AdminPages() {
             </div>
           </div>
           <div>
-            <label className="field-label">Агуулга</label>
-            <RichTextEditor value={form.body} onChange={(html) => set("body", html)} minHeight={240} />
+            <label className="field-label">Агуулга {langTab !== "mn" && "(" + langTab.toUpperCase() + ")"}</label>
+            {langTab === "mn"
+              ? <RichTextEditor key="mn" value={form.body} onChange={(html) => set("body", html)} minHeight={240} />
+              : <RichTextEditor key={langTab} value={i18n[langTab]?.body || ""} onChange={(html) => setTr(langTab, "body", html)} minHeight={240} />}
           </div>
           {err && <p className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-600">{err}</p>}
           <div className="flex gap-2">

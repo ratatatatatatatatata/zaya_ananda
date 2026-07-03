@@ -16,6 +16,9 @@ const links = [
   { href: "/courses", key: "nav.courses" },
   { href: "/shop", key: "nav.shop" },
   { href: "/resources", key: "nav.resources" },
+  { href: "/teachers", key: "nav.teachers" },
+  { href: "/mood", key: "nav.mood" },
+  { href: "/gift", key: "nav.gift" },
   { href: "/about", key: "nav.about" },
   { href: "/contact", key: "nav.contact" },
 ];
@@ -24,11 +27,13 @@ export function Header() {
   const pathname = usePathname();
   const { count, open } = useCart();
   const { user } = useAuth();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [logo, setLogo] = useState<string>();
-  const [customPages, setCustomPages] = useState<{ id: string; navLabel: string }[]>([]);
+  const [customPages, setCustomPages] = useState<{ id: string; navLabel: string; i18n?: Record<string, { navLabel?: string }> | null }[]>([]);
+  const pageLabel = (p: { navLabel: string; i18n?: Record<string, { navLabel?: string }> | null }) =>
+    (lang !== "mn" && p.i18n?.[lang]?.navLabel) || p.navLabel;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -57,7 +62,7 @@ export function Header() {
           {customPages.map((p) => (
             <Link key={p.id} href={"/p/" + p.id}
               className={cx("nav-link relative whitespace-nowrap py-1 text-[14px] 2xl:text-[15px]", isActive("/p/" + p.id) && "text-primary-700 after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:rounded-full after:bg-primary-grad")}>
-              {p.navLabel}
+              {pageLabel(p)}
             </Link>
           ))}
         </nav>
@@ -87,7 +92,7 @@ export function Header() {
           {customPages.map((p) => (
             <Link key={p.id} href={"/p/" + p.id}
               className={cx("rounded-xl px-3 py-2.5 text-[15px] font-medium transition", isActive("/p/" + p.id) ? "bg-primary-50 text-primary-700" : "text-ink/80 hover:bg-primary-50")}>
-              {p.navLabel}
+              {pageLabel(p)}
             </Link>
           ))}
           <div className="mt-2">
