@@ -39,6 +39,7 @@ export async function PATCH(req: Request) {
       teachers: Array.isArray(body.teachers)
         ? body.teachers.map((t: Record<string, unknown>) => ({
             name: String(t?.name || "").trim(),
+            role: t?.role ? String(t.role) : "",
             info: t?.info ? String(t.info) : "",
             image: t?.image ? String(t.image) : "",
           })).filter((t: { name: string }) => t.name)
