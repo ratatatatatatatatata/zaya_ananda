@@ -54,7 +54,7 @@ export function AdminTeachers() {
         body: JSON.stringify({ teachers: teachers.filter((t) => t.name?.trim()) }),
       });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
-      setMsg("Хадгаллаа. «Удирдагч багш нар» хуудсанд шинэчлэгдэнэ.");
+      setMsg("Хадгаллаа. «Хамт олон» хуудсанд шинэчлэгдлээ.");
     } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Алдаа гарлаа."); } finally { setSaving(false); }
   }
 
@@ -62,8 +62,8 @@ export function AdminTeachers() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-display text-lg font-semibold text-ink">Удирдагч багш нар: {teachers.length}</h2>
-          <p className="mt-1 text-sm text-muted">Эдгээр профайл «Удирдагч багш нар» цэсэнд гарна. Багш дээр дарахад түүний хөтөлдөг хичээлүүд (контентын «Багшийн нэр»-ээр таарсан) автоматаар харагдана.</p>
+          <h2 className="font-display text-lg font-semibold text-ink">Хамт олон: {teachers.length}</h2>
+          <p className="mt-1 text-sm text-muted">Эдгээр профайл «Хамт олон» цэсэнд гарна. Хүн дээр дарахад түүний хөтөлдөг хичээлүүд (контентын «Багшийн нэр»-ээр таарсан) автоматаар харагдана.</p>
         </div>
         <button onClick={() => setTeachers((t) => [...t, { name: "", role: "", info: "", image: "" }])} className="btn btn-primary btn-sm">+ Багш нэмэх</button>
       </div>

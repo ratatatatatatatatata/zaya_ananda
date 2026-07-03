@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { T } from "@/components/T";
 
 export const revalidate = 300;
-export const metadata = { title: "Удирдагч багш нар" };
+export const metadata = { title: "Хамт олон" };
 
 const slugOf = (name: string) => encodeURIComponent(name);
 

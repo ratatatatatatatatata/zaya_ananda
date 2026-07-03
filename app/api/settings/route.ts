@@ -49,6 +49,8 @@ export async function PATCH(req: Request) {
     });
     revalidateTag("settings");
     revalidatePath("/about");
+    revalidatePath("/teachers");
+    revalidatePath("/teachers/[slug]", "page");
     return NextResponse.json({ settings });
   } catch (e) {
     return NextResponse.json({ error: "Хадгалах үед алдаа: " + (e instanceof Error ? e.message : String(e)) }, { status: 500 });

@@ -13,6 +13,8 @@ const LANGS = ["en", "ko", "ja", "zh"] as const;
 function refreshPublic(id?: string) {
   revalidateTag("cms");
   for (const p of ["/services", "/courses", "/shop", "/resources", "/gift"]) revalidatePath(p);
+  revalidatePath("/teachers");
+  revalidatePath("/teachers/[slug]", "page");
   if (id) revalidatePath(`/item/${id}`);
 }
 

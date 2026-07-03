@@ -21,7 +21,7 @@ const nav: { id: string; k: string; label?: string; icon: string }[] = [
   { id: "courses", k: "admin.coursesM", label: "Ариусахуйн үйл", icon: "award" },
   { id: "products", k: "admin.productsM", label: "Энергийн хамгаалалт", icon: "laptop" },
   { id: "events", k: "admin.eventsM", label: "Гэгээрлийн зам", icon: "calendar" },
-  { id: "teachers", k: "admin.teachersM", label: "Удирдагч багш нар", icon: "user" },
+  { id: "teachers", k: "admin.teachersM", label: "Хамт олон", icon: "user" },
   { id: "gift", k: "admin.giftM", label: "Гэгээн бэлэг", icon: "award" },
   { id: "promos", k: "admin.promosM", label: "Сурталчилгаа", icon: "star" },
   { id: "reviews", k: "admin.reviews", icon: "star" },
