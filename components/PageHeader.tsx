@@ -6,12 +6,12 @@ import { MeditationFigure } from "./MeditationFigure";
 /** Хуудасны толгой — нүүр хуудасны кино маягийн гүн өнгөтэй уялдсан. */
 export function PageHeader({ title, desc, crumb }: { title: ReactNode; desc?: ReactNode; crumb?: ReactNode }) {
   return (
-    <section className="relative isolate overflow-hidden bg-[#0b1020]">
+    <section className="relative isolate overflow-hidden bg-[#121C33]">
       {/* Нүүрийн аура туяа */}
       <div
         aria-hidden
         className="pointer-events-none absolute -top-32 left-1/2 h-[440px] w-[760px] -translate-x-1/2 rounded-full"
-        style={{ background: "radial-gradient(ellipse, rgba(120,230,210,0.32), rgba(120,230,210,0) 70%)", filter: "blur(12px)" }}
+        style={{ background: "radial-gradient(ellipse, rgba(120,230,210,0.40), rgba(120,230,210,0) 70%)", filter: "blur(12px)" }}
       />
       <div
         aria-hidden

@@ -99,8 +99,8 @@ export function PurchaseBox({ id, price }: { id: string; title: string; price?: 
         <div className="space-y-3 text-center">
           <p className="font-semibold text-ink">QPay-ээр төлөх</p>
           <p className="text-2xl font-bold text-primary-700">{formatMNT(amount)}</p>
-          <div className="mx-auto grid h-40 w-40 grid-cols-9 gap-0.5 rounded-2xl border border-line bg-[#0D1626] p-2">
-            {Array.from({ length: 81 }).map((_, i) => <div key={i} className={fnv(id + "qr" + i) % 10 < 5 ? "bg-primary-200" : "bg-[#0D1626]"} />)}
+          <div className="mx-auto grid h-40 w-40 grid-cols-9 gap-0.5 rounded-2xl border border-line bg-[#121D33] p-2">
+            {Array.from({ length: 81 }).map((_, i) => <div key={i} className={fnv(id + "qr" + i) % 10 < 5 ? "bg-primary-200" : "bg-[#121D33]"} />)}
           </div>
           <p className="text-sm text-muted">QR-ийг уншуулж төлөөд доорх товчийг дарна уу.</p>
           {err && <p className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-600">{err}</p>}

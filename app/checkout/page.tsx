@@ -69,7 +69,7 @@ export default function CheckoutPage() {
   if (items.length === 0 && step !== "done") {
     return (
       <section className="section"><div className="container-px">
-        <div className="mx-auto max-w-md rounded-4xl border border-line bg-[#111B2D] p-10 text-center shadow-card">
+        <div className="mx-auto max-w-md rounded-4xl border border-line bg-[#1A2742] p-10 text-center shadow-card">
           <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-primary-50 text-3xl">🧺</div>
           <h1 className="mt-6 font-display text-2xl font-semibold text-ink">{t("checkout.empty")}</h1>
           <p className="mt-3 text-muted">{t("checkout.emptyHint")}</p>
@@ -97,7 +97,7 @@ export default function CheckoutPage() {
 
         {step === "done" && order ? (
           <div className="mx-auto max-w-xl">
-            <div className="rounded-4xl border border-line bg-[#111B2D] p-8 text-center shadow-card sm:p-10">
+            <div className="rounded-4xl border border-line bg-[#1A2742] p-8 text-center shadow-card sm:p-10">
               <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-jade-400/15 text-4xl text-jade-600">✓</div>
               <h1 className="mt-6 font-display text-3xl font-semibold text-ink">{t("checkout.success")}</h1>
               <p className="mt-2 font-mono text-sm text-primary-700">#{order.id.slice(0, 8).toUpperCase()}</p>
@@ -152,7 +152,7 @@ export default function CheckoutPage() {
                   {method === "qpay" ? (
                     <div className="mt-6 flex flex-col items-center rounded-3xl bg-aqua p-6 text-center">
                       <p className="text-sm text-muted">{t("pay.qpayNote")}</p>
-                      <svg viewBox="0 0 25 25" className="mt-4 h-44 w-44 rounded-xl bg-[#111B2D] p-2 shadow-card">
+                      <svg viewBox="0 0 25 25" className="mt-4 h-44 w-44 rounded-xl bg-[#1A2742] p-2 shadow-card">
                         {qr.map((row, y) => row.map((on, x) => on ? <rect key={x + "-" + y} x={x} y={y} width="1" height="1" fill="#0E746E" /> : null))}
                       </svg>
                       <p className="mt-4 font-display text-2xl font-semibold text-ink">{formatMNT(total)}</p>
@@ -161,7 +161,7 @@ export default function CheckoutPage() {
                   ) : (
                     <div className="mt-6 rounded-3xl bg-aqua p-6">
                       <p className="text-sm text-muted">{t("pay.bankNote")}</p>
-                      <div className="mt-4 rounded-2xl border border-line bg-[#111B2D] p-4">
+                      <div className="mt-4 rounded-2xl border border-line bg-[#1A2742] p-4">
                         <p className="font-semibold text-ink">{t("pay.account")}</p>
                         <p className="mt-2 font-display text-xl font-semibold text-ink">{formatMNT(total)}</p>
                       </div>

@@ -247,7 +247,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
               <p className="mb-3 text-xs leading-relaxed text-muted">{isCourse ? "Видео зөвхөн төлбөр баталгаажсан хэрэглэгчид харагдана." : "Видео дэлгэрэнгүй хуудсанд нээлттэй харагдана."}</p>
               <div className="space-y-2">
                 {lessons.map((l, idx) => (
-                  <div key={idx} className="space-y-2 rounded-xl border border-line bg-[#0D1626] p-3">
+                  <div key={idx} className="space-y-2 rounded-xl border border-line bg-[#121D33] p-3">
                     <div className="flex items-center gap-2">
                       <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-100 text-xs font-bold text-primary-700">{idx + 1}</span>
                       <input className="input flex-1" placeholder={isCourse ? "Хичээлийн гарчиг" : "Видеоны гарчиг"} value={l.title} onChange={(e) => updLesson(idx, { title: e.target.value })} />

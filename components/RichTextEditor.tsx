@@ -51,7 +51,7 @@ export function RichTextEditor({ value, onChange, minHeight = 180 }: { value: st
   );
 
   return (
-    <div className="rounded-xl border border-line bg-[#0D1626]">
+    <div className="rounded-xl border border-line bg-[#121D33]">
       <div className="flex flex-wrap items-center gap-1.5 border-b border-line bg-aqua/60 p-2">
         <select className="h-8 rounded-md border border-line bg-white/10 px-1 text-sm" defaultValue="" title="Фонт"
           onChange={(e) => { if (e.target.value) exec("fontName", e.target.value); }}>

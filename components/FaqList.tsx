@@ -7,7 +7,7 @@ import type { Faq } from "@/lib/types";
 export function FaqList({ items }: { items: Faq[] }) {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <div className="mx-auto max-w-3xl divide-y divide-line overflow-hidden rounded-3xl border border-line bg-[#111B2D] shadow-card">
+    <div className="mx-auto max-w-3xl divide-y divide-line overflow-hidden rounded-3xl border border-line bg-[#1A2742] shadow-card">
       {items.map((f, i) => {
         const isOpen = open === i;
         return (

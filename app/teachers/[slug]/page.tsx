@@ -26,7 +26,7 @@ export default async function TeacherDetailPage({ params }: { params: { slug: st
   return (
     <>
       {/* Masterclass маягийн танилцуулга */}
-      <section className="relative isolate overflow-hidden bg-[#0B1020]">
+      <section className="relative isolate overflow-hidden bg-[#121C33]">
         <div className="container-px grid items-center gap-10 py-16 lg:grid-cols-[1fr_1.3fr] lg:py-20">
           <div className="mx-auto w-full max-w-sm">
             {teacher.image

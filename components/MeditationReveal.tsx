@@ -50,7 +50,7 @@ export function MeditationReveal() {
 
         {/* rising stars */}
         {stars.map((st, i) => (
-          <span key={i} className="absolute rounded-full bg-[#111B2D]"
+          <span key={i} className="absolute rounded-full bg-[#1A2742]"
             style={{ left: st.x + "%", top: st.y + "%", width: st.s, height: st.s, opacity: auraO * (0.5 + (i % 3) * 0.18), boxShadow: "0 0 10px #9B6EF0", transform: `translateY(${(-p * (90 + i * 12)).toFixed(0)}px)` }} />
         ))}
 

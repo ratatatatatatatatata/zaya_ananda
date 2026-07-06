@@ -7,8 +7,8 @@ const config: Config = {
     extend: {
       colors: {
         // Нүүр хуудасны кино маягийн гүн өнгөний палитр
-        cream: "#0F1828", ivory: "#0D1524", aqua: "#132030",
-        ink: "#E9F2F0", muted: "#9FB6B2", line: "#233349",
+        cream: "#172339", ivory: "#141F36", aqua: "#182A40",
+        ink: "#F0F7F5", muted: "#AFC5C4", line: "#2E4160",
         primary: { 50: "#10262C", 100: "#14403F", 200: "#A4E9E1", 300: "#7CDCD2", 400: "#36C6BA", 500: "#16AFA4", 600: "#4CC8BD", 700: "#7CDCD2", 800: "#A9EAE3", 900: "#103F3C", DEFAULT: "#16AFA4" },
         accent: { 50: "#2A2412", 100: "#3D3517", 200: "#EBD392", 300: "#DFBC5E", 400: "#E3BE62", 500: "#DFBC5E", 600: "#EBD392", 700: "#F5E8C4", DEFAULT: "#DFBC5E" },
         deep: { 600: "#9FE0DA", 700: "#B9EBE6", 800: "#CDF2EE", DEFAULT: "#9FE0DA" },

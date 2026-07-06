@@ -32,7 +32,7 @@ export function LanguageSwitcher() {
         <span className="text-[10px] text-muted">▾</span>
       </button>
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-2xl border border-line bg-[#111B2D] p-1 shadow-lift">
+        <div className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-2xl border border-line bg-[#1A2742] p-1 shadow-lift">
           {localeMeta.map((m) => (
             <button
               key={m.code}

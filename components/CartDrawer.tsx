@@ -36,7 +36,7 @@ export function CartDrawer() {
               {items.map((it) => {
                 const tn = toneStyles[it.tone] ?? toneStyles.violet;
                 return (
-                  <div key={it.kind + it.slug} className="flex gap-3 rounded-2xl border border-line bg-[#111B2D] p-3">
+                  <div key={it.kind + it.slug} className="flex gap-3 rounded-2xl border border-line bg-[#1A2742] p-3">
                     <div className={cx("grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-gradient-to-br text-xl text-white", tn.grad)}>{it.glyph}</div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{t("kind." + it.kind)}</p>
@@ -56,7 +56,7 @@ export function CartDrawer() {
               })}
             </div>
 
-            <footer className="border-t border-line bg-[#111B2D] px-6 py-5">
+            <footer className="border-t border-line bg-[#1A2742] px-6 py-5">
               <div className="mb-4 flex items-center justify-between">
                 <span className="text-muted">{t("cart.total")}</span>
                 <span className="text-xl font-semibold text-ink">{formatMNT(total)}</span>

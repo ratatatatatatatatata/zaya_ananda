@@ -42,7 +42,7 @@ export function ContactSection() {
   ];
 
   return (
-    <section id="contact" className="section bg-[#0D1524]">
+    <section id="contact" className="section bg-[#141F36]">
       <div className="container-px">
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <h2 className="font-display text-3xl font-semibold text-ink">{t("contact.title")}</h2>

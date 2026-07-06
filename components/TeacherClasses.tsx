@@ -37,7 +37,7 @@ export function TeacherClasses({ classes }: { classes: TeacherClass[] }) {
         const title = locText(lang, c.title, c.i18n, "title");
         const summary = locText(lang, c.summary, c.i18n, "summary");
         return (
-          <div key={c.id} className={cx("overflow-hidden rounded-2xl border bg-[#111B2D] transition-shadow", isOpen ? "border-primary-300 shadow-glow" : "border-line hover:border-primary-300")}>
+          <div key={c.id} className={cx("overflow-hidden rounded-2xl border bg-[#1A2742] transition-shadow", isOpen ? "border-primary-300 shadow-glow" : "border-line hover:border-primary-300")}>
             <button
               type="button"
               onClick={() => setOpen(isOpen ? null : c.id)}

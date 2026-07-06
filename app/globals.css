@@ -13,24 +13,24 @@ html { font-size: 100%; scroll-behavior: smooth; color-scheme: dark; }
 /* Native select/dropdown — хар дэвсгэр дээр цагаан үсэгтэй */
 select { color-scheme: dark; }
 select option, select optgroup {
-  background-color: #0D1626;
-  color: #E9F2F0;
+  background-color: #121D33;
+  color: #F0F7F5;
 }
 select option:checked { background-color: #16AFA4; color: #ffffff; }
 * { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
 
 body {
-  color: #E9F2F0;
+  color: #F0F7F5;
   font-family: var(--font-sans);
   font-size: 1.125rem;     /* 18px */
   line-height: 1.7;
   overflow-x: clip;        /* stop stray horizontal scroll from blurs/parallax (sticky-safe) */
-  background-color: #0B1020;
+  background-color: #121C33;
   background-image:
-    radial-gradient(55% 45% at 50% 0%, rgba(120,230,210,0.10) 0%, transparent 65%),
-    radial-gradient(40% 40% at 90% 30%, rgba(155,110,240,0.08) 0%, transparent 60%),
-    radial-gradient(45% 40% at 8% 70%, rgba(94,141,224,0.08) 0%, transparent 60%),
-    linear-gradient(160deg, #0B1020 0%, #0E1830 40%, #0F2130 75%, #0B1020 100%);
+    radial-gradient(55% 45% at 50% 0%, rgba(120,230,210,0.17) 0%, transparent 65%),
+    radial-gradient(40% 40% at 90% 30%, rgba(155,110,240,0.13) 0%, transparent 60%),
+    radial-gradient(45% 40% at 8% 70%, rgba(94,141,224,0.13) 0%, transparent 60%),
+    linear-gradient(160deg, #121C33 0%, #16233E 40%, #15293C 75%, #121C33 100%);
   background-attachment: fixed;
 }
 
@@ -59,13 +59,13 @@ body {
   .btn-outline { @apply border-2 border-primary-500/50 bg-white/5 text-primary-200 hover:border-primary-400 hover:text-white; }
   .btn-ghost { @apply text-ink/80 hover:bg-white/10; }
 
-  .card { @apply rounded-3xl border border-line bg-[#111B2D] shadow-card; }
-  .glass { @apply rounded-3xl border border-white/10 bg-[#0F1728]/75 shadow-card backdrop-blur-xl; }
+  .card { @apply rounded-3xl border border-line bg-[#1A2742] shadow-card; }
+  .glass { @apply rounded-3xl border border-white/10 bg-[#16213A]/80 shadow-card backdrop-blur-xl; }
   .chip { @apply inline-flex items-center gap-1.5 rounded-full border border-primary-500/30 bg-primary-500/15 px-3 py-1 text-[0.8rem] font-semibold text-primary-300; }
   .eyebrow { @apply inline-flex items-center gap-2 text-[0.8rem] font-bold uppercase tracking-[0.2em] text-primary-600; }
 
   .field-label { @apply mb-1.5 block text-[1.04rem] font-semibold text-ink; }
-  .input { @apply w-full rounded-2xl border-2 border-line bg-[#0D1626] px-4 py-3 text-[1.06rem] text-ink placeholder:text-muted/70 outline-none transition focus:border-primary-400 focus:ring-4 focus:ring-primary-500/20; }
+  .input { @apply w-full rounded-2xl border-2 border-line bg-[#121D33] px-4 py-3 text-[1.06rem] text-ink placeholder:text-muted/70 outline-none transition focus:border-primary-400 focus:ring-4 focus:ring-primary-500/20; }
   .textarea { @apply input min-h-[130px] resize-y; }
 
   .nav-link { @apply text-[1.04rem] font-medium text-ink/80 transition hover:text-primary-700; }

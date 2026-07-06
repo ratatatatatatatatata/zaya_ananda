@@ -42,10 +42,10 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
               <h1 className="mt-4 text-balance text-4xl font-semibold text-ink sm:text-5xl"><Tr v={c.title} /></h1>
               <p className="mt-4 max-w-xl text-lg leading-relaxed text-muted"><Tr v={c.short} /></p>
               <div className="mt-6 flex flex-wrap gap-3 text-sm font-medium text-ink/70">
-                <span className="rounded-full border border-line bg-[#111B2D] px-4 py-2">📚 {c.lessons} <T k="common.lessons" /></span>
-                <span className="rounded-full border border-line bg-[#111B2D] px-4 py-2">🗓 <Tr v={c.duration} /></span>
-                {c.instructor && <span className="rounded-full border border-line bg-[#111B2D] px-4 py-2">👤 {c.instructor}</span>}
-                {typeof c.students === "number" && <span className="rounded-full border border-line bg-[#111B2D] px-4 py-2">👥 {c.students.toLocaleString()}</span>}
+                <span className="rounded-full border border-line bg-[#1A2742] px-4 py-2">📚 {c.lessons} <T k="common.lessons" /></span>
+                <span className="rounded-full border border-line bg-[#1A2742] px-4 py-2">🗓 <Tr v={c.duration} /></span>
+                {c.instructor && <span className="rounded-full border border-line bg-[#1A2742] px-4 py-2">👤 {c.instructor}</span>}
+                {typeof c.students === "number" && <span className="rounded-full border border-line bg-[#1A2742] px-4 py-2">👥 {c.students.toLocaleString()}</span>}
               </div>
             </div>
             {/* intro preview */}
@@ -133,7 +133,7 @@ export default function CourseDetailPage({ params }: { params: { slug: string } 
         </div>
       </section>
 
-      <section className="section bg-[#111B2D]">
+      <section className="section bg-[#1A2742]">
         <div className="container-px">
           <h2 className="font-display text-2xl font-semibold text-ink"><T k="courseDetail.related" /></h2>
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

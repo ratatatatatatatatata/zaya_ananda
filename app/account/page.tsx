@@ -70,7 +70,7 @@ export default function AccountPage() {
     return (
       <section className="section">
         <div className="container-px">
-          <div className="mx-auto max-w-md rounded-4xl border border-line bg-[#111B2D] p-10 text-center shadow-card">
+          <div className="mx-auto max-w-md rounded-4xl border border-line bg-[#1A2742] p-10 text-center shadow-card">
             <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-primary-50 text-3xl">🔐</div>
             <h1 className="mt-6 font-display text-2xl font-semibold text-ink">{t("account.loginRequired")}</h1>
             <p className="mt-3 text-muted">{t("account.loginRequiredSub")}</p>

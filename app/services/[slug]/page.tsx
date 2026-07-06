@@ -39,9 +39,9 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
               <h1 className="mt-4 text-balance text-4xl font-semibold text-ink sm:text-5xl"><Tr v={s.title} /></h1>
               <p className="mt-4 max-w-xl text-lg leading-relaxed text-muted"><Tr v={s.short} /></p>
               <div className="mt-6 flex flex-wrap gap-3 text-sm font-medium text-ink/70">
-                <span className="rounded-full border border-line bg-[#111B2D] px-4 py-2">⏱ <Tr v={s.duration} /></span>
-                {s.deliveryType && <span className="rounded-full border border-line bg-[#111B2D] px-4 py-2">📍 <Tr v={s.deliveryType} /></span>}
-                {s.instructor && <span className="rounded-full border border-line bg-[#111B2D] px-4 py-2">👤 {s.instructor}</span>}
+                <span className="rounded-full border border-line bg-[#1A2742] px-4 py-2">⏱ <Tr v={s.duration} /></span>
+                {s.deliveryType && <span className="rounded-full border border-line bg-[#1A2742] px-4 py-2">📍 <Tr v={s.deliveryType} /></span>}
+                {s.instructor && <span className="rounded-full border border-line bg-[#1A2742] px-4 py-2">👤 {s.instructor}</span>}
               </div>
             </div>
             <div className="flex justify-center">
@@ -74,7 +74,7 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
             <h3 className="mt-12 font-display text-2xl font-semibold text-ink"><T k="detail.faqTitle" /></h3>
             <div className="mt-5 space-y-3">
               {faqs.slice(0, 4).map((f) => (
-                <details key={f.q.mn} className="group rounded-2xl border border-line bg-[#111B2D] p-5 [&_summary]:cursor-pointer">
+                <details key={f.q.mn} className="group rounded-2xl border border-line bg-[#1A2742] p-5 [&_summary]:cursor-pointer">
                   <summary className="flex items-center justify-between font-semibold text-ink marker:content-['']"><Tr v={f.q} /><span className="text-primary-600 transition group-open:rotate-45">＋</span></summary>
                   <p className="mt-3 leading-relaxed text-muted"><Tr v={f.a} /></p>
                 </details>
@@ -107,7 +107,7 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
         </div>
       </section>
 
-      <section className="section bg-[#111B2D]">
+      <section className="section bg-[#1A2742]">
         <div className="container-px">
           <h2 className="font-display text-2xl font-semibold text-ink"><T k="detail.relatedProducts" /></h2>
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
