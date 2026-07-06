@@ -82,7 +82,7 @@ export default function AdminPage() {
 
   if (loading) return <div className="section"><div className="container-px flex min-h-[40vh] items-center justify-center"><div className="h-10 w-10 animate-spinSlow rounded-full border-2 border-primary-200 border-t-primary-600" /></div></div>;
   if (!user) {
-    return <div className="section"><div className="container-px"><div className="mx-auto max-w-md rounded-4xl border border-line bg-white p-10 text-center shadow-card">
+    return <div className="section"><div className="container-px"><div className="mx-auto max-w-md rounded-4xl border border-line bg-[#111B2D] p-10 text-center shadow-card">
       <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-primary-50 text-3xl">🔐</div>
       <h1 className="mt-6 font-display text-2xl font-semibold text-ink">{t("admin.loginReq")}</h1>
       <Link href="/login" className="btn btn-primary btn-md mt-6">{t("auth.login")}</Link></div></div></div>;
@@ -98,7 +98,7 @@ export default function AdminPage() {
   const Td = ({ children, className }: { children: React.ReactNode; className?: string }) => <td className={cx("px-4 py-3 text-sm text-ink/80", className)}>{children}</td>;
 
   return (
-    <div className="bg-[#f3f8f7]">
+    <div className="bg-transparent">
       <div className="container-px py-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -109,7 +109,7 @@ export default function AdminPage() {
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[230px_1fr]">
-          <aside className="h-fit rounded-3xl border border-line bg-white p-2 lg:sticky lg:top-24">
+          <aside className="h-fit rounded-3xl border border-line bg-[#111B2D] p-2 lg:sticky lg:top-24">
             {nav.map((n) => (
               <button key={n.id} onClick={() => setTab(n.id)}
                 className={cx("flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-sm font-medium transition", tab === n.id ? "bg-primary-50 text-primary-700" : "text-ink/70 hover:bg-primary-50/60")}>

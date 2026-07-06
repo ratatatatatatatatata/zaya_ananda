@@ -6,11 +6,12 @@ const config: Config = {
     container: { center: true, padding: { DEFAULT: "1.25rem", lg: "2rem" }, screens: { "2xl": "1240px" } },
     extend: {
       colors: {
-        cream: "#FAF6EC", ivory: "#FCF9F2", aqua: "#EAF8F7",
-        ink: "#152E2A", muted: "#46615C", line: "#E2EEEB",
-        primary: { 50: "#EDFBF9", 100: "#D0F4EF", 200: "#A4E9E1", 300: "#6FDACE", 400: "#36C6BA", 500: "#16AFA4", 600: "#0F9189", 700: "#0E746E", 800: "#105C57", 900: "#103F3C", DEFAULT: "#16AFA4" },
-        accent: { 50: "#FBF5E6", 100: "#F5E8C4", 200: "#EBD392", 300: "#DFBC5E", 400: "#CDA94B", 500: "#B8912F", 600: "#977528", 700: "#6E5620", DEFAULT: "#B8912F" },
-        deep: { 600: "#0C5C57", 700: "#0A4A46", 800: "#083A37", DEFAULT: "#0C5C57" },
+        // Нүүр хуудасны кино маягийн гүн өнгөний палитр
+        cream: "#0F1828", ivory: "#0D1524", aqua: "#132030",
+        ink: "#E9F2F0", muted: "#9FB6B2", line: "#233349",
+        primary: { 50: "#10262C", 100: "#14403F", 200: "#A4E9E1", 300: "#7CDCD2", 400: "#36C6BA", 500: "#16AFA4", 600: "#4CC8BD", 700: "#7CDCD2", 800: "#A9EAE3", 900: "#103F3C", DEFAULT: "#16AFA4" },
+        accent: { 50: "#2A2412", 100: "#3D3517", 200: "#EBD392", 300: "#DFBC5E", 400: "#E3BE62", 500: "#DFBC5E", 600: "#EBD392", 700: "#F5E8C4", DEFAULT: "#DFBC5E" },
+        deep: { 600: "#9FE0DA", 700: "#B9EBE6", 800: "#CDF2EE", DEFAULT: "#9FE0DA" },
         jade: { 400: "#34BBA2", 500: "#1B9E86", 600: "#14806C", DEFAULT: "#1B9E86" },
         blue: { 300: "#8FB4F0", 400: "#5E8DE0", 500: "#3B6FD4", 600: "#2C57AE", 700: "#274C9A", 900: "#1B3568", DEFAULT: "#3B6FD4" },
         grape: { 200: "#E4D6FF", 300: "#C9A8FF", 400: "#B488FB", 500: "#9B6EF0", 600: "#8454D8", 700: "#6B40B4", DEFAULT: "#9B6EF0" },
@@ -33,7 +34,7 @@ const config: Config = {
         aurora:
           "radial-gradient(50% 55% at 10% 8%, rgba(22,175,164,0.20) 0%, transparent 60%), radial-gradient(45% 50% at 92% 6%, rgba(155,110,240,0.16) 0%, transparent 58%), radial-gradient(50% 55% at 78% 100%, rgba(240,156,188,0.16) 0%, transparent 60%), radial-gradient(40% 45% at 40% 90%, rgba(184,145,47,0.10) 0%, transparent 60%)",
         cosmic:
-          "linear-gradient(160deg, #EAF8F7 0%, #F0ECFF 35%, #FBEEF4 70%, #FFF7E9 100%)",
+          "linear-gradient(160deg, #0B1020 0%, #0E1830 35%, #0F2130 70%, #0B1020 100%)",
         "primary-grad": "linear-gradient(135deg, #2BC8BB 0%, #16AFA4 45%, #0F9189 100%)",
         "magic-grad": "linear-gradient(120deg, #16AFA4 0%, #5E8DE0 38%, #9B6EF0 68%, #F09CBC 100%)",
         "gold-grad": "linear-gradient(135deg, #DFBC5E 0%, #B8912F 100%)",

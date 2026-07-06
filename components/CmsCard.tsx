@@ -40,7 +40,7 @@ export function CmsCard({ item }: { item: CmsItem }) {
       {item.image && (
         <div className="relative h-56 w-full overflow-hidden">
           <img src={item.image} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-          {cat && <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-primary-700 shadow-sm">{cat}</span>}
+          {cat && <span className="absolute left-3 top-3 rounded-full bg-black/55 px-3 py-1 text-xs font-semibold text-white shadow-sm">{cat}</span>}
         </div>
       )}
       <div className="flex flex-1 flex-col p-5">

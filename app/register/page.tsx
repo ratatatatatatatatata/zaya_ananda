@@ -65,7 +65,7 @@ export default function RegisterPage() {
             <p className="mt-2 text-muted">{t("auth.registerSub")}</p>
           </div>
           <form onSubmit={onSubmit} className="card p-6 sm:p-8">
-            <button type="button" onClick={onFacebook} disabled={loading} className="flex w-full items-center justify-center gap-2.5 rounded-full bg-[#1877F2] px-5 py-3.5 text-[1.05rem] font-semibold text-white transition hover:brightness-110 disabled:opacity-60"><span className="grid h-6 w-6 place-items-center rounded-full bg-white text-sm font-bold text-[#1877F2]">f</span>{tr(FB_LABEL)}</button>
+            <button type="button" onClick={onFacebook} disabled={loading} className="flex w-full items-center justify-center gap-2.5 rounded-full bg-[#1877F2] px-5 py-3.5 text-[1.05rem] font-semibold text-white transition hover:brightness-110 disabled:opacity-60"><span className="grid h-6 w-6 place-items-center rounded-full bg-[#111B2D] text-sm font-bold text-[#1877F2]">f</span>{tr(FB_LABEL)}</button>
             <div className="my-5 flex items-center gap-3 text-sm text-muted"><span className="h-px flex-1 bg-line" />{tr(OR)}<span className="h-px flex-1 bg-line" /></div>
             <div>
               <label className="field-label" htmlFor="name">{t("form.name")}</label>

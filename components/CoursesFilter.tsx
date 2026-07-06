@@ -19,7 +19,7 @@ export function CoursesFilter({ courses }: { courses: Course[] }) {
 
   return (
     <div>
-      <div className="mx-auto mb-9 flex w-full max-w-md rounded-full border border-line bg-white p-1 shadow-sm">
+      <div className="mx-auto mb-9 flex w-full max-w-md rounded-full border border-line bg-[#111B2D] p-1 shadow-sm">
         {TABS.map((tb) => (
           <button key={tb.key} onClick={() => setMode(tb.key)}
             className={cx("flex-1 rounded-full px-5 py-3 text-[1.02rem] font-semibold transition", mode === tb.key ? "bg-primary-grad text-white shadow-soft" : "text-ink/70 hover:text-primary-700")}>

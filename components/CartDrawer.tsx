@@ -12,7 +12,7 @@ export function CartDrawer() {
   return (
     <>
       <div onClick={close} aria-hidden
-        className={cx("fixed inset-0 z-50 bg-ink/40 backdrop-blur-sm transition-opacity duration-300", isOpen ? "opacity-100" : "pointer-events-none opacity-0")} />
+        className={cx("fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300", isOpen ? "opacity-100" : "pointer-events-none opacity-0")} />
       <aside
         className={cx("fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-cream shadow-2xl transition-transform duration-300 ease-out", isOpen ? "translate-x-0" : "translate-x-full")}
         aria-label={t("cart.title")}>
@@ -36,7 +36,7 @@ export function CartDrawer() {
               {items.map((it) => {
                 const tn = toneStyles[it.tone] ?? toneStyles.violet;
                 return (
-                  <div key={it.kind + it.slug} className="flex gap-3 rounded-2xl border border-line bg-white p-3">
+                  <div key={it.kind + it.slug} className="flex gap-3 rounded-2xl border border-line bg-[#111B2D] p-3">
                     <div className={cx("grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-gradient-to-br text-xl text-white", tn.grad)}>{it.glyph}</div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{t("kind." + it.kind)}</p>
@@ -56,7 +56,7 @@ export function CartDrawer() {
               })}
             </div>
 
-            <footer className="border-t border-line bg-white px-6 py-5">
+            <footer className="border-t border-line bg-[#111B2D] px-6 py-5">
               <div className="mb-4 flex items-center justify-between">
                 <span className="text-muted">{t("cart.total")}</span>
                 <span className="text-xl font-semibold text-ink">{formatMNT(total)}</span>

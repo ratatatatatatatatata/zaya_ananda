@@ -28,7 +28,7 @@ export function TeacherClasses({ classes }: { classes: TeacherClass[] }) {
   const [open, setOpen] = useState<string | null>(null);
 
   if (classes.length === 0)
-    return <p className="mt-6 rounded-2xl border border-dashed border-line bg-white/60 px-5 py-12 text-center text-muted">Одоогоор бүртгэгдсэн хичээл алга. Удахгүй нэмэгдэнэ.</p>;
+    return <p className="mt-6 rounded-2xl border border-dashed border-line bg-white/5 px-5 py-12 text-center text-muted">Одоогоор бүртгэгдсэн хичээл алга. Удахгүй нэмэгдэнэ.</p>;
 
   return (
     <div className="mt-8 space-y-3">
@@ -37,7 +37,7 @@ export function TeacherClasses({ classes }: { classes: TeacherClass[] }) {
         const title = locText(lang, c.title, c.i18n, "title");
         const summary = locText(lang, c.summary, c.i18n, "summary");
         return (
-          <div key={c.id} className={cx("overflow-hidden rounded-2xl border bg-white transition-shadow", isOpen ? "border-primary-300 shadow-glow" : "border-line hover:border-primary-200")}>
+          <div key={c.id} className={cx("overflow-hidden rounded-2xl border bg-[#111B2D] transition-shadow", isOpen ? "border-primary-300 shadow-glow" : "border-line hover:border-primary-300")}>
             <button
               type="button"
               onClick={() => setOpen(isOpen ? null : c.id)}

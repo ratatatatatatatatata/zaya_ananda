@@ -135,7 +135,7 @@ export function AdminPages() {
           <div className="flex flex-wrap gap-1.5">
             {LANG_TABS.map((lt) => (
               <button key={lt.k} type="button" onClick={() => setLangTab(lt.k)}
-                className={"rounded-full px-3.5 py-1.5 text-sm font-semibold transition " + (langTab === lt.k ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white text-ink/60 hover:text-primary-700")}>
+                className={"rounded-full px-3.5 py-1.5 text-sm font-semibold transition " + (langTab === lt.k ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white/5 text-ink/60 hover:text-primary-300")}>
                 {lt.l}
               </button>
             ))}

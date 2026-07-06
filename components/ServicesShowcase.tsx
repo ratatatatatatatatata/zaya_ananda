@@ -18,7 +18,7 @@ export function ServicesShowcase({ services }: { services: Service[] }) {
       <div className="flex flex-wrap gap-2">
         {filters.map((f) => (
           <button key={f} onClick={() => setActive(f)}
-            className={cx("rounded-full px-4 py-2 text-sm font-semibold transition", active === f ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white text-ink/70 hover:border-primary-300 hover:text-primary-700")}>
+            className={cx("rounded-full px-4 py-2 text-sm font-semibold transition", active === f ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-[#111B2D] text-ink/70 hover:border-primary-300 hover:text-primary-700")}>
             {t("filter." + f)}
           </button>
         ))}

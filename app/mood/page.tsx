@@ -45,7 +45,7 @@ export default function MoodPage() {
           {MOODS.map((m) => (
             <button key={m.key} onClick={() => setMood(m.key)}
               className={cx("rounded-full px-5 py-3 text-[1.02rem] font-semibold transition",
-                mood === m.key ? "bg-primary-grad text-white shadow-glow scale-105" : "border border-line bg-white text-ink/75 hover:border-primary-300 hover:shadow-soft")}>
+                mood === m.key ? "bg-primary-grad text-white shadow-glow scale-105" : "border border-line bg-white/5 text-ink/75 hover:border-primary-300 hover:shadow-soft")}>
               <span className="mr-1.5 text-xl">{m.emoji}</span>{m.label[lang]}
             </button>
           ))}

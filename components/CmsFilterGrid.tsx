@@ -25,7 +25,7 @@ export function CmsFilterGrid({ items, categories, groups, emptyText }: {
   const [sub, setSub] = useState("Бүгд");
 
   const Tab = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
-    <button onClick={onClick} className={cx("rounded-full px-5 py-2 text-sm font-semibold transition", active ? "bg-primary-grad text-white shadow-glow" : "border border-line bg-white text-ink/70 hover:border-primary-300")}>
+    <button onClick={onClick} className={cx("rounded-full px-5 py-2 text-sm font-semibold transition", active ? "bg-primary-grad text-white shadow-glow" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
       {label === "Бүгд" ? tr(ALL) : catLabel(label, lang)}
     </button>
   );
@@ -59,7 +59,7 @@ export function CmsFilterGrid({ items, categories, groups, emptyText }: {
         </div>
       )}
       {shown.length === 0
-        ? <p className="rounded-2xl border border-dashed border-line bg-white/60 px-5 py-14 text-center text-muted">{emptyText}</p>
+        ? <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-14 text-center text-muted">{emptyText}</p>
         : <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{shown.map((i) => <CmsCard key={i.id} item={i} />)}</div>}
     </>
   );

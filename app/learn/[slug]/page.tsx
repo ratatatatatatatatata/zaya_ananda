@@ -103,7 +103,7 @@ export default function LearnPage({ params }: { params: { slug: string } }) {
   if (!user) {
     return (
       <div className="section"><div className="container-px">
-        <div className="mx-auto max-w-md rounded-4xl border border-line bg-white p-10 text-center shadow-card">
+        <div className="mx-auto max-w-md rounded-4xl border border-line bg-[#111B2D] p-10 text-center shadow-card">
           <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-primary-50 text-3xl">🔐</div>
           <h1 className="mt-6 font-display text-2xl font-semibold text-ink">{t("account.loginRequired")}</h1>
           <p className="mt-3 text-muted">{t("learn.lockedSub")}</p>
@@ -114,9 +114,9 @@ export default function LearnPage({ params }: { params: { slug: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f3f8f7]">
+    <div className="min-h-screen bg-transparent">
       {/* learning top bar */}
-      <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-line bg-white/90 px-4 py-3 backdrop-blur">
+      <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-line bg-[#101B2E]/90 px-4 py-3 backdrop-blur">
         <div className="flex items-center gap-3">
           <Link href="/account" className="grid h-9 w-9 place-items-center rounded-full text-ink/70 hover:bg-primary-50"><Icon name="arrow" className="h-5 w-5 rotate-180" /></Link>
           <Logo withText={false} />
@@ -153,7 +153,7 @@ export default function LearnPage({ params }: { params: { slug: string } }) {
             </div>
             <div className="absolute bottom-0 left-0 right-0 z-20 p-3">
               <div className="mb-2 h-1.5 w-full overflow-hidden rounded-full bg-white/25">
-                <div className="h-full rounded-full bg-white" style={{ width: (total ? (elapsed / total) * 100 : 0) + "%" }} />
+                <div className="h-full rounded-full bg-[#111B2D]" style={{ width: (total ? (elapsed / total) * 100 : 0) + "%" }} />
               </div>
               <div className="flex items-center justify-between text-xs text-white/80">
                 <span>{mmss(elapsed)} / {lessons[active]?.duration}</span>
@@ -222,7 +222,7 @@ export default function LearnPage({ params }: { params: { slug: string } }) {
         </div>
 
         {/* sidebar */}
-        <aside className="order-1 border-b border-line bg-white p-4 lg:order-2 lg:border-b-0 lg:border-l">
+        <aside className="order-1 border-b border-line bg-[#111B2D] p-4 lg:order-2 lg:border-b-0 lg:border-l">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-display text-lg font-semibold text-ink">{t("learn.lessons")}</h2>
             <span className="text-sm text-muted">{progressPct}%</span>

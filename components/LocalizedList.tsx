@@ -21,7 +21,7 @@ export function LocalizedList({
     return (
       <ul className="mt-5 grid gap-3 sm:grid-cols-2">
         {arr.map((o) => (
-          <li key={o} className="flex items-start gap-3 rounded-2xl border border-line bg-white p-4">
+          <li key={o} className="flex items-start gap-3 rounded-2xl border border-line bg-[#111B2D] p-4">
             <span className={cx("mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full text-sm", badge)}>✓</span>
             <span className="text-sm text-ink/80">{o}</span>
           </li>

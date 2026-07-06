@@ -21,7 +21,7 @@ export default async function TeachersPage() {
       <PageHeader title={<T k="nav.teachers" />} crumb={<T k="nav.teachers" />} />
       <section className="section"><div className="container-px">
         {teachers.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-line bg-white/60 px-5 py-14 text-center text-muted">
+          <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-14 text-center text-muted">
             Багш нарын мэдээлэл удахгүй нэмэгдэнэ.
           </p>
         ) : (

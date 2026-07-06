@@ -23,7 +23,7 @@ function Player({ v, index }: { v: Video; index: number }) {
   }, [v.subtitles]);
   const e = embed(v.url);
   return (
-    <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-card">
+    <div className="overflow-hidden rounded-2xl border border-line bg-[#111B2D] shadow-card">
       <div className="flex items-center gap-3 border-b border-line px-4 py-3">
         <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-100 text-sm font-bold text-primary-700">{index + 1}</span>
         <span className="font-display font-semibold text-ink">{v.title}</span>

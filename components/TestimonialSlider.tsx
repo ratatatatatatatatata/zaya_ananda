@@ -23,8 +23,8 @@ export function TestimonialSlider({ items }: { items: Testimonial[] }) {
         ))}
       </div>
       <div className="mt-6 flex justify-center gap-3">
-        <button onClick={() => scroll(-1)} className="grid h-12 w-12 place-items-center rounded-full border-2 border-line bg-white text-xl text-ink/70 transition hover:border-primary-300 hover:text-primary-700" aria-label="Previous">←</button>
-        <button onClick={() => scroll(1)} className="grid h-12 w-12 place-items-center rounded-full border-2 border-line bg-white text-xl text-ink/70 transition hover:border-primary-300 hover:text-primary-700" aria-label="Next">→</button>
+        <button onClick={() => scroll(-1)} className="grid h-12 w-12 place-items-center rounded-full border-2 border-line bg-[#111B2D] text-xl text-ink/70 transition hover:border-primary-300 hover:text-primary-700" aria-label="Previous">←</button>
+        <button onClick={() => scroll(1)} className="grid h-12 w-12 place-items-center rounded-full border-2 border-line bg-[#111B2D] text-xl text-ink/70 transition hover:border-primary-300 hover:text-primary-700" aria-label="Next">→</button>
       </div>
     </div>
   );

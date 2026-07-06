@@ -25,7 +25,7 @@ export function ImageGallery({ images, alt = "" }: { images: string[]; alt?: str
     <div className="mb-6">
       <button type="button" onClick={() => setZoom(true)} className="group relative block w-full cursor-zoom-in overflow-hidden rounded-3xl">
         <img src={images[active]} alt={alt} className="max-h-[520px] w-full object-cover transition duration-300 group-hover:scale-[1.02]" />
-        <span className="absolute bottom-3 right-3 rounded-full bg-white/90 px-3 py-1.5 text-sm font-semibold text-ink shadow">🔍 Томруулж харах</span>
+        <span className="absolute bottom-3 right-3 rounded-full bg-black/55 px-3 py-1.5 text-sm font-semibold text-white shadow">🔍 Томруулж харах</span>
       </button>
       {images.length > 1 && (
         <div className="mt-3 flex gap-3">

@@ -38,7 +38,7 @@ export function PurchaseBox({ id, price }: { id: string; title: string; price?: 
 
   const copy = (text: string, key: string) => { navigator.clipboard?.writeText(text).then(() => { setCopied(key); setTimeout(() => setCopied(""), 1500); }).catch(() => {}); };
   const CopyBtn = ({ text, k }: { text: string; k: string }) => (
-    <button type="button" onClick={() => copy(text, k)} className="shrink-0 rounded-md border border-line bg-white px-2 py-0.5 text-xs font-medium text-primary-700 hover:bg-primary-50">{copied === k ? "Хууллаа ✓" : "Хуулах"}</button>
+    <button type="button" onClick={() => copy(text, k)} className="shrink-0 rounded-md border border-line bg-white/10 px-2 py-0.5 text-xs font-medium text-primary-300 hover:bg-primary-50">{copied === k ? "Хууллаа ✓" : "Хуулах"}</button>
   );
 
   async function notify(method: "qpay" | "bank") {
@@ -99,8 +99,8 @@ export function PurchaseBox({ id, price }: { id: string; title: string; price?: 
         <div className="space-y-3 text-center">
           <p className="font-semibold text-ink">QPay-ээр төлөх</p>
           <p className="text-2xl font-bold text-primary-700">{formatMNT(amount)}</p>
-          <div className="mx-auto grid h-40 w-40 grid-cols-9 gap-0.5 rounded-2xl border border-line bg-white p-2">
-            {Array.from({ length: 81 }).map((_, i) => <div key={i} className={fnv(id + "qr" + i) % 10 < 5 ? "bg-ink" : "bg-white"} />)}
+          <div className="mx-auto grid h-40 w-40 grid-cols-9 gap-0.5 rounded-2xl border border-line bg-[#0D1626] p-2">
+            {Array.from({ length: 81 }).map((_, i) => <div key={i} className={fnv(id + "qr" + i) % 10 < 5 ? "bg-primary-200" : "bg-[#0D1626]"} />)}
           </div>
           <p className="text-sm text-muted">QR-ийг уншуулж төлөөд доорх товчийг дарна уу.</p>
           {err && <p className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-600">{err}</p>}
@@ -112,7 +112,7 @@ export function PurchaseBox({ id, price }: { id: string; title: string; price?: 
       {step === "bank" && (
         <div className="space-y-3">
           <p className="text-center font-semibold text-ink">Банкны шилжүүлэг</p>
-          <div className="divide-y divide-line rounded-2xl border border-line bg-white px-4">
+          <div className="divide-y divide-line rounded-2xl border border-line bg-white/5 px-4">
             <div className="flex items-center justify-between gap-3 py-2.5"><span className="text-sm text-muted">Банк</span><span className="font-semibold text-ink">{bank.name}</span></div>
             <div className="flex items-center justify-between gap-3 py-2.5"><span className="text-sm text-muted">Дансны дугаар</span><span className="flex items-center gap-2 font-semibold text-ink">{bank.account}<CopyBtn text={bank.account} k="acc" /></span></div>
             <div className="flex items-center justify-between gap-3 py-2.5"><span className="text-sm text-muted">Хүлээн авагч</span><span className="font-semibold text-ink">{bank.holder}</span></div>

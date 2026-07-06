@@ -97,7 +97,7 @@ export function ToorogReading() {
   }, [birthOk, effISO, by, bm, bd, lang]);
 
   const facet = (label: L, value: string, icon: string) => (
-    <div className="rounded-2xl border border-line bg-white p-4">
+    <div className="rounded-2xl border border-line bg-[#111B2D] p-4">
       <p className="font-display font-semibold text-ink">{icon} {tr(label)}</p>
       <p className="mt-1.5 text-[1.04rem] leading-relaxed text-muted">{value}</p>
     </div>
@@ -136,7 +136,7 @@ export function ToorogReading() {
       </div>
 
       {!birthOk ? (
-        <p className="mt-6 rounded-2xl border border-dashed border-line bg-white/60 px-5 py-6 text-center text-muted">{tr(TZ.TUI.need)}</p>
+        <p className="mt-6 rounded-2xl border border-dashed border-line bg-white/5 px-5 py-6 text-center text-muted">{tr(TZ.TUI.need)}</p>
       ) : (
         <>
           {/* calendar (today .. +1 month) */}
@@ -219,13 +219,13 @@ export function ToorogReading() {
 
       {/* PAYMENT modal */}
       {payPlan && (
-        <div className="fixed inset-0 z-[60] grid place-items-center bg-ink/40 p-4 backdrop-blur-sm" onClick={() => setPayPlan(null)}>
-          <div className="w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-lift" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[60] grid place-items-center bg-black/60 p-4 backdrop-blur-sm" onClick={() => setPayPlan(null)}>
+          <div className="w-full max-w-sm rounded-3xl bg-[#111B2D] p-6 text-center shadow-lift" onClick={(e) => e.stopPropagation()}>
             <p className="font-display text-xl font-semibold text-ink">{tr(payPlan === "year" ? TZ.TUI.yearlyTitle : TZ.TUI.monthlyTitle)}</p>
             <p className="text-sm text-muted">{tr(TZ.TUI.payTitle)}</p>
             <p className="mt-1 text-3xl font-bold text-primary-700">{formatMNT(payPlan === "year" ? YEAR_PRICE : MONTH_PRICE)}</p>
-            <div className="mx-auto mt-4 grid h-44 w-44 grid-cols-9 gap-0.5 rounded-2xl border border-line bg-white p-2">
-              {Array.from({ length: 81 }).map((_, i) => <div key={i} className={(fnv(payPlan + "qr" + i) % 10 < 5) ? "bg-ink" : "bg-white"} />)}
+            <div className="mx-auto mt-4 grid h-44 w-44 grid-cols-9 gap-0.5 rounded-2xl border border-line bg-[#111B2D] p-2">
+              {Array.from({ length: 81 }).map((_, i) => <div key={i} className={(fnv(payPlan + "qr" + i) % 10 < 5) ? "bg-ink" : "bg-[#111B2D]"} />)}
             </div>
             <p className="mt-4 text-sm leading-relaxed text-muted">{tr(TZ.TUI.payDesc)}</p>
             <div className="mt-5 flex gap-3">

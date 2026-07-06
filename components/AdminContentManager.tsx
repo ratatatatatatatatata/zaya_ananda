@@ -230,7 +230,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
                   </div>
                 ))}
                 {(multiImage ? images.length < MAX_IMAGES : images.length === 0) && (
-                  <label className={"grid cursor-pointer place-items-center rounded-xl border border-dashed border-line text-2xl text-muted hover:bg-white " + (isPromo ? "h-20 w-40" : "h-24 w-32")}>
+                  <label className={"grid cursor-pointer place-items-center rounded-xl border border-dashed border-line text-2xl text-muted hover:bg-white/10" + (isPromo ? "h-20 w-40" : "h-24 w-32")}>
                     🖼+
                     <input type="file" accept="image/*" multiple={multiImage} onChange={addImage} className="hidden" />
                   </label>
@@ -247,7 +247,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
               <p className="mb-3 text-xs leading-relaxed text-muted">{isCourse ? "Видео зөвхөн төлбөр баталгаажсан хэрэглэгчид харагдана." : "Видео дэлгэрэнгүй хуудсанд нээлттэй харагдана."}</p>
               <div className="space-y-2">
                 {lessons.map((l, idx) => (
-                  <div key={idx} className="space-y-2 rounded-xl border border-line bg-white p-3">
+                  <div key={idx} className="space-y-2 rounded-xl border border-line bg-[#0D1626] p-3">
                     <div className="flex items-center gap-2">
                       <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-100 text-xs font-bold text-primary-700">{idx + 1}</span>
                       <input className="input flex-1" placeholder={isCourse ? "Хичээлийн гарчиг" : "Видеоны гарчиг"} value={l.title} onChange={(e) => updLesson(idx, { title: e.target.value })} />
@@ -281,7 +281,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
           <div className="flex flex-wrap gap-1.5">
             {LANG_TABS.map((lt) => (
               <button key={lt.k} type="button" onClick={() => setLangTab(lt.k)}
-                className={"rounded-full px-3.5 py-1.5 text-sm font-semibold transition " + (langTab === lt.k ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white text-ink/60 hover:text-primary-700")}>
+                className={"rounded-full px-3.5 py-1.5 text-sm font-semibold transition " + (langTab === lt.k ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white/5 text-ink/60 hover:text-primary-300")}>
                 {lt.l}
               </button>
             ))}
@@ -325,7 +325,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
                     {MOODS.map((m) => (
                       <button key={m.key} type="button"
                         onClick={() => setMoods((ms) => (ms.includes(m.key) ? ms.filter((x) => x !== m.key) : [...ms, m.key]))}
-                        className={"rounded-full px-3.5 py-1.5 text-sm font-medium transition " + (moods.includes(m.key) ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white text-ink/70 hover:border-primary-300")}>
+                        className={"rounded-full px-3.5 py-1.5 text-sm font-medium transition " + (moods.includes(m.key) ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
                         {m.emoji} {m.label.mn}
                       </button>
                     ))}

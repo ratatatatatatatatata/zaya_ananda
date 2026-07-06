@@ -36,7 +36,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
             <div className="relative isolate flex items-center justify-center overflow-hidden rounded-4xl border border-line bg-gradient-to-br from-aqua to-primary-50 p-10">
               <EnergyWaves />
               <GlyphTile glyph={p.glyph} tone={p.tone} size="xl" className="relative z-10 h-52 w-52 text-8xl animate-floaty" />
-              {p.badge && (<span className="absolute left-6 top-6 z-10 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-ink"><Tr v={p.badge} /></span>)}
+              {p.badge && (<span className="absolute left-6 top-6 z-10 rounded-full bg-[#101B2E]/90 px-3 py-1 text-xs font-bold text-ink"><Tr v={p.badge} /></span>)}
             </div>
 
             <div className="flex flex-col">
@@ -63,15 +63,15 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
               </div>
 
               <div className="mt-8 grid gap-3 text-sm text-muted">
-                <div className="flex items-center gap-3 rounded-2xl border border-line bg-white p-4">🔒 <T k="productDetail.secure" /></div>
-                <div className="flex items-center gap-3 rounded-2xl border border-line bg-white p-4">↩ <T k="productDetail.returns" /></div>
+                <div className="flex items-center gap-3 rounded-2xl border border-line bg-[#111B2D] p-4">🔒 <T k="productDetail.secure" /></div>
+                <div className="flex items-center gap-3 rounded-2xl border border-line bg-[#111B2D] p-4">↩ <T k="productDetail.returns" /></div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="section bg-white">
+      <section className="section bg-[#111B2D]">
         <div className="container-px">
           <h2 className="font-display text-2xl font-semibold text-ink"><T k="productDetail.related" /></h2>
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

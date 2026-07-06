@@ -98,7 +98,7 @@ export function AdminTeachers() {
             </div>
           </div>
         ))}
-        {teachers.length === 0 && <p className="rounded-2xl border border-dashed border-line bg-white/60 px-5 py-10 text-center text-sm text-muted">Хамт олны мэдээлэл алга. «+ Хамт олон нэмэх» дарж нэмнэ үү. (Контент хадгалахад багшийн мэдээлэл энд автоматаар нэмэгддэг.)</p>}
+        {teachers.length === 0 && <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-10 text-center text-sm text-muted">Хамт олны мэдээлэл алга. «+ Хамт олон нэмэх» дарж нэмнэ үү. (Контент хадгалахад багшийн мэдээлэл энд автоматаар нэмэгддэг.)</p>}
       </div>
 
       {err && <p className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-600">{err}</p>}

@@ -13,7 +13,7 @@ export default function CartPage() {
     return (
       <section className="section">
         <div className="container-px">
-          <div className="mx-auto max-w-md rounded-4xl border border-line bg-white p-10 text-center shadow-card">
+          <div className="mx-auto max-w-md rounded-4xl border border-line bg-[#111B2D] p-10 text-center shadow-card">
             <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-primary-50 text-4xl">🧺</div>
             <h1 className="mt-6 font-display text-2xl font-semibold text-ink">{t("cart.empty")}</h1>
             <p className="mt-3 text-muted">{t("cart.emptyHint")}</p>
@@ -38,7 +38,7 @@ export default function CartPage() {
             {items.map((it) => {
               const tn = toneStyles[it.tone] ?? toneStyles.violet;
               return (
-                <div key={it.kind + it.slug} className="flex flex-wrap items-center gap-4 rounded-3xl border border-line bg-white p-4 sm:flex-nowrap">
+                <div key={it.kind + it.slug} className="flex flex-wrap items-center gap-4 rounded-3xl border border-line bg-[#111B2D] p-4 sm:flex-nowrap">
                   <div className={cx("grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br text-2xl text-white", tn.grad)}>{it.glyph}</div>
                   <div className="min-w-0 flex-1">
                     <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{t("kind." + it.kind)}</p>

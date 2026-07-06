@@ -40,7 +40,7 @@ export function CourseCard({ c }: { c: Course }) {
     <div data-tilt className="glass group flex flex-col overflow-hidden transition-shadow duration-300 hover:shadow-glow-grape">
       <div className="relative flex h-32 items-center justify-center bg-gradient-to-br from-primary-100/70 via-lavender-200/60 to-blush-200/60">
         <GlyphTile glyph={c.glyph} tone={c.tone} size="lg" className="animate-floaty" />
-        <span className="absolute left-4 top-4 chip bg-white"><Tr v={c.level} /></span>
+        <span className="absolute left-4 top-4 chip bg-[#111B2D]"><Tr v={c.level} /></span>
         {c.certificate && <span className="absolute right-4 top-4 rounded-full bg-accent-500 px-2.5 py-1 text-[0.7rem] font-bold text-white">🏅 <T k="common.certificate" /></span>}
       </div>
       <div className="flex flex-1 flex-col p-5">
@@ -73,7 +73,7 @@ export function ProductCard({ p }: { p: Product }) {
       <div className="relative flex h-40 items-center justify-center bg-gradient-to-br from-aqua via-lavender-200/50 to-blush-200/50">
         <GlyphTile glyph={p.glyph} tone={p.tone} size="xl" className="animate-floaty transition duration-500 group-hover:-translate-y-1.5 group-hover:scale-105" />
         {p.badge && <span className="absolute left-4 top-4 rounded-full bg-deep px-3 py-1 text-[0.72rem] font-bold text-white"><Tr v={p.badge} /></span>}
-        {!p.inStock && <span className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[0.72rem] font-bold text-rose-500"><T k="common.soldOut" /></span>}
+        {!p.inStock && <span className="absolute right-4 top-4 rounded-full bg-[#101B2E]/90 px-3 py-1 text-[0.72rem] font-bold text-rose-500"><T k="common.soldOut" /></span>}
       </div>
       <div className="flex flex-1 flex-col p-5">
         <span className="text-[0.82rem] font-bold uppercase tracking-wide text-primary-600"><Tr v={p.category} /></span>
