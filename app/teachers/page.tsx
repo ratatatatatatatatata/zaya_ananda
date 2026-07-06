@@ -1,15 +1,16 @@
 import Link from "next/link";
-import { getSettingsCached } from "@/lib/repo";
+import { getSettings } from "@/lib/repo";
 import { PageHeader } from "@/components/PageHeader";
 import { T } from "@/components/T";
 
-export const revalidate = 300;
+// Админ дээр хадгалсан өөрчлөлт ШУУД харагдахын тулд амьд өгөгдлөөр буулгана.
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Хамт олон" };
 
 const slugOf = (name: string) => encodeURIComponent(name);
 
 export default async function TeachersPage() {
-  const settings = await getSettingsCached();
+  const settings = await getSettings();
   // «Хамт олон» таб (teachers) + хуучин Тохиргооны жагсаалт (team) — нэгтгэж харуулна
   const teachers = [
     ...(settings.teachers || []),

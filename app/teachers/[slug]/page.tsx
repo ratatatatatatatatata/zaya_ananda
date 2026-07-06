@@ -1,14 +1,15 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getSettingsCached, listCmsCached } from "@/lib/repo";
+import { getSettings, listCmsCached } from "@/lib/repo";
 import { CmsCard } from "@/components/CmsCard";
 import { T } from "@/components/T";
 
-export const revalidate = 300;
+// Багшийн мэдээлэл шууд шинэчлэгдэж харагдана.
+export const dynamic = "force-dynamic";
 
 export default async function TeacherDetailPage({ params }: { params: { slug: string } }) {
   const name = decodeURIComponent(params.slug);
-  const settings = await getSettingsCached();
+  const settings = await getSettings();
   const all = [...(settings.teachers || []), ...(settings.team || [])];
   const teacher = all.find((t) => t.name === name);
   if (!teacher) notFound();

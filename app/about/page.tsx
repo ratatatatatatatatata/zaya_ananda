@@ -6,15 +6,16 @@ import { GlyphTile } from "@/components/GlyphTile";
 import { Reveal } from "@/components/Reveal";
 import { T, Tr } from "@/components/T";
 import { aboutContent, team, faqs, siteConfig } from "@/data/content";
-import { getSettingsCached } from "@/lib/repo";
+import { getSettings } from "@/lib/repo";
 import { signedDownloadUrl } from "@/lib/supabase";
 import { ContactSection } from "@/components/ContactSection";
 
 export const metadata = { title: "Бидний тухай" };
-export const revalidate = 300;
+// Тохиргоо/Хамт олонд хийсэн өөрчлөлт шууд харагдана.
+export const dynamic = "force-dynamic";
 
 export default async function AboutPage() {
-  const settings = await getSettingsCached();
+  const settings = await getSettings();
   let aboutVideoUrl = "";
   if (settings.aboutVideo) {
     if (/^https?:\/\//.test(settings.aboutVideo)) aboutVideoUrl = settings.aboutVideo;
