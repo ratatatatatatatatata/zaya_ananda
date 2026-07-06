@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getSettings, listCmsCached } from "@/lib/repo";
-import { CmsCard } from "@/components/CmsCard";
+import { TeacherClasses, type TeacherClass } from "@/components/TeacherClasses";
 import { T } from "@/components/T";
 
 // Багшийн мэдээлэл шууд шинэчлэгдэж харагдана.
@@ -15,7 +15,12 @@ export default async function TeacherDetailPage({ params }: { params: { slug: st
   if (!teacher) notFound();
 
   const [courses, services] = await Promise.all([listCmsCached("course"), listCmsCached("service")]);
-  const classes = [...courses, ...services].filter((i) => (i.teacherName || "").trim() === teacher.name.trim());
+  const classes: TeacherClass[] = [...courses, ...services]
+    .filter((i) => (i.teacherName || "").trim() === teacher.name.trim())
+    .map((i) => ({
+      id: i.id, kind: i.kind, title: i.title, summary: i.summary, image: i.image,
+      price: i.price, lessonsCount: i.lessons?.length ?? i.videoLessons, i18n: i.i18n,
+    }));
   const lines = (teacher.info || "").split("\n").map((s) => s.trim()).filter(Boolean);
 
   return (
@@ -47,15 +52,10 @@ export default async function TeacherDetailPage({ params }: { params: { slug: st
       </section>
 
       {/* Багшийн заадаг хичээл, үйлчилгээ */}
-      <section className="section"><div className="container-px">
+      <section className="section"><div className="container-px max-w-4xl">
         <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl">{teacher.name} багшийн хөтөлдөг хичээл, үйлчилгээ</h2>
-        {classes.length === 0 ? (
-          <p className="mt-6 rounded-2xl border border-dashed border-line bg-white/60 px-5 py-12 text-center text-muted">Одоогоор бүртгэгдсэн хичээл алга. Удахгүй нэмэгдэнэ.</p>
-        ) : (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {classes.map((c) => <CmsCard key={c.id} item={c} />)}
-          </div>
-        )}
+        <p className="mt-2 text-muted">Гарчиг дээр дарж дэлгэрэнгүй мэдээллийг нь харна уу.</p>
+        <TeacherClasses classes={classes} />
       </div></section>
     </>
   );
