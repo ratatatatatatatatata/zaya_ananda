@@ -8,7 +8,15 @@
 }
 
 /* Normal rem base (keeps spacing in check) — readability comes from explicit sizes below */
-html { font-size: 100%; scroll-behavior: smooth; }
+html { font-size: 100%; scroll-behavior: smooth; color-scheme: dark; }
+
+/* Native select/dropdown — хар дэвсгэр дээр цагаан үсэгтэй */
+select { color-scheme: dark; }
+select option, select optgroup {
+  background-color: #0D1626;
+  color: #E9F2F0;
+}
+select option:checked { background-color: #16AFA4; color: #ffffff; }
 * { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
 
 body {
