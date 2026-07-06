@@ -30,7 +30,7 @@ export default async function TeachersPage() {
               <Link key={t.name} href={"/teachers/" + slugOf(t.name)}
                 className="card group relative flex flex-col overflow-hidden transition-shadow duration-300 hover:shadow-glow">
                 {t.image
-                  ? <div className="h-80 w-full overflow-hidden"><img src={t.image} alt={t.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /></div>
+                  ? <div className="h-80 w-full overflow-hidden"><img src={t.image} alt={t.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" style={{ objectPosition: "50% " + (t.focus ?? 50) + "%" }} /></div>
                   : <div className="grid h-80 w-full place-items-center bg-primary-grad text-6xl text-white">👤</div>}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent p-5 pt-14">
                   <h3 className="font-display text-2xl font-semibold text-white">{t.name}</h3>

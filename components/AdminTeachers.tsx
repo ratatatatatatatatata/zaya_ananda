@@ -65,18 +65,27 @@ export function AdminTeachers() {
           <h2 className="font-display text-lg font-semibold text-ink">Хамт олон: {teachers.length}</h2>
           <p className="mt-1 text-sm text-muted">Эдгээр профайл «Хамт олон» цэсэнд гарна. Хүн дээр дарахад түүний хөтөлдөг хичээлүүд (контентын «Багшийн нэр»-ээр таарсан) автоматаар харагдана.</p>
         </div>
-        <button onClick={() => setTeachers((t) => [...t, { name: "", role: "", info: "", image: "" }])} className="btn btn-primary btn-sm">+ Багш нэмэх</button>
+        <button onClick={() => { setTeachers((t) => [{ name: "", role: "", info: "", image: "", focus: 50 }, ...t]); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }} className="btn btn-primary btn-sm">+ Хамт олон нэмэх</button>
       </div>
 
       <div className="space-y-3">
         {teachers.map((t, i) => (
           <div key={i} className="card p-4">
             <div className="flex items-start gap-4">
-              <div className="flex flex-col items-center gap-1">
+              <div className="flex w-36 shrink-0 flex-col items-center gap-1.5">
                 {t.image
-                  ? <img src={t.image} alt="" className="h-24 w-24 rounded-2xl object-cover" />
-                  : <div className="grid h-24 w-24 place-items-center rounded-2xl border border-dashed border-line text-2xl text-muted">👤</div>}
-                <label className="cursor-pointer text-xs font-semibold text-primary-700 hover:underline">Зураг<input type="file" accept="image/*" className="hidden" onChange={(e) => pickImage(e, i)} /></label>
+                  ? <img src={t.image} alt="" className="h-44 w-36 rounded-2xl object-cover" style={{ objectPosition: "50% " + (t.focus ?? 50) + "%" }} />
+                  : <div className="grid h-44 w-36 place-items-center rounded-2xl border border-dashed border-line text-2xl text-muted">👤</div>}
+                <label className="cursor-pointer text-xs font-semibold text-primary-700 hover:underline">Зураг солих<input type="file" accept="image/*" className="hidden" onChange={(e) => pickImage(e, i)} /></label>
+                {t.image && (
+                  <div className="w-full">
+                    <div className="flex justify-between text-[10px] font-semibold text-muted"><span>↑ Дээш</span><span>Доош ↓</span></div>
+                    <input type="range" min={0} max={100} value={t.focus ?? 50}
+                      onChange={(e) => upd(i, { focus: Number(e.target.value) })}
+                      className="w-full accent-primary-600" />
+                    <p className="text-center text-[10px] text-muted">Зургийн харагдах хэсгийг гулсуулж тохируулна</p>
+                  </div>
+                )}
               </div>
               <div className="flex-1 space-y-2">
                 <div className="grid gap-2 sm:grid-cols-2">
@@ -89,7 +98,7 @@ export function AdminTeachers() {
             </div>
           </div>
         ))}
-        {teachers.length === 0 && <p className="rounded-2xl border border-dashed border-line bg-white/60 px-5 py-10 text-center text-sm text-muted">Багш алга. «+ Багш нэмэх» дарж нэмнэ үү. (Контент хадгалахад багшийн мэдээлэл энд автоматаар нэмэгддэг.)</p>}
+        {teachers.length === 0 && <p className="rounded-2xl border border-dashed border-line bg-white/60 px-5 py-10 text-center text-sm text-muted">Хамт олны мэдээлэл алга. «+ Хамт олон нэмэх» дарж нэмнэ үү. (Контент хадгалахад багшийн мэдээлэл энд автоматаар нэмэгддэг.)</p>}
       </div>
 
       {err && <p className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-600">{err}</p>}

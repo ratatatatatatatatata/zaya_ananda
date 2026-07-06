@@ -30,7 +30,7 @@ export default async function TeacherDetailPage({ params }: { params: { slug: st
         <div className="container-px grid items-center gap-10 py-16 lg:grid-cols-[1fr_1.3fr] lg:py-20">
           <div className="mx-auto w-full max-w-sm">
             {teacher.image
-              ? <img src={teacher.image} alt={teacher.name} className="aspect-[3/4] w-full rounded-3xl object-cover shadow-glow" />
+              ? <img src={teacher.image} alt={teacher.name} className="aspect-[3/4] w-full rounded-3xl object-cover shadow-glow" style={{ objectPosition: "50% " + (teacher.focus ?? 50) + "%" }} />
               : <div className="grid aspect-[3/4] w-full place-items-center rounded-3xl bg-primary-grad text-7xl text-white">👤</div>}
           </div>
           <div>

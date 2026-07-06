@@ -152,6 +152,8 @@ export interface StaffMember {
   name: string;
   role?: string;
   info?: string;
+  /** Зургийн босоо байрлал 0–100 (0 = дээд хэсэг, 100 = доод хэсэг) */
+  focus?: number;
 }
 
 export interface TeacherPreset {
@@ -159,6 +161,8 @@ export interface TeacherPreset {
   image?: string;
   role?: string;
   info?: string;
+  /** Зургийн босоо байрлал 0–100 (0 = дээд хэсэг, 100 = доод хэсэг) */
+  focus?: number;
 }
 
 export type CmsTranslations = Partial<Record<Locale, { title?: string; summary?: string; body?: string; navLabel?: string }>>;

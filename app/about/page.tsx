@@ -84,7 +84,7 @@ export default async function AboutPage() {
                   <Reveal key={m.name + i} delay={i * 80}>
                     <div className="card flex h-full flex-col items-center p-8 text-center">
                       {m.image
-                        ? <img src={m.image} alt="" className="h-28 w-28 rounded-full object-cover shadow-card" />
+                        ? <img src={m.image} alt="" className="h-28 w-28 rounded-full object-cover shadow-card" style={{ objectPosition: "50% " + (m.focus ?? 50) + "%" }} />
                         : <div className="grid h-28 w-28 place-items-center rounded-full bg-primary-50 text-3xl">👤</div>}
                       <h3 className="mt-5 font-display text-xl font-semibold text-ink">{m.name}</h3>
                       {m.role && <p className="mt-1 text-sm font-medium text-primary-600">{m.role}</p>}

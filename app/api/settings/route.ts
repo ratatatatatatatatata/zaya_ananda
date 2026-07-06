@@ -34,6 +34,7 @@ export async function PATCH(req: Request) {
             role: m?.role ? String(m.role) : "",
             info: m?.info ? String(m.info) : "",
             image: m?.image ? String(m.image) : "",
+            focus: m?.focus !== undefined && m?.focus !== null && m?.focus !== "" ? Math.max(0, Math.min(100, Number(m.focus))) : undefined,
           })).filter((m: { name: string }) => m.name)
         : undefined,
       teachers: Array.isArray(body.teachers)
@@ -42,6 +43,7 @@ export async function PATCH(req: Request) {
             role: t?.role ? String(t.role) : "",
             info: t?.info ? String(t.info) : "",
             image: t?.image ? String(t.image) : "",
+            focus: t?.focus !== undefined && t?.focus !== null && t?.focus !== "" ? Math.max(0, Math.min(100, Number(t.focus))) : undefined,
           })).filter((t: { name: string }) => t.name)
         : undefined,
       bank: body.bank && typeof body.bank === "object"
