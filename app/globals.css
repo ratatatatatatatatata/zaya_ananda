@@ -25,12 +25,13 @@ body {
   font-size: 1.125rem;     /* 18px */
   line-height: 1.7;
   overflow-x: clip;        /* stop stray horizontal scroll from blurs/parallax (sticky-safe) */
-  background-color: #121C33;
+  background-color: #111B36;
   background-image:
-    radial-gradient(55% 45% at 50% 0%, rgba(120,230,210,0.17) 0%, transparent 65%),
-    radial-gradient(40% 40% at 90% 30%, rgba(155,110,240,0.13) 0%, transparent 60%),
-    radial-gradient(45% 40% at 8% 70%, rgba(94,141,224,0.13) 0%, transparent 60%),
-    linear-gradient(160deg, #121C33 0%, #16233E 40%, #15293C 75%, #121C33 100%);
+    radial-gradient(55% 45% at 50% 0%, rgba(43,200,187,0.28) 0%, transparent 65%),
+    radial-gradient(42% 42% at 92% 25%, rgba(155,110,240,0.24) 0%, transparent 60%),
+    radial-gradient(45% 42% at 6% 65%, rgba(94,141,224,0.22) 0%, transparent 60%),
+    radial-gradient(38% 38% at 80% 95%, rgba(240,156,188,0.16) 0%, transparent 60%),
+    linear-gradient(160deg, #111B36 0%, #13234C 30%, #103641 55%, #241E4E 80%, #111B36 100%);
   background-attachment: fixed;
 }
 

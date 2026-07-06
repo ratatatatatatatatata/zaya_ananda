@@ -6,17 +6,22 @@ import { MeditationFigure } from "./MeditationFigure";
 /** Хуудасны толгой — нүүр хуудасны кино маягийн гүн өнгөтэй уялдсан. */
 export function PageHeader({ title, desc, crumb }: { title: ReactNode; desc?: ReactNode; crumb?: ReactNode }) {
   return (
-    <section className="relative isolate overflow-hidden bg-[#121C33]">
-      {/* Нүүрийн аура туяа */}
+    <section className="relative isolate overflow-hidden bg-[#131D3B]">
+      {/* Аура туяанууд — ногоон, ягаан, цэнхэр */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-32 left-1/2 h-[440px] w-[760px] -translate-x-1/2 rounded-full"
-        style={{ background: "radial-gradient(ellipse, rgba(120,230,210,0.40), rgba(120,230,210,0) 70%)", filter: "blur(12px)" }}
+        className="pointer-events-none absolute -top-32 left-1/3 h-[440px] w-[700px] -translate-x-1/2 rounded-full"
+        style={{ background: "radial-gradient(ellipse, rgba(43,200,187,0.42), rgba(43,200,187,0) 70%)", filter: "blur(12px)" }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-20 right-0 h-[360px] w-[480px] rounded-full"
+        style={{ background: "radial-gradient(ellipse, rgba(155,110,240,0.30), rgba(155,110,240,0) 70%)", filter: "blur(14px)" }}
       />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
-        style={{ background: "linear-gradient(160deg, rgba(11,16,32,0) 35%, rgba(18,64,72,0.35) 100%)" }}
+        style={{ background: "linear-gradient(160deg, rgba(17,27,54,0) 30%, rgba(16,54,65,0.45) 70%, rgba(36,30,78,0.4) 100%)" }}
       />
       <MeditationFigure tone="jade" showAura={false} className="pointer-events-none absolute -right-2 bottom-0 hidden w-44 opacity-25 lg:block" />
       <div className="relative z-10 container-px py-16 sm:py-20">
