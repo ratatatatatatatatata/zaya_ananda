@@ -96,6 +96,11 @@ body {
 
 @supports not (overflow: clip) { body { overflow-x: hidden; } }
 
+/* Утас/таблет: iOS Safari fixed background гажиг үүсгэдэг тул унтраана */
+@media (max-width: 1024px) {
+  body { background-attachment: scroll; }
+}
+
 /* falling blossom petals (hero) */
 @keyframes petalFall {
   0% { opacity: 0; transform: translate(0,0) rotate(0deg); }

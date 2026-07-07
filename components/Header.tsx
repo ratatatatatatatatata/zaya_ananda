@@ -80,7 +80,7 @@ export function Header() {
       </div>
 
       {/* mobile / tablet menu */}
-      <div className={cx("overflow-hidden border-t border-line bg-[#121C33]/95 backdrop-blur xl:hidden", menuOpen ? "max-h-[520px]" : "max-h-0")} style={{ transition: "max-height 0.3s ease" }}>
+      <div className={cx("border-t border-line bg-[#121C33]/95 backdrop-blur xl:hidden", menuOpen ? "max-h-[calc(100dvh-4.5rem)] overflow-y-auto" : "max-h-0 overflow-hidden")} style={{ transition: "max-height 0.3s ease" }}>
         <nav className="container-px flex flex-col gap-1 py-4">
           {links.map((l) => (
             <Link key={l.href} href={l.href}

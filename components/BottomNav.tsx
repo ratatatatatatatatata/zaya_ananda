@@ -24,8 +24,8 @@ export function BottomNav() {
         {items.map((it) => (
           <Link key={it.href} href={it.href}
             className={cx("flex min-h-[60px] flex-col items-center justify-center gap-1 px-1 py-2 text-[0.74rem] font-semibold transition", active(it.href) ? "text-primary-700" : "text-ink/60")}>
-            <Icon name={it.icon} className={cx("h-6 w-6", active(it.href) && "text-primary-600")} />
-            <span className="leading-none">{t(it.k)}</span>
+            <Icon name={it.icon} className={cx("h-6 w-6 shrink-0", active(it.href) && "text-primary-600")} />
+            <span className="w-full truncate px-0.5 text-center leading-none">{t(it.k)}</span>
           </Link>
         ))}
       </div>
