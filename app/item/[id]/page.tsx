@@ -11,8 +11,20 @@ import { RichBody } from "@/components/RichBody";
 import { CmsText, CatLabel } from "@/components/CmsText";
 import { CmsCard } from "@/components/CmsCard";
 import { signedDownloadUrl } from "@/lib/supabase";
+import { Journey3D } from "@/components/three/Journey3D";
+import type { WorldKind } from "@/components/three/Worlds";
 
 export const revalidate = 300;
+
+/** Төрөл бүр өөрийн realm-тай: үйлчилгээ → дотоод өргөө, сургалт → мэдлэгийн зам,
+ *  бүтээгдэхүүн → зорилгын эрдэнэ, зөвлөгөө → архив, бэлэг → номын сан */
+const kindWorld: Record<string, { world: WorldKind; eyebrow: string }> = {
+  service: { world: "chamber", eyebrow: "The Inner Chamber" },
+  course: { world: "path", eyebrow: "The Path of Knowledge" },
+  product: { world: "pedestal", eyebrow: "The Object of Intention" },
+  resource: { world: "archive", eyebrow: "The Oracle Archive" },
+  free: { world: "library", eyebrow: "The Library of Consciousness" },
+};
 
 const kindNav: Record<string, { href: string; key: string }> = {
   service: { href: "/services", key: "nav.services" },
@@ -44,8 +56,18 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
     ? (await listCmsCached("product")).filter((p) => p.id !== item.id).slice(0, 4)
     : [];
 
+  const kw = kindWorld[item.kind] || kindWorld.service;
+
   return (
-    <div className="container-px py-10 sm:py-14">
+    <>
+    <Journey3D
+      world={kw.world}
+      eyebrow={kw.eyebrow}
+      title={<CmsText mn={item.title} i18n={item.i18n} field="title" />}
+      heightVh={150}
+      cta={[{ href: "#detail", label: "Дэлгэрэнгүй үзэх" }]}
+    />
+    <div id="detail" className="container-px py-10 sm:py-14">
       <nav className="mb-6 flex items-center gap-2 text-sm text-muted">
         <Link href="/" className="hover:text-primary-700"><T k="nav.home" /></Link><span>/</span>
         <Link href={nav.href} className="hover:text-primary-700"><T k={nav.key} /></Link><span>/</span>
@@ -111,5 +133,6 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
         </section>
       )}
     </div>
+    </>
   );
 }

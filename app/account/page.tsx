@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useI18n } from "@/lib/i18n";
 import { formatMNT } from "@/lib/format";
 import type { Order } from "@/lib/types";
+import { Journey3D } from "@/components/three/Journey3D";
 
 export default function AccountPage() {
   const { user, loading, logout, updateProfile } = useAuth();
@@ -85,6 +86,15 @@ export default function AccountPage() {
   }
 
   return (
+    <>
+    {/* Хувийн мандал — хөнгөн 3D тайз, хэрэглээг дарамтлахгүй богино */}
+    <Journey3D
+      world="mandala"
+      eyebrow="The Personal Mandala"
+      title={user.name}
+      desc="Таны хувийн энергийн булан — сургалт, захиалга, аяны ахиц энд цугларна."
+      heightVh={130}
+    />
     <section className="section">
       <div className="container-px">
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -177,5 +187,6 @@ export default function AccountPage() {
         </div>
       </div>
     </section>
+    </>
   );
 }
