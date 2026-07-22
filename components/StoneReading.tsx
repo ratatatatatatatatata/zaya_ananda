@@ -105,6 +105,20 @@ export function StoneReading() {
   const universalStones = useMemo(() => STONE_LORE.filter((s) => s.zodiacs === "all"), []);
   const otherStones = useMemo(() => STONE_LORE.filter((s) => Array.isArray(s.zodiacs) && (!z || !s.zodiacs.includes(z.key)) && s.zodiacs.length === 0), [z]);
 
+  /** Танд санал болгох: эхлээд таны ордын болон бүх ордын чулуунд таарсан бүтээгдэхүүн,
+   *  таараагүй бол дэлгүүрийн бусад бүтээгдэхүүнээр нөхнө. */
+  const suggested = useMemo(() => {
+    if (!z || products.length === 0) return [];
+    const keys = [...zodiacStones, ...universalStones].flatMap((s) => s.match.map((k) => k.toLowerCase()));
+    const hit: CmsItem[] = [];
+    const rest: CmsItem[] = [];
+    for (const p of products) {
+      const hay = ((p.title || "") + " " + (p.summary || "") + " " + (p.body || "")).toLowerCase();
+      (keys.some((k) => hay.includes(k)) ? hit : rest).push(p);
+    }
+    return [...hit, ...rest].slice(0, 8);
+  }, [z, products, zodiacStones, universalStones]);
+
   const selCls = "rounded-2xl border-2 border-line bg-[#121D33] px-4 py-3 font-display text-base font-semibold text-ink outline-none transition focus:border-accent-400 hover:border-accent-400/60";
 
   return (
@@ -167,6 +181,17 @@ export function StoneReading() {
           <div className="mt-5 space-y-6">
             {universalStones.map((s) => <StoneCard key={s.key} s={s} products={products} universal />)}
           </div>
+
+          {/* Танд санал болгох бүтээгдэхүүн */}
+          {suggested.length > 0 && (
+            <div className="mt-12 rounded-4xl border border-primary-500/30 bg-[#14303A] p-7 sm:p-8">
+              <h3 className="font-display text-xl font-semibold text-ink sm:text-2xl">🛍 Танд санал болгох бүтээгдэхүүн</h3>
+              <p className="mt-2 text-sm text-muted">Таны ордод ээлтэй чулуутай холбоотой болон манай энергийн хамгаалалтын бүтээгдэхүүнүүд.</p>
+              <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {suggested.map((p) => <CmsCard key={p.id} item={p} />)}
+              </div>
+            </div>
+          )}
 
           {/* Бусад чулуунууд */}
           {otherStones.length > 0 && (

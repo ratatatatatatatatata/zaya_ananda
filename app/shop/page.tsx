@@ -1,6 +1,8 @@
 import { PageHeader } from "@/components/PageHeader";
 import { CmsCard } from "@/components/CmsCard";
 import { ShopSplit } from "@/components/ShopSplit";
+import { Stagger } from "@/components/motion/Stagger";
+import { TiltCard } from "@/components/motion/TiltCard";
 import { StoneReading } from "@/components/StoneReading";
 import { listCmsCached } from "@/lib/repo";
 import { T } from "@/components/T";
@@ -18,7 +20,7 @@ export default async function ShopPage() {
           products={
             items.length === 0
               ? <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-14 text-center text-muted">Одоохондоо бүтээгдэхүүн нэмэгдээгүй байна.</p>
-              : <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{items.map((i) => <CmsCard key={i.id} item={i} />)}</div>
+              : <Stagger className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{items.map((i) => <TiltCard key={i.id} className="h-full"><CmsCard item={i} /></TiltCard>)}</Stagger>
           }
           stones={<StoneReading />}
         />

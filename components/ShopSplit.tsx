@@ -33,8 +33,8 @@ export function ShopSplit({ products, stones }: { products: ReactNode; stones: R
           💎 Ордуудын ээлтэй чулуу
         </button>
       </div>
-      <div className={tab === "products" ? "" : "hidden"}>{products}</div>
-      <div className={tab === "stones" ? "" : "hidden"}>{stones}</div>
+      <div className={tab === "products" ? "animate-fade-rise" : "hidden"}>{products}</div>
+      <div className={tab === "stones" ? "animate-fade-rise" : "hidden"}>{stones}</div>
     </div>
   );
 }

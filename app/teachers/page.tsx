@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getSettings } from "@/lib/repo";
 import { PageHeader } from "@/components/PageHeader";
 import { T } from "@/components/T";
+import { Stagger } from "@/components/motion/Stagger";
+import { TiltCard } from "@/components/motion/TiltCard";
 
 // Админ дээр хадгалсан өөрчлөлт ШУУД харагдахын тулд амьд өгөгдлөөр буулгана.
 export const dynamic = "force-dynamic";
@@ -25,9 +27,9 @@ export default async function TeachersPage() {
             Багш нарын мэдээлэл удахгүй нэмэгдэнэ.
           </p>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <Stagger className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" step={110}>
             {teachers.map((t) => (
-              <Link key={t.name} href={"/teachers/" + slugOf(t.name)}
+              <TiltCard key={t.name} className="h-full" max={4}><Link href={"/teachers/" + slugOf(t.name)}
                 className="card group relative flex flex-col overflow-hidden transition-shadow duration-300 hover:shadow-glow">
                 {t.image
                   ? <div className="h-80 w-full overflow-hidden"><img src={t.image} alt={t.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" style={{ objectPosition: "50% " + (t.focus ?? 50) + "%" }} /></div>
@@ -37,9 +39,9 @@ export default async function TeachersPage() {
                   {t.role && <p className="mt-1 text-sm font-medium text-white/85">{t.role}</p>}
                   <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-white/70 opacity-0 transition group-hover:opacity-100">Хичээлүүдийг үзэх →</p>
                 </div>
-              </Link>
+              </Link></TiltCard>
             ))}
-          </div>
+          </Stagger>
         )}
       </div></section>
     </>

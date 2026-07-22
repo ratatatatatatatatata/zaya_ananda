@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { CmsCard } from "./CmsCard";
+import { Stagger } from "./motion/Stagger";
+import { TiltCard } from "./motion/TiltCard";
 import type { CmsItem } from "@/lib/types";
 import { cx } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
@@ -35,7 +37,7 @@ export function CmsCoursesFilter({ items }: { items: CmsItem[] }) {
       </div>
       {shown.length === 0
         ? <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-12 text-center text-muted">Одоохондоо сургалт нэмэгдээгүй байна.</p>
-        : <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{shown.map((i) => <CmsCard key={i.id} item={i} />)}</div>}
+        : <Stagger className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{shown.map((i) => <TiltCard key={i.id} className="h-full"><CmsCard item={i} /></TiltCard>)}</Stagger>}
     </div>
   );
 }

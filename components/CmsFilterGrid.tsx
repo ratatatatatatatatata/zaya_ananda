@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { CmsCard } from "./CmsCard";
+import { Stagger } from "./motion/Stagger";
+import { TiltCard } from "./motion/TiltCard";
 import { cx } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 import { catLabel } from "@/data/cms-taxonomy";
@@ -60,7 +62,7 @@ export function CmsFilterGrid({ items, categories, groups, emptyText }: {
       )}
       {shown.length === 0
         ? <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-14 text-center text-muted">{emptyText}</p>
-        : <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{shown.map((i) => <CmsCard key={i.id} item={i} />)}</div>}
+        : <Stagger className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{shown.map((i) => <TiltCard key={i.id} className="h-full"><CmsCard item={i} /></TiltCard>)}</Stagger>}
     </>
   );
 }
