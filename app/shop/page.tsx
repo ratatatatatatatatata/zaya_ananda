@@ -1,4 +1,4 @@
-import { PageHeader } from "@/components/PageHeader";
+import { Journey3D } from "@/components/three/Journey3D";
 import { CmsCard } from "@/components/CmsCard";
 import { ShopSplit } from "@/components/ShopSplit";
 import { Stagger } from "@/components/motion/Stagger";
@@ -14,8 +14,16 @@ export default async function ShopPage() {
   const items = await listCmsCached("product");
   return (
     <>
-      <PageHeader title={<T k="nav.shop" />} crumb={<T k="nav.shop" />} />
-      <section className="section"><div className="container-px">
+      {/* Тансаг галерей — гялгар шалтай танхимд эрдэнийн чулуу эргэлдэнэ */}
+      <Journey3D
+        world="gallery"
+        eyebrow="The Journey into Ananda · III"
+        title={<T k="nav.shop" />}
+        desc="Музейн үзмэр шиг тавцан дээр эргэлдэх эрдэнийн чулуу — алтан гэрэл, оюу туяаны дунд танд зориулсан энергийн хамгаалалтууд."
+        heightVh={180}
+        cta={[{ href: "#shop", label: "Бүтээгдэхүүн үзэх" }]}
+      />
+      <section id="shop" className="section"><div className="container-px">
         <ShopSplit
           products={
             items.length === 0

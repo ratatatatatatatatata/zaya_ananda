@@ -1,4 +1,4 @@
-import { PageHeader } from "@/components/PageHeader";
+import { Journey3D } from "@/components/three/Journey3D";
 import { CtaBand } from "@/components/CtaBand";
 import { CalmBand } from "@/components/CalmBand";
 import { SectionHeading } from "@/components/ui";
@@ -28,7 +28,14 @@ export default async function AboutPage() {
   const dynamicTeam = mergedTeam.length > 0 ? mergedTeam : null;
   return (
     <>
-      <PageHeader title={<T k="about.title" />} crumb={<T k="about.title" />} desc={<Tr v={siteConfig.tagline} />} />
+      {/* «Нэг гэрлээс Ananda» — харанхуйгаас гэрлийн үр ургаж, туяа дэлгэрнэ */}
+      <Journey3D
+        world="seed"
+        eyebrow="From One Light to Ananda"
+        title={<T k="about.title" />}
+        desc={<Tr v={siteConfig.tagline} />}
+        heightVh={190}
+      />
 
       {(settings.aboutTitle || settings.aboutBody || aboutVideoUrl) && (
         <section className="section"><div className="container-px max-w-3xl">

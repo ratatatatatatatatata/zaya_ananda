@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Journey3D } from "@/components/three/Journey3D";
 
 export const metadata = {
   title: "Сүнслэг аялал — Spiritual Journey Mongolia",
@@ -126,21 +127,16 @@ const FAQ = [
 export default function AyalalPage() {
   return (
     <>
-      {/* Hero */}
+      {/* Ариун хөндий — гэрлийн зам дагуу камер урагшилж, алсын нар мандалт руу аялна */}
+      <Journey3D
+        world="sanctuary"
+        eyebrow="Spiritual Journey Mongolia"
+        title="Сүнслэг аялал"
+        desc="Монголын энергийн ариун газрууд руу хийх энэ аян бол зүгээр нэг зам биш — таны дотоод амар амгалан руу хийх аялал юм. Гэрлийн зам дагуу урагшлаарай."
+        heightVh={200}
+        cta={[{ href: "#tours", label: "Хөтөлбөр үзэх" }, { href: "/about#contact", label: "Урьдчилан бүртгүүлэх" }]}
+      />
       <section className="relative isolate overflow-hidden bg-[#131D3B]">
-        <div aria-hidden className="pointer-events-none absolute -top-32 left-1/3 h-[440px] w-[700px] -translate-x-1/2 rounded-full" style={{ background: "radial-gradient(ellipse, rgba(155,110,240,0.4), rgba(155,110,240,0) 70%)", filter: "blur(12px)" }} />
-        <div aria-hidden className="pointer-events-none absolute -top-20 right-0 h-[360px] w-[480px] rounded-full" style={{ background: "radial-gradient(ellipse, rgba(43,200,187,0.3), rgba(43,200,187,0) 70%)", filter: "blur(14px)" }} />
-        <div className="relative z-10 container-px py-20 text-center sm:py-24">
-          <p className="text-sm font-bold uppercase tracking-[0.25em] text-grape-400">Spiritual Journey Mongolia</p>
-          <h1 className="mx-auto mt-4 max-w-3xl text-balance font-display text-4xl font-semibold text-white sm:text-6xl">Сүнслэг аялал</h1>
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/75">
-            Монголын энергийн ариун газрууд руу хийх энэ аян бол зүгээр нэг зам биш — таны дотоод амар амгалан руу хийх аялал юм.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <a href="#tours" className="btn btn-magic btn-lg animate-gradientShift">Хөтөлбөр үзэх</a>
-            <Link href="/about#contact" className="btn btn-outline btn-lg">Урьдчилан бүртгүүлэх</Link>
-          </div>
-        </div>
         {/* Дотоод цэс */}
         <nav className="relative z-10 border-t border-white/10 bg-[#0F1728]/70 backdrop-blur">
           <div className="container-px flex flex-wrap justify-center gap-x-7 gap-y-2 py-3.5">
