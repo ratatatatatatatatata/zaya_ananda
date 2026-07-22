@@ -84,8 +84,7 @@ export function StoneOracle() {
         <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full" style={{ background: "radial-gradient(circle, rgba(227,190,98,0.22), transparent 70%)", filter: "blur(8px)" }} />
         <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full" style={{ background: "radial-gradient(circle, rgba(155,110,240,0.18), transparent 70%)", filter: "blur(10px)" }} />
         <div className="relative z-10">
-          <p className="text-xs font-bold uppercase tracking-[0.25em] text-accent-400">Энергийн хамгаалалт · нэмэлт</p>
-          <h2 className="mt-2 font-display text-2xl font-semibold text-ink sm:text-3xl">💎 Ордны чулуун тайлал</h2>
+          <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl">💎 Ордуудын ээлтэй чулуу</h2>
           <p className="mt-2 max-w-2xl text-muted">Төрсөн огноогоо сонгох эсвэл ордоо шууд дарахад таны эрдэнийн чулууг тайлж, тохирсон бүтээгдэхүүнүүдээ санал болгоно.</p>
 
           {/* Он / Сар / Өдөр — загварлаг сонголт */}
