@@ -20,6 +20,7 @@ const HERO_SUB = Lx(
   "通过冥想、能量平衡、个人成长与专业培训，开启你的内在世界。"
 );
 const TOOROG = Lx("Төөрөг үзэх", "View your fortune", "오늘의 운세", "今日の運勢", "查看运势");
+const AYALAL = Lx("Сүнслэг аялал", "Spiritual Journey", "영적 여행", "スピリチュアルな旅", "灵性之旅");
 
 export function AnandaCinematic() {
   const ref = useRef<HTMLDivElement>(null);
@@ -160,6 +161,7 @@ export function AnandaCinematic() {
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link href="/services" className="btn btn-magic btn-lg animate-gradientShift">{t("hero2.cta1")}</Link>
               <Link href="/courses" className="btn btn-lg border-2 border-white/70 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20">{t("hero2.cta2")}</Link>
+              <Link href="/ayalal" className="btn btn-lg text-white shadow-[0_16px_40px_-14px_rgba(155,110,240,0.6)] hover:brightness-110 hover:-translate-y-0.5" style={{ backgroundImage: "linear-gradient(120deg,#9B6EF0,#5E8DE0)" }}>🕊 {tr(AYALAL)}</Link>
               <Link href="/toorog" className="btn btn-gold btn-lg">✦ {tr(TOOROG)}</Link>
             </div>
           </div>

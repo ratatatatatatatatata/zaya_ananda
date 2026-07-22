@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { getSessionUserId } from "@/lib/auth";
-import { getUserById } from "@/lib/repo";
+import { checkAdmin } from "@/lib/repo";
 import { ensureBucket, signedUploadUrl } from "@/lib/supabase";
 
 export const runtime = "nodejs";
@@ -11,9 +11,7 @@ const BUCKET = "lesson-videos";
 export async function POST(req: Request) {
   const uid = await getSessionUserId();
   if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const me = await getUserById(uid);
-  const adminEmail = process.env.ADMIN_EMAIL;
-  if (adminEmail && me?.email !== adminEmail) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await checkAdmin(uid)).ok) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
     const body = await req.json().catch(() => ({}));
     const filename = String(body?.filename || "video");

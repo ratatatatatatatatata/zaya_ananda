@@ -105,6 +105,8 @@ export interface PublicUser {
   phone?: string;
   createdAt: string;
   isAdmin?: boolean;
+  /** Зөвхөн ADMIN_EMAIL эзэмшигч — бусдад админ эрх олгож чадна */
+  isSuper?: boolean;
 }
 
 export interface User extends PublicUser {

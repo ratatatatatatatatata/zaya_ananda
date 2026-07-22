@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidateTag, revalidatePath } from "next/cache";
 import { getSessionUserId } from "@/lib/auth";
-import { getUserById, getSettingsCached, updateSettings } from "@/lib/repo";
+import { checkAdmin, getSettingsCached, updateSettings } from "@/lib/repo";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,9 +14,7 @@ export async function GET() {
 export async function PATCH(req: Request) {
   const uid = await getSessionUserId();
   if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const me = await getUserById(uid);
-  const adminEmail = process.env.ADMIN_EMAIL;
-  if (adminEmail && me?.email !== adminEmail) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await checkAdmin(uid)).ok) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
     const body = await req.json().catch(() => ({}));
     const str = (v: unknown) => (v !== undefined ? String(v || "") : undefined);

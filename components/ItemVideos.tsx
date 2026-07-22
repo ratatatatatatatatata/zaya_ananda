@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 type Video = { title: string; url: string; quality?: string; subtitles?: string };
 
 function embed(url: string): { type: "iframe" | "video"; src: string } {
-  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/);
+  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([\w-]{11})/);
   if (yt) return { type: "iframe", src: "https://www.youtube.com/embed/" + yt[1] };
   const vm = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
   if (vm) return { type: "iframe", src: "https://player.vimeo.com/video/" + vm[1] };

@@ -22,6 +22,23 @@ export function isAdminEmail(email?: string): boolean {
   return (email || "").toLowerCase() === adminEmail.toLowerCase();
 }
 
+/** Админ эрхийн шалгалт: супер админ (ADMIN_EMAIL) эсвэл олгогдсон админ эрхтэй хэрэглэгч. */
+export async function checkAdmin(uid: string | null): Promise<{ ok: boolean; isSuper: boolean }> {
+  if (!uid) return { ok: false, isSuper: false };
+  const me = await getUserById(uid);
+  if (!me) return { ok: false, isSuper: false };
+  const isSuper = isAdminEmail(me.email);
+  return { ok: isSuper || !!me.isAdmin, isSuper };
+}
+
+/** Супер админ бусад хэрэглэгчид админ эрх олгох/хасах. */
+export async function setUserAdmin(id: string, isAdmin: boolean): Promise<boolean> {
+  const u = await getUserById(id);
+  if (!u) return false;
+  await sbUpdate("users", id, { isAdmin });
+  return true;
+}
+
 export async function getUserByEmail(email: string): Promise<User | null> {
   const e = (email || "").trim().toLowerCase();
   if (!e) return null;

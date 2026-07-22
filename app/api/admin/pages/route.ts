@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidateTag, revalidatePath } from "next/cache";
 import { getSessionUserId } from "@/lib/auth";
-import { getUserById, listPages, createPage, updatePage, deletePage } from "@/lib/repo";
+import { checkAdmin, listPages, createPage, updatePage, deletePage } from "@/lib/repo";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -9,9 +9,7 @@ export const dynamic = "force-dynamic";
 async function guard() {
   const uid = await getSessionUserId();
   if (!uid) return { ok: false as const, res: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
-  const me = await getUserById(uid);
-  const adminEmail = process.env.ADMIN_EMAIL;
-  if (adminEmail && me?.email !== adminEmail)
+  if (!(await checkAdmin(uid)).ok)
     return { ok: false as const, res: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
   return { ok: true as const };
 }

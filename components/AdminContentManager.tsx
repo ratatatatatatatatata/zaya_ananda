@@ -65,7 +65,7 @@ function srtToVtt(s: string): string {
   return /^WEBVTT/.test(body.trim()) ? body : "WEBVTT\n\n" + body;
 }
 
-type LessonRow = { title: string; path: string; quality: string; subtitles?: string; filename?: string; uploading?: boolean; progress?: number };
+type LessonRow = { title: string; path: string; url?: string; quality: string; subtitles?: string; filename?: string; uploading?: boolean; progress?: number };
 
 const MAX_IMAGES = 3;
 
@@ -159,7 +159,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
     setI18n(it.i18n || {});
     setMoods(it.moods || []);
     setLangTab("mn");
-    setLessons((it.lessons || []).map((l) => ({ title: l.title || "", path: l.path || "", quality: l.quality || "1080p", subtitles: l.subtitles || "" })));
+    setLessons((it.lessons || []).map((l) => ({ title: l.title || "", path: l.path || "", url: l.url || "", quality: l.quality || "1080p", subtitles: l.subtitles || "" })));
     setEditingId(it.id); setErr(""); setOpen(true);
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -175,7 +175,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
       i18n,
       moods,
       mode: kind === "course" ? form.mode : undefined,
-      lessons: lessons.filter((l) => l.title.trim() && l.path).map((l) => ({ title: l.title.trim(), path: l.path, quality: l.quality, subtitles: l.subtitles || "" })),
+      lessons: lessons.filter((l) => l.title.trim() && (l.path || (l.url || "").trim())).map((l) => ({ title: l.title.trim(), path: l.path, url: (l.url || "").trim(), quality: l.quality, subtitles: l.subtitles || "" })),
     };
     try {
       const res = await fetch("/api/admin/content", {
@@ -264,6 +264,13 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
                         : <input type="file" accept="video/*" className="text-sm" onChange={(e) => onPickVideo(e, idx)} />}
                       {l.uploading && <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-line"><div className="h-full bg-primary-500 transition-all" style={{ width: (l.progress ?? 0) + "%" }} /></div>}
                     </div>
+                    {!l.path && !l.uploading && (
+                      <div className="flex items-center gap-2 pl-9">
+                        <span className="shrink-0 text-xs font-medium text-muted">эсвэл YouTube линк:</span>
+                        <input className="input flex-1 !py-1.5 text-sm" placeholder="https://www.youtube.com/watch?v=... эсвэл https://youtu.be/..." value={l.url || ""} onChange={(e) => updLesson(idx, { url: e.target.value })} />
+                        {(l.url || "").trim() && <span className="shrink-0 text-sm font-medium text-jade-600">✓</span>}
+                      </div>
+                    )}
                     <div className="flex flex-wrap items-center gap-2 pl-9">
                       <span className="shrink-0 text-xs font-medium text-muted">English хадмал (.vtt/.srt):</span>
                       {l.subtitles && <span className="text-sm font-medium text-jade-600">✓ Орсон</span>}
