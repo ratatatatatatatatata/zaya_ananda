@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { revalidateTag, revalidatePath } from "next/cache";
 import { getSessionUserId } from "@/lib/auth";
 import { checkAdmin, listPages, createPage, updatePage, deletePage } from "@/lib/repo";
+import { autoTranslate } from "@/lib/translate";
+import type { CmsTranslations } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,9 +24,9 @@ function refresh(id?: string) {
 const LANGS = ["en", "ko", "ja", "zh"] as const;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parseI18n(raw: any) {
+function parseI18n(raw: any): CmsTranslations | undefined {
   if (!raw || typeof raw !== "object") return undefined;
-  const out: Record<string, { title?: string; body?: string; navLabel?: string }> = {};
+  const out: CmsTranslations = {};
   for (const l of LANGS) {
     const v = raw[l];
     if (!v || typeof v !== "object") continue;
@@ -62,7 +64,9 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   if (!body || !String(body.title || "").trim()) return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
   try {
-    const page = await createPage(parseInput(body));
+    const input = parseInput(body);
+    input.i18n = await autoTranslate({ title: input.title, navLabel: input.navLabel, body: input.body }, input.i18n);
+    const page = await createPage(input);
     refresh(page.id);
     return NextResponse.json({ page });
   } catch (e) {
@@ -77,7 +81,9 @@ export async function PUT(req: Request) {
   if (!body || !body.id) return NextResponse.json({ error: "id required" }, { status: 400 });
   if (!String(body.title || "").trim()) return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
   try {
-    const page = await updatePage(String(body.id), parseInput(body));
+    const input = parseInput(body);
+    input.i18n = await autoTranslate({ title: input.title, navLabel: input.navLabel, body: input.body }, input.i18n);
+    const page = await updatePage(String(body.id), input);
     refresh(String(body.id));
     return NextResponse.json({ page });
   } catch (e) {

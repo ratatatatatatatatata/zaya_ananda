@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { revalidateTag, revalidatePath } from "next/cache";
 import { getSessionUserId } from "@/lib/auth";
 import { checkAdmin, allCms, createCmsItem, updateCmsItem, deleteCmsItem, upsertTeacherPreset } from "@/lib/repo";
+import { autoTranslate } from "@/lib/translate";
+import type { CmsTranslations } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,7 +14,7 @@ const LANGS = ["en", "ko", "ja", "zh"] as const;
 // Purge cached public pages/data so admin edits show up immediately.
 function refreshPublic(id?: string) {
   revalidateTag("cms");
-  for (const p of ["/services", "/courses", "/shop", "/resources", "/gift"]) revalidatePath(p);
+  for (const p of ["/", "/services", "/courses", "/shop", "/resources", "/gift"]) revalidatePath(p);
   revalidatePath("/teachers");
   revalidatePath("/teachers/[slug]", "page");
   if (id) revalidatePath(`/item/${id}`);
@@ -60,9 +62,9 @@ function parseInput(body: any) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parseI18n(raw: any) {
+function parseI18n(raw: any): CmsTranslations | undefined {
   if (!raw || typeof raw !== "object") return undefined;
-  const out: Record<string, { title?: string; summary?: string; body?: string; navLabel?: string }> = {};
+  const out: CmsTranslations = {};
   for (const l of LANGS) {
     const v = raw[l];
     if (!v || typeof v !== "object") continue;
@@ -90,6 +92,7 @@ export async function POST(req: Request) {
   if (!body.title || !String(body.title).trim()) return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
   try {
     const input = parseInput(body);
+    input.i18n = await autoTranslate({ title: input.title, summary: input.summary, body: input.body }, input.i18n);
     const item = await createCmsItem(input);
     if (input.teacherName) { await upsertTeacherPreset({ name: input.teacherName, image: input.teacherImage, role: input.teacherRole, info: input.teacherInfo }); revalidateTag("settings"); }
     refreshPublic(item.id);
@@ -108,6 +111,7 @@ export async function PUT(req: Request) {
   if (!body.title || !String(body.title).trim()) return NextResponse.json({ error: "Гарчиг оруулна уу." }, { status: 400 });
   try {
     const input = parseInput(body);
+    input.i18n = await autoTranslate({ title: input.title, summary: input.summary, body: input.body }, input.i18n);
     const item = await updateCmsItem(String(body.id), input);
     if (input.teacherName) { await upsertTeacherPreset({ name: input.teacherName, image: input.teacherImage, role: input.teacherRole, info: input.teacherInfo }); revalidateTag("settings"); }
     refreshPublic(String(body.id));

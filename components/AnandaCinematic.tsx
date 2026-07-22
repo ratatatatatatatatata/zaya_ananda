@@ -119,11 +119,12 @@ export function AnandaCinematic() {
   }, [mode]);
 
   const stat = mode === "static";
-  const heroO = stat ? 1 : seg(p, 0.72, 0.93);
+  // Утас/таблет (loop) дээр урт скролл шаардахгүй — текст шууд харагдана
+  const heroO = mode === "scrub" ? seg(p, 0.72, 0.93) : 1;
   const auraO = heroO * 0.6;
 
   return (
-    <section ref={ref} className="relative" style={{ height: stat ? "110vh" : "440vh" }}>
+    <section ref={ref} className="relative" style={{ height: mode === "scrub" ? "440vh" : "110vh" }}>
       <div className="sticky top-0 h-screen overflow-hidden bg-[#0b1020]">
         {stat ? (
           <img src={POSTER_MED} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "center 42%" }} />
