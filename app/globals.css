@@ -134,3 +134,7 @@ body {
 
 @keyframes zaFloatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 .anim-float { animation: zaFloatY 9s ease-in-out infinite; }
+
+/* Бүтээгдэхүүний тайзны шилжилтүүд */
+@keyframes zaStageIn { from { opacity: 0; transform: translateZ(-60px) scale(1.06); } to { opacity: 1; transform: translateZ(0) scale(1); } }
+@keyframes zaStageOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.94) translateY(8px); } }

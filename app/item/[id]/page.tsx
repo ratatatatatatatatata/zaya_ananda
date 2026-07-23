@@ -7,6 +7,7 @@ import { ProductBuyBox } from "@/components/ProductBuyBox";
 import { CourseLessons } from "@/components/CourseLessons";
 import { ItemVideos } from "@/components/ItemVideos";
 import { ImageGallery } from "@/components/ImageGallery";
+import { ProductStage } from "@/components/product/ProductStage";
 import { RichBody } from "@/components/RichBody";
 import { CmsText, CatLabel } from "@/components/CmsText";
 import { CmsCard } from "@/components/CmsCard";
@@ -76,7 +77,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
 
       <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr]">
         <div>
-          <ImageGallery images={gallery} alt={item.title} />
+          {isProduct ? <ProductStage images={gallery} alt={item.title} /> : <ImageGallery images={gallery} alt={item.title} />}
           {item.category && <span className="chip"><CatLabel cat={item.category} /></span>}
           <h1 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><CmsText mn={item.title} i18n={item.i18n} field="title" /></h1>
           {isCourse && (

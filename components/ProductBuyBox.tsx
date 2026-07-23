@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart";
 import { formatMNT } from "@/lib/format";
+import { flyToCart } from "@/lib/fly-to-cart";
 import type { L } from "@/lib/types";
 
 const same = (s: string): L => ({ mn: s, en: s, ko: s, ja: s, zh: s });
@@ -18,7 +19,9 @@ export function ProductBuyBox({ id, title, price }: { id: string; title: string;
   const cartItem = { kind: "product" as const, slug: id, title: same(title), price: price ?? 0, tone: "jade" as const, glyph: "🛍" };
 
   function addToCart() {
+    // Эхлээд жинхэнэ сагсны үйлдэл — амжилттай болсны дараа л хөдөлгөөн явна
     add(cartItem, qty);
+    flyToCart();
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   }
