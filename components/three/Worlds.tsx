@@ -10,7 +10,8 @@ import * as THREE from "three";
 
 export type WorldKind =
   | "crystal" | "library" | "gallery" | "seed" | "sanctuary"
-  | "chamber" | "path" | "pedestal" | "archive" | "mandala";
+  | "chamber" | "path" | "pedestal" | "archive" | "mandala"
+  | "candle" | "lotus";
 type P = MutableRefObject<number>;
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -1016,6 +1017,154 @@ function MandalaWorld({ progress }: { progress: P }) {
   );
 }
 
+/* ---------- 11. CANDLE — Лаа засал: галын ариусгал ---------- */
+function CandleWorld({ progress }: { progress: P }) {
+  const flames = useRef<THREE.Group>(null);
+  const lights = useRef<(THREE.PointLight | null)[]>([]);
+  const wax = useRockTextures([224, 210, 186]);
+  const ring = useMemo(
+    () => Array.from({ length: 7 }, (_, i) => {
+      const a = (i / 7) * Math.PI * 2;
+      return { x: Math.sin(a) * 1.5, z: Math.cos(a) * 1.5, h: 0.55 + (i % 3) * 0.16, ph: i * 1.7 };
+    }),
+    []
+  );
+  useFrame(({ clock, camera }) => {
+    const t = clock.elapsedTime;
+    const p = ease(progress.current);
+    const hh = handheld(t, 0.6);
+    camera.position.set(hh.x + Math.sin(t * 0.07) * lerp(3.6, 1.9, p), lerp(2.1, 0.9, p) + hh.y, Math.cos(t * 0.07) * lerp(3.6, 2.4, p));
+    camera.lookAt(0, 0.5, 0);
+    // Дөл — тогтмол биш, салхинд найгах мэт анивчина
+    flames.current?.children.forEach((c, i) => {
+      const f = 0.85 + Math.sin(t * 7 + i * 2.1) * 0.09 + Math.sin(t * 13.3 + i) * 0.05;
+      c.scale.set(f * 0.9, f, f * 0.9);
+      c.position.x = Math.sin(t * 3 + i) * 0.012;
+    });
+    lights.current.forEach((l, i) => {
+      if (l) l.intensity = 3.4 + Math.sin(t * 6.5 + i * 2.3) * 1.1;
+    });
+  });
+  return (
+    <>
+      <fog attach="fog" args={["#140d09", 3, 12]} />
+      <EnvLight sky="#4a2c14" horizon="#1c1009" ground="#070403" />
+      <ambientLight intensity={0.16} color="#ffcf9c" />
+      {/* Ширээний гадаргуу */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
+        <circleGeometry args={[4.2, 64]} />
+        <meshStandardMaterial color="#241610" roughness={0.85} metalness={0.15} envMapIntensity={0.8} />
+      </mesh>
+      <group ref={flames}>
+        {ring.map((c, i) => (
+          <mesh key={"f" + i} position={[c.x, c.h + 0.11, c.z]}>
+            <coneGeometry args={[0.045, 0.16, 12]} />
+            <meshBasicMaterial color="#FFD79A" />
+          </mesh>
+        ))}
+      </group>
+      {ring.map((c, i) => (
+        <group key={i}>
+          {/* Лаа */}
+          <mesh position={[c.x, c.h / 2, c.z]}>
+            <cylinderGeometry args={[0.085, 0.095, c.h, 20]} />
+            <meshStandardMaterial map={wax?.color ?? undefined} bumpMap={wax?.bump ?? undefined} bumpScale={0.02} color="#F3E7D2" roughness={0.7} envMapIntensity={0.9} />
+          </mesh>
+          {/* Дөлний гэрэлтэлт ба гэрэл */}
+          <Glow position={[c.x, c.h + 0.14, c.z]} scale={0.85} color="rgba(255,190,110,0.6)" />
+          <pointLight ref={(el) => { lights.current[i] = el; }} position={[c.x, c.h + 0.16, c.z]} intensity={3.4} distance={4.5} color="#FFC078" />
+          <ContactShadow y={0.005} scale={0.34} opacity={0.5} />
+        </group>
+      ))}
+      {/* Утаа — дээш хөвөх нарийн бөөмс */}
+      <Particles count={120} radius={3} color="#E8C9A0" size={0.03} progress={progress} />
+      <Glow position={[0, 1.4, 0]} scale={5} color="rgba(255,170,90,0.18)" />
+      <EnergyOrb progress={progress} path={[1.5, 2.2, 1, 0, 1.5, 0.9]} />
+    </>
+  );
+}
+
+/* ---------- 12. LOTUS — Бясалгалын сургалт: усан дээрх бадам ---------- */
+function LotusWorld({ progress }: { progress: P }) {
+  const petals = useRef<THREE.Group>(null);
+  const ripples = useRef<THREE.Group>(null);
+  const water = useRef<THREE.Mesh>(null);
+  useFrame(({ clock, camera }) => {
+    const t = clock.elapsedTime;
+    const p = ease(progress.current);
+    const hh = handheld(t, 0.6);
+    camera.position.set(hh.x, lerp(1.9, 0.75, p) + hh.y, lerp(5.4, 2.6, p));
+    camera.lookAt(0, 0.28, 0);
+    // Дэлбээ гүйлгэх тусам нээгдэнэ — амьсгалын хэмнэлтэй
+    const breathe = Math.sin(t * 0.55) * 0.5 + 0.5;
+    petals.current?.children.forEach((c, i) => {
+      const open = 0.25 + p * 0.75;
+      const layer = Math.floor(i / 8);
+      c.rotation.x = -0.15 - open * (0.85 + layer * 0.25) - breathe * 0.06;
+      c.position.y = 0.22 + layer * 0.05;
+    });
+    // Ус — толин тусгал, долгион тэлнэ
+    ripples.current?.children.forEach((c, i) => {
+      const k = ((t * 0.22 + i / 3) % 1);
+      c.scale.setScalar(0.6 + k * 3.6);
+      ((c as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity = 0.3 * (1 - k);
+    });
+    if (water.current) water.current.position.y = -0.02 + Math.sin(t * 0.4) * 0.005;
+  });
+  return (
+    <>
+      <fog attach="fog" args={["#08211f", 4, 14]} />
+      <EnvLight sky="#4d8f86" horizon="#12332f" ground="#050d0c" />
+      <ambientLight intensity={0.3} color="#cfeee6" />
+      <directionalLight position={[3, 5, 4]} intensity={2.4} color="#FFF4DC" />
+      <pointLight position={[-3, 1, -2]} intensity={7} color="#2BC8BB" />
+      {/* Тайван ус — тусгалтай */}
+      <mesh ref={water} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
+        <circleGeometry args={[14, 72]} />
+        <meshPhysicalMaterial color="#0d3b38" metalness={0.6} roughness={0.08} clearcoat={1} envMapIntensity={1.6} />
+      </mesh>
+      {/* Тэлэх долгион */}
+      <group ref={ripples}>
+        {[0, 1, 2].map((i) => (
+          <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
+            <ringGeometry args={[0.5, 0.53, 64]} />
+            <meshBasicMaterial color="#9BF0E6" transparent opacity={0.3} depthWrite={false} />
+          </mesh>
+        ))}
+      </group>
+      {/* Бадам цэцэг — 3 давхар дэлбээ */}
+      <group ref={petals} position={[0, 0, 0]}>
+        {Array.from({ length: 24 }, (_, i) => {
+          const layer = Math.floor(i / 8), k = i % 8;
+          const a = (k / 8) * Math.PI * 2 + layer * 0.4;
+          const r = 0.16 + layer * 0.12;
+          return (
+            <mesh key={i} position={[Math.sin(a) * r, 0.22, Math.cos(a) * r]} rotation={[-0.4, a, 0]}>
+              <coneGeometry args={[0.11 + layer * 0.02, 0.52 + layer * 0.1, 10]} />
+              <meshPhysicalMaterial color={layer === 0 ? "#fdf3f6" : layer === 1 ? "#f7dfe8" : "#efc9d8"} sheen={1} sheenColor={new THREE.Color("#ffd9e6")} roughness={0.55} clearcoat={0.35} envMapIntensity={1.1} />
+            </mesh>
+          );
+        })}
+      </group>
+      {/* Цэцгийн төв */}
+      <mesh position={[0, 0.3, 0]}>
+        <sphereGeometry args={[0.11, 24, 24]} />
+        <meshStandardMaterial color="#E3BE62" emissive="#8a6a1f" emissiveIntensity={0.5} roughness={0.4} />
+      </mesh>
+      <Glow position={[0, 0.34, 0]} scale={1.8} color="rgba(255,220,150,0.35)" />
+      {/* Усан дээрх навчнууд */}
+      {[[1.5, 0.9], [-1.7, 0.6], [0.6, -1.8], [-1.2, -1.4]].map(([x, z], i) => (
+        <mesh key={"l" + i} rotation={[-Math.PI / 2, 0, i]} position={[x, 0.004, z]}>
+          <circleGeometry args={[0.42 + (i % 2) * 0.14, 24, 0.35, Math.PI * 1.85]} />
+          <meshStandardMaterial color="#1d5c4e" roughness={0.7} side={THREE.DoubleSide} envMapIntensity={0.8} />
+        </mesh>
+      ))}
+      <Particles count={160} radius={6} color="#BFF0E6" size={0.032} progress={progress} />
+      <EnergyOrb progress={progress} path={[1.3, 1.9, 0.9, 0, 1.2, 1.1]} />
+    </>
+  );
+}
+
 /* ---------- Canvas ---------- */
 const WORLDS: Record<WorldKind, (p: { progress: P }) => JSX.Element> = {
   crystal: CrystalWorld,
@@ -1028,6 +1177,8 @@ const WORLDS: Record<WorldKind, (p: { progress: P }) => JSX.Element> = {
   pedestal: PedestalWorld,
   archive: ArchiveWorld,
   mandala: MandalaWorld,
+  candle: CandleWorld,
+  lotus: LotusWorld,
 };
 
 export default function Worlds({ world, progress }: { world: WorldKind; progress: P }) {

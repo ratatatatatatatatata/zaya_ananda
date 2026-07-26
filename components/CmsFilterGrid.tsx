@@ -7,6 +7,8 @@ import { TiltCard } from "./motion/TiltCard";
 import { cx } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 import { catLabel } from "@/data/cms-taxonomy";
+import { CATEGORY_THEME, GROUP_THEME } from "@/data/theme-map";
+import { CategoryGlyph } from "./CategoryGlyph";
 import type { CmsItem } from "@/lib/types";
 
 const ALL = { mn: "Бүгд", en: "All", ko: "전체", ja: "すべて", zh: "全部" };
@@ -27,7 +29,11 @@ export function CmsFilterGrid({ items, categories, groups, emptyText }: {
   const [sub, setSub] = useState("Бүгд");
 
   const Tab = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
-    <button onClick={onClick} className={cx("focus-ring rounded-full px-5 py-2 text-sm font-semibold transition", active ? "bg-primary-grad text-white shadow-glow" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
+    <button onClick={onClick} className={cx("focus-ring inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition", active ? "bg-primary-grad text-white shadow-glow" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
+      {label !== "Бүгд" && (GROUP_THEME[label] || CATEGORY_THEME[label]) && (() => {
+        const g = GROUP_THEME[label] || CATEGORY_THEME[label];
+        return <CategoryGlyph glyph={g.glyph} from={active ? "#ffffff" : g.from} to={active ? "#e9fffb" : g.to} className="h-4.5 w-4.5" id={label} />;
+      })()}
       {label === "Бүгд" ? tr(ALL) : catLabel(label, lang)}
     </button>
   );
@@ -54,7 +60,10 @@ export function CmsFilterGrid({ items, categories, groups, emptyText }: {
       {subTabs.length > 0 && (
         <div className="mb-8 flex flex-wrap gap-2">
           {["Бүгд", ...subTabs].map((s) => (
-            <button key={s} onClick={() => setSub(s)} className={cx("focus-ring rounded-full px-4 py-1.5 text-xs font-semibold transition", sub === s ? "bg-primary-100 text-primary-700 ring-1 ring-primary-400" : "bg-aqua text-ink/60 hover:text-primary-700")}>
+            <button key={s} onClick={() => setSub(s)} className={cx("focus-ring inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition", sub === s ? "bg-primary-100 text-primary-700 ring-1 ring-primary-400" : "bg-aqua text-ink/60 hover:text-primary-700")}>
+              {s !== "Бүгд" && CATEGORY_THEME[s] && (
+                <CategoryGlyph glyph={CATEGORY_THEME[s].glyph} from={CATEGORY_THEME[s].from} to={CATEGORY_THEME[s].to} className="h-4 w-4" id={s} />
+              )}
               {s === "Бүгд" ? tr(ALL) : catLabel(s, lang)}
             </button>
           ))}

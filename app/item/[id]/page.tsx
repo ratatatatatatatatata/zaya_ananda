@@ -13,19 +13,10 @@ import { CmsText, CatLabel } from "@/components/CmsText";
 import { CmsCard } from "@/components/CmsCard";
 import { signedDownloadUrl } from "@/lib/supabase";
 import { Journey3D } from "@/components/three/Journey3D";
-import type { WorldKind } from "@/components/three/Worlds";
+import { themeFor } from "@/data/theme-map";
+import { CategoryGlyph } from "@/components/CategoryGlyph";
 
 export const revalidate = 300;
-
-/** Төрөл бүр өөрийн realm-тай: үйлчилгээ → дотоод өргөө, сургалт → мэдлэгийн зам,
- *  бүтээгдэхүүн → зорилгын эрдэнэ, зөвлөгөө → архив, бэлэг → номын сан */
-const kindWorld: Record<string, { world: WorldKind; eyebrow: string }> = {
-  service: { world: "chamber", eyebrow: "The Inner Chamber" },
-  course: { world: "path", eyebrow: "The Path of Knowledge" },
-  product: { world: "pedestal", eyebrow: "The Object of Intention" },
-  resource: { world: "archive", eyebrow: "The Oracle Archive" },
-  free: { world: "library", eyebrow: "The Library of Consciousness" },
-};
 
 const kindNav: Record<string, { href: string; key: string }> = {
   service: { href: "/services", key: "nav.services" },
@@ -57,13 +48,14 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
     ? (await listCmsCached("product")).filter((p) => p.id !== item.id).slice(0, 4)
     : [];
 
-  const kw = kindWorld[item.kind] || kindWorld.service;
+  // Агуулгад тулгуурласан загвар: ангилал нь ертөнц, өнгө, бэлгэдлийг тодорхойлно
+  const th = themeFor(item.kind, item.category);
 
   return (
     <>
     <Journey3D
-      world={kw.world}
-      eyebrow={kw.eyebrow}
+      world={th.world}
+      eyebrow={th.eyebrow}
       title={<CmsText mn={item.title} i18n={item.i18n} field="title" />}
       heightVh={150}
       cta={[{ href: "#detail", label: "Дэлгэрэнгүй үзэх" }]}
@@ -78,7 +70,15 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
       <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr]">
         <div>
           {isProduct ? <ProductStage images={gallery} alt={item.title} /> : <ImageGallery images={gallery} alt={item.title} />}
-          {item.category && <span className="chip"><CatLabel cat={item.category} /></span>}
+          <div className="mt-1 flex items-center gap-3">
+            <span
+              className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border"
+              style={{ borderColor: th.from + "44", background: `linear-gradient(135deg, ${th.from}14, ${th.to}14)` }}
+            >
+              <CategoryGlyph glyph={th.glyph} from={th.from} to={th.to} className="h-8 w-8" id={item.id} />
+            </span>
+            {item.category && <span className="chip"><CatLabel cat={item.category} /></span>}
+          </div>
           <h1 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><CmsText mn={item.title} i18n={item.i18n} field="title" /></h1>
           {isCourse && (
             <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-muted">

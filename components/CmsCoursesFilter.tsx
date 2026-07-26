@@ -8,6 +8,8 @@ import type { CmsItem } from "@/lib/types";
 import { cx } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 import { catLabel, COURSE_CATS } from "@/data/cms-taxonomy";
+import { CATEGORY_THEME } from "@/data/theme-map";
+import { CategoryGlyph } from "./CategoryGlyph";
 
 const TABS = [
   { k: "online" as const, l: "Онлайн сургалт" },
@@ -30,7 +32,10 @@ export function CmsCoursesFilter({ items }: { items: CmsItem[] }) {
       </div>
       <div className="mb-8 flex flex-wrap justify-center gap-2">
         {["Бүгд", ...COURSE_CATS].map((c) => (
-          <button key={c} onClick={() => setCat(c)} className={cx("focus-ring rounded-full px-5 py-2 text-sm font-semibold transition", cat === c ? "bg-primary-grad text-white shadow-glow" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
+          <button key={c} onClick={() => setCat(c)} className={cx("focus-ring inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition", cat === c ? "bg-primary-grad text-white shadow-glow" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
+            {c !== "Бүгд" && CATEGORY_THEME[c] && (
+              <CategoryGlyph glyph={CATEGORY_THEME[c].glyph} from={cat === c ? "#ffffff" : CATEGORY_THEME[c].from} to={cat === c ? "#e9fffb" : CATEGORY_THEME[c].to} className="h-4 w-4" id={c} />
+            )}
             {c === "Бүгд" ? tr(ALL) : catLabel(c, lang)}
           </button>
         ))}

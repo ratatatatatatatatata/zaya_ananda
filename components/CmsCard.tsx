@@ -5,6 +5,8 @@ import { formatMNT } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 import { locText } from "@/lib/cms-i18n";
 import { catLabel } from "@/data/cms-taxonomy";
+import { themeFor } from "@/data/theme-map";
+import { CategoryGlyph } from "./CategoryGlyph";
 import type { CmsItem } from "@/lib/types";
 
 const modeLabel: Record<string, string> = { online: "Онлайн сургалт", tankhim: "Танхимын сургалт", both: "Онлайн + Танхим" };
@@ -17,6 +19,8 @@ export function CmsCard({ item }: { item: CmsItem }) {
   const title = locText(lang, item.title, item.i18n, "title");
   const summary = locText(lang, item.summary, item.i18n, "summary");
   const cat = catLabel(item.category, lang);
+  // Агуулгад тохирсон бэлгэдэл, өнгө
+  const th = themeFor(item.kind, item.category);
 
   // Бүтээгдэхүүн: зураг → нэр → үнэ гэсэн энгийн байрлал
   if (isProduct) {
@@ -44,7 +48,15 @@ export function CmsCard({ item }: { item: CmsItem }) {
         </div>
       )}
       <div className="flex flex-1 flex-col p-5">
-        {!item.image && cat && <span className="chip mb-2 self-start">{cat}</span>}
+        {!item.image && (
+          <div className="mb-3 flex items-center gap-2.5">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border"
+              style={{ borderColor: th.from + "40", background: `linear-gradient(135deg, ${th.from}12, ${th.to}12)` }}>
+              <CategoryGlyph glyph={th.glyph} from={th.from} to={th.to} className="h-6 w-6" id={item.id} />
+            </span>
+            {cat && <span className="chip">{cat}</span>}
+          </div>
+        )}
         <h3 className="font-display text-xl font-semibold leading-snug text-ink transition group-hover:text-primary-700">{title}</h3>
         {summary && <p className="mt-2 line-clamp-2 text-[1.02rem] leading-relaxed text-muted">{summary}</p>}
         {isCourse && hasCounts && (
