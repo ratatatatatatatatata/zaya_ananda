@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useRef, type MutableRefObject } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, type MutableRefObject } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 /** "THE JOURNEY INTO ANANDA" — процедурт бүтээсэн 3D ертөнцүүд.
@@ -103,43 +103,218 @@ function GoldRing({ r = 1.6, tilt = 0.5, speed = 0.12, y = 0 }: { r?: number; ti
   );
 }
 
+/** Орчны гэрэлтүүлгийн зураглал (PMREM) — метал, шил, чулууны гадаргууг бодитой болгоно. */
+function EnvLight({ sky = "#2f6b64", horizon = "#123430", ground = "#050c0d" }: { sky?: string; horizon?: string; ground?: string }) {
+  const gl = useThree((s) => s.gl);
+  const scene = useThree((s) => s.scene);
+  useEffect(() => {
+    const c = document.createElement("canvas");
+    c.width = 32; c.height = 128;
+    const ctx = c.getContext("2d");
+    if (!ctx) return;
+    const g = ctx.createLinearGradient(0, 0, 0, 128);
+    g.addColorStop(0, sky); g.addColorStop(0.52, horizon); g.addColorStop(1, ground);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 32, 128);
+    const tex = new THREE.CanvasTexture(c);
+    tex.mapping = THREE.EquirectangularReflectionMapping;
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const pmrem = new THREE.PMREMGenerator(gl);
+    const rt = pmrem.fromEquirectangular(tex);
+    scene.environment = rt.texture;
+    tex.dispose(); pmrem.dispose();
+    return () => { scene.environment = null; rt.dispose(); };
+  }, [gl, scene, sky, horizon, ground]);
+  return null;
+}
+
+/** Радиаль градиент бүхий зөөлөн текстур — контакт сүүдэр/гэрэлтэлтэд. */
+function useRadialTexture(inner: string, outer: string) {
+  return useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 128;
+    const ctx = c.getContext("2d");
+    if (!ctx) return null;
+    const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    g.addColorStop(0, inner); g.addColorStop(1, outer);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 128, 128);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }, [inner, outer]);
+}
+
+/** Бодит контакт сүүдэр — объектын өндөр, хэмжээнд тохирсон зөөлөн зуйван сүүдэр. */
+function ContactShadow({ y = -0.62, scale = 1.9, opacity = 0.55, follow }: { y?: number; scale?: number; opacity?: number; follow?: MutableRefObject<THREE.Mesh | null> }) {
+  const tex = useRadialTexture("rgba(0,0,0,0.85)", "rgba(0,0,0,0)");
+  const ref = useRef<THREE.Mesh>(null);
+  useFrame(() => {
+    if (!ref.current || !follow?.current) return;
+    // Объект дээшлэх тусам сүүдэр бүдгэрч томорно
+    const h = follow.current.position.y;
+    const k = THREE.MathUtils.clamp(1 - (h - 0.55) * 0.55, 0.45, 1.15);
+    ref.current.scale.setScalar(scale * (2 - k));
+    (ref.current.material as THREE.MeshBasicMaterial).opacity = opacity * k;
+  });
+  if (!tex) return null;
+  return (
+    <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, y, 0]} scale={scale} renderOrder={-1}>
+      <planeGeometry args={[2, 2]} />
+      <meshBasicMaterial map={tex} transparent opacity={opacity} depthWrite={false} />
+    </mesh>
+  );
+}
+
+/** Зөөлөн гэрлийн бүрхүүл (bloom-ийн хямд хувилбар) */
+function Glow({ position = [0, 0, 0] as [number, number, number], scale = 3, color = "rgba(124,220,210,0.55)" }) {
+  const tex = useRadialTexture(color, "rgba(0,0,0,0)");
+  if (!tex) return null;
+  return (
+    <sprite position={position} scale={[scale, scale, 1]}>
+      <spriteMaterial map={tex} transparent depthWrite={false} blending={THREE.AdditiveBlending} opacity={0.75} />
+    </sprite>
+  );
+}
+
+/** Гараар барьсан мэт камерын нарийн хэлбэлзэл — механик биш, амьд мэдрэмж өгнө. */
+function handheld(t: number, amp = 1) {
+  return {
+    x: (Math.sin(t * 0.31) * 0.6 + Math.sin(t * 0.73 + 1.2) * 0.28 + Math.sin(t * 1.51 + 2.6) * 0.09) * 0.14 * amp,
+    y: (Math.sin(t * 0.27 + 0.8) * 0.5 + Math.sin(t * 0.91 + 2.1) * 0.2) * 0.1 * amp,
+  };
+}
+
 /* ---------- 1. CRYSTAL — Үйлчилгээ: ойн сүмийн болор ---------- */
 function CrystalWorld({ progress }: { progress: P }) {
   const crystal = useRef<THREE.Mesh>(null);
-  const wire = useRef<THREE.Mesh>(null);
+  const edges = useRef<THREE.LineSegments>(null);
+  const shards = useRef<THREE.Group>(null);
+  const key = useRef<THREE.SpotLight>(null);
+
+  // Хагарлын хэлтэрхийнүүд — болор задрахад тарж, эргэлдэнэ
+  const shardData = useMemo(
+    () => Array.from({ length: 18 }, () => ({
+      dir: new THREE.Vector3(Math.random() - 0.5, Math.random() * 0.7 - 0.15, Math.random() - 0.5).normalize(),
+      rot: new THREE.Vector3(Math.random(), Math.random(), Math.random()).multiplyScalar(1.4),
+      size: 0.05 + Math.random() * 0.1,
+    })),
+    []
+  );
+
   useFrame(({ clock, camera }) => {
     const t = clock.elapsedTime;
     const p = ease(progress.current);
-    camera.position.set(Math.sin(t * 0.05) * 0.4, lerp(1.3, 0.5, p), lerp(8.5, 3.4, p));
-    camera.lookAt(0, 0.4, 0);
-    const shatter = Math.max(0, (progress.current - 0.62) / 0.38);
-    const s = (1 + Math.sin(t * 1.1) * 0.03) * (1 - ease(shatter));
-    if (crystal.current) { crystal.current.rotation.y = t * 0.25; crystal.current.scale.setScalar(s); }
-    if (wire.current) { wire.current.rotation.y = -t * 0.18; wire.current.scale.setScalar(s * 1.25); }
+    const hh = handheld(t);
+
+    // Камер: гараар барьсан мэт хэлбэлзэлтэй, аажим ойртоно
+    camera.position.set(hh.x + Math.sin(t * 0.05) * 0.25, lerp(1.35, 0.55, p) + hh.y, lerp(8.6, 3.5, p));
+    camera.lookAt(0, 0.55 + hh.y * 0.4, 0);
+
+    const shatter = THREE.MathUtils.clamp((progress.current - 0.6) / 0.4, 0, 1);
+    const sh = ease(shatter);
+    // Амьсгал: нийлмэл давтамжтай — механик биш
+    const breathe = 1 + Math.sin(t * 0.85) * 0.022 + Math.sin(t * 1.9 + 1) * 0.008;
+    const s = breathe * (1 - sh);
+
+    if (crystal.current) {
+      crystal.current.rotation.y = t * 0.16;
+      crystal.current.rotation.x = Math.sin(t * 0.4) * 0.06;      // зөөлөн найгалт
+      crystal.current.rotation.z = Math.sin(t * 0.27 + 1.4) * 0.04;
+      crystal.current.position.y = 0.75 + Math.sin(t * 0.6) * 0.05;
+      crystal.current.scale.setScalar(0.9 * s);
+    }
+    if (edges.current && crystal.current) {
+      edges.current.rotation.copy(crystal.current.rotation);
+      edges.current.position.copy(crystal.current.position);
+      edges.current.scale.setScalar(0.9 * s * 1.001);
+      (edges.current.material as THREE.LineBasicMaterial).opacity = 0.22 * (1 - sh);
+    }
+    // Хэлтэрхийнүүд задарч тарна
+    if (shards.current) {
+      shards.current.visible = sh > 0.001;
+      shards.current.children.forEach((c, i) => {
+        const d = shardData[i];
+        const dist = sh * (1.4 + i * 0.06);
+        c.position.set(d.dir.x * dist, 0.75 + d.dir.y * dist, d.dir.z * dist);
+        c.rotation.set(t * d.rot.x, t * d.rot.y, t * d.rot.z);
+        c.scale.setScalar(d.size * (1 - sh * 0.35));
+        ((c as THREE.Mesh).material as THREE.MeshStandardMaterial).opacity = 1 - sh * 0.8;
+      });
+    }
+    // Гол гэрэл болор дээр анивчиж, задрахад бүдгэрнэ
+    if (key.current) key.current.intensity = (46 + Math.sin(t * 1.3) * 5) * (1 - sh * 0.55);
   });
+
   return (
     <>
-      <fog attach="fog" args={["#0c1f22", 5, 15]} />
-      <ambientLight intensity={0.35} color="#9adfd6" />
-      <pointLight position={[3, 4, 3]} intensity={26} color="#2BC8BB" />
-      <pointLight position={[-4, 2, -2]} intensity={14} color="#E3BE62" />
-      <pointLight position={[0, -2, 3]} intensity={7} color="#5E8DE0" />
-      {/* Болор */}
-      <mesh ref={crystal} position={[0, 0.7, 0]}>
-        <icosahedronGeometry args={[0.9, 0]} />
-        <meshStandardMaterial color="#134e4a" emissive="#2BC8BB" emissiveIntensity={0.55} metalness={0.35} roughness={0.12} transparent opacity={0.92} />
+      <fog attach="fog" args={["#08181b", 4.5, 16]} />
+      <EnvLight sky="#2b6d66" horizon="#0e3330" ground="#04090a" />
+      <ambientLight intensity={0.22} color="#9adfd6" />
+      {/* Гол гэрэл — дээрээс, зөөлөн ирмэгтэй (сарны туяа мод дундуур) */}
+      <spotLight ref={key} position={[2.2, 6, 2.6]} angle={0.42} penumbra={0.85} intensity={46} color="#CFEFE8" />
+      {/* Ирмэгийн гэрэл — контурыг ялгаруулна */}
+      <pointLight position={[-4, 1.6, -2.4]} intensity={16} color="#E3BE62" />
+      <pointLight position={[3.4, 0.4, -3]} intensity={9} color="#5E8DE0" />
+      <pointLight position={[0, -1.4, 2.6]} intensity={5} color="#2BC8BB" />
+
+      {/* Болор — жинхэнэ шилэн материал: гэрэл нэвтэрч, хугарна */}
+      <mesh ref={crystal} position={[0, 0.75, 0]}>
+        <icosahedronGeometry args={[1, 0]} />
+        <meshPhysicalMaterial
+          color="#cdeeea"
+          transmission={0.92}
+          thickness={1.35}
+          ior={1.72}
+          roughness={0.08}
+          metalness={0}
+          clearcoat={1}
+          clearcoatRoughness={0.12}
+          iridescence={0.35}
+          iridescenceIOR={1.4}
+          attenuationColor={new THREE.Color("#1f7f78")}
+          attenuationDistance={1.1}
+          envMapIntensity={1.3}
+          transparent
+        />
       </mesh>
-      <mesh ref={wire} position={[0, 0.7, 0]}>
-        <icosahedronGeometry args={[0.9, 1]} />
-        <meshBasicMaterial color="#7CDCD2" wireframe transparent opacity={0.16} />
+      {/* Талстын ирмэг — маш нарийн шугам (торон бүрхүүлийн оронд) */}
+      <lineSegments ref={edges} position={[0, 0.75, 0]}>
+        <edgesGeometry args={[new THREE.IcosahedronGeometry(1, 0)]} />
+        <lineBasicMaterial color="#a8ede6" transparent opacity={0.22} />
+      </lineSegments>
+
+      {/* Задарсан хэлтэрхийнүүд */}
+      <group ref={shards} visible={false}>
+        {shardData.map((d, i) => (
+          <mesh key={i}>
+            <tetrahedronGeometry args={[1, 0]} />
+            <meshPhysicalMaterial color="#bfe9e4" transmission={0.75} thickness={0.5} ior={1.6} roughness={0.15} transparent envMapIntensity={1.2} />
+          </mesh>
+        ))}
+      </group>
+
+      <Glow position={[0, 0.75, -0.4]} scale={4.2} color="rgba(80,210,196,0.42)" />
+      <ContactShadow y={-0.6} scale={1.7} opacity={0.6} follow={crystal} />
+
+      {/* Чулуун тавцан — барзгар гадаргуутай, орчны тусгалтай */}
+      <mesh position={[0, -0.92, 0]} receiveShadow>
+        <cylinderGeometry args={[2.15, 2.5, 0.55, 64]} />
+        <meshStandardMaterial color="#16302c" roughness={0.94} metalness={0.05} envMapIntensity={0.6} />
       </mesh>
-      {/* Чулуун тавцан */}
-      <mesh position={[0, -0.9, 0]}>
-        <cylinderGeometry args={[2.2, 2.6, 0.5, 48]} />
-        <meshStandardMaterial color="#0f2422" metalness={0.2} roughness={0.85} />
+      {/* Тавцангийн ирмэгийн зөөлөн гялбаа */}
+      <mesh position={[0, -0.64, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[2.16, 0.02, 8, 96]} />
+        <meshStandardMaterial color="#3d7a72" emissive="#1b4a45" emissiveIntensity={0.5} roughness={0.5} />
       </mesh>
-      <GoldRing r={1.7} tilt={0.45} y={0.7} />
-      <GoldRing r={2.2} tilt={-0.3} speed={-0.08} y={0.7} />
+      {/* Хөвдтэй жижиг чулуунууд — байгалийн эмх замбараагүй байдал */}
+      {[[1.5, -0.55, 0.9], [-1.7, -0.6, 0.4], [0.7, -0.58, -1.6], [-0.9, -0.62, -1.3]].map((pos, i) => (
+        <mesh key={i} position={pos as [number, number, number]} rotation={[i * 0.7, i * 1.3, i * 0.4]}>
+          <dodecahedronGeometry args={[0.15 + (i % 3) * 0.05, 0]} />
+          <meshStandardMaterial color={i % 2 ? "#1d3b33" : "#24463c"} roughness={0.95} envMapIntensity={0.5} />
+        </mesh>
+      ))}
+
+      <GoldRing r={1.75} tilt={0.45} y={0.75} />
+      <GoldRing r={2.25} tilt={-0.3} speed={-0.08} y={0.75} />
       <Particles burst progress={progress} />
       <EnergyOrb progress={progress} path={[1.6, 2.2, 1, 0, 1.9, 1.6]} />
     </>
@@ -173,7 +348,8 @@ function LibraryWorld({ progress }: { progress: P }) {
   return (
     <>
       <fog attach="fog" args={["#0c1430", 6, 16]} />
-      <ambientLight intensity={0.3} color="#8fb2e8" />
+      <EnvLight sky="#2c4a80" horizon="#111c3a" ground="#050815" />
+      <ambientLight intensity={0.24} color="#8fb2e8" />
       <pointLight position={[0, 5, 2]} intensity={22} color="#5E8DE0" />
       <pointLight position={[-3, -1, 3]} intensity={10} color="#2BC8BB" />
       {/* Төв гэрлийн багана */}
@@ -210,22 +386,25 @@ function GalleryWorld({ progress }: { progress: P }) {
   useFrame(({ clock, camera }) => {
     const t = clock.elapsedTime;
     const p = ease(progress.current);
-    camera.position.set(Math.sin(t * 0.05) * 0.6, lerp(1.6, 0.9, p), lerp(7.5, 3.6, p));
-    camera.lookAt(0, 0.5, 0);
+    const hh = handheld(t, 0.8);
+    camera.position.set(hh.x + Math.sin(t * 0.05) * 0.4, lerp(1.6, 0.9, p) + hh.y, lerp(7.5, 3.6, p));
+    camera.lookAt(0, 0.5 + hh.y * 0.3, 0);
     if (stone.current) { stone.current.rotation.y = t * 0.3; stone.current.rotation.x = Math.sin(t * 0.4) * 0.1; }
     if (orbit.current) orbit.current.rotation.y = t * 0.12;
   });
   return (
     <>
       <fog attach="fog" args={["#0a1a16", 5, 14]} />
-      <ambientLight intensity={0.3} color="#cfe8dd" />
-      <spotLight position={[0, 6, 2]} angle={0.5} penumbra={0.7} intensity={60} color="#F0E4C2" />
+      <EnvLight sky="#3a6f66" horizon="#0f2a26" ground="#050b0a" />
+      <ambientLight intensity={0.2} color="#cfe8dd" />
+      <spotLight position={[0, 6, 2]} angle={0.5} penumbra={0.85} intensity={60} color="#F0E4C2" />
       <pointLight position={[-4, 1.5, 2]} intensity={10} color="#2BC8BB" />
       {/* Гялгар шал */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.15, 0]}>
         <planeGeometry args={[26, 26]} />
-        <meshStandardMaterial color="#0c1d1a" metalness={0.85} roughness={0.35} />
+        <meshStandardMaterial color="#0c1d1a" metalness={0.9} roughness={0.22} envMapIntensity={1.1} />
       </mesh>
+      <ContactShadow y={-1.13} scale={1.9} opacity={0.5} follow={stone} />
       {/* Тавцан + гол чулуу */}
       <mesh position={[0, -0.7, 0]}>
         <cylinderGeometry args={[1.1, 1.3, 0.9, 36]} />
@@ -233,8 +412,9 @@ function GalleryWorld({ progress }: { progress: P }) {
       </mesh>
       <mesh ref={stone} position={[0, 0.6, 0]}>
         <dodecahedronGeometry args={[0.75, 0]} />
-        <meshStandardMaterial color="#1d4440" emissive="#2BC8BB" emissiveIntensity={0.35} metalness={0.5} roughness={0.25} />
+        <meshPhysicalMaterial color="#2a5f59" roughness={0.28} metalness={0.25} clearcoat={0.9} clearcoatRoughness={0.2} envMapIntensity={1.4} />
       </mesh>
+      <Glow position={[0, 0.6, -0.3]} scale={3} color="rgba(80,210,196,0.3)" />
       {/* Тойрон хөвөх жижиг чулуунууд */}
       <group ref={orbit}>
         {[0, 1, 2, 3, 4].map((i) => (
@@ -320,7 +500,8 @@ function SanctuaryWorld({ progress }: { progress: P }) {
   return (
     <>
       <fog attach="fog" args={["#0d1f26", 4, 16]} />
-      <ambientLight intensity={0.3} color="#bfe3da" />
+      <EnvLight sky="#4a7a6c" horizon="#153029" ground="#060c0c" />
+      <ambientLight intensity={0.24} color="#bfe3da" />
       <pointLight position={[0, 3, -16]} intensity={40} color="#F0B27A" /> {/* алсын нар мандалт */}
       <pointLight position={[2, 3, 0]} intensity={10} color="#2BC8BB" />
       {/* Газар */}
@@ -367,7 +548,8 @@ function ChamberWorld({ progress }: { progress: P }) {
   return (
     <>
       <fog attach="fog" args={["#101a2e", 4, 12]} />
-      <ambientLight intensity={0.35} color="#a8cfe0" />
+      <EnvLight sky="#33566e" horizon="#132335" ground="#05090f" />
+      <ambientLight intensity={0.28} color="#a8cfe0" />
       <pointLight position={[2.5, 3, 2]} intensity={16} color="#2BC8BB" />
       <pointLight position={[-3, 1, -2]} intensity={8} color="#9B6EF0" />
       {/* Хүний хийсвэр дүрс */}
@@ -422,7 +604,8 @@ function PathWorld({ progress }: { progress: P }) {
   return (
     <>
       <fog attach="fog" args={["#0d1530", 4, 15]} />
-      <ambientLight intensity={0.32} color="#a6bde8" />
+      <EnvLight sky="#31508a" horizon="#131d3c" ground="#050815" />
+      <ambientLight intensity={0.26} color="#a6bde8" />
       <pointLight position={[0, 4, -6]} intensity={20} color="#5E8DE0" />
       <pointLight position={[0, 2, -16]} intensity={30} color="#E3BE62" />
       {/* Модулийн арлууд */}
@@ -474,12 +657,13 @@ function PedestalWorld({ progress }: { progress: P }) {
   return (
     <>
       <fog attach="fog" args={["#0b1a17", 4, 11]} />
-      <ambientLight intensity={0.32} color="#d8eadf" />
-      <spotLight position={[0, 5, 1]} angle={0.45} penumbra={0.8} intensity={55} color="#F0E4C2" />
+      <EnvLight sky="#43705f" horizon="#12302a" ground="#050b0a" />
+      <ambientLight intensity={0.22} color="#d8eadf" />
+      <spotLight position={[0, 5, 1]} angle={0.45} penumbra={0.9} intensity={55} color="#F0E4C2" />
       <pointLight position={[-2.5, 1, 2]} intensity={8} color="#2BC8BB" />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.85, 0]}>
         <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial color="#0c1c18" metalness={0.8} roughness={0.4} />
+        <meshStandardMaterial color="#0c1c18" metalness={0.9} roughness={0.25} envMapIntensity={1.1} />
       </mesh>
       <mesh position={[0, -0.35, 0]}>
         <cylinderGeometry args={[0.9, 1.05, 0.85, 32]} />
@@ -488,8 +672,10 @@ function PedestalWorld({ progress }: { progress: P }) {
       {/* Алтан дөл мэт эрдэнэ */}
       <mesh ref={gem}>
         <icosahedronGeometry args={[0.5, 0]} />
-        <meshStandardMaterial color="#7a5a18" emissive="#E3BE62" emissiveIntensity={0.7} metalness={0.7} roughness={0.2} />
+        <meshPhysicalMaterial color="#E7C778" metalness={1} roughness={0.18} clearcoat={0.8} envMapIntensity={1.6} />
       </mesh>
+      <Glow position={[0, 0.9, -0.3]} scale={2.6} color="rgba(227,190,98,0.4)" />
+      <ContactShadow y={-0.83} scale={1.15} opacity={0.55} follow={gem} />
       {/* Ач тусын бэлгэдлүүд тойрно */}
       <group ref={orbit}>
         {[0, 1, 2, 3, 4].map((i) => (
@@ -523,7 +709,8 @@ function ArchiveWorld({ progress }: { progress: P }) {
   return (
     <>
       <fog attach="fog" args={["#0e1826", 3.5, 14]} />
-      <ambientLight intensity={0.3} color="#bcd2e8" />
+      <EnvLight sky="#3a5170" horizon="#141f2e" ground="#05080d" />
+      <ambientLight intensity={0.24} color="#bcd2e8" />
       <pointLight position={[0, 4, -4]} intensity={18} color="#E3BE62" />
       <pointLight position={[0, 2, -12]} intensity={16} color="#5E8DE0" />
       {/* Гэрлийн багана — тоос харагдана */}
@@ -566,7 +753,8 @@ function MandalaWorld({ progress }: { progress: P }) {
   return (
     <>
       <fog attach="fog" args={["#0e1c26", 4, 12]} />
-      <ambientLight intensity={0.4} color="#cfe6df" />
+      <EnvLight sky="#3d6e66" horizon="#122a2c" ground="#050b0c" />
+      <ambientLight intensity={0.3} color="#cfe6df" />
       <pointLight position={[0, 3, 2]} intensity={14} color="#2BC8BB" />
       <pointLight position={[-2, 1, -2]} intensity={6} color="#E3BE62" />
       {/* Дэлбээнүүд */}
@@ -617,6 +805,11 @@ export default function Worlds({ world, progress }: { world: WorldKind; progress
     <Canvas
       dpr={[1, 1.5]}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+      onCreated={({ gl }) => {
+        gl.toneMapping = THREE.ACESFilmicToneMapping;   // кино маягийн өнгөний хувиргалт
+        gl.toneMappingExposure = 1.15;
+        gl.outputColorSpace = THREE.SRGBColorSpace;
+      }}
       camera={{ fov: 45, position: [0, 1, 8] }}
       style={{ position: "absolute", inset: 0 }}
     >
