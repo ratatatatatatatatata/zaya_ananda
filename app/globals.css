@@ -138,3 +138,28 @@ body {
 /* Бүтээгдэхүүний тайзны шилжилтүүд */
 @keyframes zaStageIn { from { opacity: 0; transform: translateZ(-60px) scale(1.06); } to { opacity: 1; transform: translateZ(0) scale(1); } }
 @keyframes zaStageOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.94) translateY(8px); } }
+
+/* Хүртээмж — гарын товчоор шилжихэд ил тод фокус (WCAG 2.4.7) */
+@layer components {
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111B36];
+  }
+  /* Хүрэлцэх талбай ≥ 44×44px (WCAG 2.5.5 / Apple HIG) */
+  .tap-target { min-width: 44px; min-height: 44px; }
+}
+
+/* Дотоод хуудсуудын тансаг гадаргуу — UI/UX Pro Max "Modern Dark" шалгуурын дагуу:
+   цул саарал хүрээгүй (зөвхөн rgba), цэвэр хараас зайлсхийсэн, дээд ирмэгийн гэрэлтэй,
+   Bezier(0.16,1,0.3,1) зөөлрөлттэй. Нүүр хуудсанд ашиглагддаггүй. */
+@layer components {
+  .card-lux {
+    @apply relative rounded-3xl border shadow-card;
+    border-color: rgba(255, 255, 255, 0.08);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0) 42%), linear-gradient(180deg, #1c2942 0%, #182338 100%);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+  }
+  .card-lux:hover { border-color: rgba(124, 220, 210, 0.28); box-shadow: 0 24px 60px -28px rgba(43, 200, 187, 0.45); }
+  .card-lux-gold { border-color: rgba(227, 190, 98, 0.24); }
+  .card-lux-gold:hover { border-color: rgba(227, 190, 98, 0.5); box-shadow: 0 24px 60px -28px rgba(227, 190, 98, 0.4); }
+}
+@layer utilities { .ease-lux { transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1); } }

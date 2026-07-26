@@ -9,3 +9,6 @@ install.done
 /data/db.json
 .DS_Store
 .vercel
+
+# UI/UX Pro Max skill database (local design intelligence)
+.claude/skills/

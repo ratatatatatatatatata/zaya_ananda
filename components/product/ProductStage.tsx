@@ -102,12 +102,12 @@ export function ProductStage({ images, alt = "" }: { images: string[]; alt?: str
         <div aria-hidden className="pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem]" style={{ background: "radial-gradient(70% 65% at 50% 42%, rgba(43,200,187,0.10), transparent 70%)" }} />
 
         {/* Зураг — гүнтэй шилжилт */}
-        <div ref={imgWrap} className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-[#101d2e] transition-transform duration-300 ease-out will-change-transform" style={{ transformStyle: "preserve-3d" }} data-stage-img>
+        <div ref={imgWrap} className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-surface-4 transition-transform duration-300 ease-out will-change-transform" style={{ transformStyle: "preserve-3d" }} data-stage-img>
           {prev !== null && !failed[prev] && (
             <img key={"p" + prev} src={images[prev]} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" style={{ animation: "zaStageOut 0.6s ease forwards" }} />
           )}
           {failed[active] ? (
-            <div className="grid h-full w-full place-items-center bg-gradient-to-br from-[#14283a] to-[#0f1d2c] text-center">
+            <div className="grid h-full w-full place-items-center bg-gradient-to-br from-surface-1 to-surface-4 text-center">
               <div>
                 <p className="text-4xl">🛍</p>
                 <p className="mt-2 text-sm text-muted">Зураг ачаалагдсангүй</p>
@@ -130,8 +130,8 @@ export function ProductStage({ images, alt = "" }: { images: string[]; alt?: str
           <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/55 px-3 py-1.5 text-sm font-semibold text-white opacity-0 shadow transition group-hover:opacity-100">🔍 Томруулж харах</span>
           {images.length > 1 && (
             <>
-              <button type="button" aria-label="Өмнөх зураг" onClick={() => go(-1)} className="absolute left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/40 text-lg text-white opacity-0 backdrop-blur transition hover:bg-black/60 focus-visible:opacity-100 group-hover:opacity-100">‹</button>
-              <button type="button" aria-label="Дараах зураг" onClick={() => go(1)} className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-black/40 text-lg text-white opacity-0 backdrop-blur transition hover:bg-black/60 focus-visible:opacity-100 group-hover:opacity-100">›</button>
+              <button type="button" aria-label="Өмнөх зураг" onClick={() => go(-1)} className="focus-ring tap-target absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-black/45 text-lg text-white backdrop-blur transition hover:bg-black/65 md:opacity-0 md:focus-visible:opacity-100 md:group-hover:opacity-100">‹</button>
+              <button type="button" aria-label="Дараах зураг" onClick={() => go(1)} className="focus-ring tap-target absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-black/45 text-lg text-white backdrop-blur transition hover:bg-black/65 md:opacity-0 md:focus-visible:opacity-100 md:group-hover:opacity-100">›</button>
             </>
           )}
         </div>
@@ -152,7 +152,7 @@ export function ProductStage({ images, alt = "" }: { images: string[]; alt?: str
         <div className="mt-5 flex gap-3 overflow-x-auto pb-1">
           {images.map((img, i) => (
             <button key={i} type="button" onClick={() => pick(i)} aria-label={`Зураг ${i + 1}`}
-              className={cx("h-20 w-28 shrink-0 overflow-hidden rounded-xl border-2 transition", i === active ? "border-primary-500 shadow-glow" : "border-transparent opacity-70 hover:opacity-100")}>
+              aria-current={i === active} className={cx("focus-ring h-20 w-28 shrink-0 overflow-hidden rounded-xl border-2 transition", i === active ? "border-primary-500 shadow-glow" : "border-line/60 opacity-70 hover:opacity-100")}>
               <img src={img} alt="" className="h-full w-full object-cover" />
             </button>
           ))}
@@ -162,11 +162,11 @@ export function ProductStage({ images, alt = "" }: { images: string[]; alt?: str
       {/* Lightbox */}
       {zoom && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-4" onClick={() => setZoom(false)}>
-          <button type="button" className="absolute right-5 top-5 grid h-11 w-11 place-items-center rounded-full bg-white/15 text-xl text-white hover:bg-white/25" onClick={() => setZoom(false)} aria-label="Хаах">✕</button>
+          <button type="button" className="focus-ring tap-target absolute right-5 top-5 grid h-11 w-11 place-items-center rounded-full bg-white/15 text-xl text-white hover:bg-white/25" onClick={() => setZoom(false)} aria-label="Хаах">✕</button>
           {images.length > 1 && (
             <>
-              <button type="button" className="absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-xl text-white hover:bg-white/25" onClick={(e) => { e.stopPropagation(); go(-1); }} aria-label="Өмнөх">‹</button>
-              <button type="button" className="absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-xl text-white hover:bg-white/25" onClick={(e) => { e.stopPropagation(); go(1); }} aria-label="Дараах">›</button>
+              <button type="button" className="focus-ring tap-target absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-xl text-white hover:bg-white/25" onClick={(e) => { e.stopPropagation(); go(-1); }} aria-label="Өмнөх">‹</button>
+              <button type="button" className="focus-ring tap-target absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-xl text-white hover:bg-white/25" onClick={(e) => { e.stopPropagation(); go(1); }} aria-label="Дараах">›</button>
             </>
           )}
           <img src={src} alt={alt} className="max-h-[92vh] max-w-[95vw] rounded-2xl object-contain" onClick={(e) => e.stopPropagation()} />

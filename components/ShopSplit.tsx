@@ -8,21 +8,23 @@ export function ShopSplit({ products, stones }: { products: ReactNode; stones: R
   const [tab, setTab] = useState<"products" | "stones">("products");
   const btn = (active: boolean) =>
     cx(
-      "flex-1 rounded-2xl px-5 py-3.5 font-display text-base font-semibold transition sm:text-lg",
+      "focus-ring flex-1 rounded-2xl px-5 py-3.5 font-display text-base font-semibold transition sm:text-lg",
       active
         ? "bg-primary-grad text-white shadow-[0_0_30px_-8px_rgba(76,200,189,0.55)]"
         : "text-muted hover:text-ink"
     );
   return (
     <div>
-      <div className="mx-auto mb-10 flex max-w-2xl gap-1.5 rounded-3xl border border-line bg-[#121D33] p-1.5">
-        <button type="button" className={btn(tab === "products")} onClick={() => setTab("products")}>
+      <div role="tablist" aria-label="Дэлгүүрийн хэсгүүд" className="mx-auto mb-10 flex max-w-2xl gap-1.5 rounded-3xl border border-line bg-surface-3 p-1.5">
+        <button type="button" role="tab" aria-selected={tab === "products"} className={btn(tab === "products")} onClick={() => setTab("products")}>
           🛍 Бүтээгдэхүүн
         </button>
         <button
           type="button"
+          role="tab"
+          aria-selected={tab === "stones"}
           className={cx(
-            "flex-1 rounded-2xl px-5 py-3.5 font-display text-base font-semibold transition sm:text-lg",
+            "focus-ring flex-1 rounded-2xl px-5 py-3.5 font-display text-base font-semibold transition sm:text-lg",
             tab === "stones"
               ? "text-[#1B1B2E] shadow-[0_0_30px_-8px_rgba(227,190,98,0.6)]"
               : "text-muted hover:text-ink"

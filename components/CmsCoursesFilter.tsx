@@ -25,12 +25,12 @@ export function CmsCoursesFilter({ items }: { items: CmsItem[] }) {
     <div>
       <div className="mx-auto mb-6 flex w-full max-w-md rounded-full border border-line bg-white/5 p-1 shadow-sm">
         {TABS.map((tb) => (
-          <button key={tb.k} onClick={() => setMode(tb.k)} className={cx("flex-1 rounded-full px-5 py-3 text-[1.02rem] font-semibold transition", mode === tb.k ? "bg-primary-grad text-white shadow-soft" : "text-ink/70 hover:text-primary-700")}>{tb.l}</button>
+          <button key={tb.k} onClick={() => setMode(tb.k)} className={cx("focus-ring flex-1 rounded-full px-5 py-3 text-[1.02rem] font-semibold transition", mode === tb.k ? "bg-primary-grad text-white shadow-soft" : "text-ink/70 hover:text-primary-700")}>{tb.l}</button>
         ))}
       </div>
       <div className="mb-8 flex flex-wrap justify-center gap-2">
         {["Бүгд", ...COURSE_CATS].map((c) => (
-          <button key={c} onClick={() => setCat(c)} className={cx("rounded-full px-5 py-2 text-sm font-semibold transition", cat === c ? "bg-primary-grad text-white shadow-glow" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
+          <button key={c} onClick={() => setCat(c)} className={cx("focus-ring rounded-full px-5 py-2 text-sm font-semibold transition", cat === c ? "bg-primary-grad text-white shadow-glow" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
             {c === "Бүгд" ? tr(ALL) : catLabel(c, lang)}
           </button>
         ))}
