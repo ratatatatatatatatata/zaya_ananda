@@ -105,7 +105,8 @@ export function Journey3D({
   const isWebgl = mode === "webgl";
 
   return (
-    <section ref={wrap} className="relative" style={{ height: isWebgl ? `${heightVh}vh` : undefined }}>
+    // .night — гүн кино хэсэг: доторх токен ашигласан товч/хүрээ/текст гүн өнгө рүү шилжинэ
+    <section ref={wrap} className="night relative" style={{ height: isWebgl ? `${heightVh}vh` : undefined }}>
       <div className={isWebgl ? "sticky top-0 h-screen overflow-hidden" : "relative overflow-hidden"} style={{ background: "radial-gradient(80% 90% at 50% 10%, #10322f 0%, #0b1626 55%, #070d18 100%)" }}>
         {/* Дүрслэл */}
         {isWebgl && near && <Worlds world={world} progress={progress} />}

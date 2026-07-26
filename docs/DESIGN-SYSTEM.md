@@ -1,34 +1,90 @@
 # Zaya's Ananda — Design System
 
+> **Энэ баримт бол кодын үнэн эх сурвалж.** Өнгө нэмэх/өөрчлөх бол эхлээд
+> `app/tokens.css`-ийг засна — `tailwind.config.ts` нь зөвхөн тэр хувьсагчид рүү
+> заадаг. Компонент дотор түүхий hex (`bg-[#1A2742]`) бичихийг хориглоно.
+
 ## Brand
-Calm, clean energy, trust, wisdom, inner balance, professional education. Light & premium — never dark-mystical, neon or cluttered.
+
+Calm, clean energy, trust, wisdom, inner balance, professional education.
+**Гэрэлтэй, тансаг** — агуулгын хуудсууд цайван; **гүн кино мөчүүд** нь зориуд
+тусгаарлагдсан (hero, 3D аялал, хуудасны толгой).
+
+## Хоёр хүрээ / Two scopes
+
+| Scope | Хаана | Хэрхэн |
+|---|---|---|
+| `:root` (light) | Бүх агуулгын хуудас — үйлчилгээ, сургалт, дэлгүүр, тухай, сагс, админ | Өгөгдмөл |
+| `.night` (dark) | `PageHeader`, `Journey3D`, `AnandaCinematic`, Сүнслэг аяллын карт | Тухайн section дээр `night` класс нэмнэ |
+
+`.night` дотор орсон бүх токен (`bg-surface-1`, `text-ink`, `border-line`,
+`text-primary-700` …) автоматаар гүн хувилбар руу шилжинэ. Тиймээс компонентод
+theme-aware класс бичих шаардлагагүй.
+
+```tsx
+<section className="night relative overflow-hidden bg-[#131D3B]">
+  <p className="text-muted">…</p>   {/* .night дотор цайвар саарал болно */}
+</section>
+```
 
 ## Colors
-- Primary turquoise/teal: `#16AFA4` (scale `primary.50–900`), from the circular logo
-- Deep teal: `#0C5C57` (`deep`)
-- Muted gold accent: `#B8912F` (`accent`)
-- Charcoal blue-green text: `#15302C` (`ink`); muted `#5C726E`
-- Surfaces: white `#FFFFFF`, warm ivory `#FAF6EC` (`cream`), light aqua `#EFFAF8` (`aqua`)
-- Borders/lines: `#E2EEEB` (`line`)
-- Success / in-stock: `#1B9E86` (`jade`)
-- Backgrounds: clean white with subtle aqua radial gradients (`bg-aurora`, body tint)
+
+Бүх өнгө `app/tokens.css` дотор **RGB channel triplet** хэлбэрээр — ингэснээр
+Tailwind-ийн тунгалаг байдлын модификатор (`bg-primary-500/15`) ажиллана.
+
+- Primary turquoise: `#16AFA4` (лого) — `primary.50–900`
+- Accent gold: `#846821` текстэд, `#E3C26B → #C9A03A` градиентэд
+- Jade (success): `#14806C`
+- Ink `#15302C`, muted `#5C726E`, line `#E2EEEB`
+- Surfaces: `surface.1` цагаан → `surface.5` хамгийн гүн цайвар; хуудасны дэвсгэр warm ivory `#FAF7F0`
+- Decorative (хоёр сэдэвт ижил): `blue`, `grape`, `lavender`, `blush`
+
+### Хүртээмжийн дүрэм (WCAG 2.1 AA)
+
+Эдгээрийг **зөрчиж болохгүй** — `node contrast.js` шалгана:
+
+- Жижиг текст ≥ **4.5:1**, том текст (≥24px, эсвэл ≥18.66px bold) ≥ **3:1**
+- `primary.600/700/800` нь цайвар дэвсгэр дээр текстэд аюулгүй (4.73 / 5.63 / 8.56)
+- `primary.300/400/500` бол **текстийн өнгө биш** — зөвхөн хүрээ, дүрс, дэвсгэр
+- Товчны градиент цагаан текстээ давуулна: `--grad-primary` хамгийн цайвар цэг = 5.06:1
+- Алтан товч (`btn-gold`) нь **гүн бэхэн текстээр** (7.13:1), цагаанаар биш
+- Зураг дээрх шошго: `bg-[#15302C]/80` (хамгийн муу тохиолдолд 7.48:1)
 
 ## Typography
-- Display (titles): **Playfair Display** serif — supports Cyrillic
-- Body / UI: **Manrope** sans — supports Cyrillic
-- CJK fallback: Noto Sans/Serif KR·JP·SC (for the 5-language system mn/en/ko/ja/zh)
+
+- Display: **Lora** — кирилл бүрэн дэмждэг
+- Body / UI: **Manrope** — кирилл бүрэн дэмждэг
+- CJK fallback: Noto Sans/Serif KR·JP·SC (mn/en/ko/ja/zh)
+- ⚠️ **Instrument Serif-д кирилл үсэг байхгүй.** `.font-instrument` нь одоо Lora руу
+  заадаг — монгол гарчигт Instrument Serif ашиглавал fallback болж, харагдац эвдэрнэ.
+- Фонт нь `public/fonts`-оос өөрсдийн сервер дээрээс ачаалагдана (`app/fonts.css`).
+  Google Fonts руу гуравдагч талын render-blocking хүсэлт **байхгүй**.
 
 ## Radius & elevation
-- Cards: `rounded-3xl` (≈24px) / panels `rounded-4xl`–`rounded-5xl`
-- Shadows: `shadow-card`, `shadow-soft`, `shadow-lift` (teal-tinted, soft)
+
+- Cards `rounded-3xl` (24px), panels `rounded-4xl`–`rounded-5xl`
+- Shadows: `shadow-card`, `shadow-soft`, `shadow-lift` — `--shadow-tint`-ээр өнгөрдөг
+  тул `.night` дотор автоматаар гүнзгийрнэ
 
 ## Components
-- Buttons: `.btn` + `.btn-primary` (teal gradient), `.btn-gold`, `.btn-outline`, `.btn-ghost`; sizes sm/md/lg, pill-shaped
-- Cards `.card`, chips `.chip`, eyebrow `.eyebrow`, inputs `.input`/`.textarea`, `.field-label`
-- Decorative: `EnergyWaves` (soft concentric ripples, flowing lines, light particles), `MeditationFigure` (elegant lotus silhouette), `Logo` (turquoise circular emblem), line `Icon` set
-- Motion: gentle — `fadeUp`, `floaty`, `ripple`, `drift`; reduced, calm
+
+- Buttons `.btn` + `.btn-primary` / `.btn-gold` / `.btn-magic` / `.btn-outline` / `.btn-ghost`,
+  хэмжээ sm/md/lg, бүгд pill хэлбэртэй, **хамгийн багадаа 44px өндөр** (WCAG 2.5.5)
+- `.card`, `.card-lux`, `.chip`, `.eyebrow`, `.input` / `.textarea`, `.field-label`, `.nav-link`
+- Decorative: `CosmicBackdrop` (зөөлөн аура + оч), `EnergyWaves`, `MeditationFigure`, `Logo`, `Icon`
+- Motion: `fadeUp`, `floaty`, `ripple`, `driftUp` — тайван, багассан хөдөлгөөнийг хүндэтгэнэ
 
 ## Layout & responsive
-- Container max 1240px; section padding `py-16 → py-24`
-- Mobile-first: large readable text, simple checkout, clear single CTA, sticky header with hamburger
-- Accessibility: high contrast charcoal-on-light, large tap targets for older users
+
+- Container max 1240px; section padding `py-14 → py-24`
+- Mobile-first: том уншигдахуйц текст, энгийн төлбөр, тод нэг CTA, наалдамхай толгой
+- Хэвтээ гүйлт хориотой — чимэглэлийн blur-ууд `overflow-hidden` эцэгтэй байх
+- Хүртээмж: өндөр контраст, ахмад хэрэглэгчдэд том хүрэх талбай
+
+## Шалгах / Verify
+
+```bash
+npm run build          # TypeScript + production build
+node contrast.js       # WCAG AA сканнер (бүх хуудсаар)
+node shots.js          # desktop + mobile скриншот, хэвтээ гүйлт илрүүлэлт
+```

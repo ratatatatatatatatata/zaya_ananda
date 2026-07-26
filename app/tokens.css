@@ -1,0 +1,123 @@
+/* ============================================================================
+   Zaya's Ananda — semantic colour tokens
+   ----------------------------------------------------------------------------
+   Every colour is an RGB channel triplet so Tailwind opacity modifiers
+   (bg-primary-500/15, border-line/60 …) keep working.
+
+   :root   = light & premium — the documented brand. Used by all content pages.
+   .night  = dark cinematic scope. Put it on a hero / 3D / immersive section and
+             every token-based child inside it flips to the dark palette.
+
+   Scales run 50 = lightest … 900 = darkest in BOTH themes for surfaces, but for
+   the accent hues each step keeps its *role* (e.g. 700 is always "readable
+   accent text on the current surface") so components never need theme-aware
+   class names.
+   ========================================================================== */
+
+:root {
+  /* page + surfaces */
+  --c-cream: 250 247 240;
+  --c-ivory: 255 255 255;
+  --c-aqua: 239 250 248;
+  --c-s1: 255 255 255;
+  --c-s2: 250 247 240;
+  --c-s3: 243 250 248;
+  --c-s4: 239 246 243;
+  --c-s5: 232 242 239;
+
+  /* text + lines */
+  --c-ink: 21 48 44;
+  --c-muted: 92 114 110;
+  --c-line: 226 238 235;
+
+  /* primary — turquoise from the logo */
+  --c-p50: 234 248 246;
+  --c-p100: 210 241 236;
+  --c-p200: 164 227 220;
+  --c-p300: 95 207 196;
+  --c-p400: 43 200 187;
+  --c-p500: 22 175 164;
+  /* 600/700/800 нь жижиг текстэд ашиглагддаг тул WCAG AA (≥4.5:1) хангана:
+     600 = 4.73:1, 700 = 5.63:1, 800 = 8.56:1 (cream дэвсгэр дээр) */
+  --c-p600: 12 124 116;
+  --c-p700: 11 111 104;
+  --c-p800: 8 81 76;
+  --c-p900: 6 62 58;
+
+  /* accent — muted gold. 300+ нь текстэд хэрэглэгддэг тул уншигдахуйц гүн алт
+     (#846821 = 4.93:1); 50–200 нь зөвхөн дэвсгэр/хүрээнд. */
+  --c-a50: 251 246 232;
+  --c-a100: 245 232 196;
+  --c-a200: 232 208 145;
+  --c-a300: 132 104 33;
+  --c-a400: 122 94 24;
+  --c-a500: 108 83 21;
+  --c-a600: 94 72 18;
+  --c-a700: 78 60 15;
+
+  /* jade — success / availability */
+  --c-j400: 52 187 162;
+  --c-j500: 27 158 134;
+  --c-j600: 20 128 108;
+
+  /* deep teal — dark blocks that stay dark in both themes */
+  --c-d600: 12 92 87;
+  --c-d700: 10 74 70;
+  --c-d800: 8 59 56;
+
+  /* gradients + glows */
+  /* Товчны градиент — цагаан текст WCAG AA давна (хамгийн цайвар цэг нь 5.06:1).
+     Тод #16AFA4 брэндийн өнгө нь хүрээ/дүрс/онцлолд хэвээр үлдэнэ. */
+  --grad-primary: linear-gradient(135deg, #0C7C74 0%, #0A6A63 48%, #084F4A 100%);
+  /* Алтан товч нь гүн бэхэн текстээр (7.13:1) — тансаг, уншигдахуйц */
+  --grad-gold: linear-gradient(135deg, #E3C26B 0%, #C9A03A 100%);
+  --grad-magic: linear-gradient(120deg, #16AFA4 0%, #5E8DE0 38%, #9B6EF0 68%, #F09CBC 100%);
+  --shadow-tint: 16 92 87;
+  --focus-offset: 255 255 255;
+}
+
+.night {
+  --c-cream: 23 35 57;
+  --c-ivory: 20 31 54;
+  --c-aqua: 24 42 64;
+  --c-s1: 26 39 66;
+  --c-s2: 27 32 56;
+  --c-s3: 18 29 51;
+  --c-s4: 16 29 46;
+  --c-s5: 15 23 40;
+
+  --c-ink: 240 247 245;
+  --c-muted: 175 197 196;
+  --c-line: 46 65 96;
+
+  --c-p50: 16 38 44;
+  --c-p100: 20 64 63;
+  --c-p200: 164 233 225;
+  --c-p300: 124 220 210;
+  --c-p400: 54 198 186;
+  --c-p500: 22 175 164;
+  --c-p600: 76 200 189;
+  --c-p700: 124 220 210;
+  --c-p800: 169 234 227;
+  --c-p900: 16 63 60;
+
+  --c-a50: 42 36 18;
+  --c-a100: 61 53 23;
+  --c-a200: 235 211 146;
+  --c-a300: 223 188 94;
+  --c-a400: 227 190 98;
+  --c-a500: 223 188 94;
+  --c-a600: 235 211 146;
+  --c-a700: 245 232 196;
+
+  --c-j400: 52 187 162;
+  --c-j500: 27 158 134;
+  --c-j600: 124 220 210;
+
+  --c-d600: 159 224 218;
+  --c-d700: 185 235 230;
+  --c-d800: 205 242 238;
+
+  --shadow-tint: 4 12 24;
+  --focus-offset: 17 27 54;
+}

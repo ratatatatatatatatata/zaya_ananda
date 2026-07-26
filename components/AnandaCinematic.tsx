@@ -124,7 +124,7 @@ export function AnandaCinematic() {
   const auraO = heroO * 0.6;
 
   return (
-    <section ref={ref} className="relative" style={{ height: mode === "scrub" ? "440vh" : "110vh" }}>
+    <section ref={ref} className="night relative" style={{ height: mode === "scrub" ? "440vh" : "110vh" }}>
       <div className="sticky top-0 h-screen overflow-hidden bg-[#0b1020]">
         {stat ? (
           <img src={POSTER_MED} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "center 42%" }} />

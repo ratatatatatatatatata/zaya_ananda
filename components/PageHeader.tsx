@@ -8,7 +8,7 @@ import { Atmosphere } from "./motion/Atmosphere";
  *  Гэрлийн тоос, ариун геометрийн цагираг, гэрлийн урсгал, зөөлөн орох хөдөлгөөн. */
 export function PageHeader({ title, desc, crumb }: { title: ReactNode; desc?: ReactNode; crumb?: ReactNode }) {
   return (
-    <section className="relative isolate overflow-hidden bg-[#131D3B]">
+    <section className="night relative isolate overflow-hidden bg-[#131D3B]">
       {/* Аура туяанууд — ногоон, ягаан, цэнхэр */}
       <div
         aria-hidden
@@ -68,8 +68,9 @@ export function PageHeader({ title, desc, crumb }: { title: ReactNode; desc?: Re
         {desc && <p className="animate-fade-rise-delay-2 mt-4 max-w-2xl text-lg leading-relaxed text-white/70">{desc}</p>}
       </div>
 
-      {/* Доод зөөлөн шилжилт — дараагийн хэсэг рүү уусна */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-16" style={{ background: "linear-gradient(to bottom, rgba(17,27,54,0), rgba(17,27,54,0.75))" }} />
+      {/* Доод ирмэг — гүн баннераас цайвар хуудас руу цэвэрхэн шилжинэ */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-20" style={{ background: "linear-gradient(to bottom, rgba(19,29,59,0), rgba(19,29,59,0.9))" }} />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-primary-400/25" />
     </section>
   );
 }

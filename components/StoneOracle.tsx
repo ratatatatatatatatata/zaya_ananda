@@ -76,10 +76,10 @@ export function StoneOracle() {
     });
   }, [z, products]);
 
-  const selCls = "rounded-2xl border-2 border-line bg-[#121D33] px-4 py-3 font-display text-base font-semibold text-ink outline-none transition focus:border-accent-400 hover:border-accent-400/60";
+  const selCls = "rounded-2xl border-2 border-line bg-surface-3 px-4 py-3 font-display text-base font-semibold text-ink outline-none transition focus:border-accent-400 hover:border-accent-400/60";
 
   return (
-    <div className="mb-12 overflow-hidden rounded-4xl border border-accent-300/30 bg-[#1B2038]">
+    <div className="mb-12 overflow-hidden rounded-4xl border border-accent-300/30 bg-surface-2">
       <div className="relative p-7 sm:p-9">
         <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full" style={{ background: "radial-gradient(circle, rgba(227,190,98,0.22), transparent 70%)", filter: "blur(8px)" }} />
         <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full" style={{ background: "radial-gradient(circle, rgba(155,110,240,0.18), transparent 70%)", filter: "blur(10px)" }} />
@@ -133,7 +133,7 @@ export function StoneOracle() {
           </div>
 
           {z && (
-            <div className="mt-7 rounded-3xl border border-line bg-[#121D33] p-6">
+            <div className="mt-7 rounded-3xl border border-line bg-surface-3 p-6">
               <div className="flex flex-wrap items-center gap-4">
                 <span className="grid h-16 w-16 place-items-center rounded-full border border-accent-400/40 bg-accent-300/10 text-4xl text-accent-300">{z.symbol}</span>
                 <div>

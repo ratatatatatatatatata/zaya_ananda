@@ -70,7 +70,7 @@ export default function MatrixPage() {
                 const a = ARCANA[p.n];
                 return (
                   <div key={p.k} className="card overflow-hidden">
-                    <div className="flex flex-wrap items-center gap-4 border-b border-line bg-[#1F2E4F] px-6 py-4">
+                    <div className="flex flex-wrap items-center gap-4 border-b border-line bg-surface-4 px-6 py-4">
                       <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-primary-grad font-display text-2xl font-bold text-white">{p.n}</span>
                       <div className="min-w-0">
                         <p className="text-xs font-bold uppercase tracking-wide text-primary-300">{p.label}</p>
@@ -117,7 +117,7 @@ export default function MatrixPage() {
             )}
 
             {/* CTA */}
-            <div className="mt-10 rounded-4xl border border-primary-500/30 bg-[#14303A] p-7 text-center sm:p-9">
+            <div className="mt-10 rounded-4xl border border-primary-500/30 bg-primary-50 p-7 text-center sm:p-9">
               <h3 className="font-display text-2xl font-semibold text-ink">Бүрэн хувийн тайлал авмаар байна уу?</h3>
               <p className="mx-auto mt-3 max-w-2xl text-muted">
                 Энд гарсан нь таны матриксын үндсэн тойм. Харилцаа, мэргэжил, үйлийн үр, авьяас чадварын гүнзгий тайллыг манай багш нар хувьчлан хийж өгнө.

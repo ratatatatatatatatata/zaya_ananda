@@ -9,7 +9,7 @@ export function ZodiacStoneGrid() {
       </p>
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {ZODIAC_STONES.map((z) => (
-          <div key={z.key} className="group relative overflow-hidden rounded-4xl border border-accent-300/25 bg-[#1B2038] p-6 transition hover:border-accent-400/60 hover:shadow-[0_0_40px_-12px_rgba(227,190,98,0.35)]">
+          <div key={z.key} className="group relative overflow-hidden rounded-4xl border border-accent-300/25 bg-surface-2 p-6 transition hover:border-accent-400/60 hover:shadow-[0_0_40px_-12px_rgba(227,190,98,0.35)]">
             <div aria-hidden className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full opacity-70 transition group-hover:scale-110" style={{ background: "radial-gradient(circle, rgba(227,190,98,0.18), transparent 70%)", filter: "blur(6px)" }} />
             <div className="relative z-10">
               <div className="flex items-center gap-3.5">

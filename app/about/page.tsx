@@ -65,7 +65,7 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <section className="section bg-[#141F36]">
+      <section className="section bg-surface-2">
         <div className="container-px">
           <SectionHeading center eyebrow={<T k="about.valuesEyebrow" />} title={<T k="about.valuesTitle" />} />
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -113,7 +113,7 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <section className="section bg-[#141F36]">
+      <section className="section bg-surface-2">
         <div className="container-px max-w-3xl">
           <SectionHeading center eyebrow={<T k="about.faqEyebrow" />} title={<T k="about.faqTitle" />} />
           <div className="mt-10 space-y-3">

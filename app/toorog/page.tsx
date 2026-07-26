@@ -9,7 +9,7 @@ export default function ToorogPage() {
       <ToorogReading />
 
       {/* Тоон зурхайн матрикс руу */}
-      <div className="relative mt-12 overflow-hidden rounded-4xl border border-grape-500/30 bg-[#1B1B44] p-7 sm:p-9">
+      <div className="night relative mt-12 overflow-hidden rounded-4xl border border-grape-500/30 bg-[#1B1B44] p-7 sm:p-9">
         <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full" style={{ background: "radial-gradient(circle, rgba(155,110,240,0.3), transparent 70%)", filter: "blur(8px)" }} />
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-5">
           <div className="max-w-2xl">

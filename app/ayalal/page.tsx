@@ -136,7 +136,7 @@ export default function AyalalPage() {
         heightVh={200}
         cta={[{ href: "#tours", label: "Хөтөлбөр үзэх" }, { href: "/about#contact", label: "Урьдчилан бүртгүүлэх" }]}
       />
-      <section className="relative isolate overflow-hidden bg-[#131D3B]">
+      <section className="night relative isolate overflow-hidden bg-[#131D3B]">
         {/* Дотоод цэс */}
         <nav className="relative z-10 border-t border-white/10 bg-[#0F1728]/70 backdrop-blur">
           <div className="container-px flex flex-wrap justify-center gap-x-7 gap-y-2 py-3.5">
@@ -164,15 +164,15 @@ export default function AyalalPage() {
       </div></section>
 
       {/* Аяллын хөтөлбөрүүд */}
-      <section id="tours" className="section bg-[#141F36] scroll-mt-20"><div className="container-px">
+      <section id="tours" className="section bg-surface-2 scroll-mt-20"><div className="container-px">
         <h2 className="font-display text-3xl font-semibold text-ink">Аяллын хөтөлбөрүүд</h2>
         <p className="mt-2 max-w-2xl text-muted">Хөтөлбөрүүд улирал бүр шинэчлэгдэнэ. Огноо, үнийн мэдээллийг урьдчилан бүртгүүлсэн зочдод хамгийн түрүүнд хүргэнэ.</p>
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
           {TOURS.map((t) => (
             <div key={t.name} className="card flex h-full flex-col overflow-hidden">
-              <div className="border-b border-line bg-[#1F2E4F] p-6">
+              <div className="border-b border-line bg-surface-4 p-6">
                 <h3 className="font-display text-2xl font-semibold text-ink">{t.name}</h3>
-                <p className="mt-1 text-sm font-medium text-primary-300">{t.tagline}</p>
+                <p className="mt-1 text-sm font-medium text-primary-700">{t.tagline}</p>
                 <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-muted">
                   <span>🗓 {t.days}</span><span>👥 {t.group}</span><span>🚌 {t.transport}</span><span>⛺ {t.stay}</span>
                 </div>
@@ -186,8 +186,8 @@ export default function AyalalPage() {
                   ))}
                 </ul>
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-xl bg-jade-400/10 p-3.5"><p className="text-xs font-bold uppercase tracking-wide text-jade-400">Багтсан</p><p className="mt-1 text-sm text-ink/80">{t.included}</p></div>
-                  <div className="rounded-xl bg-rose-500/10 p-3.5"><p className="text-xs font-bold uppercase tracking-wide text-rose-300">Багтаагүй</p><p className="mt-1 text-sm text-ink/80">{t.excluded}</p></div>
+                  <div className="rounded-xl bg-jade-400/10 p-3.5"><p className="text-xs font-bold uppercase tracking-wide text-jade-600">Багтсан</p><p className="mt-1 text-sm text-ink/80">{t.included}</p></div>
+                  <div className="rounded-xl bg-rose-500/10 p-3.5"><p className="text-xs font-bold uppercase tracking-wide text-rose-700">Багтаагүй</p><p className="mt-1 text-sm text-ink/80">{t.excluded}</p></div>
                 </div>
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-6">
                   <span className="text-sm font-semibold text-accent-400">{t.price}</span>
@@ -212,7 +212,7 @@ export default function AyalalPage() {
               </div>
               <p className="mt-3 text-sm leading-relaxed text-muted">{pl.story}</p>
               <div className="mt-4 rounded-xl bg-primary-500/10 p-4">
-                <p className="text-xs font-bold uppercase tracking-wide text-primary-300">Зан үйлийн зааварчилгаа</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-primary-700">Зан үйлийн зааварчилгаа</p>
                 <p className="mt-1.5 text-sm leading-relaxed text-ink/80">{pl.ritual}</p>
               </div>
             </div>
@@ -221,7 +221,7 @@ export default function AyalalPage() {
       </div></section>
 
       {/* Багш, хөтөч нар */}
-      <section id="guides" className="section bg-[#141F36] scroll-mt-20"><div className="container-px text-center">
+      <section id="guides" className="section bg-surface-2 scroll-mt-20"><div className="container-px text-center">
         <h2 className="font-display text-3xl font-semibold text-ink">Багш, хөтөч нар</h2>
         <p className="mx-auto mt-3 max-w-2xl text-muted">
           Аялал бүрийг бясалгалын туршлагатай багш нар болон нутаг усаа гарын алга шиг мэддэг хөтөч нар хамтран удирдана.
@@ -262,11 +262,11 @@ export default function AyalalPage() {
       </div></section>
 
       {/* FAQ */}
-      <section id="faq" className="section bg-[#141F36] scroll-mt-20"><div className="container-px max-w-3xl">
+      <section id="faq" className="section bg-surface-2 scroll-mt-20"><div className="container-px max-w-3xl">
         <h2 className="text-center font-display text-3xl font-semibold text-ink">Түгээмэл асуултууд</h2>
         <div className="mt-8 space-y-3">
           {FAQ.map((f) => (
-            <details key={f.q} className="group rounded-2xl border border-line bg-[#1A2742] p-5 [&_summary]:cursor-pointer">
+            <details key={f.q} className="group rounded-2xl border border-line bg-surface-1 p-5 [&_summary]:cursor-pointer">
               <summary className="flex items-center justify-between font-semibold text-ink marker:content-['']">
                 {f.q}
                 <span className="text-primary-400 transition group-open:rotate-45">＋</span>
