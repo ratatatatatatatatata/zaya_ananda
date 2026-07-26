@@ -3,7 +3,7 @@ import type { Locale } from "@/lib/types";
 export const messages: Record<Locale, Record<string, string>> = {
   mn: {
     "brand.sub": "Ананда төв",
-    "nav.home": "Нүүр", "nav.services": "Энергийн засал", "nav.courses": "Ариусахуйн үйл",
+    "nav.home": "Нүүр", "nav.services": "Энергийн засал", "nav.courses": "Ариусахуйн үйл", "nav.journey": "Сүнслэг аялал",
     "nav.shop": "Энергийн хамгаалалт", "nav.about": "Бидний тухай", "nav.contact": "Холбоо барих",
     "nav.teachers": "Хамт олон", "nav.mood": "Сэтгэлийн туяа", "nav.gift": "Гэгээн бэлэг",
     "nav.login": "Нэвтрэх", "nav.account": "Миний булан", "auth.loginRegister": "Нэвтрэх / Бүртгүүлэх",
@@ -102,7 +102,7 @@ export const messages: Record<Locale, Record<string, string>> = {
   },
   en: {
     "brand.sub": "Ananda Center",
-    "nav.home": "Home", "nav.services": "Healing", "nav.courses": "Purification",
+    "nav.home": "Home", "nav.services": "Healing", "nav.courses": "Purification", "nav.journey": "Journey",
     "nav.shop": "Protection", "nav.about": "About", "nav.contact": "Contact",
     "nav.teachers": "Our Team", "nav.mood": "Soul Rays", "nav.gift": "Sacred Gift",
     "nav.login": "Log in", "nav.account": "My account", "auth.loginRegister": "Log in / Sign up",
@@ -192,7 +192,7 @@ export const messages: Record<Locale, Record<string, string>> = {
   },
   ko: {
     "brand.sub": "아난다 센터",
-    "nav.home": "홈", "nav.services": "힐링", "nav.courses": "정화의 길",
+    "nav.home": "홈", "nav.services": "힐링", "nav.courses": "정화의 길", "nav.journey": "영적 여행",
     "nav.shop": "에너지 보호", "nav.about": "소개", "nav.contact": "문의",
     "nav.teachers": "우리 팀", "nav.mood": "마음의 빛", "nav.gift": "선물",
     "nav.login": "로그인", "nav.account": "마이페이지", "auth.loginRegister": "로그인 / 회원가입",
@@ -282,7 +282,7 @@ export const messages: Record<Locale, Record<string, string>> = {
   },
   ja: {
     "brand.sub": "アナンダセンター",
-    "nav.home": "ホーム", "nav.services": "ヒーリング", "nav.courses": "浄化の道",
+    "nav.home": "ホーム", "nav.services": "ヒーリング", "nav.courses": "浄化の道", "nav.journey": "聖地の旅",
     "nav.shop": "エナジー保護", "nav.about": "私たちについて", "nav.contact": "お問い合わせ",
     "nav.teachers": "チーム", "nav.mood": "心の光", "nav.gift": "贈り物",
     "nav.login": "ログイン", "nav.account": "マイページ", "auth.loginRegister": "ログイン / 登録",
@@ -372,7 +372,7 @@ export const messages: Record<Locale, Record<string, string>> = {
   },
   zh: {
     "brand.sub": "阿南达中心",
-    "nav.home": "首页", "nav.services": "能量疗愈", "nav.courses": "净化之道",
+    "nav.home": "首页", "nav.services": "能量疗愈", "nav.courses": "净化之道", "nav.journey": "心灵之旅",
     "nav.shop": "能量守护", "nav.about": "关于", "nav.contact": "联系",
     "nav.teachers": "团队", "nav.mood": "心灵之光", "nav.gift": "圣洁之礼",
     "nav.login": "登录", "nav.account": "我的账户", "auth.loginRegister": "登录 / 注册",

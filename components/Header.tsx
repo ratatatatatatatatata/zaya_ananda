@@ -14,6 +14,7 @@ const links = [
   { href: "/", key: "nav.home" },
   { href: "/services", key: "nav.services" },
   { href: "/courses", key: "nav.courses" },
+  { href: "/ayalal", key: "nav.journey" },
   { href: "/shop", key: "nav.shop" },
   { href: "/resources", key: "nav.resources" },
   { href: "/teachers", key: "nav.teachers" },
@@ -47,7 +48,7 @@ export function Header() {
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   return (
-    <header className={cx("sticky top-0 z-40 transition-all duration-300", scrolled ? "glass border-b border-line shadow-sm" : "border-b border-transparent bg-[#121C33]/80 backdrop-blur-sm")}>
+    <header className={cx("sticky top-0 z-40 transition-all duration-300", scrolled ? "glass border-b border-line shadow-sm" : "border-b border-transparent bg-ivory/80 backdrop-blur-sm")}>
       <div className="flex h-16 w-full items-center justify-between gap-3 px-4 lg:h-[72px] lg:px-6">
         <Link href="/" aria-label="Zaya's Ananda" className="shrink-0"><Logo logoSrc={logo} /></Link>
 
@@ -80,7 +81,7 @@ export function Header() {
       </div>
 
       {/* mobile / tablet menu */}
-      <div className={cx("border-t border-line bg-[#121C33]/95 backdrop-blur xl:hidden", menuOpen ? "max-h-[calc(100dvh-4.5rem)] overflow-y-auto" : "max-h-0 overflow-hidden")} style={{ transition: "max-height 0.3s ease" }}>
+      <div className={cx("border-t border-line bg-ivory/95 backdrop-blur xl:hidden", menuOpen ? "max-h-[calc(100dvh-4.5rem)] overflow-y-auto" : "max-h-0 overflow-hidden")} style={{ transition: "max-height 0.3s ease" }}>
         <nav className="container-px flex flex-col gap-1 py-4">
           {links.map((l) => (
             <Link key={l.href} href={l.href}

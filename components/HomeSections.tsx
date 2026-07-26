@@ -3,6 +3,8 @@ import { listCmsCached, getSettingsCached } from "@/lib/repo";
 import { CmsCard } from "./CmsCard";
 import { Reveal } from "./Reveal";
 import { T, Tr } from "./T";
+import { PathsHighlight } from "./home/PathsHighlight";
+import { HowItWorks } from "./home/HowItWorks";
 import type { Locale } from "@/lib/types";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
@@ -84,8 +86,20 @@ export async function HomeSections() {
     ...(settings.team || []).filter((m) => !(settings.teachers || []).some((t) => t.name === m.name)),
   ].slice(0, 3);
 
+  const lessonCount = courses.reduce((n, c) => n + (c.lessons?.length ?? (typeof c.videoLessons === "number" ? c.videoLessons : 0)), 0);
+  const teacherCount = [
+    ...(settings.teachers || []),
+    ...(settings.team || []).filter((m) => !(settings.teachers || []).some((t) => t.name === m.name)),
+  ].length;
+
   return (
     <>
+      {/* Хоёр гол зам — Йог/сургалт ба Сүнслэг аялал */}
+      <PathsHighlight courseCount={courses.length} lessonCount={lessonCount} teacherCount={teacherCount} />
+
+      {/* Хэрхэн эхлэх вэ — 3 алхам */}
+      <HowItWorks />
+
       {/* Энергийн засал */}
       <section className="section"><div className="container-px">
         <SectionHead titleKey="nav.services" desc={D.services} href="/services" icon="✨" />
@@ -97,7 +111,7 @@ export async function HomeSections() {
       </div></section>
 
       {/* Ариусахуйн үйл */}
-      <section className="section bg-[#141F36]"><div className="container-px">
+      <section className="section bg-surface-2"><div className="container-px">
         <SectionHead titleKey="nav.courses" desc={D.courses} href="/courses" icon="🧘" />
         {courses.length > 0 && (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -106,24 +120,8 @@ export async function HomeSections() {
         )}
       </div></section>
 
-      {/* Сүнслэг аялал — онцлох баннер */}
-      <section className="section"><div className="container-px">
-        <div className="relative overflow-hidden rounded-4xl border border-grape-500/30 bg-[#1B1B44] p-8 sm:p-12">
-          <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full" style={{ background: "radial-gradient(circle, rgba(155,110,240,0.35), transparent 70%)", filter: "blur(10px)" }} />
-          <div aria-hidden className="pointer-events-none absolute -bottom-28 left-1/4 h-80 w-80 rounded-full" style={{ background: "radial-gradient(circle, rgba(43,200,187,0.22), transparent 70%)", filter: "blur(12px)" }} />
-          <div className="relative z-10 max-w-2xl">
-            <p className="text-sm font-bold uppercase tracking-[0.25em] text-grape-400">Spiritual Journey</p>
-            <h2 className="mt-3 font-display text-3xl font-semibold text-white sm:text-4xl">🕊 Сүнслэг аялал</h2>
-            <p className="mt-4 leading-relaxed text-white/75"><Tr v={D.journey} /></p>
-            <Link href="/ayalal" className="btn btn-lg mt-7 text-white shadow-glow-grape hover:brightness-110 hover:-translate-y-0.5" style={{ backgroundImage: "linear-gradient(120deg,#9B6EF0,#5E8DE0)" }}>
-              Аяллын хөтөлбөр үзэх →
-            </Link>
-          </div>
-        </div>
-      </div></section>
-
       {/* Энергийн хамгаалалт */}
-      <section className="section bg-[#141F36]"><div className="container-px">
+      <section className="section bg-surface-2"><div className="container-px">
         <SectionHead titleKey="nav.shop" desc={D.shop} href="/shop" icon="🛡" />
         {products.length > 0 && (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -144,7 +142,7 @@ export async function HomeSections() {
 
       {/* Хамт олон */}
       {teachers.length > 0 && (
-        <section className="section bg-[#141F36]"><div className="container-px">
+        <section className="section bg-surface-2"><div className="container-px">
           <SectionHead titleKey="nav.teachers" desc={D.teachers} href="/teachers" icon="🤝" />
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {teachers.map((t, idx) => (
@@ -166,13 +164,13 @@ export async function HomeSections() {
 
       {/* Сэтгэлийн туяа + Гэгээн бэлэг */}
       <section className="section"><div className="container-px grid gap-6 lg:grid-cols-2">
-        <div className="relative overflow-hidden rounded-4xl border border-line bg-[#1A2742] p-8">
+        <div className="relative overflow-hidden rounded-4xl border border-line bg-surface-1 p-8">
           <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full" style={{ background: "radial-gradient(circle, rgba(240,156,188,0.25), transparent 70%)" }} />
           <h2 className="font-display text-2xl font-semibold text-ink">🌅 <T k="nav.mood" /></h2>
           <p className="mt-3 leading-relaxed text-muted"><Tr v={D.mood} /></p>
           <Link href="/mood" className="btn btn-primary btn-md mt-6"><T k="nav.mood" /> →</Link>
         </div>
-        <div className="relative overflow-hidden rounded-4xl border border-line bg-[#1A2742] p-8">
+        <div className="relative overflow-hidden rounded-4xl border border-line bg-surface-1 p-8">
           <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full" style={{ background: "radial-gradient(circle, rgba(227,190,98,0.22), transparent 70%)" }} />
           <h2 className="font-display text-2xl font-semibold text-ink">🎁 <T k="nav.gift" /></h2>
           <p className="mt-3 leading-relaxed text-muted"><Tr v={D.gift} /></p>
