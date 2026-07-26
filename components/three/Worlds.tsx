@@ -24,6 +24,7 @@ function Particles({ count = 260, radius = 7, color = "#7CDCD2", size = 0.05, bu
   burst?: boolean; progress: P;
 }) {
   const ref = useRef<THREE.Points>(null);
+  const starTex = useStarTexture();
   const positions = useMemo(() => {
     const a = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
@@ -45,7 +46,9 @@ function Particles({ count = 260, radius = 7, color = "#7CDCD2", size = 0.05, bu
     // Болор бутрахад бөөмс гэрлийн үүл болж тэлнэ
     const s = burst ? 1 + ease(Math.max(0, p - 0.6) / 0.4) * 1.8 : 1;
     m.scale.setScalar(s);
-    (m.material as THREE.PointsMaterial).opacity = burst ? 0.9 : 0.75;
+    // Одод анивчина — агаар мандлын гэрлийн хэлбэлзэл
+    const twinkle = 0.82 + Math.sin(clock.elapsedTime * 1.7) * 0.08 + Math.sin(clock.elapsedTime * 3.3 + 1.1) * 0.05;
+    (m.material as THREE.PointsMaterial).opacity = (burst ? 0.95 : 0.85) * twinkle;
   });
 
   return (
@@ -53,7 +56,7 @@ function Particles({ count = 260, radius = 7, color = "#7CDCD2", size = 0.05, bu
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
-      <pointsMaterial color={color} size={size} sizeAttenuation transparent opacity={0.75} depthWrite={false} blending={THREE.AdditiveBlending} />
+      <pointsMaterial map={starTex ?? undefined} color={color} size={size * 2.6} sizeAttenuation transparent opacity={0.85} depthWrite={false} blending={THREE.AdditiveBlending} />
     </points>
   );
 }
@@ -183,140 +186,241 @@ function handheld(t: number, amp = 1) {
   };
 }
 
+
+/* ---------- Процедурт текстурууд (canvas дээр кодоор зурагдана) ---------- */
+
+/** Одны цэгийн текстур — дугуй гэрэлтэлт + сул загалмай туяа */
+function useStarTexture() {
+  return useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 64;
+    const ctx = c.getContext("2d");
+    if (!ctx) return null;
+    const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, "rgba(255,255,255,1)");
+    g.addColorStop(0.18, "rgba(235,248,255,0.85)");
+    g.addColorStop(0.45, "rgba(180,220,240,0.22)");
+    g.addColorStop(1, "rgba(160,200,230,0)");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 64, 64);
+    // загалмай туяа
+    ctx.globalCompositeOperation = "lighter";
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.lineWidth = 1.1;
+    ctx.beginPath(); ctx.moveTo(32, 6); ctx.lineTo(32, 58); ctx.moveTo(6, 32); ctx.lineTo(58, 32); ctx.stroke();
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }, []);
+}
+
+/** Утга-шуугиан (fBm) — гарагийн гадаргуу, үүл үүсгэхэд */
+function valueNoise(w: number, h: number, octaves = 5) {
+  const out = new Float32Array(w * h);
+  let amp = 1, total = 0;
+  for (let o = 0; o < octaves; o++) {
+    const gw = Math.max(3, Math.round(w / Math.pow(2, octaves - o)));
+    const gh = Math.max(3, Math.round(h / Math.pow(2, octaves - o)));
+    const grid = new Float32Array(gw * gh);
+    for (let i = 0; i < grid.length; i++) grid[i] = Math.random();
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const fx = (x / w) * gw, fy = (y / h) * gh;
+        const x0 = Math.floor(fx) % gw, y0 = Math.floor(fy) % gh;
+        const x1 = (x0 + 1) % gw, y1 = (y0 + 1) % gh;
+        const tx = fx - Math.floor(fx), ty = fy - Math.floor(fy);
+        const sx = tx * tx * (3 - 2 * tx), sy = ty * ty * (3 - 2 * ty);
+        const a = grid[y0 * gw + x0], b = grid[y0 * gw + x1], c2 = grid[y1 * gw + x0], d = grid[y1 * gw + x1];
+        const top = a + (b - a) * sx, bot = c2 + (d - c2) * sx;
+        out[y * w + x] += (top + (bot - top) * sy) * amp;
+      }
+    }
+    total += amp; amp *= 0.5;
+  }
+  for (let i = 0; i < out.length; i++) out[i] /= total;
+  return out;
+}
+
+/** Гарагийн гадаргуугийн зураг: далай → эрэг → тал → өндөрлөг → цас */
+function usePlanetTextures() {
+  return useMemo(() => {
+    const W = 256, H = 128;
+    const n = valueNoise(W, H, 5);
+    const surf = document.createElement("canvas"); surf.width = W; surf.height = H;
+    const bump = document.createElement("canvas"); bump.width = W; bump.height = H;
+    const sc = surf.getContext("2d"), bc = bump.getContext("2d");
+    if (!sc || !bc) return null;
+    const si = sc.createImageData(W, H), bi = bc.createImageData(W, H);
+    const stops: [number, number[]][] = [
+      [0.00, [8, 34, 40]],    // гүн далай
+      [0.42, [12, 62, 62]],   // тунгалаг ус
+      [0.50, [24, 84, 72]],   // эрэг
+      [0.62, [32, 98, 74]],   // тал
+      [0.76, [70, 118, 88]],  // өндөрлөг
+      [0.88, [150, 170, 150]],// хад
+      [1.00, [226, 240, 235]],// цас
+    ];
+    for (let y = 0; y < H; y++) {
+      // туйл руу цасжилт нэмнэ
+      const lat = Math.abs(y / H - 0.5) * 2;
+      for (let x = 0; x < W; x++) {
+        let v = n[y * W + x];
+        v = Math.min(1, v * 1.15 + lat * lat * 0.35);
+        let c = stops[0][1];
+        for (let i = 1; i < stops.length; i++) {
+          if (v <= stops[i][0]) {
+            const [p0, c0] = stops[i - 1], [p1, c1] = stops[i];
+            const k = (v - p0) / (p1 - p0);
+            c = [0, 1, 2].map((j) => c0[j] + (c1[j] - c0[j]) * k);
+            break;
+          }
+          c = stops[i][1];
+        }
+        const i4 = (y * W + x) * 4;
+        si.data[i4] = c[0]; si.data[i4 + 1] = c[1]; si.data[i4 + 2] = c[2]; si.data[i4 + 3] = 255;
+        const g = Math.round(v * 255);
+        bi.data[i4] = bi.data[i4 + 1] = bi.data[i4 + 2] = g; bi.data[i4 + 3] = 255;
+      }
+    }
+    sc.putImageData(si, 0, 0); bc.putImageData(bi, 0, 0);
+
+    // Үүлний давхарга
+    const cn = valueNoise(W, H, 4);
+    const cl = document.createElement("canvas"); cl.width = W; cl.height = H;
+    const cc = cl.getContext("2d");
+    if (!cc) return null;
+    const ci = cc.createImageData(W, H);
+    for (let i = 0; i < W * H; i++) {
+      const v = Math.max(0, (cn[i] - 0.52) / 0.48);
+      const a = Math.round(Math.pow(v, 1.4) * 210);
+      ci.data[i * 4] = ci.data[i * 4 + 1] = ci.data[i * 4 + 2] = 255;
+      ci.data[i * 4 + 3] = a;
+    }
+    cc.putImageData(ci, 0, 0);
+
+    // Гарагийн цагираг — төвөөс гарах туузан бүтэц (RingGeometry-ийн диск UV-д тохирно)
+    const R = 128;
+    const rg = document.createElement("canvas"); rg.width = rg.height = R;
+    const rc = rg.getContext("2d");
+    if (!rc) return null;
+    rc.clearRect(0, 0, R, R);
+    for (let i = 0; i < 44; i++) {
+      const rad = 20 + (i / 44) * 42;
+      const alpha = (0.05 + Math.random() * 0.32) * (1 - Math.abs(i / 44 - 0.45));
+      rc.beginPath();
+      rc.arc(R / 2, R / 2, rad, 0, Math.PI * 2);
+      rc.strokeStyle = `rgba(${222 + Math.random() * 24 | 0},${196 + Math.random() * 30 | 0},${150 + Math.random() * 50 | 0},${alpha.toFixed(3)})`;
+      rc.lineWidth = 0.6 + Math.random() * 1.4;
+      rc.stroke();
+    }
+
+    const mk = (c: HTMLCanvasElement, srgb = true) => {
+      const t = new THREE.CanvasTexture(c);
+      t.wrapS = THREE.RepeatWrapping;
+      if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+      t.anisotropy = 4;
+      return t;
+    };
+    return { surface: mk(surf), bump: mk(bump, false), clouds: mk(cl), rings: mk(rg) };
+  }, []);
+}
+
 /* ---------- 1. CRYSTAL — Үйлчилгээ: ойн сүмийн болор ---------- */
 function CrystalWorld({ progress }: { progress: P }) {
-  const crystal = useRef<THREE.Mesh>(null);
-  const edges = useRef<THREE.LineSegments>(null);
-  const shards = useRef<THREE.Group>(null);
-  const key = useRef<THREE.SpotLight>(null);
-
-  // Хагарлын хэлтэрхийнүүд — болор задрахад тарж, эргэлдэнэ
-  const shardData = useMemo(
-    () => Array.from({ length: 18 }, () => ({
-      dir: new THREE.Vector3(Math.random() - 0.5, Math.random() * 0.7 - 0.15, Math.random() - 0.5).normalize(),
-      rot: new THREE.Vector3(Math.random(), Math.random(), Math.random()).multiplyScalar(1.4),
-      size: 0.05 + Math.random() * 0.1,
-    })),
-    []
-  );
+  const tex = usePlanetTextures();
+  const planet = useRef<THREE.Mesh>(null);
+  const clouds = useRef<THREE.Mesh>(null);
+  const rings = useRef<THREE.Mesh>(null);
+  const moonPivot = useRef<THREE.Group>(null);
+  const atmo = useRef<THREE.Mesh>(null);
+  const sun = useRef<THREE.DirectionalLight>(null);
 
   useFrame(({ clock, camera }) => {
     const t = clock.elapsedTime;
     const p = ease(progress.current);
-    const hh = handheld(t);
+    const hh = handheld(t, 0.7);
 
-    // Камер: гараар барьсан мэт хэлбэлзэлтэй, аажим ойртоно
-    camera.position.set(hh.x + Math.sin(t * 0.05) * 0.25, lerp(1.35, 0.55, p) + hh.y, lerp(8.6, 3.5, p));
-    camera.lookAt(0, 0.55 + hh.y * 0.4, 0);
+    // Камер: сансрын гүнээс гараг руу аажим дөхнө
+    camera.position.set(hh.x + Math.sin(t * 0.04) * 0.3, lerp(1.15, 0.35, p) + hh.y, lerp(9.2, 4.2, p));
+    camera.lookAt(0, 0.35 + hh.y * 0.3, 0);
 
-    const shatter = THREE.MathUtils.clamp((progress.current - 0.6) / 0.4, 0, 1);
-    const sh = ease(shatter);
-    // Амьсгал: нийлмэл давтамжтай — механик биш
-    const breathe = 1 + Math.sin(t * 0.85) * 0.022 + Math.sin(t * 1.9 + 1) * 0.008;
-    const s = breathe * (1 - sh);
-
-    if (crystal.current) {
-      crystal.current.rotation.y = t * 0.16;
-      crystal.current.rotation.x = Math.sin(t * 0.4) * 0.06;      // зөөлөн найгалт
-      crystal.current.rotation.z = Math.sin(t * 0.27 + 1.4) * 0.04;
-      crystal.current.position.y = 0.75 + Math.sin(t * 0.6) * 0.05;
-      crystal.current.scale.setScalar(0.9 * s);
+    // Гараг тэнхлэгээ тойрон жигд эргэнэ (тэнхлэгийн налуутай)
+    if (planet.current) planet.current.rotation.y = t * 0.045;
+    // Үүлс арай хурдан, өөр чиглэлд
+    if (clouds.current) { clouds.current.rotation.y = t * 0.062; clouds.current.rotation.x = 0.06; }
+    // Цагираг маш аажим эргэлдэж, гүйлгэх тусам налуу нь өөрчлөгдөнө
+    if (rings.current) {
+      rings.current.rotation.z = t * 0.02;
+      rings.current.rotation.x = -Math.PI / 2 + 0.42 + p * 0.16;
     }
-    if (edges.current && crystal.current) {
-      edges.current.rotation.copy(crystal.current.rotation);
-      edges.current.position.copy(crystal.current.position);
-      edges.current.scale.setScalar(0.9 * s * 1.001);
-      (edges.current.material as THREE.LineBasicMaterial).opacity = 0.22 * (1 - sh);
+    // Дагуул тойрог замаараа
+    if (moonPivot.current) {
+      moonPivot.current.rotation.y = t * 0.16;
+      moonPivot.current.rotation.z = 0.22;
     }
-    // Хэлтэрхийнүүд задарч тарна
-    if (shards.current) {
-      shards.current.visible = sh > 0.001;
-      shards.current.children.forEach((c, i) => {
-        const d = shardData[i];
-        const dist = sh * (1.4 + i * 0.06);
-        c.position.set(d.dir.x * dist, 0.75 + d.dir.y * dist, d.dir.z * dist);
-        c.rotation.set(t * d.rot.x, t * d.rot.y, t * d.rot.z);
-        c.scale.setScalar(d.size * (1 - sh * 0.35));
-        ((c as THREE.Mesh).material as THREE.MeshStandardMaterial).opacity = 1 - sh * 0.8;
-      });
-    }
-    // Гол гэрэл болор дээр анивчиж, задрахад бүдгэрнэ
-    if (key.current) key.current.intensity = (46 + Math.sin(t * 1.3) * 5) * (1 - sh * 0.55);
+    // Агаар мандлын гэрэлтэлт — нар талын хэсэг илүү тод
+    if (atmo.current) (atmo.current.material as THREE.MeshBasicMaterial).opacity = 0.16 + Math.sin(t * 0.5) * 0.02 + p * 0.06;
+    if (sun.current) sun.current.intensity = 3.2 + Math.sin(t * 0.6) * 0.12;
   });
 
   return (
     <>
-      <fog attach="fog" args={["#08181b", 4.5, 16]} />
-      <EnvLight sky="#2b6d66" horizon="#0e3330" ground="#04090a" />
-      <ambientLight intensity={0.22} color="#9adfd6" />
-      {/* Гол гэрэл — дээрээс, зөөлөн ирмэгтэй (сарны туяа мод дундуур) */}
-      <spotLight ref={key} position={[2.2, 6, 2.6]} angle={0.42} penumbra={0.85} intensity={46} color="#CFEFE8" />
-      {/* Ирмэгийн гэрэл — контурыг ялгаруулна */}
-      <pointLight position={[-4, 1.6, -2.4]} intensity={16} color="#E3BE62" />
-      <pointLight position={[3.4, 0.4, -3]} intensity={9} color="#5E8DE0" />
-      <pointLight position={[0, -1.4, 2.6]} intensity={5} color="#2BC8BB" />
+      <fog attach="fog" args={["#040910", 9, 26]} />
+      <EnvLight sky="#16303f" horizon="#0a1622" ground="#02050a" />
+      <ambientLight intensity={0.12} color="#8fb6cf" />
+      {/* Нар — хажуу талаас, терминатор (өдөр/шөнийн зааг) үүсгэнэ */}
+      <directionalLight ref={sun} position={[6, 2.6, 3.5]} intensity={3.2} color="#FFF3DA" />
+      {/* Тусгал гэрэл — сүүдэрт талыг бүрэн харлуулахгүй */}
+      <pointLight position={[-5, -1.5, -3]} intensity={5} color="#2f5f86" />
 
-      {/* Болор — жинхэнэ шилэн материал: гэрэл нэвтэрч, хугарна */}
-      <mesh ref={crystal} position={[0, 0.75, 0]}>
-        <icosahedronGeometry args={[1, 0]} />
-        <meshPhysicalMaterial
-          color="#cdeeea"
-          transmission={0.92}
-          thickness={1.35}
-          ior={1.72}
-          roughness={0.08}
-          metalness={0}
-          clearcoat={1}
-          clearcoatRoughness={0.12}
-          iridescence={0.35}
-          iridescenceIOR={1.4}
-          attenuationColor={new THREE.Color("#1f7f78")}
-          attenuationDistance={1.1}
-          envMapIntensity={1.3}
-          transparent
-        />
-      </mesh>
-      {/* Талстын ирмэг — маш нарийн шугам (торон бүрхүүлийн оронд) */}
-      <lineSegments ref={edges} position={[0, 0.75, 0]}>
-        <edgesGeometry args={[new THREE.IcosahedronGeometry(1, 0)]} />
-        <lineBasicMaterial color="#a8ede6" transparent opacity={0.22} />
-      </lineSegments>
-
-      {/* Задарсан хэлтэрхийнүүд */}
-      <group ref={shards} visible={false}>
-        {shardData.map((d, i) => (
-          <mesh key={i}>
-            <tetrahedronGeometry args={[1, 0]} />
-            <meshPhysicalMaterial color="#bfe9e4" transmission={0.75} thickness={0.5} ior={1.6} roughness={0.15} transparent envMapIntensity={1.2} />
-          </mesh>
-        ))}
+      {/* Гараг */}
+      <group rotation={[0, 0, 0.28]}>
+        <mesh ref={planet}>
+          <sphereGeometry args={[1.5, 64, 64]} />
+          <meshStandardMaterial
+            map={tex?.surface ?? undefined}
+            bumpMap={tex?.bump ?? undefined}
+            bumpScale={0.035}
+            roughness={0.92}
+            metalness={0.02}
+            envMapIntensity={0.35}
+          />
+        </mesh>
+        {/* Үүлний давхарга */}
+        <mesh ref={clouds}>
+          <sphereGeometry args={[1.53, 48, 48]} />
+          <meshStandardMaterial map={tex?.clouds ?? undefined} transparent opacity={0.42} depthWrite={false} roughness={1} />
+        </mesh>
+        {/* Агаар мандал — ирмэгийн цэнхэр туяа */}
+        <mesh ref={atmo} scale={1.09}>
+          <sphereGeometry args={[1.5, 48, 48]} />
+          <meshBasicMaterial color="#7fd8ea" transparent opacity={0.16} side={THREE.BackSide} blending={THREE.AdditiveBlending} depthWrite={false} />
+        </mesh>
       </group>
 
-      <Glow position={[0, 0.75, -0.4]} scale={4.2} color="rgba(80,210,196,0.42)" />
-      <ContactShadow y={-0.6} scale={1.7} opacity={0.6} follow={crystal} />
+      {/* Гарагийн цагираг — тоос, мөсний тууз */}
+      <mesh ref={rings} rotation={[-Math.PI / 2 + 0.42, 0, 0]}>
+        <ringGeometry args={[2.1, 3.5, 128, 1]} />
+        <meshBasicMaterial map={tex?.rings ?? undefined} transparent side={THREE.DoubleSide} depthWrite={false} opacity={0.95} />
+      </mesh>
 
-      {/* Чулуун тавцан — барзгар гадаргуутай, орчны тусгалтай */}
-      <mesh position={[0, -0.92, 0]} receiveShadow>
-        <cylinderGeometry args={[2.15, 2.5, 0.55, 64]} />
-        <meshStandardMaterial color="#16302c" roughness={0.94} metalness={0.05} envMapIntensity={0.6} />
-      </mesh>
-      {/* Тавцангийн ирмэгийн зөөлөн гялбаа */}
-      <mesh position={[0, -0.64, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[2.16, 0.02, 8, 96]} />
-        <meshStandardMaterial color="#3d7a72" emissive="#1b4a45" emissiveIntensity={0.5} roughness={0.5} />
-      </mesh>
-      {/* Хөвдтэй жижиг чулуунууд — байгалийн эмх замбараагүй байдал */}
-      {[[1.5, -0.55, 0.9], [-1.7, -0.6, 0.4], [0.7, -0.58, -1.6], [-0.9, -0.62, -1.3]].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]} rotation={[i * 0.7, i * 1.3, i * 0.4]}>
-          <dodecahedronGeometry args={[0.15 + (i % 3) * 0.05, 0]} />
-          <meshStandardMaterial color={i % 2 ? "#1d3b33" : "#24463c"} roughness={0.95} envMapIntensity={0.5} />
+      {/* Дагуул сар */}
+      <group ref={moonPivot}>
+        <mesh position={[4.4, 0.6, 0]}>
+          <sphereGeometry args={[0.28, 32, 32]} />
+          <meshStandardMaterial map={tex?.bump ?? undefined} color="#c9d3d8" roughness={0.98} metalness={0} bumpMap={tex?.bump ?? undefined} bumpScale={0.05} />
         </mesh>
-      ))}
+      </group>
 
-      <GoldRing r={1.75} tilt={0.45} y={0.75} />
-      <GoldRing r={2.25} tilt={-0.3} speed={-0.08} y={0.75} />
-      <Particles burst progress={progress} />
-      <EnergyOrb progress={progress} path={[1.6, 2.2, 1, 0, 1.9, 1.6]} />
+      {/* Алсын нар — гялбаа */}
+      <Glow position={[6.2, 2.4, -2]} scale={5} color="rgba(255,238,200,0.5)" />
+      <Glow position={[0, 0, -3]} scale={9} color="rgba(60,150,190,0.16)" />
+
+      {/* Оддын огторгуй — гурван гүнд, өөр өөр хэмжээтэй */}
+      <Particles count={420} radius={16} color="#EAF4FF" size={0.028} progress={progress} />
+      <Particles count={220} radius={11} color="#BFD8F0" size={0.045} progress={progress} />
+      <Particles burst count={90} radius={7} color="#9BF0E6" size={0.06} progress={progress} />
+
+      <EnergyOrb progress={progress} path={[2.6, 2.6, 1.4, 0.4, 2.1, 2.2]} />
     </>
   );
 }
