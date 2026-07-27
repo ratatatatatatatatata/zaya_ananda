@@ -1,6 +1,6 @@
 import { CmsFilterGrid } from "@/components/CmsFilterGrid";
 import { PromoBanner } from "@/components/PromoBanner";
-import { Journey3D } from "@/components/three/Journey3D";
+import { VideoHero } from "@/components/video/VideoHero";
 import { listCmsCached } from "@/lib/repo";
 import { SERVICE_GROUPS } from "@/data/cms-taxonomy";
 import { T } from "@/components/T";
@@ -14,12 +14,11 @@ export default async function ServicesPage() {
     <>
       <PromoBanner items={promos} />
       {/* Ойн сүмийн болор — камер болор руу ойртож, гэрлийн бөөмс болон бутарна */}
-      <Journey3D
-        world="crystal"
-        eyebrow="The Journey into Ananda · I"
+      <VideoHero
+        clip="temple"
+        eyebrow="Эдгэрлийн ой"
         title={<T k="nav.services" />}
-        desc="Ойн гүн дэх болор таныг угтана — гүйлгэх бүрд камер ойртож, болор гэрлийн мянган бөөмс болон задарч, эдгэрлийн ертөнцүүд нээгдэнэ."
-        heightVh={200}
+        desc="Ойн гүнд нуугдсан сүм шиг — чимээгүй, ариун орон зайд биеийн болон энергийн тэнцвэрээ сэргээх зам."
         cta={[{ href: "#services", label: "Үйлчилгээ үзэх" }, { href: "/about#contact", label: "Цаг захиалах" }]}
       />
       <section id="services" className="section"><div className="container-px">

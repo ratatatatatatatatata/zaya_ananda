@@ -1,4 +1,4 @@
-import { Journey3D } from "@/components/three/Journey3D";
+import { VideoHero } from "@/components/video/VideoHero";
 import { CtaBand } from "@/components/CtaBand";
 import { CalmBand } from "@/components/CalmBand";
 import { SectionHeading } from "@/components/ui";
@@ -29,12 +29,11 @@ export default async function AboutPage() {
   return (
     <>
       {/* «Нэг гэрлээс Ananda» — харанхуйгаас гэрлийн үр ургаж, туяа дэлгэрнэ */}
-      <Journey3D
-        world="seed"
-        eyebrow="From One Light to Ananda"
+      <VideoHero
+        clip="temple"
+        eyebrow="Нэг гэрлээс Ananda"
         title={<T k="about.title" />}
         desc={<Tr v={siteConfig.tagline} />}
-        heightVh={190}
       />
 
       {(settings.aboutTitle || settings.aboutBody || aboutVideoUrl) && (

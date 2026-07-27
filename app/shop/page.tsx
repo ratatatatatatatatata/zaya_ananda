@@ -1,4 +1,4 @@
-import { Journey3D } from "@/components/three/Journey3D";
+import { VideoHero } from "@/components/video/VideoHero";
 import { CmsCard } from "@/components/CmsCard";
 import { ShopSplit } from "@/components/ShopSplit";
 import { Stagger } from "@/components/motion/Stagger";
@@ -15,12 +15,12 @@ export default async function ShopPage() {
   return (
     <>
       {/* Тансаг галерей — гялгар шалтай танхимд эрдэнийн чулуу эргэлдэнэ */}
-      <Journey3D
-        world="gallery"
-        eyebrow="The Journey into Ananda · III"
+      <VideoHero
+        clip="stones"
+        eyebrow="Чулууны тэнцвэр"
         title={<T k="nav.shop" />}
-        desc="Музейн үзмэр шиг тавцан дээр эргэлдэх эрдэнийн чулуу — алтан гэрэл, оюу туяаны дунд танд зориулсан энергийн хамгаалалтууд."
-        heightVh={180}
+        desc="Урсгалын хажууд өрсөн чулуу шиг — таны энергийг тогтвортой байлгах эрдэнэ, сахиус, хамгаалалтууд."
+        height="mid"
         cta={[{ href: "#shop", label: "Бүтээгдэхүүн үзэх" }]}
       />
       <section id="shop" className="section"><div className="container-px">

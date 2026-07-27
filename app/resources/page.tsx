@@ -1,5 +1,5 @@
 import { CmsFilterGrid } from "@/components/CmsFilterGrid";
-import { Journey3D } from "@/components/three/Journey3D";
+import { VideoHero } from "@/components/video/VideoHero";
 import { listCmsCached } from "@/lib/repo";
 import { T } from "@/components/T";
 
@@ -11,12 +11,12 @@ export default async function ResourcesPage() {
   return (
     <>
       {/* Мэргэдийн архив — гэрлийн багана дундуур хөвөх чулуун хавтангууд */}
-      <Journey3D
-        world="archive"
-        eyebrow="The Oracle Archive"
+      <VideoHero
+        clip="stream"
+        eyebrow="Мэдлэгийн урсгал"
         title={<T k="nav.resources" />}
-        desc="Мэргэдийн архивын манантай танхимаар камер урагшлан аялж, гэрлийн багана дунд хөвөх мэдлэгийн хавтангууд нээгдэнэ."
-        heightVh={190}
+        desc="Уулын горхи шиг тасралтгүй — өдөр тутмын амьдралд тань гэрэл нэмэх зөвлөгөө, нийтлэл, нээлттэй видеонууд."
+        height="mid"
         cta={[{ href: "#resources", label: "Зөвлөгөө унших" }]}
       />
       <section id="resources" className="section"><div className="container-px">

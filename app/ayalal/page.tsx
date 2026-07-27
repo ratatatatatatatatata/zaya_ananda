@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Journey3D } from "@/components/three/Journey3D";
+import { VideoHero } from "@/components/video/VideoHero";
 
 export const metadata = {
   title: "Сүнслэг аялал — Spiritual Journey Mongolia",
@@ -128,17 +128,16 @@ export default function AyalalPage() {
   return (
     <>
       {/* Ариун хөндий — гэрлийн зам дагуу камер урагшилж, алсын нар мандалт руу аялна */}
-      <Journey3D
-        world="sanctuary"
+      <VideoHero
+        clip="stream"
         eyebrow="Spiritual Journey Mongolia"
         title="Сүнслэг аялал"
-        desc="Монголын энергийн ариун газрууд руу хийх энэ аян бол зүгээр нэг зам биш — таны дотоод амар амгалан руу хийх аялал юм. Гэрлийн зам дагуу урагшлаарай."
-        heightVh={200}
+        desc="Монголын энергийн ариун газрууд руу хийх энэ аян бол зүгээр нэг зам биш — таны дотоод амар амгалан руу хийх аялал юм."
         cta={[{ href: "#tours", label: "Хөтөлбөр үзэх" }, { href: "/about#contact", label: "Урьдчилан бүртгүүлэх" }]}
       />
-      <section className="night relative isolate overflow-hidden bg-[#131D3B]">
+      <section className="night relative isolate overflow-hidden bg-[#0C1A17]">
         {/* Дотоод цэс */}
-        <nav className="relative z-10 border-t border-white/10 bg-[#0F1728]/70 backdrop-blur">
+        <nav className="relative z-10 border-y border-white/10 bg-[#0B1714]/80 backdrop-blur">
           <div className="container-px flex flex-wrap justify-center gap-x-7 gap-y-2 py-3.5">
             {NAV.map((n) => (
               <a key={n.id} href={"#" + n.id} className="text-sm font-semibold text-white/65 transition hover:text-primary-300">{n.label}</a>

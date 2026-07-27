@@ -4,6 +4,7 @@ import { CmsCard } from "./CmsCard";
 import { Reveal } from "./Reveal";
 import { T, Tr } from "./T";
 import { PathsHighlight } from "./home/PathsHighlight";
+import { VideoBand } from "./video/VideoBand";
 import { HowItWorks } from "./home/HowItWorks";
 import type { Locale } from "@/lib/types";
 
@@ -121,6 +122,13 @@ export async function HomeSections() {
           </div>
         )}
       </div></section>
+
+      <VideoBand
+        clip="temple"
+        quote="Ойн гүн дэх сүм шиг — дотоод ертөнц тань чимээгүй байдал, хүндэтгэлээр нээгддэг."
+        author="Zaya's Ananda"
+        cta={{ href: "/about", label: "Бидний тухай" }}
+      />
 
       {/* Энергийн хамгаалалт */}
       <section className="section bg-surface-2"><div className="container-px">

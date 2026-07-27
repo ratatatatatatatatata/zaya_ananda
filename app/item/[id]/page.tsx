@@ -12,7 +12,7 @@ import { RichBody } from "@/components/RichBody";
 import { CmsText, CatLabel } from "@/components/CmsText";
 import { CmsCard } from "@/components/CmsCard";
 import { signedDownloadUrl } from "@/lib/supabase";
-import { Journey3D } from "@/components/three/Journey3D";
+import { VideoHero, type Clip } from "@/components/video/VideoHero";
 import { themeFor } from "@/data/theme-map";
 import { CategoryGlyph } from "@/components/CategoryGlyph";
 
@@ -26,6 +26,28 @@ const kindNav: Record<string, { href: string; key: string }> = {
   free: { href: "/gift", key: "nav.gift" },
 };
 const modeLabel: Record<string, string> = { online: "Онлайн сургалт", tankhim: "Танхимын сургалт", both: "Онлайн + Танхим" };
+
+/** Агуулгад тохирсон бичлэг — ангилал, дараа нь төрлөөр */
+function clipFor(kind: string, category?: string | null): Clip {
+  const byCat: Record<string, Clip> = {
+    "Бясалгалын сургалт": "meditation",
+    "Сүнслэг аялал": "stream",
+    "Лаа засал үйлчилгээ": "temple",
+    "Аура оношилгоо": "meditation",
+    "Сканнер оношилгоо": "temple",
+    "Тоон зурхайн матрикс": "temple",
+    "Шагайн мэргэ": "stones",
+    "Advanced эмчилгээ": "stream",
+    "Жэт аппарат эмчилгээ": "temple",
+    "Озонатор эмчилгээ": "stream",
+    "Хувь заяаны засал эмчилгээ": "temple",
+    "Зөвлөгөө": "stream",
+    "Видео зөвлөгөө": "stream",
+  };
+  if (category && byCat[category]) return byCat[category];
+  const byKind: Record<string, Clip> = { service: "temple", course: "meditation", product: "stones", resource: "stream", free: "meditation" };
+  return byKind[kind] || "temple";
+}
 
 export default async function ItemPage({ params }: { params: { id: string } }) {
   const item = await getCmsByIdCached(params.id);
@@ -53,11 +75,11 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
 
   return (
     <>
-    <Journey3D
-      world={th.world}
+    <VideoHero
+      clip={clipFor(item.kind, item.category)}
       eyebrow={th.eyebrow}
       title={<CmsText mn={item.title} i18n={item.i18n} field="title" />}
-      heightVh={150}
+      height="mid"
       cta={[{ href: "#detail", label: "Дэлгэрэнгүй үзэх" }]}
     />
     <div id="detail" className="container-px py-10 sm:py-14">
