@@ -46,7 +46,7 @@ function StoneCard({ s, products, universal }: { s: StoneLore; products: CmsItem
   }, [s, products]);
 
   return (
-    <div className="card-lux card-lux-gold overflow-hidden rounded-4xl">
+    <div className="panel">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-accent-300/[0.06] px-6 py-4">
         <div className="flex items-center gap-3">
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-accent-400/40 bg-accent-300/10 text-xl">💎</span>
@@ -124,7 +124,7 @@ export function StoneReading() {
   return (
     <div>
       {/* Төрсөн огноо */}
-      <div className="card-lux card-lux-gold relative overflow-hidden rounded-4xl p-7 sm:p-9">
+      <div className="panel p-7 sm:p-9">
         <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full" style={{ background: "radial-gradient(circle, rgba(227,190,98,0.22), transparent 70%)", filter: "blur(8px)" }} />
         <div className="relative z-10">
           <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl">Төрсөн огноогоо оруулна уу</h2>
@@ -184,7 +184,7 @@ export function StoneReading() {
 
           {/* Танд санал болгох бүтээгдэхүүн */}
           {suggested.length > 0 && (
-            <div className="card-lux mt-12 rounded-4xl p-7 sm:p-8">
+            <div className="panel mt-12 p-7 sm:p-8">
               <h3 className="font-display text-xl font-semibold text-ink sm:text-2xl">🛍 Танд санал болгох бүтээгдэхүүн</h3>
               <p className="mt-2 text-sm text-muted">Таны ордод ээлтэй чулуутай холбоотой болон манай энергийн хамгаалалтын бүтээгдэхүүнүүд.</p>
               <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

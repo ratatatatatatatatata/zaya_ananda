@@ -30,7 +30,7 @@ export default async function TeachersPage() {
           <Stagger className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" step={110}>
             {teachers.map((t) => (
               <TiltCard key={t.name} className="h-full" max={4}><Link href={"/teachers/" + slugOf(t.name)}
-                className="card group relative flex flex-col overflow-hidden transition-shadow duration-300 hover:shadow-glow">
+                className="panel group relative flex flex-col">
                 {t.image
                   ? <div className="h-80 w-full overflow-hidden"><img src={t.image} alt={t.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" style={{ objectPosition: "50% " + (t.focus ?? 50) + "%" }} /></div>
                   : <div className="grid h-80 w-full place-items-center bg-primary-grad text-6xl text-white">👤</div>}

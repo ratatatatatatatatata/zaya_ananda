@@ -25,7 +25,7 @@ export function CmsCard({ item }: { item: CmsItem }) {
   // Бүтээгдэхүүн: зураг → нэр → үнэ гэсэн энгийн байрлал
   if (isProduct) {
     return (
-      <Link href={"/item/" + item.id} className="card group flex flex-col overflow-hidden transition-shadow duration-300 hover:shadow-glow">
+      <Link href={"/item/" + item.id} className="panel group flex flex-col">
         {item.image && (
           <div className="relative h-60 w-full overflow-hidden">
             <img src={item.image} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
@@ -40,7 +40,7 @@ export function CmsCard({ item }: { item: CmsItem }) {
   }
 
   return (
-    <Link href={"/item/" + item.id} className="card group flex flex-col overflow-hidden transition-shadow duration-300 hover:shadow-glow">
+    <Link href={"/item/" + item.id} className="panel group flex flex-col">
       {item.image && (
         <div className="relative h-56 w-full overflow-hidden">
           <img src={item.image} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />

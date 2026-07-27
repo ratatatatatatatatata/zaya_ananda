@@ -107,7 +107,7 @@ export function Journey3D({
   return (
     // .night — гүн кино хэсэг: доторх токен ашигласан товч/хүрээ/текст гүн өнгө рүү шилжинэ
     <section ref={wrap} className="night relative" style={{ height: isWebgl ? `${heightVh}vh` : undefined }}>
-      <div className={isWebgl ? "sticky top-0 h-screen overflow-hidden" : "relative overflow-hidden"} style={{ background: "radial-gradient(80% 90% at 50% 10%, #10322f 0%, #0b1626 55%, #070d18 100%)" }}>
+      <div className={isWebgl ? "sticky top-0 h-screen overflow-hidden" : "relative overflow-hidden"} style={{ background: "radial-gradient(80% 90% at 50% 10%, #123a31 0%, #0b1f1b 55%, #060f0d 100%)" }}>
         {/* Дүрслэл */}
         {isWebgl && near && <Worlds world={world} progress={progress} />}
         {mode === "fallback" && (
@@ -118,7 +118,7 @@ export function Journey3D({
         )}
 
         {/* Уншигдахуйц байдлын scrim */}
-        <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(7,13,24,0.82) 0%, rgba(7,13,24,0.15) 38%, rgba(7,13,24,0.25) 100%)" }} />
+        <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(6,15,13,0.84) 0%, rgba(6,15,13,0.12) 38%, rgba(6,15,13,0.24) 100%)" }} />
 
         {/* Текст — тайзны дотор */}
         <div className={isWebgl ? "absolute inset-x-0 bottom-0" : "relative"}>

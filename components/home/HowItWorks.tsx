@@ -50,15 +50,15 @@ export function HowItWorks() {
     <section className="section bg-surface-2"><div className="container-px">
       <Reveal>
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.28em] text-primary-600"><Tr v={T_.eyebrow} /></p>
-          <h2 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl"><Tr v={T_.title} /></h2>
+          <p className="eyebrow-line justify-center"><Tr v={T_.eyebrow} /></p>
+          <h2 className="mt-4 font-display text-3xl font-semibold text-ink sm:text-4xl"><Tr v={T_.title} /></h2>
         </div>
       </Reveal>
 
       <ol className="mt-10 grid gap-6 md:grid-cols-3">
         {STEPS.map((s, i) => (
           <Reveal key={s.n} delay={i * 90}>
-            <li className="card-lux relative h-full p-7">
+            <li className="panel relative h-full p-7">
               <span aria-hidden className="absolute right-6 top-5 font-display text-4xl font-semibold text-primary-500/15">{s.n}</span>
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary-500/12 text-2xl">{s.icon}</span>
               <h3 className="mt-4 font-display text-xl font-semibold text-ink"><Tr v={s.title} /></h3>

@@ -8,22 +8,22 @@ import { Atmosphere } from "./motion/Atmosphere";
  *  Гэрлийн тоос, ариун геометрийн цагираг, гэрлийн урсгал, зөөлөн орох хөдөлгөөн. */
 export function PageHeader({ title, desc, crumb }: { title: ReactNode; desc?: ReactNode; crumb?: ReactNode }) {
   return (
-    <section className="night relative isolate overflow-hidden bg-[#131D3B]">
+    <section className="night edge-wave relative isolate overflow-hidden bg-[#0C1A17]">
       {/* Аура туяанууд — ногоон, ягаан, цэнхэр */}
       <div
         aria-hidden
         className="anim-breathe pointer-events-none absolute -top-32 left-1/3 h-[440px] w-[700px] -translate-x-1/2 rounded-full"
-        style={{ background: "radial-gradient(ellipse, rgba(43,200,187,0.42), rgba(43,200,187,0) 70%)", filter: "blur(12px)" }}
+        style={{ background: "radial-gradient(ellipse, rgba(45,172,145,0.45), rgba(45,172,145,0) 70%)", filter: "blur(12px)" }}
       />
       <div
         aria-hidden
         className="pointer-events-none absolute -top-20 right-0 h-[360px] w-[480px] rounded-full"
-        style={{ background: "radial-gradient(ellipse, rgba(155,110,240,0.30), rgba(155,110,240,0) 70%)", filter: "blur(14px)", animation: "zaBreathe 9s ease-in-out 1.5s infinite" }}
+        style={{ background: "radial-gradient(ellipse, rgba(232,183,95,0.28), rgba(232,183,95,0) 70%)", filter: "blur(14px)", animation: "zaBreathe 9s ease-in-out 1.5s infinite" }}
       />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
-        style={{ background: "linear-gradient(160deg, rgba(17,27,54,0) 30%, rgba(16,54,65,0.45) 70%, rgba(36,30,78,0.4) 100%)" }}
+        style={{ background: "linear-gradient(160deg, rgba(12,26,23,0) 28%, rgba(14,48,42,0.5) 68%, rgba(40,32,16,0.35) 100%)" }}
       />
 
       {/* Гэрлийн тоос */}
@@ -69,7 +69,7 @@ export function PageHeader({ title, desc, crumb }: { title: ReactNode; desc?: Re
       </div>
 
       {/* Доод ирмэг — гүн баннераас цайвар хуудас руу цэвэрхэн шилжинэ */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-20" style={{ background: "linear-gradient(to bottom, rgba(19,29,59,0), rgba(19,29,59,0.9))" }} />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-20" style={{ background: "linear-gradient(to bottom, rgba(12,26,23,0), rgba(12,26,23,0.92))" }} />
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-primary-400/25" />
     </section>
   );

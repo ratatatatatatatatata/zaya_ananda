@@ -63,14 +63,16 @@ const ALLBTN = Lx("Бүгдийг үзэх", "View all", "전체 보기", "す�
 
 function SectionHead({ titleKey, desc, href, icon }: { titleKey: string; desc: Record<Locale, string>; href: string; icon: string }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-4">
-      <div className="max-w-2xl">
-        <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl">
-          <span className="mr-2">{icon}</span><T k={titleKey} />
-        </h2>
-        <p className="mt-2 leading-relaxed text-muted"><Tr v={desc} /></p>
+    <div>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="max-w-2xl">
+          <p className="eyebrow-line"><span>{icon}</span></p>
+          <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><T k={titleKey} /></h2>
+          <p className="mt-3 leading-relaxed text-muted"><Tr v={desc} /></p>
+        </div>
+        <Link href={href} className="btn btn-outline btn-sm shrink-0"><Tr v={ALLBTN} /> →</Link>
       </div>
-      <Link href={href} className="btn btn-outline btn-sm shrink-0"><Tr v={ALLBTN} /> →</Link>
+      <div aria-hidden className="khas-rule mt-6 opacity-70" />
     </div>
   );
 }

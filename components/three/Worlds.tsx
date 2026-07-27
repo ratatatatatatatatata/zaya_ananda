@@ -20,7 +20,7 @@ const ease = (t: number) => t * t * (3 - 2 * t);
 /* ---------- Хуваалцсан элементүүд ---------- */
 
 /** Гэрлийн бөөмс — нэг BufferGeometry (instancing-ийн оронд Points, GPU-д хөнгөн) */
-function Particles({ count = 260, radius = 7, color = "#7CDCD2", size = 0.05, burst, progress }: {
+function Particles({ count = 260, radius = 7, color = "#7CDCC2", size = 0.05, burst, progress }: {
   count?: number; radius?: number; color?: string; size?: number;
   burst?: boolean; progress: P;
 }) {
@@ -88,7 +88,7 @@ function EnergyOrb({ progress, path = [0, 1.6, 0, 0, -0.4, 1.5] }: { progress: P
       </mesh>
       <mesh ref={glow}>
         <sphereGeometry args={[1, 16, 16]} />
-        <meshBasicMaterial color="#2BC8BB" transparent opacity={0.22} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color="#2DAC91" transparent opacity={0.22} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
     </>
   );
@@ -102,7 +102,7 @@ function GoldRing({ r = 1.6, tilt = 0.5, speed = 0.12, y = 0 }: { r?: number; ti
   return (
     <mesh ref={ref} rotation={[Math.PI / 2 - tilt, 0, 0]} position={[0, y, 0]}>
       <torusGeometry args={[r, 0.015, 12, 96]} />
-      <meshStandardMaterial color="#E3BE62" emissive="#8a6a1f" emissiveIntensity={0.6} metalness={0.9} roughness={0.25} />
+      <meshStandardMaterial color="#E8B75F" emissive="#8a6a1f" emissiveIntensity={0.6} metalness={0.9} roughness={0.25} />
     </mesh>
   );
 }
@@ -551,15 +551,15 @@ function LibraryWorld({ progress }: { progress: P }) {
   });
   return (
     <>
-      <fog attach="fog" args={["#0c1430", 6, 16]} />
-      <EnvLight sky="#2c4a80" horizon="#111c3a" ground="#050815" />
-      <ambientLight intensity={0.24} color="#8fb2e8" />
-      <pointLight position={[0, 5, 2]} intensity={22} color="#5E8DE0" />
-      <pointLight position={[-3, -1, 3]} intensity={10} color="#2BC8BB" />
+      <fog attach="fog" args={["#0a1a14", 6, 16]} />
+      <EnvLight sky="#3a5f4a" horizon="#16281f" ground="#050a08" />
+      <ambientLight intensity={0.24} color="#bfd4b6" />
+      <pointLight position={[0, 5, 2]} intensity={22} color="#3E8C6E" />
+      <pointLight position={[-3, -1, 3]} intensity={10} color="#2DAC91" />
       {/* Төв гэрлийн багана — тоос харагдана */}
       <mesh ref={beam} position={[0, 0.5, -0.5]}>
         <cylinderGeometry args={[0.5, 1.1, 9, 24, 1, true]} />
-        <meshBasicMaterial color="#9BC7F0" transparent opacity={0.08} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color="#D8CBA6" transparent opacity={0.08} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
       <Glow position={[0, 0.6, -1]} scale={7} color="rgba(120,170,235,0.22)" />
       <LightShaft position={[0, 3, -1.2]} rotation={[0, 0, 0]} size={[2.4, 9]} rgb="150,190,240" />
@@ -572,7 +572,7 @@ function LibraryWorld({ progress }: { progress: P }) {
               map={paper?.color ?? undefined}
               bumpMap={paper?.bump ?? undefined}
               bumpScale={0.02}
-              color={b.gold ? "#E3BE62" : "#2c4d63"}
+              color={b.gold ? "#E8B75F" : "#2c4d63"}
               emissive={b.gold ? "#6b5217" : "#12433f"}
               emissiveIntensity={b.gold ? 0.35 : 0.18}
               metalness={b.gold ? 0.85 : 0.15}
@@ -583,7 +583,7 @@ function LibraryWorld({ progress }: { progress: P }) {
         ))}
       </group>
       <GoldRing r={2.9} tilt={0.9} speed={0.06} y={0.4} />
-      <Particles count={340} radius={8} color="#9BC7F0" size={0.04} progress={progress} />
+      <Particles count={340} radius={8} color="#D8CBA6" size={0.04} progress={progress} />
       <EnergyOrb progress={progress} path={[-1.8, 2.4, 0.5, 0, 0.9, 1.8]} />
     </>
   );
@@ -608,7 +608,7 @@ function GalleryWorld({ progress }: { progress: P }) {
       <EnvLight sky="#3a6f66" horizon="#0f2a26" ground="#050b0a" />
       <ambientLight intensity={0.2} color="#cfe8dd" />
       <spotLight position={[0, 6, 2]} angle={0.5} penumbra={0.85} intensity={60} color="#F0E4C2" />
-      <pointLight position={[-4, 1.5, 2]} intensity={10} color="#2BC8BB" />
+      <pointLight position={[-4, 1.5, 2]} intensity={10} color="#2DAC91" />
       {/* Гялгар шал */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.15, 0]}>
         <planeGeometry args={[26, 26]} />
@@ -630,7 +630,7 @@ function GalleryWorld({ progress }: { progress: P }) {
         {[0, 1, 2, 3, 4].map((i) => (
           <mesh key={i} position={[Math.sin((i / 5) * Math.PI * 2) * 2.4, 0.4 + (i % 2) * 0.7, Math.cos((i / 5) * Math.PI * 2) * 2.4]}>
             <dodecahedronGeometry args={[0.22 + (i % 3) * 0.07, 0]} />
-            <meshStandardMaterial color={i % 2 ? "#E3BE62" : "#35625c"} emissive={i % 2 ? "#8a6a1f" : "#2BC8BB"} emissiveIntensity={0.3} metalness={0.6} roughness={0.35} />
+            <meshStandardMaterial color={i % 2 ? "#E8B75F" : "#35625c"} emissive={i % 2 ? "#8a6a1f" : "#2DAC91"} emissiveIntensity={0.3} metalness={0.6} roughness={0.35} />
           </mesh>
         ))}
       </group>
@@ -678,7 +678,7 @@ function SeedWorld({ progress }: { progress: P }) {
       </mesh>
       <mesh ref={halo} position={[0, 0.2, -0.2]}>
         <sphereGeometry args={[1, 24, 24]} />
-        <meshBasicMaterial color="#E3BE62" transparent opacity={0.06} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color="#E8B75F" transparent opacity={0.06} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
       {/* Гэрлийн туяанууд */}
       <group ref={rays} position={[0, 0.2, -0.5]}>
@@ -716,7 +716,7 @@ function SanctuaryWorld({ progress }: { progress: P }) {
       <EnvLight sky="#4a7a6c" horizon="#153029" ground="#060c0c" />
       <ambientLight intensity={0.24} color="#bfe3da" />
       <pointLight position={[0, 3, -16]} intensity={40} color="#F0B27A" /> {/* алсын нар мандалт */}
-      <pointLight position={[2, 3, 0]} intensity={10} color="#2BC8BB" />
+      <pointLight position={[2, 3, 0]} intensity={10} color="#2DAC91" />
       {/* Уулархаг хөндий — оройн цэгүүд шуугианаар өргөгдсөн жинхэнэ рельеф */}
       <mesh geometry={terrain} rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.05, -14]}>
         <meshStandardMaterial map={rock?.color ?? undefined} bumpMap={rock?.bump ?? undefined} bumpScale={0.25} color="#4c7a68" roughness={0.96} metalness={0} envMapIntensity={0.5} flatShading />
@@ -756,7 +756,7 @@ function SanctuaryWorld({ progress }: { progress: P }) {
 }
 
 /* ---------- 6. CHAMBER — Үйлчилгээний дэлгэрэнгүй: дотоод өргөө ---------- */
-const CHAKRAS = ["#e05252", "#e08a3c", "#e0c84a", "#4ec77a", "#4aa8d8", "#5a6ee0", "#9B6EF0"];
+const CHAKRAS = ["#e05252", "#e08a3c", "#e0c84a", "#4ec77a", "#4aa8d8", "#5a6ee0", "#C2884A"];
 function ChamberWorld({ progress }: { progress: P }) {
   const scan = useRef<THREE.Mesh>(null);
   const aura = useRef<THREE.Mesh>(null);
@@ -775,11 +775,11 @@ function ChamberWorld({ progress }: { progress: P }) {
   });
   return (
     <>
-      <fog attach="fog" args={["#101a2e", 4, 12]} />
-      <EnvLight sky="#33566e" horizon="#132335" ground="#05090f" />
+      <fog attach="fog" args={["#0e1c18", 4, 12]} />
+      <EnvLight sky="#3c6656" horizon="#152b25" ground="#050b09" />
       <ambientLight intensity={0.28} color="#a8cfe0" />
-      <pointLight position={[2.5, 3, 2]} intensity={16} color="#2BC8BB" />
-      <pointLight position={[-3, 1, -2]} intensity={8} color="#9B6EF0" />
+      <pointLight position={[2.5, 3, 2]} intensity={16} color="#2DAC91" />
+      <pointLight position={[-3, 1, -2]} intensity={8} color="#C2884A" />
       {/* Хүний хийсвэр дүрс */}
       <mesh position={[0, 1, 0]}>
         <capsuleGeometry args={[0.35, 1.1, 12, 24]} />
@@ -801,7 +801,7 @@ function ChamberWorld({ progress }: { progress: P }) {
       {/* Аура бүрхүүл + сканнер */}
       <mesh ref={aura} position={[0, 1.15, 0]}>
         <sphereGeometry args={[1.15, 24, 24]} />
-        <meshBasicMaterial color="#2BC8BB" transparent opacity={0.07} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+        <meshBasicMaterial color="#2DAC91" transparent opacity={0.07} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>
       <mesh ref={scan} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.85, 0.012, 10, 64]} />
@@ -815,7 +815,7 @@ function ChamberWorld({ progress }: { progress: P }) {
         <Glow key={"g" + i} position={[0, 0.35 + i * 0.3, 0.42]} scale={0.72} color={hexToRgba(c, 0.5)} />
       ))}
       <GoldRing r={1.9} tilt={0.35} y={1.1} />
-      <Particles count={200} radius={5.5} color="#9BC7F0" size={0.035} progress={progress} />
+      <Particles count={200} radius={5.5} color="#D8CBA6" size={0.035} progress={progress} />
       <EnergyOrb progress={progress} path={[1.5, 2.6, 0.5, 0, 2.5, 0.8]} />
     </>
   );
@@ -835,11 +835,11 @@ function PathWorld({ progress }: { progress: P }) {
   });
   return (
     <>
-      <fog attach="fog" args={["#0d1530", 4, 15]} />
-      <EnvLight sky="#31508a" horizon="#131d3c" ground="#050815" />
-      <ambientLight intensity={0.26} color="#a6bde8" />
-      <pointLight position={[0, 4, -6]} intensity={20} color="#5E8DE0" />
-      <pointLight position={[0, 2, -16]} intensity={30} color="#E3BE62" />
+      <fog attach="fog" args={["#0b1a14", 4, 15]} />
+      <EnvLight sky="#3c6249" horizon="#16291d" ground="#050a07" />
+      <ambientLight intensity={0.26} color="#c3d6b8" />
+      <pointLight position={[0, 4, -6]} intensity={20} color="#3E8C6E" />
+      <pointLight position={[0, 2, -16]} intensity={30} color="#E8B75F" />
       {/* Модулийн арлууд */}
       {isles.map((pos, i) => (
         <group key={i} position={[pos.x, pos.y, pos.z]}>
@@ -849,7 +849,7 @@ function PathWorld({ progress }: { progress: P }) {
           </mesh>
           <mesh position={[0, 0.35, 0]}>
             <octahedronGeometry args={[0.2, 0]} />
-            <meshStandardMaterial color="#2BC8BB" emissive="#2BC8BB" emissiveIntensity={0.5} metalness={0.4} roughness={0.3} />
+            <meshStandardMaterial color="#2DAC91" emissive="#2DAC91" emissiveIntensity={0.5} metalness={0.4} roughness={0.3} />
           </mesh>
         </group>
       ))}
@@ -859,17 +859,17 @@ function PathWorld({ progress }: { progress: P }) {
         return (
           <mesh key={"l" + i} position={[(a.x + b.x) / 2, (a.y + b.y) / 2 + 0.35, (a.z + b.z) / 2]} rotation={[0, Math.atan2(b.x - a.x, b.z - a.z), 0]}>
             <cylinderGeometry args={[0.012, 0.012, Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z), 6]} />
-            <meshBasicMaterial color="#7CDCD2" transparent opacity={0.5} />
+            <meshBasicMaterial color="#7CDCC2" transparent opacity={0.5} />
           </mesh>
         );
       })}
       {/* Төгсгөлийн гэрэлт хаалга */}
       <mesh ref={gate} position={[0, 1.2, -17]}>
         <torusGeometry args={[1.6, 0.06, 16, 80]} />
-        <meshStandardMaterial color="#E3BE62" emissive="#b8912f" emissiveIntensity={0.8} metalness={0.95} roughness={0.15} envMapIntensity={1.5} />
+        <meshStandardMaterial color="#E8B75F" emissive="#b8912f" emissiveIntensity={0.8} metalness={0.95} roughness={0.15} envMapIntensity={1.5} />
       </mesh>
       <Glow position={[0, 1.2, -17.4]} scale={5.5} color="rgba(227,190,98,0.34)" />
-      <Particles count={260} radius={8} color="#9BC7F0" size={0.04} progress={progress} />
+      <Particles count={260} radius={8} color="#D8CBA6" size={0.04} progress={progress} />
       <EnergyOrb progress={progress} path={[0, 2, 1, 0, 1.4, -3]} />
     </>
   );
@@ -893,7 +893,7 @@ function PedestalWorld({ progress }: { progress: P }) {
       <EnvLight sky="#43705f" horizon="#12302a" ground="#050b0a" />
       <ambientLight intensity={0.22} color="#d8eadf" />
       <spotLight position={[0, 5, 1]} angle={0.45} penumbra={0.9} intensity={55} color="#F0E4C2" />
-      <pointLight position={[-2.5, 1, 2]} intensity={8} color="#2BC8BB" />
+      <pointLight position={[-2.5, 1, 2]} intensity={8} color="#2DAC91" />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.85, 0]}>
         <planeGeometry args={[20, 20]} />
         <meshStandardMaterial color="#0c1c18" metalness={0.9} roughness={0.25} envMapIntensity={1.1} />
@@ -914,7 +914,7 @@ function PedestalWorld({ progress }: { progress: P }) {
         {[0, 1, 2, 3, 4].map((i) => (
           <mesh key={i} position={[Math.sin((i / 5) * Math.PI * 2) * 1.7, 0.9 + Math.sin(i * 2) * 0.3, Math.cos((i / 5) * Math.PI * 2) * 1.7]}>
             <octahedronGeometry args={[0.13, 0]} />
-            <meshStandardMaterial color="#2BC8BB" emissive="#2BC8BB" emissiveIntensity={0.6} metalness={0.5} roughness={0.3} />
+            <meshStandardMaterial color="#2DAC91" emissive="#2DAC91" emissiveIntensity={0.6} metalness={0.5} roughness={0.3} />
           </mesh>
         ))}
       </group>
@@ -942,11 +942,11 @@ function ArchiveWorld({ progress }: { progress: P }) {
   });
   return (
     <>
-      <fog attach="fog" args={["#0e1826", 3.5, 14]} />
-      <EnvLight sky="#3a5170" horizon="#141f2e" ground="#05080d" />
-      <ambientLight intensity={0.24} color="#bcd2e8" />
-      <pointLight position={[0, 4, -4]} intensity={18} color="#E3BE62" />
-      <pointLight position={[0, 2, -12]} intensity={16} color="#5E8DE0" />
+      <fog attach="fog" args={["#0d1a13", 3.5, 14]} />
+      <EnvLight sky="#4a5c40" horizon="#1c2419" ground="#060806" />
+      <ambientLight intensity={0.24} color="#d6cfb4" />
+      <pointLight position={[0, 4, -4]} intensity={18} color="#E8B75F" />
+      <pointLight position={[0, 2, -12]} intensity={16} color="#3E8C6E" />
       {/* Гэрлийн багана — тоос харагдана */}
       {[-3, -8].map((z, i) => (
         <LightShaft key={z} position={[0.6 - i * 1.2, 2.6, z]} rotation={[0, 0, 0.22 - i * 0.35]} size={[1.4, 7]} rgb="240,228,194" />
@@ -955,7 +955,7 @@ function ArchiveWorld({ progress }: { progress: P }) {
       {tablets.map((tb, i) => (
         <mesh key={i} position={[tb.x, tb.y, tb.z]} rotation={[0, tb.r, 0.06]}>
           <boxGeometry args={[0.7, 1, 0.07]} />
-          <meshStandardMaterial map={slab?.color ?? undefined} bumpMap={slab?.bump ?? undefined} bumpScale={0.05} color={i % 5 === 0 ? "#E3BE62" : "#4a6478"} emissive={i % 5 === 0 ? "#6b5217" : "#123a44"} emissiveIntensity={i % 5 === 0 ? 0.3 : 0.12} metalness={i % 5 === 0 ? 0.8 : 0.1} roughness={i % 5 === 0 ? 0.3 : 0.9} envMapIntensity={1} />
+          <meshStandardMaterial map={slab?.color ?? undefined} bumpMap={slab?.bump ?? undefined} bumpScale={0.05} color={i % 5 === 0 ? "#E8B75F" : "#4a6478"} emissive={i % 5 === 0 ? "#6b5217" : "#123a44"} emissiveIntensity={i % 5 === 0 ? 0.3 : 0.12} metalness={i % 5 === 0 ? 0.8 : 0.1} roughness={i % 5 === 0 ? 0.3 : 0.9} envMapIntensity={1} />
         </mesh>
       ))}
       {/* Уншлагын тавцан */}
@@ -986,8 +986,8 @@ function MandalaWorld({ progress }: { progress: P }) {
       <fog attach="fog" args={["#0e1c26", 4, 12]} />
       <EnvLight sky="#3d6e66" horizon="#122a2c" ground="#050b0c" />
       <ambientLight intensity={0.3} color="#cfe6df" />
-      <pointLight position={[0, 3, 2]} intensity={14} color="#2BC8BB" />
-      <pointLight position={[-2, 1, -2]} intensity={6} color="#E3BE62" />
+      <pointLight position={[0, 3, 2]} intensity={14} color="#2DAC91" />
+      <pointLight position={[-2, 1, -2]} intensity={6} color="#E8B75F" />
       {/* Дэлбээнүүд */}
       <group ref={petals}>
         {Array.from({ length: 12 }, (_, i) => (
@@ -1117,7 +1117,7 @@ function LotusWorld({ progress }: { progress: P }) {
       <EnvLight sky="#4d8f86" horizon="#12332f" ground="#050d0c" />
       <ambientLight intensity={0.3} color="#cfeee6" />
       <directionalLight position={[3, 5, 4]} intensity={2.4} color="#FFF4DC" />
-      <pointLight position={[-3, 1, -2]} intensity={7} color="#2BC8BB" />
+      <pointLight position={[-3, 1, -2]} intensity={7} color="#2DAC91" />
       {/* Тайван ус — тусгалтай */}
       <mesh ref={water} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
         <circleGeometry args={[14, 72]} />
@@ -1149,7 +1149,7 @@ function LotusWorld({ progress }: { progress: P }) {
       {/* Цэцгийн төв */}
       <mesh position={[0, 0.3, 0]}>
         <sphereGeometry args={[0.11, 24, 24]} />
-        <meshStandardMaterial color="#E3BE62" emissive="#8a6a1f" emissiveIntensity={0.5} roughness={0.4} />
+        <meshStandardMaterial color="#E8B75F" emissive="#8a6a1f" emissiveIntensity={0.5} roughness={0.4} />
       </mesh>
       <Glow position={[0, 0.34, 0]} scale={1.8} color="rgba(255,220,150,0.35)" />
       {/* Усан дээрх навчнууд */}

@@ -54,7 +54,7 @@ export function PathsHighlight({ courseCount, lessonCount, teacherCount }: {
     <section className="section"><div className="container-px">
       <Reveal>
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.28em] text-primary-600"><Tr v={C.eyebrow} /></p>
+          <p className="eyebrow-line justify-center"><Tr v={C.eyebrow} /></p>
           <p className="mt-4 text-lg leading-relaxed text-ink/85 sm:text-xl"><Tr v={C.lead} /></p>
         </div>
       </Reveal>
@@ -62,7 +62,7 @@ export function PathsHighlight({ courseCount, lessonCount, teacherCount }: {
       <div className="mt-12 grid gap-7 lg:grid-cols-2">
         {/* Йог ба сургалт */}
         <Reveal>
-          <article className="card-lux group relative flex h-full flex-col overflow-hidden p-8 sm:p-10">
+          <article className="panel group relative flex h-full flex-col p-8 sm:p-10">
             <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full opacity-70 transition duration-700 group-hover:scale-110"
               style={{ background: "radial-gradient(circle, rgb(var(--c-p400) / 0.22), transparent 70%)", filter: "blur(8px)" }} />
             <div className="relative z-10 flex flex-1 flex-col">
@@ -95,10 +95,10 @@ export function PathsHighlight({ courseCount, lessonCount, teacherCount }: {
 
         {/* Сүнслэг аялал */}
         <Reveal delay={110}>
-          <article className="night group relative flex h-full flex-col overflow-hidden rounded-3xl border border-grape-500/30 p-8 sm:p-10"
-            style={{ backgroundImage: "linear-gradient(160deg,#1E1B45 0%,#191A3A 55%,#12203A 100%)" }}>
+          <article className="night group relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-accent-300/25 p-8 sm:p-10"
+            style={{ backgroundImage: "linear-gradient(160deg,#0F2B26 0%,#123029 52%,#1B2E22 100%)" }}>
             <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full transition duration-700 group-hover:scale-110"
-              style={{ background: "radial-gradient(circle, rgba(155,110,240,0.35), transparent 70%)", filter: "blur(10px)" }} />
+              style={{ background: "radial-gradient(circle, rgba(232,183,95,0.3), transparent 70%)", filter: "blur(10px)" }} />
             <div aria-hidden className="pointer-events-none absolute -bottom-28 left-1/4 h-72 w-72 rounded-full"
               style={{ background: "radial-gradient(circle, rgba(43,200,187,0.22), transparent 70%)", filter: "blur(12px)" }} />
             <div className="relative z-10 flex flex-1 flex-col">
@@ -122,7 +122,7 @@ export function PathsHighlight({ courseCount, lessonCount, teacherCount }: {
 
               <div className="mt-auto pt-7">
                 <Link href="/ayalal" className="btn btn-lg text-white shadow-glow-grape transition hover:-translate-y-0.5 hover:brightness-110"
-                  style={{ backgroundImage: "linear-gradient(120deg,#9B6EF0,#5E8DE0)" }}>
+                  style={{ backgroundImage: "linear-gradient(120deg,#C4802A,#0F7A66)" }}>
                   <Tr v={C.travelCta} /> →
                 </Link>
               </div>
