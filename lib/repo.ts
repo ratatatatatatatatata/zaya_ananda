@@ -39,6 +39,30 @@ export async function setUserAdmin(id: string, isAdmin: boolean): Promise<boolea
   return true;
 }
 
+/** Төхөөрөмжийн бүртгэл — нэг эрхээр зэрэг ашиглах төхөөрөмжийн тоог хязгаарлана.
+ *  users.devices (jsonb) талбарт сүүлд ашигласан төхөөрөмжүүдийг хадгална.
+ *  Буцаах утга: true = зөвшөөрөв, false = хязгаар хэтэрсэн. */
+export async function registerDevice(uid: string, deviceId: string, max: number): Promise<boolean> {
+  const u = await getUserById(uid);
+  if (!u) return true;
+  const raw = (u as unknown as { devices?: { id: string; at: string }[] }).devices;
+  const list = Array.isArray(raw) ? raw : [];
+  const now = new Date().toISOString();
+  const found = list.find((d) => d.id === deviceId);
+  if (found) {
+    found.at = now;
+    await sbUpdate("users", uid, { devices: list });
+    return true;
+  }
+  // 60 хоног ашиглаагүй төхөөрөмжийг чөлөөлнө
+  const cutoff = Date.now() - 60 * 86400000;
+  const fresh = list.filter((d) => new Date(d.at).getTime() > cutoff);
+  if (fresh.length >= max) return false;
+  fresh.push({ id: deviceId, at: now });
+  await sbUpdate("users", uid, { devices: fresh });
+  return true;
+}
+
 export async function getUserByEmail(email: string): Promise<User | null> {
   const e = (email || "").trim().toLowerCase();
   if (!e) return null;

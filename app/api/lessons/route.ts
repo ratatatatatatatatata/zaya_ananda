@@ -1,13 +1,18 @@
 import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth";
-import { getCmsById, getOrdersByUser } from "@/lib/repo";
+import { getCmsById, getOrdersByUser, getUserById, registerDevice } from "@/lib/repo";
 import { signedDownloadUrl } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+/** Нэг эрхээр зэрэг ашиглаж болох төхөөрөмжийн дээд тоо (гэрээ: төхөөрөмжийн хязгаарлалт) */
+const MAX_DEVICES = 3;
+
 export async function GET(req: Request) {
-  const itemId = new URL(req.url).searchParams.get("itemId");
+  const u = new URL(req.url);
+  const itemId = u.searchParams.get("itemId");
+  const deviceId = (u.searchParams.get("device") || "").slice(0, 64);
   if (!itemId) return NextResponse.json({ status: "none", lessons: [] });
   try {
     const item = await getCmsById(itemId);
@@ -26,6 +31,19 @@ export async function GET(req: Request) {
       else if (mine.some((o) => o.status === "pending")) status = "pending";
     }
 
+    // Төхөөрөмжийн хязгаар — хэт олон төхөөрөмжөөс нэвтэрвэл түгжинэ
+    let mark = "";
+    if (status === "active" && uid) {
+      const user = await getUserById(uid).catch(() => null);
+      mark = (user?.email || user?.phone || uid).slice(0, 42);
+      if (deviceId) {
+        const okDevice = await registerDevice(uid, deviceId, MAX_DEVICES).catch(() => true);
+        if (!okDevice) {
+          return NextResponse.json({ status: "device-limit", lessons: [], maxDevices: MAX_DEVICES });
+        }
+      }
+    }
+
     const BUCKET = "lesson-videos";
     const out = await Promise.all(lessons.map(async (l) => {
       let url = "";
@@ -35,7 +53,7 @@ export async function GET(req: Request) {
       }
       return { title: l.title, url, quality: l.quality || "", subtitles: status === "active" ? (l.subtitles || "") : "" };
     }));
-    return NextResponse.json({ status, lessons: out });
+    return NextResponse.json({ status, lessons: out, mark });
   } catch {
     return NextResponse.json({ status: "none", lessons: [] });
   }

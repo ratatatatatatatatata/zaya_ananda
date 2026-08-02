@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ProtectedVideo } from "./ProtectedVideo";
+import { getDeviceId } from "@/lib/device";
 
 type Lesson = { title: string; url: string; quality?: string; subtitles?: string };
-type Data = { status: "none" | "pending" | "active" | "expired"; lessons: Lesson[] };
+type Data = { status: "none" | "pending" | "active" | "expired" | "device-limit"; lessons: Lesson[]; mark?: string; maxDevices?: number };
 
 function embed(url: string): { type: "iframe" | "video"; src: string } {
   const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/);
@@ -16,12 +18,24 @@ function embed(url: string): { type: "iframe" | "video"; src: string } {
 export function CourseLessons({ id }: { id: string }) {
   const [data, setData] = useState<Data | null>(null);
   useEffect(() => {
-    fetch("/api/lessons?itemId=" + encodeURIComponent(id), { cache: "no-store" })
+    fetch("/api/lessons?itemId=" + encodeURIComponent(id) + "&device=" + encodeURIComponent(getDeviceId()), { cache: "no-store" })
       .then((r) => r.json())
       .then(setData)
       .catch(() => setData({ status: "none", lessons: [] }));
   }, [id]);
 
+  // Төхөөрөмжийн хязгаар хэтэрсэн — гэрээний «төхөөрөмжийн хязгаарлалт» нөхцөл
+  if (data?.status === "device-limit") {
+    return (
+      <div className="mt-10 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm text-amber-800">
+        <p className="font-semibold">🔒 Төхөөрөмжийн хязгаар хэтэрлээ</p>
+        <p className="mt-1">
+          Энэ эрхийг зэрэг {data.maxDevices ?? 3} төхөөрөмж дээр ашиглах боломжтой. Өөр төхөөрөмжөөс гарсны дараа
+          эсвэл манай багтай холбогдож хязгаараа шинэчлүүлээрэй.
+        </p>
+      </div>
+    );
+  }
   if (!data || data.lessons.length === 0) return null;
   const locked = data.status !== "active";
   const notice =
@@ -53,14 +67,14 @@ export function CourseLessons({ id }: { id: string }) {
               </div>
             );
           }
-          return <LessonVideo key={i} lesson={l} index={i} />;
+          return <LessonVideo key={i} lesson={l} index={i} mark={data.mark || ""} />;
         })}
       </div>
     </div>
   );
 }
 
-function LessonVideo({ lesson, index }: { lesson: Lesson; index: number }) {
+function LessonVideo({ lesson, index, mark }: { lesson: Lesson; index: number; mark: string }) {
   const [subUrl, setSubUrl] = useState<string | undefined>();
   useEffect(() => {
     if (!lesson.subtitles) { setSubUrl(undefined); return; }
@@ -82,10 +96,7 @@ function LessonVideo({ lesson, index }: { lesson: Lesson; index: number }) {
         {e.type === "iframe" ? (
           <iframe src={e.src} title={lesson.title} className="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
         ) : (
-          <video controls className="h-full w-full" controlsList="nodownload">
-            <source src={e.src} />
-            {subUrl && <track kind="subtitles" srcLang="en" label="English" src={subUrl} default />}
-          </video>
+          <ProtectedVideo src={e.src} mark={mark || "Zaya's Ananda"} />
         )}
       </div>
       {lesson.subtitles && e.type !== "iframe" && (
