@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
+import { PurchaseBox } from "@/components/PurchaseBox";
 import { ZODIAC_SIGNS, zodiacOf, pickIndex } from "@/data/daily-horoscope";
 import { ARCANA } from "@/data/matrix-data";
 import {
   LIFE_PATHS, lifePathOf, personalYear, PERSONAL_YEAR_TEXT,
-  HD_TYPES, HD_AUTHORITY, DAY_THEMES, MONTH_THEMES, YEAR_ADVICE, seedIndex,
+  HD_TYPES, HD_AUTHORITY, DAY_THEMES, MONTH_THEMES, YEAR_ADVICE, seedIndex, MERGE_ITEMS,
 } from "@/data/merge-toorog";
 
 const MONTHS = ["1-р сар", "2-р сар", "3-р сар", "4-р сар", "5-р сар", "6-р сар", "7-р сар", "8-р сар", "9-р сар", "10-р сар", "11-р сар", "12-р сар"];
@@ -30,7 +30,6 @@ const DIMENSIONS = [
 ];
 
 type Access = { status: "none" | "pending" | "active" | "expired"; daysLeft?: number | null };
-type CmsLite = { id: string; title: string; summary?: string; price?: number };
 
 function reduceArcana(n: number): number {
   let x = n;
@@ -68,57 +67,50 @@ function Card({ eyebrow, title, children }: { eyebrow: string; title: string; ch
   );
 }
 
-/** Түгжээтэй хэсэг — худалдан авалт хийгээгүй үед */
+/** Түгжээтэй хэсэг — тогтсон үнээр төлбөр төлж нээнэ */
 function LockedPanel({
-  icon, title, desc, item, access, onBuy, busy, err, user,
+  icon, title, desc, bullets, item,
 }: {
-  icon: string; title: string; desc: string;
-  item: CmsLite | null; access: Access | null;
-  onBuy: () => void; busy: boolean; err: string; user: unknown;
+  icon: string; title: string; desc: string; bullets: string[];
+  item: { id: string; title: string; price: number; days: number };
 }) {
-  const st = access?.status;
   return (
-    <div className="night relative overflow-hidden rounded-[1.75rem] p-7 sm:p-9"
-      style={{ backgroundImage: "linear-gradient(150deg,#0F2B26 0%,#12302A 55%,#1E2A1C 100%)" }}>
-      <div aria-hidden className="pointer-events-none absolute -left-16 -bottom-16 h-56 w-56 rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(232,183,95,0.24), transparent 70%)", filter: "blur(10px)" }} />
-      <div className="relative z-10">
-        <div className="flex items-start gap-4">
-          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-accent-300/40 bg-white/5 text-2xl">{icon}</span>
-          <div className="min-w-0">
-            <h3 className="font-display text-2xl font-semibold text-white">{title}</h3>
-            <p className="mt-1.5 leading-relaxed text-white/75">{desc}</p>
+    <div className="grid gap-6 lg:grid-cols-[1fr_minmax(0,22rem)]">
+      <div className="night relative overflow-hidden rounded-[1.75rem] p-7 sm:p-9"
+        style={{ backgroundImage: "linear-gradient(150deg,#0F2B26 0%,#12302A 55%,#1E2A1C 100%)" }}>
+        <div aria-hidden className="pointer-events-none absolute -left-16 -bottom-16 h-56 w-56 rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(232,183,95,0.24), transparent 70%)", filter: "blur(10px)" }} />
+        <div className="relative z-10">
+          <div className="flex items-start gap-4">
+            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-accent-300/40 bg-white/5 text-2xl">{icon}</span>
+            <div className="min-w-0">
+              <h3 className="font-display text-2xl font-semibold text-white">{title}</h3>
+              <p className="mt-1.5 leading-relaxed text-white/75">{desc}</p>
+            </div>
           </div>
-        </div>
 
-        {/* Бүдгэрсэн урьдчилсан харагдац */}
-        <div aria-hidden className="mt-6 space-y-2.5 select-none" style={{ filter: "blur(5px)", opacity: 0.5 }}>
-          <div className="h-3 w-11/12 rounded-full bg-white/25" />
-          <div className="h-3 w-9/12 rounded-full bg-white/20" />
-          <div className="h-3 w-10/12 rounded-full bg-white/20" />
-          <div className="h-3 w-7/12 rounded-full bg-white/15" />
-        </div>
+          <ul className="mt-6 space-y-2.5">
+            {bullets.map((b) => (
+              <li key={b} className="flex gap-3 text-white/85">
+                <span aria-hidden className="mt-1 text-accent-300">✦</span>
+                <span className="leading-relaxed">{b}</span>
+              </li>
+            ))}
+          </ul>
 
-        <div className="mt-7 flex flex-wrap items-center gap-4">
-          {typeof item?.price === "number" && item.price > 0 && (
-            <span className="font-display text-2xl font-semibold text-accent-300">
-              {item.price.toLocaleString("mn-MN")}₮
-            </span>
-          )}
-          {!item ? (
-            <p className="text-sm text-white/70">Тун удахгүй нээгдэнэ. Дэлгэрэнгүйг <Link href="/contact" className="font-semibold text-accent-300 underline">холбоо барих</Link> хэсгээс.</p>
-          ) : st === "pending" ? (
-            <p className="rounded-xl bg-white/10 px-4 py-2 text-sm text-white/85">Захиалга баталгаажихыг хүлээж байна.</p>
-          ) : !user ? (
-            <Link href="/login" className="btn btn-gold btn-md">Нэвтрээд авах</Link>
-          ) : (
-            <button onClick={onBuy} disabled={busy} className="btn btn-gold btn-md disabled:opacity-60">
-              {busy ? "Илгээж байна…" : st === "expired" ? "Дахин авах" : "🔓 Тайллаа нээх"}
-            </button>
-          )}
+          {/* Бүдгэрсэн урьдчилсан харагдац */}
+          <div aria-hidden className="mt-6 space-y-2.5 select-none" style={{ filter: "blur(5px)", opacity: 0.45 }}>
+            <div className="h-3 w-11/12 rounded-full bg-white/25" />
+            <div className="h-3 w-9/12 rounded-full bg-white/20" />
+            <div className="h-3 w-10/12 rounded-full bg-white/15" />
+          </div>
+
+          <p className="mt-6 text-sm text-white/60">Төлбөр баталгаажсаны дараа {item.days} хоногийн турш нээлттэй.</p>
         </div>
-        {err && <p className="mt-3 rounded-xl bg-rose-500/20 px-4 py-2 text-sm text-rose-100">{err}</p>}
-        {item && !user && <p className="mt-3 text-sm text-white/60">Худалдан авахын тулд эхлээд нэвтэрнэ үү.</p>}
+      </div>
+
+      <div className="lg:self-start">
+        <PurchaseBox id={item.id} title={item.title} price={item.price} />
       </div>
     </div>
   );
@@ -141,47 +133,21 @@ export function MergeToorog() {
   const [calM, setCalM] = useState(now.getMonth() + 1);
   const [selDay, setSelDay] = useState(now.getDate());
 
-  // Төлбөрт тайллын бараа
-  const [items, setItems] = useState<CmsLite[]>([]);
+  // Төлбөрт тайллын хандах эрх
   const [accM, setAccM] = useState<Access | null>(null);
   const [accY, setAccY] = useState<Access | null>(null);
-  const [busy, setBusy] = useState("");
-  const [err, setErr] = useState<{ k: string; msg: string } | null>(null);
 
   const ready = typeof by === "number" && typeof bm === "number" && typeof bd === "number";
   const birthKey = ready ? `${by}-${bm}-${bd}-${bt}` : "";
-
-  const monthItem = useMemo(() => items.find((i) => /сарын\s*мэргэ/i.test(i.title)) || null, [items]);
-  const yearItem = useMemo(() => items.find((i) => /жилийн\s*мэргэ/i.test(i.title)) || null, [items]);
-
-  useEffect(() => {
-    fetch("/api/content?kinds=service", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((d) => setItems(Array.isArray(d.items) ? d.items : []))
-      .catch(() => setItems([]));
-  }, []);
 
   useEffect(() => {
     if (!user) { setAccM(null); setAccY(null); return; }
     const load = (id: string, set: (a: Access) => void) =>
       fetch("/api/access?itemId=" + encodeURIComponent(id), { cache: "no-store" })
         .then((r) => r.json()).then(set).catch(() => set({ status: "none" }));
-    if (monthItem) load(monthItem.id, setAccM);
-    if (yearItem) load(yearItem.id, setAccY);
-  }, [user, monthItem, yearItem]);
-
-  async function buy(item: CmsLite | null, which: "m" | "y") {
-    if (!item) return;
-    setBusy(which); setErr(null);
-    try {
-      const res = await fetch("/api/pay/notify", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ itemId: item.id, method: "bank" }),
-      });
-      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
-      (which === "m" ? setAccM : setAccY)({ status: "pending" });
-    } catch (e) { setErr({ k: which, msg: e instanceof Error ? e.message : "Алдаа гарлаа." }); } finally { setBusy(""); }
-  }
+    load(MERGE_ITEMS.month.id, setAccM);
+    load(MERGE_ITEMS.year.id, setAccY);
+  }, [user]);
 
   /* ---- Үндсэн профайл (үнэгүй) ---- */
   const profile = useMemo(() => {
@@ -485,8 +451,14 @@ export function MergeToorog() {
               </div>
             ) : (
               <LockedPanel icon="🌙" title="Сарын мэргэ төөрөг"
-                desc="Сонгосон сарын бүтэн зураглал — долоо хоног тус бүрийн урсгал, хамгийн хүчтэй ба болгоомжлох өдөр, сарын аркан, санхүү, харилцааны чиг хандлага."
-                item={monthItem} access={accM} onBuy={() => buy(monthItem, "m")} busy={busy === "m"} err={err?.k === "m" ? err.msg : ""} user={user} />
+                desc="Сонгосон сарын бүтэн зураглал таны төрсөн огноон дээр тулгуурлан гарна."
+                bullets={[
+                  "Долоо хоног тус бүрийн эрчмийн урсгал ба сэдэв",
+                  "Хамгийн хүчтэй өдөр ба болгоомжлох өдөр",
+                  "Сарын аркан — гол даалгавар, сургамж",
+                  "Санхүү, харилцаа, эрүүл мэндийн чиг хандлага",
+                ]}
+                item={MERGE_ITEMS.month} />
             )}
           </div>
 
@@ -513,18 +485,18 @@ export function MergeToorog() {
               </div>
             ) : (
               <LockedPanel icon="☀️" title="Жилийн мэргэ төөрөг"
-                desc="Бүтэн жилийн зураглал — хувийн жилийн эрчим, 12 сар тус бүрийн чиг хандлага, эргэлтийн цэгүүд, жилийн түлхүүр зөвлөгөө."
-                item={yearItem} access={accY} onBuy={() => buy(yearItem, "y")} busy={busy === "y"} err={err?.k === "y" ? err.msg : ""} user={user} />
+                desc="Бүтэн жилийн зураглал — таны 9 жилийн мөчлөгийн аль үе шатанд яваагаас эхлээд сар бүрийн урсгал хүртэл."
+                bullets={[
+                  "Хувийн жилийн эрчим ба түүний утга учир",
+                  "12 сар тус бүрийн чиг хандлага",
+                  "Жилийн эргэлтийн цэгүүд, боломжийн цонх",
+                  "Жилийн түлхүүр зөвлөгөө",
+                ]}
+                item={MERGE_ITEMS.year} />
             )}
           </div>
 
-          {/* Холбоос */}
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Link href="/matrix" className="btn btn-outline btn-md">🔢 Тоон зурхайн матрикс</Link>
-            <Link href="/toorog" className="btn btn-outline btn-md">🎲 Шагайн төөрөг</Link>
-            <Link href="/services" className="btn btn-primary btn-md">Гүнзгий тайлал захиалах</Link>
-          </div>
-          <p className="mt-4 text-center text-xs text-muted">Мэргэ төөрөг бол чиглүүлэг — эцсийн шийдвэр үргэлж таных.</p>
+          <p className="mt-10 text-center text-xs text-muted">Мэргэ төөрөг бол чиглүүлэг — эцсийн шийдвэр үргэлж таных.</p>
         </div>
       )}
     </div>

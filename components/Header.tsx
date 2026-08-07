@@ -15,7 +15,6 @@ const links = [
   { href: "/services", key: "nav.services" },
   { href: "/courses", key: "nav.courses" },
   { href: "/ayalal", key: "nav.journey" },
-  { href: "/merge", key: "nav.merge" },
   { href: "/shop", key: "nav.shop" },
   { href: "/resources", key: "nav.resources" },
   { href: "/teachers", key: "nav.teachers" },

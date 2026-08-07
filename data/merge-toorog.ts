@@ -113,6 +113,14 @@ export const YEAR_ADVICE = [
   "Өгөх, үйлчлэх замаар таны амьдрал утга учираар дүүрнэ.",
 ];
 
+/* ---------- 4. Төлбөрт тайллын тогтсон үнэ ---------- */
+export const MERGE_ITEMS = {
+  month: { id: "merge-month", title: "Сарын мэргэ төөрөг", price: 19000, days: 35 },
+  year: { id: "merge-year", title: "Жилийн мэргэ төөрөг", price: 49000, days: 370 },
+} as const;
+
+export type MergeItemKey = keyof typeof MERGE_ITEMS;
+
 /** Тогтмол индекс — түлхүүр + огнооны хослолоос */
 export function seedIndex(seed: string, len: number): number {
   let h = 2166136261;

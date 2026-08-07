@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth";
 import { checkAdmin, updateOrder, getOrderById, getCmsById, deleteOrder } from "@/lib/repo";
+import { MERGE_ITEMS } from "@/data/merge-toorog";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,8 +23,13 @@ export async function PATCH(req: Request) {
       if (!days) {
         const existing = await getOrderById(id);
         const itemId = existing?.items?.[0]?.slug;
-        const item = itemId ? await getCmsById(itemId) : null;
-        days = item && typeof item.accessDays === "number" ? item.accessDays : 0;
+        // Мэргэ төөрөгийн тогтсон үнэтэй тайлал — CMS-д байхгүй тул хугацааг эндээс авна
+        const fixed = Object.values(MERGE_ITEMS).find((m) => m.id === itemId);
+        if (fixed) days = fixed.days;
+        else {
+          const item = itemId ? await getCmsById(itemId) : null;
+          days = item && typeof item.accessDays === "number" ? item.accessDays : 0;
+        }
       }
       patch.expiresAt = days > 0 ? new Date(Date.now() + days * 86400000).toISOString() : null;
     } else {
