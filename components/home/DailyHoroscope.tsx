@@ -181,7 +181,8 @@ export function DailyHoroscope() {
 
           {/* Гүнзгий тайлал руу */}
           <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Link href="/matrix" className="btn btn-primary btn-md">🔢 Тоон зурхайн матрикс</Link>
+            <Link href="/merge" className="btn btn-primary btn-md">🔮 Мэргэ төөрөг — бүтэн зураглал</Link>
+            <Link href="/matrix" className="btn btn-outline btn-md">🔢 Тоон зурхайн матрикс</Link>
             <Link href="/shop#shop" className="btn btn-gold btn-md">💎 Ордын ээлтэй чулуу</Link>
             <Link href="/services" className="btn btn-outline btn-md">Гүнзгий тайлал захиалах</Link>
           </div>

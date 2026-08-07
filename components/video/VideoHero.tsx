@@ -22,7 +22,7 @@ export function VideoHero({
   eyebrow?: ReactNode;
   title: ReactNode;
   desc?: ReactNode;
-  cta?: { href: string; label: ReactNode }[];
+  cta?: { href: string; label: ReactNode; variant?: "gold" }[];
   height?: "tall" | "mid" | "short";
   align?: "left" | "center";
 }) {
@@ -118,7 +118,7 @@ export function VideoHero({
           {cta && cta.length > 0 && (
             <div className={`animate-fade-rise-delay-2 mt-8 flex flex-wrap gap-3 ${align === "center" ? "justify-center" : ""}`}>
               {cta.map((c, i) => (
-                <Link key={i} href={c.href} className={i === 0 ? "btn btn-primary btn-lg" : "btn btn-outline btn-lg"}>
+                <Link key={i} href={c.href} className={`btn btn-lg ${c.variant === "gold" ? "btn-gold" : i === 0 ? "btn-primary" : "btn-outline"}`}>
                   {c.label}
                 </Link>
               ))}

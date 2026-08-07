@@ -11,7 +11,7 @@ export default function HomePage() {
         eyebrow="Zaya's Ananda"
         title={<>Дотоод чимээгүй байдал<br className="hidden sm:block" /> руу хийх аялал</>}
         desc="Урсгал усны хажууд, ойн гүнд — далд ухамсар, энерги-мэдээллийн судалгааны төв. Йог, бясалгал, эдгэрлийн засал, ариун газрын аялал."
-        cta={[{ href: "/courses", label: "Сургалт эхлүүлэх" }, { href: "/ayalal", label: "Сүнслэг аялал" }]}
+        cta={[{ href: "/courses", label: "Сургалт эхлүүлэх" }, { href: "/ayalal", label: "Сүнслэг аялал" }, { href: "/merge", label: "🔮 Мэргэ төөрөг", variant: "gold" as const }]}
       />
       <HomeSections />
     </>

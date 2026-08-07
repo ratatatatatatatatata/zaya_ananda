@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { p: "/about", pr: 0.7, ch: "monthly" },
     { p: "/matrix", pr: 0.6, ch: "monthly" },
     { p: "/toorog", pr: 0.6, ch: "monthly" },
+    { p: "/merge", pr: 0.8, ch: "weekly" },
     { p: "/login", pr: 0.3, ch: "monthly" },
     { p: "/register", pr: 0.3, ch: "monthly" },
   ];
