@@ -2,43 +2,33 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
+import { useI18n } from "@/lib/i18n";
 import { PurchaseBox } from "@/components/PurchaseBox";
 import { ZODIAC_SIGNS, zodiacOf, pickIndex } from "@/data/daily-horoscope";
-import { ARCANA } from "@/data/matrix-data";
 import {
-  LIFE_PATHS, lifePathOf, personalYear, PERSONAL_YEAR_TEXT,
-  HD_TYPES, HD_AUTHORITY, DAY_THEMES, MONTH_THEMES, YEAR_ADVICE, seedIndex, MERGE_ITEMS,
-} from "@/data/merge-toorog";
+  LIFE_PATHS_L, BIRTH_MONTH_L, BIRTH_YEAR_L, ARCANA_L,
+  ZODIAC_NAME_L, ELEMENT_L, TRAIT_L,
+} from "@/data/merge-i18n";
+import {
+  DAY_THEMES_L, MONTH_THEMES_L, YEAR_ADVICE_L, PERSONAL_YEAR_L,
+  HD_TYPES_L, HD_AUTHORITY_L, UI,
+} from "@/data/merge-i18n2";
+import { lifePathOf, personalYear, seedIndex, MERGE_ITEMS } from "@/data/merge-toorog";
 
-const MONTHS = ["1-р сар", "2-р сар", "3-р сар", "4-р сар", "5-р сар", "6-р сар", "7-р сар", "8-р сар", "9-р сар", "10-р сар", "11-р сар", "12-р сар"];
-const WD = ["Да", "Мя", "Лх", "Пү", "Ба", "Бя", "Ня"];
 const daysIn = (y: number, m: number) => new Date(y, m, 0).getDate();
 const fmt = (n: number) => String(n).padStart(2, "0");
-
-/* Мэргэ төөрөгийн 10 хэмжүүр (MysticSync-ийн бүтцээр) */
-const DIMENSIONS = [
-  { key: "lead", label: "Манлайлал" },
-  { key: "create", label: "Бүтээлч" },
-  { key: "intu", label: "Зөн совин" },
-  { key: "bond", label: "Холбоо" },
-  { key: "disc", label: "Сахилга" },
-  { key: "spirit", label: "Сүнслэг" },
-  { key: "love", label: "Хайр" },
-  { key: "wealth", label: "Баялаг" },
-  { key: "learn", label: "Сурах" },
-  { key: "serve", label: "Үйлчлэх" },
-];
+const DIM_KEYS = ["lead", "create", "intu", "bond", "disc", "spirit", "love", "wealth", "learn", "serve"];
+const FREE_DAYS = 7;
 
 type Access = { status: "none" | "pending" | "active" | "expired"; daysLeft?: number | null };
 
 function reduceArcana(n: number): number {
-  let x = n;
-  while (x > 22) x -= 22;
-  return x || 22;
+  let v = n;
+  while (v > 22) v -= 22;
+  return v || 22;
 }
-function digitSum(n: number): number {
-  return String(n).split("").reduce((a, c) => a + Number(c), 0);
-}
+const digitSum = (n: number) => String(n).split("").reduce((a, c) => a + Number(c), 0);
+const dayStart = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
 
 /* ---------- Дэд бүрдлүүд ---------- */
 
@@ -67,12 +57,12 @@ function Card({ eyebrow, title, children }: { eyebrow: string; title: string; ch
   );
 }
 
-/** Түгжээтэй хэсэг — тогтсон үнээр төлбөр төлж нээнэ */
 function LockedPanel({
-  icon, title, desc, bullets, item,
+  icon, title, desc, bullets, item, afterPay, daysOpen,
 }: {
   icon: string; title: string; desc: string; bullets: string[];
   item: { id: string; title: string; price: number; days: number };
+  afterPay: string; daysOpen: string;
 }) {
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_minmax(0,22rem)]">
@@ -88,7 +78,6 @@ function LockedPanel({
               <p className="mt-1.5 leading-relaxed text-white/75">{desc}</p>
             </div>
           </div>
-
           <ul className="mt-6 space-y-2.5">
             {bullets.map((b) => (
               <li key={b} className="flex gap-3 text-white/85">
@@ -97,18 +86,14 @@ function LockedPanel({
               </li>
             ))}
           </ul>
-
-          {/* Бүдгэрсэн урьдчилсан харагдац */}
           <div aria-hidden className="mt-6 space-y-2.5 select-none" style={{ filter: "blur(5px)", opacity: 0.45 }}>
             <div className="h-3 w-11/12 rounded-full bg-white/25" />
             <div className="h-3 w-9/12 rounded-full bg-white/20" />
             <div className="h-3 w-10/12 rounded-full bg-white/15" />
           </div>
-
-          <p className="mt-6 text-sm text-white/60">Төлбөр баталгаажсаны дараа {item.days} хоногийн турш нээлттэй.</p>
+          <p className="mt-6 text-sm text-white/60">{afterPay} {item.days} {daysOpen}</p>
         </div>
       </div>
-
       <div className="lg:self-start">
         <PurchaseBox id={item.id} title={item.title} price={item.price} />
       </div>
@@ -120,25 +105,28 @@ function LockedPanel({
 
 export function MergeToorog() {
   const { user } = useAuth();
-  const now = new Date();
+  const { tr } = useI18n();
+  const u = (k: string) => tr(UI[k]);
+
+  const now = useMemo(() => new Date(), []);
   const years = useMemo(() => Array.from({ length: now.getFullYear() - 1929 }, (_, i) => now.getFullYear() - i), [now]);
+  const MONTHS = useMemo(() => u("monthNames").split(","), [tr]); // eslint-disable-line react-hooks/exhaustive-deps
+  const WD = useMemo(() => u("weekdays").split(","), [tr]); // eslint-disable-line react-hooks/exhaustive-deps
+  const DIM_LABELS = useMemo(() => u("dims").split(","), [tr]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [by, setBy] = useState<number | "">("");
   const [bm, setBm] = useState<number | "">("");
   const [bd, setBd] = useState<number | "">("");
-  const [bt, setBt] = useState("");
 
-  // Хуанли
   const [calY, setCalY] = useState(now.getFullYear());
   const [calM, setCalM] = useState(now.getMonth() + 1);
   const [selDay, setSelDay] = useState(now.getDate());
 
-  // Төлбөрт тайллын хандах эрх
   const [accM, setAccM] = useState<Access | null>(null);
   const [accY, setAccY] = useState<Access | null>(null);
 
   const ready = typeof by === "number" && typeof bm === "number" && typeof bd === "number";
-  const birthKey = ready ? `${by}-${bm}-${bd}-${bt}` : "";
+  const birthKey = ready ? `${by}-${bm}-${bd}` : "";
 
   useEffect(() => {
     if (!user) { setAccM(null); setAccY(null); return; }
@@ -149,34 +137,41 @@ export function MergeToorog() {
     load(MERGE_ITEMS.year.id, setAccY);
   }, [user]);
 
-  /* ---- Үндсэн профайл (үнэгүй) ---- */
+  const paid = accM?.status === "active" || accY?.status === "active";
+
+  /* ---- Үнэгүй үндсэн профайл ---- */
   const profile = useMemo(() => {
     if (!ready) return null;
     const y = by as number, m = bm as number, d = bd as number;
     const z = zodiacOf(m, d);
-    const lp = LIFE_PATHS[lifePathOf(y, m, d)] || LIFE_PATHS[9];
-    const dayArc = ARCANA[reduceArcana(d)];
-    const monArc = ARCANA[reduceArcana(m)];
+    const lp = LIFE_PATHS_L[lifePathOf(y, m, d)] || LIFE_PATHS_L[9];
+    const dayArc = ARCANA_L[reduceArcana(d)];
+    const monArc = ARCANA_L[reduceArcana(m)];
     let yr = digitSum(y); if (yr > 22) yr = digitSum(yr);
-    const yearArc = ARCANA[reduceArcana(yr)];
-    const purpose = ARCANA[reduceArcana(reduceArcana(d) + reduceArcana(m) + reduceArcana(yr))];
-    const hd = HD_TYPES[seedIndex(birthKey + "hd", HD_TYPES.length)];
-    const auth = HD_AUTHORITY[seedIndex(birthKey + "auth", HD_AUTHORITY.length)];
-    const dims = DIMENSIONS.map((dim) => ({ ...dim, value: 30 + seedIndex(birthKey + dim.key, 66) }));
+    const yearArc = ARCANA_L[reduceArcana(yr)];
+    const purpose = ARCANA_L[reduceArcana(reduceArcana(d) + reduceArcana(m) + reduceArcana(yr))];
+    const hd = HD_TYPES_L[seedIndex(birthKey + "hd", HD_TYPES_L.length)];
+    const auth = HD_AUTHORITY_L[seedIndex(birthKey + "auth", HD_AUTHORITY_L.length)];
+    const dims = DIM_KEYS.map((k, i) => ({ k, label: DIM_LABELS[i] || k, value: 30 + seedIndex(birthKey + k, 66) }));
     const py = personalYear(m, d, now.getFullYear());
-    return { z, lp, dayArc, monArc, yearArc, purpose, hd, auth, dims, py };
-  }, [ready, by, bm, bd, birthKey, now]);
+    const bMonth = BIRTH_MONTH_L[m];
+    const bYear = BIRTH_YEAR_L[((digitSum(y) - 1) % 9) + 1];
+    return { z, lp, dayArc, monArc, yearArc, purpose, hd, auth, dims, py, bMonth, bYear };
+  }, [ready, by, bm, bd, birthKey, now, DIM_LABELS]);
 
-  /* ---- Сонгосон өдрийн тайлал (үнэгүй) ---- */
+  /* ---- Сонгосон өдөр ---- */
+  const selTime = useMemo(() => new Date(calY, calM - 1, selDay).getTime(), [calY, calM, selDay]);
+  const todayT = useMemo(() => dayStart(now), [now]);
+  const freeUntil = todayT + (FREE_DAYS - 1) * 86400000;
+  const dayUnlocked = paid || (selTime >= todayT && selTime <= freeUntil);
+
   const dayRead = useMemo(() => {
     if (!profile) return null;
     const key = `${calY}-${fmt(calM)}-${fmt(selDay)}`;
-    const theme = DAY_THEMES[pickIndex(profile.z.key + birthKey, key, DAY_THEMES.length)];
-    const arc = ARCANA[reduceArcana(((selDay + calM + digitSum(calY)) % 22) + 1)];
+    const theme = DAY_THEMES_L[pickIndex(profile.z.key + birthKey, key, DAY_THEMES_L.length)];
+    const arc = ARCANA_L[reduceArcana(((selDay + calM + digitSum(calY)) % 22) + 1)];
     return {
-      key,
-      theme,
-      arc,
+      theme, arc,
       energy: 2 + pickIndex(birthKey + "e", key, 4),
       work: 2 + pickIndex(birthKey + "w", key, 4),
       love: 2 + pickIndex(birthKey + "l", key, 4),
@@ -186,39 +181,31 @@ export function MergeToorog() {
     };
   }, [profile, calY, calM, selDay, birthKey]);
 
-  /* ---- Сарын тайлал (төлбөртэй) ---- */
   const monthRead = useMemo(() => {
     if (!profile) return null;
     const key = `${calY}-${fmt(calM)}`;
-    const head = MONTH_THEMES[pickIndex(birthKey + "M", key, MONTH_THEMES.length)];
-    const weeks = [1, 2, 3, 4].map((w) => ({
-      w,
-      text: DAY_THEMES[pickIndex(birthKey + "w" + w, key, DAY_THEMES.length)].s,
-      title: DAY_THEMES[pickIndex(birthKey + "w" + w, key, DAY_THEMES.length)].t,
-    }));
-    const best = 1 + pickIndex(birthKey + "best", key, daysIn(calY, calM));
-    const care = 1 + pickIndex(birthKey + "care", key, daysIn(calY, calM));
-    const arc = ARCANA[reduceArcana(((calM + digitSum(calY)) % 22) + 1)];
-    return { head, weeks, best, care, arc };
+    const head = MONTH_THEMES_L[pickIndex(birthKey + "M", key, MONTH_THEMES_L.length)];
+    const weeks = [1, 2, 3, 4].map((w) => DAY_THEMES_L[pickIndex(birthKey + "w" + w, key, DAY_THEMES_L.length)]);
+    return {
+      head, weeks,
+      best: 1 + pickIndex(birthKey + "best", key, daysIn(calY, calM)),
+      care: 1 + pickIndex(birthKey + "care", key, daysIn(calY, calM)),
+      arc: ARCANA_L[reduceArcana(((calM + digitSum(calY)) % 22) + 1)],
+    };
   }, [profile, calY, calM, birthKey]);
 
-  /* ---- Жилийн тайлал (төлбөртэй) ---- */
   const yearRead = useMemo(() => {
     if (!profile) return null;
-    const py = personalYear(bm as number, bd as number, calY);
-    const advice = YEAR_ADVICE[pickIndex(birthKey + "Y", String(calY), YEAR_ADVICE.length)];
-    const months = MONTHS.map((label, i) => ({
-      label,
-      text: MONTH_THEMES[pickIndex(birthKey + "m" + i, String(calY), MONTH_THEMES.length)],
-    }));
-    return { py, advice, months };
-  }, [profile, bm, bd, calY, birthKey]);
+    return {
+      py: personalYear(bm as number, bd as number, calY),
+      advice: YEAR_ADVICE_L[pickIndex(birthKey + "Y", String(calY), YEAR_ADVICE_L.length)],
+      months: MONTHS.map((label, i) => ({ label, text: MONTH_THEMES_L[pickIndex(birthKey + "m" + i, String(calY), MONTH_THEMES_L.length)] })),
+    };
+  }, [profile, bm, bd, calY, birthKey, MONTHS]);
 
-  /* ---- Хуанлийн сүлжээ ---- */
   const grid = useMemo(() => {
     const total = daysIn(calY, calM);
-    const first = new Date(calY, calM - 1, 1).getDay(); // 0=Ням
-    const lead = (first + 6) % 7; // Даваагаар эхлүүлэх
+    const lead = (new Date(calY, calM - 1, 1).getDay() + 6) % 7;
     return { total, lead };
   }, [calY, calM]);
 
@@ -236,48 +223,39 @@ export function MergeToorog() {
 
   return (
     <div>
-      {/* Толгой */}
       <div className="mx-auto max-w-3xl text-center">
-        <p className="eyebrow-line justify-center">Мэргэ төөрөг</p>
-        <h1 className="mt-4 font-display text-3xl font-semibold text-ink sm:text-5xl">Төрсөн огноогоор тайлагдах хувь заяаны зураглал</h1>
-        <p className="mt-4 leading-relaxed text-muted">
-          Астрологийн зурхай, тоон судлал, хувь тавилангийн матрикс, Human Design —
-          дөрвөн системийг нэгтгэн таны гол мөн чанар, сүнсний зорилго, авьяасын төв,
-          мөчлөгийн урсгалыг нэг зураглалд харуулна.
-        </p>
+        <p className="eyebrow-line justify-center">{u("eyebrow")}</p>
+        <h1 className="mt-4 font-display text-3xl font-semibold text-ink sm:text-5xl">{u("h1")}</h1>
+        <p className="mt-4 leading-relaxed text-muted">{u("intro")}</p>
       </div>
 
       {/* Огнооны оролт */}
       <div className="panel mx-auto mt-10 max-w-3xl p-6 sm:p-8">
-        <div className="grid gap-4 sm:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">Төрсөн он</label>
+            <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">{u("year")}</label>
             <select className={selCls} value={by} onChange={(e) => setBy(e.target.value ? Number(e.target.value) : "")}>
-              <option value="">— Он —</option>
+              <option value="">{u("pickYear")}</option>
               {years.map((y) => <option key={y} value={y}>{y}</option>)}
             </select>
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">Сар</label>
+            <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">{u("month")}</label>
             <select className={selCls} value={bm} onChange={(e) => setBm(e.target.value ? Number(e.target.value) : "")}>
-              <option value="">— Сар —</option>
+              <option value="">{u("pickMonth")}</option>
               {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
             </select>
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">Өдөр</label>
+            <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">{u("day")}</label>
             <select className={selCls} value={bd} onChange={(e) => setBd(e.target.value ? Number(e.target.value) : "")}>
-              <option value="">— Өдөр —</option>
+              <option value="">{u("pickDay")}</option>
               {Array.from({ length: typeof bm === "number" ? daysIn(typeof by === "number" ? by : 2000, bm) : 31 }, (_, i) => i + 1)
                 .map((d) => <option key={d} value={d}>{d}</option>)}
             </select>
           </div>
-          <div>
-            <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">Цаг <span className="font-normal normal-case">(заавал бус)</span></label>
-            <input type="time" className={selCls} value={bt} onChange={(e) => setBt(e.target.value)} />
-          </div>
         </div>
-        {!ready && <p className="mt-4 text-center text-sm text-muted">Он, сар, өдрөө сонгоход тайлал шууд гарч ирнэ.</p>}
+        {!ready && <p className="mt-4 text-center text-sm text-muted">{u("hint")}</p>}
       </div>
 
       {ready && profile && (
@@ -290,213 +268,228 @@ export function MergeToorog() {
             <div className="relative z-10 flex flex-wrap items-center gap-6">
               <span className="grid h-24 w-24 shrink-0 place-items-center rounded-full border border-accent-300/40 bg-white/5 text-6xl text-accent-300">{profile.z.symbol}</span>
               <div className="min-w-0">
-                <p className="text-xs font-bold uppercase tracking-[0.28em] text-accent-300">
-                  {by} оны {bm} сарын {bd}{bt ? ` · ${bt}` : ""}
-                </p>
-                <h2 className="mt-1.5 font-display text-3xl font-semibold text-white sm:text-4xl">{profile.z.name} орд · {profile.lp.title}</h2>
+                <p className="text-xs font-bold uppercase tracking-[0.28em] text-accent-300">{by} · {MONTHS[(bm as number) - 1]} · {bd}</p>
+                <h2 className="mt-1.5 font-display text-3xl font-semibold text-white sm:text-4xl">
+                  {tr(ZODIAC_NAME_L[profile.z.key])} · {tr(profile.lp.title)}
+                </h2>
                 <p className="mt-1.5 text-sm text-white/70">
-                  {profile.z.element} махбод · Амьдралын зам {profile.lp.n} · {profile.hd.name}
+                  {tr(ELEMENT_L[profile.z.element])} · {u("lifePath")} {profile.lp.n} · {tr(profile.hd.name)}
                 </p>
               </div>
             </div>
-            <p className="relative z-10 mt-7 text-lg leading-relaxed text-white/90">{profile.lp.core}</p>
+            <p className="relative z-10 mt-7 text-lg leading-relaxed text-white/90">{tr(profile.lp.core)}</p>
             <div className="relative z-10 mt-6 grid gap-4 sm:grid-cols-2">
               <div className="rounded-2xl bg-white/5 p-5">
-                <p className="text-xs font-bold uppercase tracking-wide text-accent-300">Хүчит тал</p>
-                <p className="mt-1.5 text-white/85">{profile.lp.strength}</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-accent-300">{u("strengths")}</p>
+                <p className="mt-1.5 text-white/85">{tr(profile.lp.strength)}</p>
               </div>
               <div className="rounded-2xl bg-white/5 p-5">
-                <p className="text-xs font-bold uppercase tracking-wide text-accent-300">Сурах хичээл</p>
-                <p className="mt-1.5 text-white/85">{profile.lp.lesson}</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-accent-300">{u("lessonT")}</p>
+                <p className="mt-1.5 text-white/85">{tr(profile.lp.lesson)}</p>
               </div>
             </div>
           </div>
 
           {/* 10 хэмжүүр */}
           <div className="panel mt-6 p-6 sm:p-8">
-            <p className="eyebrow-line">Эрчмийн зураглал</p>
-            <h3 className="mt-3 font-display text-xl font-semibold text-ink">Таны 10 хэмжүүр</h3>
+            <p className="eyebrow-line">{u("mapEyebrow")}</p>
+            <h3 className="mt-3 font-display text-xl font-semibold text-ink">{u("mapTitle")}</h3>
             <div className="mt-6 grid gap-x-10 gap-y-4 sm:grid-cols-2">
-              {profile.dims.map((d) => <Meter key={d.key} label={d.label} value={d.value} />)}
+              {profile.dims.map((d) => <Meter key={d.k} label={d.label} value={d.value} />)}
             </div>
           </div>
 
           {/* Дөрвөн систем */}
           <div className="mt-6 grid gap-5 lg:grid-cols-2">
-            <Card eyebrow="Астрологи" title={`${profile.z.name} — ${profile.z.element} махбод`}>
-              {profile.z.trait}. Нарны орд таны гадаад илэрхийлэл, амин хүсэл эрмэлзлийн үндсэн өнгө.
-              {bt ? " Оруулсан цагаар тань өдрийн эрчмийн нарийвчлал нэмэгдсэн." : " Төрсөн цагаа оруулбал тайлал нарийсна."}
+            <Card eyebrow={u("astro")} title={`${tr(ZODIAC_NAME_L[profile.z.key])} · ${tr(ELEMENT_L[profile.z.element])}`}>
+              {tr(TRAIT_L[profile.z.key])}
             </Card>
-            <Card eyebrow="Human Design" title={`${profile.hd.name}`}>
-              {profile.hd.text} <br />
-              <span className="mt-2 block font-semibold text-ink">Стратеги: {profile.hd.strategy}</span>
-              <span className="block text-sm">{profile.auth}</span>
+            <Card eyebrow={u("hd")} title={tr(profile.hd.name)}>
+              {tr(profile.hd.text)}
+              <span className="mt-2 block font-semibold text-ink">{tr(profile.hd.strategy)}</span>
+              <span className="block text-sm">{tr(profile.auth)}</span>
             </Card>
-            <Card eyebrow="Destiny Matrix" title={`Сүнсний зорилго · ${profile.purpose.n}-р аркан`}>
-              <span className="font-semibold text-ink">{profile.purpose.name}</span> — {profile.purpose.short}
+            <Card eyebrow={u("matrix")} title={`${u("purpose")} · ${tr(profile.purpose.name)}`}>
+              {tr(profile.purpose.text)}
             </Card>
-            <Card eyebrow="Тоон судлал" title={`${new Date().getFullYear()} — таны ${profile.py}-р хувийн жил`}>
-              {PERSONAL_YEAR_TEXT[profile.py]}
+            <Card eyebrow={u("numerology")} title={`${now.getFullYear()} · ${profile.py}`}>
+              {tr(PERSONAL_YEAR_L[profile.py])}
+            </Card>
+            <Card eyebrow={u("monthTask")} title={tr(profile.bMonth.title)}>
+              {tr(profile.bMonth.text)}
+            </Card>
+            <Card eyebrow={u("yearLesson")} title={`${by}`}>
+              {tr(profile.bYear)}
             </Card>
           </div>
 
-          {/* Матриксын гурван аркан */}
+          {/* Гурван аркан */}
           <div className="mt-6 grid gap-5 sm:grid-cols-3">
             {[
-              { t: "Өдрийн аркан · Мөн чанар", a: profile.dayArc },
-              { t: "Сарын аркан · Авьяас", a: profile.monArc },
-              { t: "Жилийн аркан · Даалгавар", a: profile.yearArc },
-            ].map((x) => (
-              <article key={x.t} className="panel p-6">
-                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary-500/12 font-display text-xl font-semibold text-primary-700">{x.a.n}</span>
-                <p className="mt-3 text-xs font-bold uppercase tracking-wide text-muted">{x.t}</p>
-                <h4 className="mt-1 font-display text-base font-semibold text-ink">{x.a.name}</h4>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{x.a.short}</p>
+              { t: u("arcDay"), a: profile.dayArc, n: reduceArcana(bd as number) },
+              { t: u("arcMonth"), a: profile.monArc, n: reduceArcana(bm as number) },
+              { t: u("arcYear"), a: profile.yearArc, n: 0 },
+            ].map((it) => (
+              <article key={it.t} className="panel p-6">
+                <p className="text-xs font-bold uppercase tracking-wide text-muted">{it.t}</p>
+                <h4 className="mt-2 font-display text-lg font-semibold text-ink">{tr(it.a.name)}</h4>
+                <p className="mt-2 text-sm leading-relaxed text-muted">{tr(it.a.text)}</p>
               </article>
             ))}
           </div>
 
-          {/* ---------- ХУАНЛИ ---------- */}
+          {/* ХУАНЛИ */}
           <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,20rem)_1fr]">
             <div className="panel p-5 sm:p-6">
               <div className="flex items-center justify-between">
-                <button onClick={() => shiftMonth(-1)} aria-label="Өмнөх сар"
+                <button onClick={() => shiftMonth(-1)} aria-label={u("prevMonth")}
                   className="focus-ring grid h-9 w-9 place-items-center rounded-xl border border-line text-ink transition hover:bg-primary-500/10">‹</button>
                 <p className="font-display text-base font-semibold text-ink">{calY} · {MONTHS[calM - 1]}</p>
-                <button onClick={() => shiftMonth(1)} aria-label="Дараах сар"
+                <button onClick={() => shiftMonth(1)} aria-label={u("nextMonth")}
                   className="focus-ring grid h-9 w-9 place-items-center rounded-xl border border-line text-ink transition hover:bg-primary-500/10">›</button>
               </div>
               <div className="mt-4 grid grid-cols-7 gap-1 text-center">
-                {WD.map((w) => <span key={w} className="py-1 text-[0.7rem] font-bold uppercase tracking-wide text-muted">{w}</span>)}
+                {WD.map((w, i) => <span key={i} className="py-1 text-[0.7rem] font-bold uppercase tracking-wide text-muted">{w}</span>)}
                 {Array.from({ length: grid.lead }, (_, i) => <span key={"x" + i} />)}
                 {Array.from({ length: grid.total }, (_, i) => i + 1).map((d) => {
+                  const t = new Date(calY, calM - 1, d).getTime();
+                  const free = paid || (t >= todayT && t <= freeUntil);
                   const isSel = d === selDay;
-                  const isToday = calY === now.getFullYear() && calM === now.getMonth() + 1 && d === now.getDate();
+                  const isToday = t === todayT;
                   return (
                     <button key={d} onClick={() => setSelDay(d)} aria-pressed={isSel}
-                      className={`focus-ring aspect-square rounded-xl text-sm font-semibold transition ${
+                      className={`focus-ring relative aspect-square rounded-xl text-sm font-semibold transition ${
                         isSel ? "bg-primary-600 text-white shadow-sm"
                         : isToday ? "border-2 border-accent-300 text-ink"
-                        : "text-ink hover:bg-primary-500/10"}`}>
+                        : free ? "text-ink hover:bg-primary-500/10"
+                        : "text-muted/60 hover:bg-primary-500/5"}`}>
                       {d}
+                      {!free && !isSel && <span aria-hidden className="absolute right-0.5 top-0.5 text-[0.55rem] opacity-70">🔒</span>}
                     </button>
                   );
                 })}
               </div>
-              <p className="mt-4 text-center text-xs text-muted">Өдрөө сонгоход тухайн өдрийн тайлал баруун талд гарна.</p>
+              <p className="mt-4 text-center text-xs text-muted">{u("calHint")}</p>
             </div>
 
-            {/* Сонгосон өдрийн тайлал */}
+            {/* Өдрийн тайлал */}
             {dayRead && (
-              <div className="panel p-6 sm:p-8">
-                <p className="eyebrow-line">{calY} оны {calM} сарын {selDay}</p>
-                <h3 className="mt-3 font-display text-2xl font-semibold text-ink">{dayRead.theme.t}</h3>
-                <p className="mt-2.5 leading-relaxed text-muted">{dayRead.theme.s}</p>
+              dayUnlocked ? (
+                <div className="panel p-6 sm:p-8">
+                  <p className="eyebrow-line">{calY} · {MONTHS[calM - 1]} · {selDay}</p>
+                  <h3 className="mt-3 font-display text-2xl font-semibold text-ink">{tr(dayRead.theme.t)}</h3>
+                  <p className="mt-2.5 leading-relaxed text-muted">{tr(dayRead.theme.s)}</p>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                  {[["Ерөнхий эрчим", dayRead.energy], ["Ажил хэрэг", dayRead.work], ["Харилцаа", dayRead.love]].map(([l, v]) => (
-                    <div key={l as string} className="rounded-2xl bg-surface-2 p-4">
-                      <p className="text-xs uppercase tracking-wide text-muted">{l}</p>
-                      <div className="mt-1"><Stars n={v as number} /></div>
+                  <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                    {[[u("general"), dayRead.energy], [u("workE"), dayRead.work], [u("loveE"), dayRead.love]].map(([l, v]) => (
+                      <div key={l as string} className="rounded-2xl bg-surface-2 p-4">
+                        <p className="text-xs uppercase tracking-wide text-muted">{l}</p>
+                        <div className="mt-1"><Stars n={v as number} /></div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-5 rounded-2xl border border-line p-5">
+                    <p className="font-display text-base font-semibold text-ink">{tr(dayRead.arc.name)}</p>
+                    <p className="mt-1.5 text-sm leading-relaxed text-muted">{tr(dayRead.arc.text)}</p>
+                  </div>
+
+                  <div className="mt-5 grid gap-4 text-center sm:grid-cols-3">
+                    <div><p className="text-xs uppercase tracking-wide text-muted">{u("luckyN")}</p><p className="mt-1 font-display text-2xl font-semibold text-primary-700">{dayRead.luckyN}</p></div>
+                    <div><p className="text-xs uppercase tracking-wide text-muted">{u("goodHour")}</p><p className="mt-1 font-display text-2xl font-semibold text-primary-700">{dayRead.hour}:00</p></div>
+                    <div><p className="text-xs uppercase tracking-wide text-muted">{u("friendSign")}</p><p className="mt-1 font-display text-base font-semibold text-ink">{dayRead.friend.symbol} {tr(ZODIAC_NAME_L[dayRead.friend.key])}</p></div>
+                  </div>
+                </div>
+              ) : (
+                <div className="panel relative overflow-hidden p-6 sm:p-8">
+                  <div aria-hidden className="space-y-3 select-none" style={{ filter: "blur(6px)", opacity: 0.35 }}>
+                    <div className="h-6 w-2/3 rounded-full bg-ink/30" />
+                    <div className="h-3 w-11/12 rounded-full bg-ink/20" />
+                    <div className="h-3 w-10/12 rounded-full bg-ink/20" />
+                    <div className="mt-6 h-20 w-full rounded-2xl bg-ink/10" />
+                    <div className="h-16 w-full rounded-2xl bg-ink/10" />
+                  </div>
+                  <div className="absolute inset-0 grid place-items-center p-6 text-center">
+                    <div className="max-w-sm">
+                      <span aria-hidden className="text-3xl">🔒</span>
+                      <p className="mt-3 font-display text-xl font-semibold text-ink">{u("lockedDayT")}</p>
+                      <p className="mt-2 text-sm leading-relaxed text-muted">{u("lockedDayS")}</p>
+                      <a href="#merge-paid" className="btn btn-gold btn-md mt-5">{u("monthReadT")}</a>
                     </div>
-                  ))}
+                  </div>
                 </div>
-
-                <div className="mt-5 rounded-2xl border border-line p-5">
-                  <p className="text-xs font-bold uppercase tracking-wide text-muted">Өдрийн аркан · {dayRead.arc.n}</p>
-                  <p className="mt-1 font-display text-base font-semibold text-ink">{dayRead.arc.name}</p>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted">{dayRead.arc.short}</p>
-                </div>
-
-                <div className="mt-5 grid gap-4 sm:grid-cols-3 text-center">
-                  <div><p className="text-xs uppercase tracking-wide text-muted">Азын тоо</p><p className="mt-1 font-display text-2xl font-semibold text-primary-700">{dayRead.luckyN}</p></div>
-                  <div><p className="text-xs uppercase tracking-wide text-muted">Тохиромжтой цаг</p><p className="mt-1 font-display text-2xl font-semibold text-primary-700">{dayRead.hour}:00</p></div>
-                  <div><p className="text-xs uppercase tracking-wide text-muted">Ээлтэй орд</p><p className="mt-1 font-display text-base font-semibold text-ink">{dayRead.friend.symbol} {dayRead.friend.name}</p></div>
-                </div>
-              </div>
+              )
             )}
           </div>
 
-          {/* ---------- САРЫН ТАЙЛАЛ (төлбөртэй) ---------- */}
-          <div className="mt-10">
+          {/* САРЫН ТАЙЛАЛ */}
+          <div id="merge-paid" className="mt-10 scroll-mt-24">
             {accM?.status === "active" && monthRead ? (
               <div className="panel p-6 sm:p-8">
-                <p className="eyebrow-line">Сарын тайлал · {calY} оны {calM} сар</p>
-                <h3 className="mt-3 font-display text-2xl font-semibold text-ink">{monthRead.head}</h3>
+                <p className="eyebrow-line">{u("monthReadT")} · {calY} · {MONTHS[calM - 1]}</p>
+                <h3 className="mt-3 font-display text-2xl font-semibold text-ink">{tr(monthRead.head)}</h3>
                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                  {monthRead.weeks.map((w) => (
-                    <div key={w.w} className="rounded-2xl bg-surface-2 p-5">
-                      <p className="text-xs font-bold uppercase tracking-wide text-primary-700">{w.w}-р долоо хоног</p>
-                      <p className="mt-1 font-display text-base font-semibold text-ink">{w.title}</p>
-                      <p className="mt-1.5 text-sm leading-relaxed text-muted">{w.text}</p>
+                  {monthRead.weeks.map((w, i) => (
+                    <div key={i} className="rounded-2xl bg-surface-2 p-5">
+                      <p className="text-xs font-bold uppercase tracking-wide text-primary-700">{i + 1} {u("weekN")}</p>
+                      <p className="mt-1 font-display text-base font-semibold text-ink">{tr(w.t)}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-muted">{tr(w.s)}</p>
                     </div>
                   ))}
                 </div>
                 <div className="mt-5 grid gap-4 sm:grid-cols-3">
                   <div className="rounded-2xl border border-line p-5 text-center">
-                    <p className="text-xs uppercase tracking-wide text-muted">Хамгийн хүчтэй өдөр</p>
+                    <p className="text-xs uppercase tracking-wide text-muted">{u("bestDay")}</p>
                     <p className="mt-1 font-display text-2xl font-semibold text-primary-700">{monthRead.best}</p>
                   </div>
                   <div className="rounded-2xl border border-line p-5 text-center">
-                    <p className="text-xs uppercase tracking-wide text-muted">Болгоомжлох өдөр</p>
+                    <p className="text-xs uppercase tracking-wide text-muted">{u("careDay")}</p>
                     <p className="mt-1 font-display text-2xl font-semibold text-accent-300">{monthRead.care}</p>
                   </div>
                   <div className="rounded-2xl border border-line p-5 text-center">
-                    <p className="text-xs uppercase tracking-wide text-muted">Сарын аркан</p>
-                    <p className="mt-1 font-display text-2xl font-semibold text-primary-700">{monthRead.arc.n}</p>
+                    <p className="text-xs uppercase tracking-wide text-muted">{u("monthCard")}</p>
+                    <p className="mt-1 font-display text-base font-semibold text-primary-700">{tr(monthRead.arc.name)}</p>
                   </div>
                 </div>
-                <p className="mt-5 text-sm leading-relaxed text-muted"><span className="font-semibold text-ink">{monthRead.arc.name}</span> — {monthRead.arc.short}</p>
-                {typeof accM.daysLeft === "number" && <p className="mt-4 text-xs text-muted">Эрх дуусахад {accM.daysLeft} хоног үлдсэн.</p>}
+                <p className="mt-5 text-sm leading-relaxed text-muted">{tr(monthRead.arc.text)}</p>
+                {typeof accM.daysLeft === "number" && <p className="mt-4 text-xs text-muted">{u("daysLeft")} {accM.daysLeft}</p>}
               </div>
             ) : (
-              <LockedPanel icon="🌙" title="Сарын мэргэ төөрөг"
-                desc="Сонгосон сарын бүтэн зураглал таны төрсөн огноон дээр тулгуурлан гарна."
-                bullets={[
-                  "Долоо хоног тус бүрийн эрчмийн урсгал ба сэдэв",
-                  "Хамгийн хүчтэй өдөр ба болгоомжлох өдөр",
-                  "Сарын аркан — гол даалгавар, сургамж",
-                  "Санхүү, харилцаа, эрүүл мэндийн чиг хандлага",
-                ]}
-                item={MERGE_ITEMS.month} />
+              <LockedPanel icon="🌙" title={u("monthReadT")} desc={u("monthReadD")}
+                bullets={[u("mBul1"), u("mBul2"), u("mBul3"), u("mBul4")]}
+                item={MERGE_ITEMS.month} afterPay={u("afterPay")} daysOpen={u("daysOpen")} />
             )}
           </div>
 
-          {/* ---------- ЖИЛИЙН ТАЙЛАЛ (төлбөртэй) ---------- */}
+          {/* ЖИЛИЙН ТАЙЛАЛ */}
           <div className="mt-6">
             {accY?.status === "active" && yearRead ? (
               <div className="panel p-6 sm:p-8">
-                <p className="eyebrow-line">Жилийн тайлал · {calY}</p>
-                <h3 className="mt-3 font-display text-2xl font-semibold text-ink">{calY} — таны {yearRead.py}-р хувийн жил</h3>
-                <p className="mt-2.5 leading-relaxed text-muted">{PERSONAL_YEAR_TEXT[yearRead.py]}</p>
+                <p className="eyebrow-line">{u("yearReadT")} · {calY}</p>
+                <h3 className="mt-3 font-display text-2xl font-semibold text-ink">{calY} · {yearRead.py}</h3>
+                <p className="mt-2.5 leading-relaxed text-muted">{tr(PERSONAL_YEAR_L[yearRead.py])}</p>
                 <div className="mt-5 rounded-2xl bg-primary-500/8 p-5">
-                  <p className="text-xs font-bold uppercase tracking-wide text-primary-700">Жилийн түлхүүр зөвлөгөө</p>
-                  <p className="mt-1.5 font-display text-lg leading-relaxed text-ink">“{yearRead.advice}”</p>
+                  <p className="text-xs font-bold uppercase tracking-wide text-primary-700">{u("keyAdvice")}</p>
+                  <p className="mt-1.5 font-display text-lg leading-relaxed text-ink">“{tr(yearRead.advice)}”</p>
                 </div>
                 <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {yearRead.months.map((m) => (
                     <div key={m.label} className="rounded-2xl border border-line p-5">
                       <p className="text-xs font-bold uppercase tracking-wide text-primary-700">{m.label}</p>
-                      <p className="mt-1.5 text-sm leading-relaxed text-muted">{m.text}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-muted">{tr(m.text)}</p>
                     </div>
                   ))}
                 </div>
-                {typeof accY.daysLeft === "number" && <p className="mt-4 text-xs text-muted">Эрх дуусахад {accY.daysLeft} хоног үлдсэн.</p>}
+                {typeof accY.daysLeft === "number" && <p className="mt-4 text-xs text-muted">{u("daysLeft")} {accY.daysLeft}</p>}
               </div>
             ) : (
-              <LockedPanel icon="☀️" title="Жилийн мэргэ төөрөг"
-                desc="Бүтэн жилийн зураглал — таны 9 жилийн мөчлөгийн аль үе шатанд яваагаас эхлээд сар бүрийн урсгал хүртэл."
-                bullets={[
-                  "Хувийн жилийн эрчим ба түүний утга учир",
-                  "12 сар тус бүрийн чиг хандлага",
-                  "Жилийн эргэлтийн цэгүүд, боломжийн цонх",
-                  "Жилийн түлхүүр зөвлөгөө",
-                ]}
-                item={MERGE_ITEMS.year} />
+              <LockedPanel icon="☀️" title={u("yearReadT")} desc={u("yearReadD")}
+                bullets={[u("yBul1"), u("yBul2"), u("yBul3"), u("yBul4")]}
+                item={MERGE_ITEMS.year} afterPay={u("afterPay")} daysOpen={u("daysOpen")} />
             )}
           </div>
 
-          <p className="mt-10 text-center text-xs text-muted">Мэргэ төөрөг бол чиглүүлэг — эцсийн шийдвэр үргэлж таных.</p>
+          <p className="mt-10 text-center text-xs text-muted">{u("disclaimer")}</p>
         </div>
       )}
     </div>
