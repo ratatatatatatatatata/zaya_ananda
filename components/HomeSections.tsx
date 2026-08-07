@@ -4,6 +4,7 @@ import { CmsCard } from "./CmsCard";
 import { Reveal } from "./Reveal";
 import { T, Tr } from "./T";
 import { PathsHighlight } from "./home/PathsHighlight";
+import { DailyHoroscope } from "./home/DailyHoroscope";
 import { VideoBand } from "./video/VideoBand";
 import { HowItWorks } from "./home/HowItWorks";
 import type { Locale } from "@/lib/types";
@@ -99,6 +100,9 @@ export async function HomeSections() {
     <>
       {/* Хоёр гол зам — Йог/сургалт ба Сүнслэг аялал */}
       <PathsHighlight courseCount={courses.length} lessonCount={lessonCount} teacherCount={teacherCount} />
+
+      {/* Өдрийн зурхай — төрсөн огноогоор */}
+      <DailyHoroscope />
 
       {/* Хэрхэн эхлэх вэ — 3 алхам */}
       <HowItWorks />
