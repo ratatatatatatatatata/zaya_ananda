@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { VideoHero } from "@/components/video/VideoHero";
 import { heroVideoSrc } from "@/lib/hero-video";
-import { JOURNEYS } from "@/data/journeys";
+import { JOURNEYS, JOURNEY_FAQ } from "@/data/journeys";
 import { JourneyImage } from "@/components/journey/SceneArt";
 
 export const metadata = {
@@ -79,13 +79,6 @@ const PREP = {
   food: "Аяллын хоол нь голдуу цагаан (вегетариан) чиглэлтэй, өдөрт 3 удаа, нутгийн цэвэр түүхий эдээр бэлтгэгдэнэ. Махан хоолны сонголт урьдчилан мэдэгдсэн тохиолдолд боломжтой.",
 };
 
-const FAQ = [
-  { q: "Анхлан суралцагч оролцож болох уу?", a: "Тийм. Хөтөлбөрүүд маань туршлага шаарддаггүй — багш нар алхам бүрийг зааж, хүн бүрийн хэмнэлд тохируулна." },
-  { q: "Цаг агаар таагүй бол яах вэ?", a: "Хөтөлбөрийг аюулгүй байдлыг нэн тэргүүнд тавьж зохицуулна. Шаардлагатай бол өдрийн дараалал солигдох буюу дотор өрөөнд зан үйл, бясалгал үргэлжилнэ." },
-  { q: "Төлбөр хэрхэн төлөх вэ, аюулгүй юу?", a: "Сайтын худалдан авалтын системээр QPay эсвэл банкны шилжүүлгээр төлнө. Захиалга бүрийг админ гараар баталгаажуулдаг тул андуурал гарахгүй." },
-  { q: "Цуцлах нөхцөл ямар байдаг вэ?", a: "Аялал эхлэхээс 7-оос дээш хоногийн өмнө бол бүрэн буцаан олгоно. Долоо хоногийн дотор бол дараагийн аялалд шилжүүлэх боломжтой." },
-  { q: "Гадаад зочид оролцож болох уу?", a: "Болно. Хөтөлбөрүүд англи хэлний орчуулгатай явагдах боломжтой — урьдчилан мэдэгдээрэй." },
-];
 
 export default async function AyalalPage() {
   const heroSrc = await heroVideoSrc("ayalal");
@@ -98,7 +91,7 @@ export default async function AyalalPage() {
         eyebrow="Spiritual Journey Mongolia"
         title="Сүнслэг аялал"
         desc="Монголын энергийн ариун газрууд руу хийх энэ аян бол зүгээр нэг зам биш — таны дотоод амар амгалан руу хийх аялал юм."
-        cta={[{ href: "#tours", label: "Хөтөлбөр үзэх" }, { href: "/about#contact", label: "Урьдчилан бүртгүүлэх" }]}
+        cta={[{ href: "#tours", label: "Хөтөлбөр үзэх" }, { href: "#faq", label: "Түгээмэл асуултууд" }]}
       />
       <section className="night relative isolate overflow-hidden bg-[#0C1A17]">
         {/* Дотоод цэс */}
@@ -224,7 +217,7 @@ export default async function AyalalPage() {
       <section id="faq" className="section bg-surface-2 scroll-mt-20"><div className="container-px max-w-3xl">
         <h2 className="text-center font-display text-3xl font-semibold text-ink">Түгээмэл асуултууд</h2>
         <div className="mt-8 space-y-3">
-          {FAQ.map((f) => (
+          {JOURNEY_FAQ.map((f) => (
             <details key={f.q} className="group rounded-2xl border border-line bg-surface-1 p-5 [&_summary]:cursor-pointer">
               <summary className="flex items-center justify-between font-semibold text-ink marker:content-['']">
                 {f.q}

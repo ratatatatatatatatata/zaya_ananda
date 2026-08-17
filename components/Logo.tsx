@@ -1,10 +1,10 @@
 export function Logo({ withText = true, className = "", logoSrc }: { withText?: boolean; className?: string; logoSrc?: string }) {
   return (
-    <span className={"inline-flex items-center gap-2.5 " + className}>
+    <span className={"inline-flex items-center gap-3 " + className}>
       {logoSrc ? (
-        <img src={logoSrc} alt="Zaya's Ananda" className="h-10 w-10 shrink-0 rounded-xl object-cover" />
+        <img src={logoSrc} alt="Zaya's Ananda" className="h-14 w-14 shrink-0 rounded-2xl object-cover" />
       ) : (
-      <svg viewBox="0 0 48 48" className="h-10 w-10 shrink-0" role="img" aria-label="Zaya's Ananda">
+      <svg viewBox="0 0 48 48" className="h-14 w-14 shrink-0" role="img" aria-label="Zaya's Ananda">
         <defs>
           <linearGradient id="logo-t" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#2BC8BB" />
@@ -24,8 +24,8 @@ export function Logo({ withText = true, className = "", logoSrc }: { withText?: 
       )}
       {withText && (
         <span className="flex flex-col leading-none">
-          <span className="whitespace-nowrap font-display text-lg font-semibold text-ink">Zaya&apos;s Ananda</span>
-          <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.22em] text-primary-600">Ananda Center</span>
+          <span className="whitespace-nowrap font-display text-2xl font-semibold text-ink">Zaya&apos;s Ananda</span>
+          <span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.3em] text-primary-600">Төв</span>
         </span>
       )}
     </span>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { JOURNEYS, journeyBySlug } from "@/data/journeys";
+import { JOURNEYS, journeyBySlug, JOURNEY_FAQ } from "@/data/journeys";
 import { JourneyImage } from "@/components/journey/SceneArt";
 import { LeadCard, CrewRow } from "@/components/journey/PersonCard";
 
@@ -42,7 +42,7 @@ export default function JourneyPage({ params }: { params: { slug: string } }) {
 
       {/* Товч мэдээлэл */}
       <section className="section"><div className="container-px">
-        <div className="grid gap-5 lg:grid-cols-3">
+        <div className="grid gap-5 lg:grid-cols-4">
           <div className="panel p-6">
             <p className="text-xs font-bold uppercase tracking-wide text-muted">Хэнд тохирох вэ</p>
             <p className="mt-2 leading-relaxed text-ink/85">{j.audience}</p>
@@ -54,6 +54,10 @@ export default function JourneyPage({ params }: { params: { slug: string } }) {
           <div className="panel p-6">
             <p className="text-xs font-bold uppercase tracking-wide text-rose-700">Багтаагүй</p>
             <p className="mt-2 leading-relaxed text-ink/85">{j.excluded}</p>
+          </div>
+          <div className="panel p-6">
+            <p className="text-xs font-bold uppercase tracking-wide text-accent-300">Үнэ</p>
+            <p className="mt-2 leading-relaxed text-ink/85">{j.price}</p>
           </div>
         </div>
       </div></section>
@@ -113,19 +117,23 @@ export default function JourneyPage({ params }: { params: { slug: string } }) {
         </div>
       </div></section>
 
-      {/* Бүртгэл */}
-      <section className="section bg-surface-2"><div className="container-px">
-        <div className="night relative overflow-hidden rounded-4xl p-8 sm:p-12"
-          style={{ backgroundImage: "linear-gradient(150deg,#0F2B26 0%,#12302A 55%,#1E2A1C 100%)" }}>
-          <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full"
-            style={{ background: "radial-gradient(circle, rgba(232,183,95,0.26), transparent 70%)", filter: "blur(10px)" }} />
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-6">
-            <div className="max-w-xl">
-              <h2 className="font-display text-2xl font-semibold text-white sm:text-3xl">Энэ аялалд нэгдэх үү?</h2>
-              <p className="mt-2.5 leading-relaxed text-white/80">{j.price}</p>
-            </div>
-            <Link href="/about#contact" className="btn btn-gold btn-lg shrink-0">Урьдчилан бүртгүүлэх</Link>
-          </div>
+      {/* Түгээмэл асуултууд */}
+      <section id="faq" className="section scroll-mt-24 bg-surface-2"><div className="container-px max-w-3xl">
+        <h2 className="text-center font-display text-3xl font-semibold text-ink sm:text-4xl">Түгээмэл асуултууд</h2>
+        <div className="mt-8 space-y-3">
+          {JOURNEY_FAQ.map((f) => (
+            <details key={f.q} className="group rounded-2xl border border-line bg-surface-1 p-5 [&_summary]:cursor-pointer">
+              <summary className="flex items-center justify-between gap-4 font-semibold text-ink marker:content-['']">
+                {f.q}
+                <span aria-hidden className="text-primary-400 transition group-open:rotate-45">＋</span>
+              </summary>
+              <p className="mt-3 leading-relaxed text-muted">{f.a}</p>
+            </details>
+          ))}
+        </div>
+        <div className="mt-10 text-center">
+          <p className="text-muted">Өөр асуулт байна уу?</p>
+          <Link href="/about#contact" className="btn btn-outline btn-md mt-4">Бидэнтэй холбогдох</Link>
         </div>
       </div></section>
     </>

@@ -20,7 +20,6 @@ const ITEMS: { href: string; icon: string; label: Record<Locale, string> }[] = [
   { href: "/ayalal", icon: "🕊", label: Lx("Сүнслэг аялал", "Journeys", "영적 여행", "聖地の旅", "心灵之旅") },
   { href: "#shop", icon: "🛡", label: Lx("Хамгаалалт", "Protection", "보호", "プロテクション", "守护") },
   { href: "#gift", icon: "🎁", label: Lx("Гэгээн бэлэг", "Free gift", "무료 선물", "無料の贈り物", "免费礼物") },
-  { href: "#mood", icon: "🌅", label: Lx("Сэтгэлийн туяа", "Soul rays", "마음의 빛", "心の光", "心灵之光") },
 ];
 
 /** Нүүр хуудасны хурдан шилжих зурвас — товч дарахад тухайн хэсэг рүү очно. */
