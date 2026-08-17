@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { VideoHero } from "@/components/video/VideoHero";
+import { heroVideoSrc } from "@/lib/hero-video";
+import { JOURNEYS } from "@/data/journeys";
+import { JourneyImage } from "@/components/journey/SceneArt";
 
 export const metadata = {
   title: "Сүнслэг аялал — Spiritual Journey Mongolia",
@@ -24,46 +27,6 @@ const VALUES = [
   { icon: "🌿", title: "Байгальд ээлтэй, хүндэтгэлтэй", text: "Ариун газруудад мөр үлдээхгүй зарчмаар аялж, нутгийн соёл, зан үйлийг гүнээ хүндэтгэнэ." },
   { icon: "👥", title: "Цөөн хүнтэй, гүн туршлага", text: "Бүлэг бүр цөөн хүнтэй байдаг тул хүн бүрд багшийн анхаарал хүртээмжтэй, туршлага тань гүн байх болно." },
   { icon: "🧭", title: "Туршлагатай удирдагчид", text: "Бясалгалын багш болон нутаг усаа мэддэг хөтөч нар аяллын турш хамт байж, аюулгүй байдал, утга агуулгыг нэгэн зэрэг хангана." },
-];
-
-const TOURS = [
-  {
-    name: "Шамбалын орон — Говийн энергийн аялал",
-    tagline: "Дорноговь, Хамарын хийд · Данзанравжаагийн өв",
-    days: "2 өдөр, 1 шөнө",
-    group: "Дээд тал нь 15 хүн",
-    transport: "Тохилог автобус",
-    stay: "Жуулчны бааз (гэр)",
-    audience: "Анхлан суралцагчид болон дотоод амар амгалангаа сэргээхийг хүссэн хэн бүхэнд",
-    itinerary: [
-      "1-р өдөр, өглөө — УБ-аас хөдөлж, замдаа зориулгын тайлбар, амьсгалын дасгал",
-      "1-р өдөр, үдээс хойш — Хамарын хийд, Шамбалын орны зан үйл: хүслээ даатгах, 108 суварга тойрох",
-      "1-р өдөр, орой — Говийн нар жаргалт дунд чимээгүй бясалгал, галын зан үйл",
-      "2-р өдөр, үүрээр — Нар угтах ёслол, хамтын бясалгал",
-      "2-р өдөр, өдөр — Хийдийн музей, агуйн бясалгалын газрууд, буцах зам",
-    ],
-    included: "Унаа, хоол (цагаан хоолны сонголттой), байр, хөтөч, бясалгалын хөтөлбөр",
-    excluded: "Хувийн зардал, даатгал, нэмэлт үйлчилгээ",
-    price: "Үнэ тодорхойлогдож байна — урьдчилан бүртгүүлээрэй",
-  },
-  {
-    name: "Хангайн ариун нутгийн аялал",
-    tagline: "Амарбаясгалант хийд · уул усны тахилга",
-    days: "3 өдөр, 2 шөнө",
-    group: "Дээд тал нь 12 хүн",
-    transport: "Жийп болон микро автобус",
-    stay: "Гэр бааз, нутгийн айл",
-    audience: "Байгальд гүн холбогдож, уламжлалт зан үйлтэй танилцахыг хүсэгчдэд",
-    itinerary: [
-      "1-р өдөр — Амарбаясгалант хийд: түүх, ном айлдвар, оройн бясалгал",
-      "2-р өдөр — Уулын тахилга, овоо тойрох ёс, голын эрэг дээрх дуут бясалгал",
-      "2-р өдөр, орой — Гал тахих зан үйл, одтой тэнгэр дор чимээгүй цаг",
-      "3-р өдөр — Үүрийн бясалгал, талархлын ёслол, буцах зам",
-    ],
-    included: "Унаа, хоол, байр, хөтөч, бясалгалын хөтөлбөр, зан үйлийн хэрэглэл",
-    excluded: "Хувийн зардал, даатгал",
-    price: "Үнэ тодорхойлогдож байна — урьдчилан бүртгүүлээрэй",
-  },
 ];
 
 const PLACES = [
@@ -124,11 +87,13 @@ const FAQ = [
   { q: "Гадаад зочид оролцож болох уу?", a: "Болно. Хөтөлбөрүүд англи хэлний орчуулгатай явагдах боломжтой — урьдчилан мэдэгдээрэй." },
 ];
 
-export default function AyalalPage() {
+export default async function AyalalPage() {
+  const heroSrc = await heroVideoSrc("ayalal");
   return (
     <>
       {/* Ариун хөндий — гэрлийн зам дагуу камер урагшилж, алсын нар мандалт руу аялна */}
       <VideoHero
+        src={heroSrc}
         clip="stream"
         eyebrow="Spiritual Journey Mongolia"
         title="Сүнслэг аялал"
@@ -162,38 +127,29 @@ export default function AyalalPage() {
         </div>
       </div></section>
 
-      {/* Аяллын хөтөлбөрүүд */}
-      <section id="tours" className="section bg-surface-2 scroll-mt-20"><div className="container-px">
+      {/* Аяллын хөтөлбөрүүд — зурган карт */}
+      <section id="tours" className="section scroll-mt-20 bg-surface-2"><div className="container-px">
         <h2 className="font-display text-3xl font-semibold text-ink">Аяллын хөтөлбөрүүд</h2>
-        <p className="mt-2 max-w-2xl text-muted">Хөтөлбөрүүд улирал бүр шинэчлэгдэнэ. Огноо, үнийн мэдээллийг урьдчилан бүртгүүлсэн зочдод хамгийн түрүүнд хүргэнэ.</p>
+        <p className="mt-2 max-w-2xl text-muted">Аялал сонгоод дарвал өдөр өдрийн хөтөлбөр, хариуцах багш, хамт явах баг зэрэг бүх мэдээлэл дэлгэрэнгүй нээгдэнэ.</p>
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
-          {TOURS.map((t) => (
-            <div key={t.name} className="card flex h-full flex-col overflow-hidden">
-              <div className="border-b border-line bg-surface-4 p-6">
-                <h3 className="font-display text-2xl font-semibold text-ink">{t.name}</h3>
-                <p className="mt-1 text-sm font-medium text-primary-700">{t.tagline}</p>
-                <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-muted">
-                  <span>🗓 {t.days}</span><span>👥 {t.group}</span><span>🚌 {t.transport}</span><span>⛺ {t.stay}</span>
+          {JOURNEYS.map((j) => (
+            <Link key={j.slug} href={`/ayalal/${j.slug}`} className="card group block overflow-hidden transition hover:-translate-y-1 hover:shadow-glow">
+              <div className="relative aspect-[16/10] w-full overflow-hidden">
+                <JourneyImage src={j.image} scene={j.scene} alt={j.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.06]" />
+                <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,20,17,0.86) 0%, rgba(8,20,17,0.15) 55%, transparent 100%)" }} />
+                <div className="absolute inset-x-0 bottom-0 p-6">
+                  <p className="text-xs font-bold uppercase tracking-[0.24em] text-accent-300">{j.tagline}</p>
+                  <h3 className="mt-2 font-display text-2xl font-semibold text-white sm:text-3xl">{j.name}</h3>
                 </div>
               </div>
-              <div className="flex flex-1 flex-col p-6">
-                <p className="text-sm italic leading-relaxed text-muted">Хэнд тохирох вэ: {t.audience}</p>
-                <h4 className="mt-5 font-display text-base font-semibold text-ink">Өдөр өдрийн хөтөлбөр</h4>
-                <ul className="mt-3 space-y-2">
-                  {t.itinerary.map((d, i) => (
-                    <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-ink/80"><span className="mt-0.5 text-primary-400">✦</span><span>{d}</span></li>
-                  ))}
-                </ul>
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-xl bg-jade-400/10 p-3.5"><p className="text-xs font-bold uppercase tracking-wide text-jade-600">Багтсан</p><p className="mt-1 text-sm text-ink/80">{t.included}</p></div>
-                  <div className="rounded-xl bg-rose-500/10 p-3.5"><p className="text-xs font-bold uppercase tracking-wide text-rose-700">Багтаагүй</p><p className="mt-1 text-sm text-ink/80">{t.excluded}</p></div>
+              <div className="p-6">
+                <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-muted">
+                  <span>🗓 {j.days}</span><span>👥 {j.group}</span><span>⛺ {j.stay}</span>
                 </div>
-                <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-6">
-                  <span className="text-sm font-semibold text-accent-400">{t.price}</span>
-                  <Link href="/about#contact" className="btn btn-primary btn-sm">Бүртгүүлэх</Link>
-                </div>
+                <p className="mt-3 leading-relaxed text-muted">{j.summary}</p>
+                <span className="btn btn-primary btn-sm mt-5">Дэлгэрэнгүй үзэх →</span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div></section>
@@ -220,13 +176,17 @@ export default function AyalalPage() {
       </div></section>
 
       {/* Багш, хөтөч нар */}
-      <section id="guides" className="section bg-surface-2 scroll-mt-20"><div className="container-px text-center">
+      <section id="guides" className="section scroll-mt-20 bg-surface-2"><div className="container-px text-center">
         <h2 className="font-display text-3xl font-semibold text-ink">Багш, хөтөч нар</h2>
         <p className="mx-auto mt-3 max-w-2xl text-muted">
-          Аялал бүрийг бясалгалын туршлагатай багш нар болон нутаг усаа гарын алга шиг мэддэг хөтөч нар хамтран удирдана.
-          Багш нарынхаа намтар, баримталдаг зарчимтай «Хамт олон» хуудаснаас дэлгэрэнгүй танилцаарай.
+          Аялал бүрийг бясалгалын туршлагатай багш болон нутаг усаа мэддэг хөтөч нар хамтран удирдана.
+          Тухайн аяллыг хэн хариуцаж, хэн хамт явахыг аяллын дэлгэрэнгүй хуудаснаас харна уу.
         </p>
-        <Link href="/teachers" className="btn btn-primary btn-md mt-7">Хамт олонтой танилцах →</Link>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          {JOURNEYS.map((j) => (
+            <Link key={j.slug} href={`/ayalal/${j.slug}#baga`} className="btn btn-outline btn-md">{j.name} →</Link>
+          ))}
+        </div>
       </div></section>
 
       {/* Аялагчдын зөвлөмж */}

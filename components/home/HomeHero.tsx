@@ -3,12 +3,13 @@
 import { VideoHero } from "@/components/video/VideoHero";
 import { useI18n } from "@/lib/i18n";
 
-export function HomeHero() {
+export function HomeHero({ src }: { src?: string }) {
   const { t } = useI18n();
 
   return (
     <VideoHero
       clip="meditation"
+      src={src}
       eyebrow="Zaya's Ananda"
       title={
         <>
@@ -20,7 +21,7 @@ export function HomeHero() {
       cta={[
         { href: "/courses", label: t("home.heroStart") },
         { href: "/ayalal", label: t("home.heroJourney") },
-        { href: "/merge", label: `🔮 ${t("home.heroOracle")}`, variant: "gold" as const },
+        { href: "/merge", label: `🔮 ${t("nav.merge")}`, variant: "gold" as const },
       ]}
     />
   );

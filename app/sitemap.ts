@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { listCmsCached, listPagesCached } from "@/lib/repo";
+import { JOURNEYS } from "@/data/journeys";
 
 export const revalidate = 3600;
 
@@ -24,6 +25,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { p: "/login", pr: 0.3, ch: "monthly" },
     { p: "/register", pr: 0.3, ch: "monthly" },
   ];
+
+  for (const j of JOURNEYS) staticPaths.push({ p: "/ayalal/" + j.slug, pr: 0.8, ch: "monthly" });
 
   const now = new Date();
   const out: MetadataRoute.Sitemap = staticPaths.map((s) => ({

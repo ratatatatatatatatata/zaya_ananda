@@ -1,4 +1,5 @@
 import { VideoHero } from "@/components/video/VideoHero";
+import { heroVideoSrc } from "@/lib/hero-video";
 import { CtaBand } from "@/components/CtaBand";
 import { CalmBand } from "@/components/CalmBand";
 import { SectionHeading } from "@/components/ui";
@@ -15,6 +16,7 @@ export const metadata = { title: "Бидний тухай" };
 export const dynamic = "force-dynamic";
 
 export default async function AboutPage() {
+  const heroSrc = await heroVideoSrc("about");
   const settings = await getSettings();
   let aboutVideoUrl = "";
   if (settings.aboutVideo) {
@@ -30,6 +32,7 @@ export default async function AboutPage() {
     <>
       {/* «Нэг гэрлээс Ananda» — харанхуйгаас гэрлийн үр ургаж, туяа дэлгэрнэ */}
       <VideoHero
+        src={heroSrc}
         clip="temple"
         eyebrow="Нэг гэрлээс Ananda"
         title={<T k="about.title" />}

@@ -14,7 +14,7 @@ const C = {
     "Zaya's Anandaには2つの柱があります — 自宅で学べるヨガ・瞑想講座と、モンゴルの聖地を巡る旅。",
     "Zaya's Ananda 有两大体系 — 在家学习的瑜伽与冥想课程，以及蒙古圣地的心灵之旅。"),
 
-  yogaTitle: Lx("Йог ба бясалгалын сургалт", "Yoga & meditation training", "요가·명상 교육", "ヨガと瞑想の講座", "瑜伽与冥想课程"),
+  yogaTitle: Lx("Бясалгалын сургалт", "Meditation training", "명상 교육", "瞑想の講座", "冥想课程"),
   yogaText: Lx(
     "Биеэ сунгах йогийн дасгалаас эхлээд гүн бясалгал хүртэл — видео хичээлээр, өөрийн хэмнэлээр, гэрээсээ. Худалдан авсан хичээл тань хувийн буланд үүрд нээлттэй.",
     "From body-opening yoga to deep meditation — video lessons at your own pace, from home. Purchased courses stay open in your personal space.",

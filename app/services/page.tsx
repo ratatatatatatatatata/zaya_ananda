@@ -1,6 +1,7 @@
 import { CmsFilterGrid } from "@/components/CmsFilterGrid";
 import { PromoBanner } from "@/components/PromoBanner";
 import { VideoHero } from "@/components/video/VideoHero";
+import { heroVideoSrc } from "@/lib/hero-video";
 import { listCmsCached } from "@/lib/repo";
 import { SERVICE_GROUPS } from "@/data/cms-taxonomy";
 import { T } from "@/components/T";
@@ -9,12 +10,14 @@ export const revalidate = 300;
 export const metadata = { title: "Үйлчилгээ" };
 
 export default async function ServicesPage() {
+  const heroSrc = await heroVideoSrc("services");
   const [items, promos] = await Promise.all([listCmsCached("service"), listCmsCached("promo")]);
   return (
     <>
       <PromoBanner items={promos} />
       {/* Ойн сүмийн болор — камер болор руу ойртож, гэрлийн бөөмс болон бутарна */}
       <VideoHero
+        src={heroSrc}
         clip="temple"
         eyebrow="Эдгэрлийн ой"
         title={<T k="nav.services" />}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { BankInfo } from "@/lib/types";
+import { HERO_SLOTS } from "@/lib/hero-slots";
 
 function compressImage(file: File, maxW = 800, quality = 0.85): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -51,6 +52,8 @@ const EMPTY_BANK: BankInfo = { bankName: "", account: "", holder: "" };
 export function AdminSettings() {
   const [form, setForm] = useState(EMPTY);
   const [bank, setBank] = useState<BankInfo>(EMPTY_BANK);
+  const [heroVideos, setHeroVideos] = useState<Record<string, string>>({});
+  const [heroBusy, setHeroBusy] = useState<{ key: string; pct: number } | null>(null);
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
@@ -68,6 +71,7 @@ export function AdminSettings() {
           facebook: s.facebook || "", instagram: s.instagram || "", youtube: s.youtube || "",
         });
         if (s.bank) setBank({ ...EMPTY_BANK, ...s.bank });
+        if (s.heroVideos && typeof s.heroVideos === "object") setHeroVideos(s.heroVideos);
       })
       .catch(() => {});
   }, []);
@@ -83,11 +87,21 @@ export function AdminSettings() {
     catch (e2) { setErr(e2 instanceof Error ? e2.message : "Видео байршуулахад алдаа."); }
     finally { setVideoProgress(null); }
   }
+  async function pickHeroVideo(key: string, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]; if (!file) return;
+    setErr(""); setHeroBusy({ key, pct: 0 });
+    try {
+      const path = await uploadVideo(file, (p) => setHeroBusy({ key, pct: p }));
+      setHeroVideos((h) => ({ ...h, [key]: path }));
+    } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Видео байршуулахад алдаа."); }
+    finally { setHeroBusy(null); e.target.value = ""; }
+  }
+
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true); setErr(""); setMsg("");
     try {
-      const payload = { ...form, bank };
+      const payload = { ...form, bank, heroVideos };
       const res = await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
       setMsg("Хадгаллаа. Шинэ мэдээлэл сайтад тусгагдана.");
@@ -126,7 +140,40 @@ export function AdminSettings() {
         </div>
       </div>
 
-      <p className="rounded-xl bg-aqua px-4 py-2.5 text-sm text-muted">ℹ️ Хамт олны (багш нарын) мэдээллийг зүүн цэсний <b>«Хамт олон»</b> таб дээр удирдана — тэнд нэмсэн хүмүүс «Хамт олон» цэс болон «Бидний тухай» хуудсанд хамт гарна.</p>
+      <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+        <p className="font-display font-semibold text-ink">Толгойн богино бичлэгүүд</p>
+        <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">
+          Цэс бүрийн дээд хэсэгт тоглодог бичлэгийг эндээс солино. Байршуулаагүй бол өгөгдмөл бичлэг ажиллана.
+          Богино (5–15 сек), чимээгүй, 1920×1080 mp4 хамгийн тохиромжтой.
+        </p>
+        <div className="space-y-2.5">
+          {HERO_SLOTS.map((slot) => {
+            const cur = heroVideos[slot.key];
+            const busy = heroBusy?.key === slot.key;
+            return (
+              <div key={slot.key} className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface-1 px-3 py-2.5">
+                <span className="min-w-[10rem] text-sm font-semibold text-ink">{slot.label}</span>
+                {busy ? (
+                  <span className="flex flex-1 items-center gap-3">
+                    <span className="text-sm font-medium text-primary-700">{heroBusy?.pct}%</span>
+                    <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-line"><span className="block h-full bg-primary-500 transition-all" style={{ width: (heroBusy?.pct ?? 0) + "%" }} /></span>
+                  </span>
+                ) : cur ? (
+                  <span className="flex flex-1 items-center gap-3">
+                    <span className="truncate text-sm font-medium text-jade-600">✓ Байршуулсан</span>
+                    <label className="cursor-pointer text-xs font-semibold text-primary-700 hover:underline">
+                      Солих<input type="file" accept="video/*" className="hidden" onChange={(ev) => pickHeroVideo(slot.key, ev)} />
+                    </label>
+                    <button type="button" onClick={() => setHeroVideos((h) => ({ ...h, [slot.key]: "" }))} className="text-xs font-semibold text-rose-500 hover:underline">Устгах</button>
+                  </span>
+                ) : (
+                  <input type="file" accept="video/*" onChange={(ev) => pickHeroVideo(slot.key, ev)} className="flex-1 text-sm" />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
         <p className="mb-3 font-display font-semibold text-ink">Дансны мэдээлэл (худалдан авалтад харагдана)</p>

@@ -180,6 +180,8 @@ export interface SiteSettings {
   aboutTitle?: string;
   aboutBody?: string;
   aboutVideo?: string;
+  /** Хуудас бүрийн толгойн богино бичлэг — түлхүүр: home/services/courses/ayalal/shop/about/resources/item */
+  heroVideos?: Record<string, string>;
   facebook?: string;
   instagram?: string;
   youtube?: string;

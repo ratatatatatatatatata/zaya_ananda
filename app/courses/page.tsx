@@ -1,5 +1,6 @@
 import { CmsCoursesFilter } from "@/components/CmsCoursesFilter";
 import { VideoHero } from "@/components/video/VideoHero";
+import { heroVideoSrc } from "@/lib/hero-video";
 import { VideoBand } from "@/components/video/VideoBand";
 import { listCmsCached } from "@/lib/repo";
 import { T } from "@/components/T";
@@ -8,11 +9,13 @@ export const revalidate = 300;
 export const metadata = { title: "Сургалт" };
 
 export default async function CoursesPage() {
+  const [heroSrc, bandSrc] = await Promise.all([heroVideoSrc("courses"), heroVideoSrc("band")]);
   const items = await listCmsCached("course");
   return (
     <>
       {/* Ухамсрын номын сан — оддын дунд хөвөх номууд, төв гэрлийн багана */}
       <VideoHero
+        src={heroSrc}
         clip="meditation"
         eyebrow="Дотоод чимээгүй байдал"
         title={<T k="nav.courses" />}
@@ -22,6 +25,7 @@ export default async function CoursesPage() {
       <section id="courses" className="section"><div className="container-px"><CmsCoursesFilter items={items} /></div></section>
 
       <VideoBand
+        src={bandSrc}
         clip="stream"
         quote="Ус чулууг хүчээр биш, тэвчээрээр элээдэг. Бясалгал ч мөн адил — өдөр бүрийн жижиг алхам таныг өөрчилнө."
         author="Zaya's Ananda"

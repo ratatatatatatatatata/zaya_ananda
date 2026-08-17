@@ -23,6 +23,9 @@ export async function PATCH(req: Request) {
       aboutTitle: str(body.aboutTitle),
       aboutBody: str(body.aboutBody),
       aboutVideo: str(body.aboutVideo),
+      heroVideos: body.heroVideos && typeof body.heroVideos === "object"
+        ? Object.fromEntries(Object.entries(body.heroVideos as Record<string, unknown>).map(([k, v]) => [k, String(v || "")]))
+        : undefined,
       facebook: str(body.facebook),
       instagram: str(body.instagram),
       youtube: str(body.youtube),
@@ -49,6 +52,7 @@ export async function PATCH(req: Request) {
         : undefined,
     });
     revalidateTag("settings");
+    revalidatePath("/", "layout");
     revalidatePath("/about");
     revalidatePath("/teachers");
     revalidatePath("/teachers/[slug]", "page");

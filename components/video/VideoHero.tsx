@@ -11,6 +11,7 @@ export type Clip = "meditation" | "stream" | "temple" | "stones";
  *  - reduced-motion / өгөгдөл хэмнэх горимд зөвхөн постер зураг харагдана */
 export function VideoHero({
   clip,
+  src,
   eyebrow,
   title,
   desc,
@@ -19,6 +20,8 @@ export function VideoHero({
   align = "left",
 }: {
   clip: Clip;
+  /** Админаас байршуулсан бичлэгийн хаяг — байвал өгөгдмөл клипийг орлоно */
+  src?: string;
   eyebrow?: ReactNode;
   title: ReactNode;
   desc?: ReactNode;
@@ -86,7 +89,7 @@ export function VideoHero({
           <video
             ref={video}
             className="h-full w-full object-cover"
-            src={`/video/${clip}.mp4`}
+            src={src || `/video/${clip}.mp4`}
             poster={`/video/${clip}.jpg`}
             muted
             loop

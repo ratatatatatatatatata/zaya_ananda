@@ -16,8 +16,8 @@ const STEPS = [
     n: "01", icon: "🧭",
     title: Lx("Замаа сонгох", "Choose your path", "길을 선택", "道を選ぶ", "选择路径"),
     text: Lx(
-      "Йогийн дасгал, бясалгалын хөтөлбөр эсвэл ариун газрын аялал — өөрт тохирохоо сонгоно. Сэтгэлийн туяа хэсэг танд зөвлөнө.",
-      "Yoga practice, a meditation program, or a sacred-site journey — pick what fits. Our mood guide can suggest one.",
+      "Бясалгалын хөтөлбөр эсвэл ариун газрын аялал — өөрт тохирохоо сонгоно. Сэтгэлийн туяа хэсэг танд зөвлөнө.",
+      "A meditation program or a sacred-site journey — pick what fits. Our mood guide can suggest one.",
       "요가, 명상 프로그램, 성지 여행 중 나에게 맞는 것을 선택하세요.",
       "ヨガ、瞑想プログラム、聖地の旅 — 自分に合うものを選びます。",
       "瑜伽、冥想课程或圣地之旅 — 选择适合你的方式。"),

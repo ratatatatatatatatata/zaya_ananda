@@ -17,6 +17,8 @@ export function Footer() {
       { href: "/courses", label: t("nav.courses") },
       { href: "/ayalal", label: t("nav.journey") },
       { href: "/shop", label: t("nav.shop") },
+      { href: "/merge", label: t("nav.merge") },
+      { href: "/mood", label: t("nav.mood") },
     ] },
     { title: t("footer.centerCol"), links: [
       { href: "/about", label: t("nav.about") },

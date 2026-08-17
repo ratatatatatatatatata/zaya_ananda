@@ -8,11 +8,13 @@ import type { Clip } from "./VideoHero";
  *  Хоёр хэсгийн хооронд байгалийн дүрслэлээр сэтгэлийг чөлөөлнө. */
 export function VideoBand({
   clip,
+  src,
   quote,
   author,
   cta,
 }: {
   clip: Clip;
+  src?: string;
   quote: ReactNode;
   author?: ReactNode;
   cta?: { href: string; label: ReactNode };
@@ -59,7 +61,7 @@ export function VideoBand({
     <section ref={wrap} className="night relative isolate flex min-h-[58svh] items-center overflow-hidden">
       <div ref={layer} aria-hidden className="absolute inset-0 -z-10 will-change-transform">
         {motion ? (
-          <video ref={video} className="h-full w-full object-cover" src={`/video/${clip}.mp4`} poster={`/video/${clip}.jpg`} muted loop playsInline preload="none" />
+          <video ref={video} className="h-full w-full object-cover" src={src || `/video/${clip}.mp4`} poster={`/video/${clip}.jpg`} muted loop playsInline preload="none" />
         ) : (
           <img src={`/video/${clip}.jpg`} alt="" className="h-full w-full object-cover" />
         )}
