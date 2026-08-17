@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import type { SitePage, CmsTranslations } from "@/lib/types";
-import { NAV_LINKS } from "@/lib/nav-links";
+import { NAV_LINKS, EXTRA_HERO_SLOTS } from "@/lib/nav-links";
+import { HeroMediaEditor } from "@/components/AdminHeroMedia";
 import { useI18n } from "@/lib/i18n";
 
 const LANG_TABS = [
@@ -126,20 +127,29 @@ export function AdminPages() {
     <div className="space-y-5">
       {/* Одоо байгаа үндсэн цэс */}
       <div className="card p-5">
-        <h2 className="font-display text-lg font-semibold text-ink">Одоогийн цэс</h2>
+        <h2 className="font-display text-lg font-semibold text-ink">Одоогийн цэс ба толгойн дэвсгэр</h2>
         <p className="mt-1 text-sm text-muted">
-          Сайтын дээд хэсэгт эдгээр цэс харагдаж байна. Эдгээр нь системийн үндсэн хуудсууд тул эндээс устгагдахгүй —
-          доор нэмсэн шинэ хуудсууд эдгээрийн ард нэмэгдэнэ.
+Сайтын дээд хэсэгт эдгээр цэс харагдаж байна. Хуудас тус бүрийн <b>толгойн дэвсгэрийг</b> эндээс шууд солино — видео эсвэл зураг байршуулж болно.
         </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {NAV_LINKS.map((l, i) => (
-            <a key={l.href} href={l.href} target="_blank" rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-2 px-3.5 py-1.5 text-sm font-semibold text-ink transition hover:border-primary-500/45 hover:text-primary-700">
-              <span className="text-xs text-muted">{i + 1}</span>
-              {t(l.key)}
-              <span className="text-xs font-normal text-muted">{l.href}</span>
-            </a>
-          ))}
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          {NAV_LINKS.map((l) =>
+            l.slot ? (
+              <HeroMediaEditor key={l.href} slot={l.slot} label={t(l.key)} href={l.href} />
+            ) : (
+              <div key={l.href} className="rounded-2xl border border-dashed border-line bg-surface-2/60 p-4">
+                <p className="font-display text-base font-semibold text-ink">{t(l.key)}</p>
+                <p className="text-xs text-muted">{l.href}</p>
+                <p className="mt-2 text-xs text-muted">Энэ хуудсанд толгойн дэвсгэр байхгүй.</p>
+              </div>
+            ),
+          )}
+        </div>
+
+        <div className="mt-6 border-t border-line pt-5">
+          <p className="text-xs font-bold uppercase tracking-wide text-muted">Бусад дэвсгэр</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {EXTRA_HERO_SLOTS.map((x) => <HeroMediaEditor key={x.slot} slot={x.slot} label={x.label} />)}
+          </div>
         </div>
         {pages.length > 0 && (
           <div className="mt-4 border-t border-line pt-4">
