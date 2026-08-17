@@ -40,6 +40,19 @@ export default function JourneyPage({ params }: { params: { slug: string } }) {
         </div>
       </section>
 
+      {/* Дотоод цэс — гүйлгэхэд толгойн доор наалдаж, хамт хөдөлнө */}
+      <nav className="night sticky top-16 z-30 border-y border-white/10 bg-[#0B1714]/90 backdrop-blur lg:top-[72px]">
+        <div className="container-px flex gap-x-7 gap-y-2 overflow-x-auto py-3.5 sm:flex-wrap sm:justify-center sm:overflow-visible">
+          {[
+            { id: "hutulbur", label: "Өдөр өдрийн хөтөлбөр" },
+            { id: "baga", label: "Хариуцах баг" },
+            { id: "faq", label: "Асуулт хариулт" },
+          ].map((n) => (
+            <a key={n.id} href={"#" + n.id} className="shrink-0 whitespace-nowrap text-sm font-semibold text-white/70 transition hover:text-primary-300">{n.label}</a>
+          ))}
+        </div>
+      </nav>
+
       {/* Товч мэдээлэл */}
       <section className="section"><div className="container-px">
         <div className="grid gap-5 lg:grid-cols-4">
@@ -63,7 +76,7 @@ export default function JourneyPage({ params }: { params: { slug: string } }) {
       </div></section>
 
       {/* Өдөр өдрийн хөтөлбөр — зүүн талд зураг, баруун талд мэдээлэл */}
-      <section id="hutulbur" className="section scroll-mt-24 bg-surface-2"><div className="container-px">
+      <section id="hutulbur" className="section scroll-mt-32 bg-surface-2"><div className="container-px">
         <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Өдөр өдрийн хөтөлбөр</h2>
         <p className="mt-2 max-w-2xl text-muted">Өдөр бүрийн урсгал, юу үзэж, юу хийхийг дарааллаар нь харуулав.</p>
 
@@ -102,7 +115,7 @@ export default function JourneyPage({ params }: { params: { slug: string } }) {
       </div></section>
 
       {/* Хариуцах хүн ба баг */}
-      <section id="baga" className="section scroll-mt-24"><div className="container-px">
+      <section id="baga" className="section scroll-mt-32"><div className="container-px">
         <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Аяллыг хэн хариуцах вэ</h2>
         <p className="mt-2 max-w-2xl text-muted">Аяллын турш тантай хамт явж, хөтөлбөрийг удирдах хүмүүс.</p>
 
@@ -118,7 +131,7 @@ export default function JourneyPage({ params }: { params: { slug: string } }) {
       </div></section>
 
       {/* Түгээмэл асуултууд */}
-      <section id="faq" className="section scroll-mt-24 bg-surface-2"><div className="container-px max-w-3xl">
+      <section id="faq" className="section scroll-mt-32 bg-surface-2"><div className="container-px max-w-3xl">
         <h2 className="text-center font-display text-3xl font-semibold text-ink sm:text-4xl">Түгээмэл асуултууд</h2>
         <div className="mt-8 space-y-3">
           {JOURNEY_FAQ.map((f) => (

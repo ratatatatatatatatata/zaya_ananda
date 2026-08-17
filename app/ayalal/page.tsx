@@ -93,16 +93,14 @@ export default async function AyalalPage() {
         desc="Монголын энергийн ариун газрууд руу хийх энэ аян бол зүгээр нэг зам биш — таны дотоод амар амгалан руу хийх аялал юм."
         cta={[{ href: "#tours", label: "Хөтөлбөр үзэх" }, { href: "#faq", label: "Түгээмэл асуултууд" }]}
       />
-      <section className="night relative isolate overflow-hidden bg-[#0C1A17]">
-        {/* Дотоод цэс */}
-        <nav className="relative z-10 border-y border-white/10 bg-[#0B1714]/80 backdrop-blur">
-          <div className="container-px flex flex-wrap justify-center gap-x-7 gap-y-2 py-3.5">
-            {NAV.map((n) => (
-              <a key={n.id} href={"#" + n.id} className="text-sm font-semibold text-white/65 transition hover:text-primary-300">{n.label}</a>
-            ))}
-          </div>
-        </nav>
-      </section>
+      {/* Дотоод цэс — гүйлгэхэд толгойн доор наалдаж, хамт хөдөлнө */}
+      <nav className="night sticky top-16 z-30 border-y border-white/10 bg-[#0B1714]/90 backdrop-blur lg:top-[72px]">
+        <div className="container-px flex gap-x-7 gap-y-2 overflow-x-auto py-3.5 sm:flex-wrap sm:justify-center sm:overflow-visible">
+          {NAV.map((n) => (
+            <a key={n.id} href={"#" + n.id} className="shrink-0 whitespace-nowrap text-sm font-semibold text-white/70 transition hover:text-primary-300">{n.label}</a>
+          ))}
+        </div>
+      </nav>
 
       {/* Үнэт зүйлс */}
       <section className="section"><div className="container-px">
@@ -121,7 +119,7 @@ export default async function AyalalPage() {
       </div></section>
 
       {/* Аяллын хөтөлбөрүүд — зурган карт */}
-      <section id="tours" className="section scroll-mt-20 bg-surface-2"><div className="container-px">
+      <section id="tours" className="section scroll-mt-32 bg-surface-2"><div className="container-px">
         <h2 className="font-display text-3xl font-semibold text-ink">Аяллын хөтөлбөрүүд</h2>
         <p className="mt-2 max-w-2xl text-muted">Аялал сонгоод дарвал өдөр өдрийн хөтөлбөр, хариуцах багш, хамт явах баг зэрэг бүх мэдээлэл дэлгэрэнгүй нээгдэнэ.</p>
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
@@ -148,7 +146,7 @@ export default async function AyalalPage() {
       </div></section>
 
       {/* Энергийн газрууд */}
-      <section id="places" className="section scroll-mt-20"><div className="container-px">
+      <section id="places" className="section scroll-mt-32"><div className="container-px">
         <h2 className="font-display text-3xl font-semibold text-ink">Энергийн газрууд</h2>
         <p className="mt-2 max-w-2xl text-muted">Монгол орны өндөр энергит, ариун дагшин нутгууд — түүх, соёлын учир холбогдол, тэнд хийх зан үйлийн хамт.</p>
         <div className="mt-10 grid gap-6 lg:grid-cols-2">
@@ -169,7 +167,7 @@ export default async function AyalalPage() {
       </div></section>
 
       {/* Багш, хөтөч нар */}
-      <section id="guides" className="section scroll-mt-20 bg-surface-2"><div className="container-px text-center">
+      <section id="guides" className="section scroll-mt-32 bg-surface-2"><div className="container-px text-center">
         <h2 className="font-display text-3xl font-semibold text-ink">Багш, хөтөч нар</h2>
         <p className="mx-auto mt-3 max-w-2xl text-muted">
           Аялал бүрийг бясалгалын туршлагатай багш болон нутаг усаа мэддэг хөтөч нар хамтран удирдана.
@@ -183,7 +181,7 @@ export default async function AyalalPage() {
       </div></section>
 
       {/* Аялагчдын зөвлөмж */}
-      <section id="prep" className="section scroll-mt-20"><div className="container-px">
+      <section id="prep" className="section scroll-mt-32"><div className="container-px">
         <h2 className="font-display text-3xl font-semibold text-ink">Аялагчдын зөвлөмж</h2>
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
           <div className="card p-6">
@@ -214,7 +212,7 @@ export default async function AyalalPage() {
       </div></section>
 
       {/* FAQ */}
-      <section id="faq" className="section bg-surface-2 scroll-mt-20"><div className="container-px max-w-3xl">
+      <section id="faq" className="section bg-surface-2 scroll-mt-32"><div className="container-px max-w-3xl">
         <h2 className="text-center font-display text-3xl font-semibold text-ink">Түгээмэл асуултууд</h2>
         <div className="mt-8 space-y-3">
           {JOURNEY_FAQ.map((f) => (
