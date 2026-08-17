@@ -182,6 +182,8 @@ export interface SiteSettings {
   aboutVideo?: string;
   /** Хуудас бүрийн толгойн богино бичлэг — түлхүүр: home/services/courses/ayalal/shop/about/resources/item */
   heroVideos?: Record<string, string>;
+  /** Толгойн дэвсгэр — бичлэг эсвэл зураг. Түлхүүр: hero slot */
+  heroMedia?: Record<string, { kind: "video" | "image"; src: string }>;
   facebook?: string;
   instagram?: string;
   youtube?: string;

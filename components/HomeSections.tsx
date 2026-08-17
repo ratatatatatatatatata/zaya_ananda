@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { listCmsCached, getSettingsCached } from "@/lib/repo";
-import { heroVideoSrc } from "@/lib/hero-video";
+import { heroMediaFor } from "@/lib/hero-video";
 import { CmsCard } from "./CmsCard";
 import { Reveal } from "./Reveal";
 import { T, Tr } from "./T";
@@ -67,9 +67,9 @@ function SectionHead({ titleKey, desc, href, icon }: { titleKey: string; desc: R
 
 /** Нүүр хуудас — хэсэг бүр товч мэдээлэл, шууд орох товчтой. */
 export async function HomeSections() {
-  const [services, courses, products, free, settings, bandSrc] = await Promise.all([
+  const [services, courses, products, free, settings, bandMedia] = await Promise.all([
     listCmsCached("service"), listCmsCached("course"), listCmsCached("product"),
-    listCmsCached("free"), getSettingsCached(), heroVideoSrc("band"),
+    listCmsCached("free"), getSettingsCached(), heroMediaFor("band"),
   ]);
 
   const lessonCount = courses.reduce((n, c) => n + (c.lessons?.length ?? (typeof c.videoLessons === "number" ? c.videoLessons : 0)), 0);
@@ -114,7 +114,7 @@ export async function HomeSections() {
 
       <VideoBand
         clip="temple"
-        src={bandSrc}
+        media={bandMedia}
         quote="Ойн гүн дэх сүм шиг — дотоод ертөнц тань чимээгүй байдал, хүндэтгэлээр нээгддэг."
         author="Zaya's Ananda"
         cta={{ href: "/about", label: "Бидний тухай" }}

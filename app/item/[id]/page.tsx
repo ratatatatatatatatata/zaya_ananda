@@ -13,6 +13,7 @@ import { CmsText, CatLabel } from "@/components/CmsText";
 import { CmsCard } from "@/components/CmsCard";
 import { signedDownloadUrl } from "@/lib/supabase";
 import { VideoHero, type Clip } from "@/components/video/VideoHero";
+import { heroMediaFor } from "@/lib/hero-video";
 import { themeFor } from "@/data/theme-map";
 import { CategoryGlyph } from "@/components/CategoryGlyph";
 
@@ -50,6 +51,7 @@ function clipFor(kind: string, category?: string | null): Clip {
 }
 
 export default async function ItemPage({ params }: { params: { id: string } }) {
+  const heroMedia = await heroMediaFor("item");
   const item = await getCmsByIdCached(params.id);
   if (!item) notFound();
   const nav = kindNav[item.kind] || kindNav.service;
@@ -76,6 +78,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
   return (
     <>
     <VideoHero
+      media={heroMedia}
       clip={clipFor(item.kind, item.category)}
       eyebrow={th.eyebrow}
       title={<CmsText mn={item.title} i18n={item.i18n} field="title" />}

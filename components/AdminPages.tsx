@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import type { SitePage, CmsTranslations } from "@/lib/types";
+import { NAV_LINKS } from "@/lib/nav-links";
+import { useI18n } from "@/lib/i18n";
 
 const LANG_TABS = [
   { k: "mn" as const, l: "🇲🇳 Монгол" },
@@ -59,6 +61,7 @@ const EMPTY = { title: "", navLabel: "", body: "", image: "", video: "", positio
 
 /** Ерөнхий тохиргоо — цэсэнд шинэ мөр (хуудас) нэмж, агуулгыг нь засварлана. */
 export function AdminPages() {
+  const { t } = useI18n();
   const [pages, setPages] = useState<SitePage[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(EMPTY);
@@ -121,6 +124,38 @@ export function AdminPages() {
 
   return (
     <div className="space-y-5">
+      {/* Одоо байгаа үндсэн цэс */}
+      <div className="card p-5">
+        <h2 className="font-display text-lg font-semibold text-ink">Одоогийн цэс</h2>
+        <p className="mt-1 text-sm text-muted">
+          Сайтын дээд хэсэгт эдгээр цэс харагдаж байна. Эдгээр нь системийн үндсэн хуудсууд тул эндээс устгагдахгүй —
+          доор нэмсэн шинэ хуудсууд эдгээрийн ард нэмэгдэнэ.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {NAV_LINKS.map((l, i) => (
+            <a key={l.href} href={l.href} target="_blank" rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-2 px-3.5 py-1.5 text-sm font-semibold text-ink transition hover:border-primary-500/45 hover:text-primary-700">
+              <span className="text-xs text-muted">{i + 1}</span>
+              {t(l.key)}
+              <span className="text-xs font-normal text-muted">{l.href}</span>
+            </a>
+          ))}
+        </div>
+        {pages.length > 0 && (
+          <div className="mt-4 border-t border-line pt-4">
+            <p className="text-xs font-bold uppercase tracking-wide text-muted">Нэмсэн хуудсууд</p>
+            <div className="mt-2.5 flex flex-wrap gap-2">
+              {pages.map((p) => (
+                <a key={p.id} href={"/p/" + p.id} target="_blank" rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-primary-500/35 bg-primary-50 px-3.5 py-1.5 text-sm font-semibold text-primary-700">
+                  {p.navLabel || p.title}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-display text-lg font-semibold text-ink">Цэсний хуудсууд: {pages.length}</h2>

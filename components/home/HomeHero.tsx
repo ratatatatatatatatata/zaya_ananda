@@ -3,13 +3,13 @@
 import { VideoHero } from "@/components/video/VideoHero";
 import { useI18n } from "@/lib/i18n";
 
-export function HomeHero({ src }: { src?: string }) {
+export function HomeHero({ media }: { media?: { kind: "video" | "image"; url: string } }) {
   const { t } = useI18n();
 
   return (
     <VideoHero
       clip="meditation"
-      src={src}
+      media={media}
       eyebrow="Zaya's Ananda"
       title={
         <>

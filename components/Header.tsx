@@ -9,17 +9,8 @@ import { useI18n } from "@/lib/i18n";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Logo } from "./Logo";
 import { cx } from "@/lib/format";
+import { NAV_LINKS as links } from "@/lib/nav-links";
 
-const links = [
-  { href: "/", key: "nav.home" },
-  { href: "/services", key: "nav.services" },
-  { href: "/courses", key: "nav.courses" },
-  { href: "/ayalal", key: "nav.journey" },
-  { href: "/merge", key: "nav.merge" },
-  { href: "/shop", key: "nav.shop" },
-  { href: "/gift", key: "nav.gift" },
-  { href: "/about", key: "nav.about" },
-];
 
 export function Header() {
   const pathname = usePathname();

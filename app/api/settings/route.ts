@@ -26,6 +26,14 @@ export async function PATCH(req: Request) {
       heroVideos: body.heroVideos && typeof body.heroVideos === "object"
         ? Object.fromEntries(Object.entries(body.heroVideos as Record<string, unknown>).map(([k, v]) => [k, String(v || "")]))
         : undefined,
+      heroMedia: body.heroMedia && typeof body.heroMedia === "object"
+        ? Object.fromEntries(
+            Object.entries(body.heroMedia as Record<string, { kind?: unknown; src?: unknown }>).map(([k, v]) => [
+              k,
+              { kind: v?.kind === "image" ? ("image" as const) : ("video" as const), src: String(v?.src || "") },
+            ]),
+          )
+        : undefined,
       facebook: str(body.facebook),
       instagram: str(body.instagram),
       youtube: str(body.youtube),

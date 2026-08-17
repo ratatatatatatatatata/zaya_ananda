@@ -12,6 +12,7 @@ export type Clip = "meditation" | "stream" | "temple" | "stones";
 export function VideoHero({
   clip,
   src,
+  media,
   eyebrow,
   title,
   desc,
@@ -22,6 +23,8 @@ export function VideoHero({
   clip: Clip;
   /** Админаас байршуулсан бичлэгийн хаяг — байвал өгөгдмөл клипийг орлоно */
   src?: string;
+  /** Админаас тохируулсан дэвсгэр — бичлэг эсвэл зураг */
+  media?: { kind: "video" | "image"; url: string };
   eyebrow?: ReactNode;
   title: ReactNode;
   desc?: ReactNode;
@@ -85,11 +88,13 @@ export function VideoHero({
     <section ref={wrap} className={`night relative isolate flex ${h} items-end overflow-hidden`}>
       {/* Дүрслэл */}
       <div ref={layer} aria-hidden className="absolute inset-0 -z-10 will-change-transform">
-        {motion ? (
+        {media?.kind === "image" ? (
+          <img src={media.url} alt="" className="h-full w-full object-cover" />
+        ) : motion ? (
           <video
             ref={video}
             className="h-full w-full object-cover"
-            src={src || `/video/${clip}.mp4`}
+            src={media?.url || src || `/video/${clip}.mp4`}
             poster={`/video/${clip}.jpg`}
             muted
             loop

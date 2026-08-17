@@ -1,6 +1,6 @@
 import { CmsFilterGrid } from "@/components/CmsFilterGrid";
 import { VideoHero } from "@/components/video/VideoHero";
-import { heroVideoSrc } from "@/lib/hero-video";
+import { heroMediaFor } from "@/lib/hero-video";
 import { listCmsCached } from "@/lib/repo";
 import { T } from "@/components/T";
 
@@ -8,13 +8,13 @@ export const revalidate = 300;
 export const metadata = { title: "Зөвлөгөө, мэдээлэл" };
 
 export default async function ResourcesPage() {
-  const heroSrc = await heroVideoSrc("resources");
+  const heroMedia = await heroMediaFor("resources");
   const items = await listCmsCached("resource");
   return (
     <>
       {/* Мэргэдийн архив — гэрлийн багана дундуур хөвөх чулуун хавтангууд */}
       <VideoHero
-        src={heroSrc}
+        media={heroMedia}
         clip="stream"
         eyebrow="Мэдлэгийн урсгал"
         title={<T k="nav.resources" />}

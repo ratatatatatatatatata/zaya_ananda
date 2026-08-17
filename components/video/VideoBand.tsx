@@ -9,12 +9,14 @@ import type { Clip } from "./VideoHero";
 export function VideoBand({
   clip,
   src,
+  media,
   quote,
   author,
   cta,
 }: {
   clip: Clip;
   src?: string;
+  media?: { kind: "video" | "image"; url: string };
   quote: ReactNode;
   author?: ReactNode;
   cta?: { href: string; label: ReactNode };
@@ -61,7 +63,9 @@ export function VideoBand({
     <section ref={wrap} className="night relative isolate flex min-h-[58svh] items-center overflow-hidden">
       <div ref={layer} aria-hidden className="absolute inset-0 -z-10 will-change-transform">
         {motion ? (
-          <video ref={video} className="h-full w-full object-cover" src={src || `/video/${clip}.mp4`} poster={`/video/${clip}.jpg`} muted loop playsInline preload="none" />
+          media?.kind === "image"
+            ? <img src={media.url} alt="" className="h-full w-full object-cover" />
+            : <video ref={video} className="h-full w-full object-cover" src={media?.url || src || `/video/${clip}.mp4`} poster={`/video/${clip}.jpg`} muted loop playsInline preload="none" />
         ) : (
           <img src={`/video/${clip}.jpg`} alt="" className="h-full w-full object-cover" />
         )}

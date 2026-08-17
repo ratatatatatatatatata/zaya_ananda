@@ -1,5 +1,5 @@
 import { VideoHero } from "@/components/video/VideoHero";
-import { heroVideoSrc } from "@/lib/hero-video";
+import { heroMediaFor } from "@/lib/hero-video";
 import { CmsCard } from "@/components/CmsCard";
 import { ShopSplit } from "@/components/ShopSplit";
 import { Stagger } from "@/components/motion/Stagger";
@@ -12,13 +12,13 @@ export const revalidate = 300;
 export const metadata = { title: "Дэлгүүр" };
 
 export default async function ShopPage() {
-  const heroSrc = await heroVideoSrc("shop");
+  const heroMedia = await heroMediaFor("shop");
   const items = await listCmsCached("product");
   return (
     <>
       {/* Тансаг галерей — гялгар шалтай танхимд эрдэнийн чулуу эргэлдэнэ */}
       <VideoHero
-        src={heroSrc}
+        media={heroMedia}
         clip="stones"
         eyebrow="Чулууны тэнцвэр"
         title={<T k="nav.shop" />}

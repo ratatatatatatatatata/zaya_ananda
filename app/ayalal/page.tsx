@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { VideoHero } from "@/components/video/VideoHero";
-import { heroVideoSrc } from "@/lib/hero-video";
+import { heroMediaFor } from "@/lib/hero-video";
 import { JOURNEYS, JOURNEY_FAQ } from "@/data/journeys";
 import { JourneyImage } from "@/components/journey/SceneArt";
 
@@ -81,12 +81,12 @@ const PREP = {
 
 
 export default async function AyalalPage() {
-  const heroSrc = await heroVideoSrc("ayalal");
+  const heroMedia = await heroMediaFor("ayalal");
   return (
     <>
       {/* Ариун хөндий — гэрлийн зам дагуу камер урагшилж, алсын нар мандалт руу аялна */}
       <VideoHero
-        src={heroSrc}
+        media={heroMedia}
         clip="stream"
         eyebrow="Spiritual Journey Mongolia"
         title="Сүнслэг аялал"
