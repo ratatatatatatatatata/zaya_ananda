@@ -6,6 +6,8 @@ export const HERO_SLOTS = [
   { key: "ayalal", label: "Сүнслэг аялал" },
   { key: "shop", label: "Энергийн хамгаалалт" },
   { key: "gift", label: "Гэгээн бэлэг" },
+  { key: "merge", label: "Зурхай" },
+  { key: "account", label: "Хувийн булан (профайл)" },
   { key: "resources", label: "Гэгээрлийн зам" },
   { key: "about", label: "Бидний тухай" },
   { key: "item", label: "Дэлгэрэнгүй хуудас" },

@@ -39,6 +39,7 @@ function supportsWebGL(): boolean {
  *  - Дэлгэцэд ойртох хүртэл canvas огт ачаалагдахгүй (lazy) */
 export function Journey3D({
   world,
+  media,
   eyebrow,
   title,
   desc,
@@ -46,6 +47,8 @@ export function Journey3D({
   cta,
 }: {
   world: WorldKind;
+  /** Админаас тохируулсан дэвсгэр — байвал 3D тайзны оронд харагдана */
+  media?: { kind: "video" | "image"; url: string };
   eyebrow?: ReactNode;
   title: ReactNode;
   desc?: ReactNode;
@@ -102,15 +105,20 @@ export function Journey3D({
     return () => { cancelAnimationFrame(raf); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); };
   }, []);
 
-  const isWebgl = mode === "webgl";
+  const isWebgl = mode === "webgl" && !media;
 
   return (
     // .night — гүн кино хэсэг: доторх токен ашигласан товч/хүрээ/текст гүн өнгө рүү шилжинэ
     <section ref={wrap} className="night relative" style={{ height: isWebgl ? `${heightVh}vh` : undefined }}>
       <div className={isWebgl ? "sticky top-0 h-screen overflow-hidden" : "relative overflow-hidden"} style={{ background: "radial-gradient(80% 90% at 50% 10%, #123a31 0%, #0b1f1b 55%, #060f0d 100%)" }}>
         {/* Дүрслэл */}
+        {media ? (
+          media.kind === "image"
+            ? <img aria-hidden src={media.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            : <video aria-hidden src={media.url} className="absolute inset-0 h-full w-full object-cover" muted loop autoPlay playsInline preload="metadata" />
+        ) : null}
         {isWebgl && near && <Worlds world={world} progress={progress} />}
-        {mode === "fallback" && (
+        {!media && mode === "fallback" && (
           <>
             <Atmosphere className="pointer-events-none absolute inset-0 h-full w-full" density={1.4} />
             <div aria-hidden className="anim-breathe pointer-events-none absolute left-1/2 top-1/3 h-72 w-72 -translate-x-1/2 rounded-full" style={{ background: "radial-gradient(circle, rgba(43,200,187,0.35), transparent 70%)", filter: "blur(10px)" }} />

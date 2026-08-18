@@ -87,13 +87,13 @@ export async function HomeSections() {
       <PathsHighlight courseCount={courses.length} lessonCount={lessonCount} teacherCount={teacherCount} />
 
       {/* Өдрийн зурхай */}
-      <div id="zurhai" className="scroll-mt-24"><DailyHoroscope /></div>
+      <div id="zurhai" className="scroll-mt-36"><DailyHoroscope /></div>
 
       {/* Хэрхэн эхлэх вэ */}
       <HowItWorks />
 
       {/* Энергийн засал */}
-      <section id="services" className="section scroll-mt-24"><div className="container-px">
+      <section id="services" className="section scroll-mt-36"><div className="container-px">
         <SectionHead titleKey="nav.services" desc={D.services} href="/services" icon="✨" />
         {services.length > 0 && (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -103,7 +103,7 @@ export async function HomeSections() {
       </div></section>
 
       {/* Ариусахуйн үйл */}
-      <section id="courses" className="section scroll-mt-24 bg-surface-2"><div className="container-px">
+      <section id="courses" className="section scroll-mt-36 bg-surface-2"><div className="container-px">
         <SectionHead titleKey="nav.courses" desc={D.courses} href="/courses" icon="🧘" />
         {courses.length > 0 && (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -121,7 +121,7 @@ export async function HomeSections() {
       />
 
       {/* Энергийн хамгаалалт */}
-      <section id="shop" className="section scroll-mt-24 bg-surface-2"><div className="container-px">
+      <section id="shop" className="section scroll-mt-36 bg-surface-2"><div className="container-px">
         <SectionHead titleKey="nav.shop" desc={D.shop} href="/shop" icon="🛡" />
         {products.length > 0 && (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -131,7 +131,7 @@ export async function HomeSections() {
       </div></section>
 
       {/* Гэгээн бэлэг */}
-      <section id="gift" className="section scroll-mt-24"><div className="container-px">
+      <section id="gift" className="section scroll-mt-36"><div className="container-px">
         <SectionHead titleKey="nav.gift" desc={D.gift} href="/gift" icon="🎁" />
         {free.length > 0 && (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -141,7 +141,7 @@ export async function HomeSections() {
       </div></section>
 
       {/* Сэтгэлийн туяа — хуудасны хамгийн доод хэсэг */}
-      <section id="mood" className="section scroll-mt-24 bg-surface-2"><div className="container-px">
+      <section id="mood" className="section scroll-mt-36 bg-surface-2"><div className="container-px">
         <div className="relative overflow-hidden rounded-4xl border border-line bg-surface-1 p-8 sm:p-12">
           <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full"
             style={{ background: "radial-gradient(circle, rgba(240,156,188,0.25), transparent 70%)" }} />

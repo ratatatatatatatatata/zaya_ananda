@@ -9,12 +9,15 @@ import { formatMNT } from "@/lib/format";
 import type { Order } from "@/lib/types";
 import { Journey3D } from "@/components/three/Journey3D";
 
+type HeroMedia = { kind: "video" | "image"; url: string };
+
 export default function AccountPage() {
   const { user, loading, logout, updateProfile } = useAuth();
   const { t } = useI18n();
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const [heroMedia, setHeroMedia] = useState<HeroMedia | null>(null);
 
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "" });
@@ -25,6 +28,13 @@ export default function AccountPage() {
   useEffect(() => {
     if (user) setForm({ name: user.name, phone: user.phone || "", email: user.email });
   }, [user]);
+
+  useEffect(() => {
+    fetch("/api/hero?slot=account", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d?.media && setHeroMedia(d.media))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -89,6 +99,7 @@ export default function AccountPage() {
     <>
     {/* Хувийн мандал — хөнгөн 3D тайз, хэрэглээг дарамтлахгүй богино */}
     <Journey3D
+      media={heroMedia ?? undefined}
       world="mandala"
       eyebrow="The Personal Mandala"
       title={user.name}
