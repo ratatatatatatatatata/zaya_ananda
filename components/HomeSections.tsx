@@ -12,6 +12,7 @@ import { SectionJump } from "./home/SectionJump";
 import { SectionZoom } from "./home/SectionZoom";
 import { ZurhaiSlider } from "./home/ZurhaiSlider";
 import { ServiceCard } from "./home/ServiceCard";
+import { AboutFacts } from "./home/AboutFacts";
 import { JourneyImage } from "./journey/SceneArt";
 import { JOURNEYS } from "@/data/journeys";
 import type { Locale } from "@/lib/types";
@@ -26,41 +27,6 @@ const JOURNEY_DESC = Lx(
   "現在申し込み受付中の旅です。選ぶと日ごとの行程と同行チームが表示されます。",
   "目前开放报名的行程。点选后可查看逐日安排与随行团队。",
 );
-const ABOUT_POINTS = [
-  {
-    icon: "🌿",
-    title: Lx("Ойн дунд, чимээгүй орон зай", "A quiet space in the forest", "숲속의 고요한 공간", "森の中の静かな空間", "森林中的静谧空间"),
-    text: Lx(
-      "Урсгал усны хажууд, ойн гүнд байрлах бясалгал, эдгэрлийн төв.",
-      "A meditation and healing centre deep in the forest, beside flowing water.",
-      "흐르는 물가, 숲 깊은 곳의 명상·치유 센터.",
-      "せせらぎのそば、森の奥にある瞑想とヒーリングのセンター。",
-      "溪水旁、森林深处的冥想与疗愈中心。",
-    ),
-  },
-  {
-    icon: "🤝",
-    title: Lx("Туршлагатай багш нар", "Experienced teachers", "경험 많은 선생님", "経験豊かな講師", "资深导师"),
-    text: Lx(
-      "Бясалгал, зан үйл, энергийн заслыг олон жил заасан багш нар хөтөлнө.",
-      "Led by teachers with many years in meditation, ritual and energy healing.",
-      "명상·의식·에너지 힐링을 오래 가르쳐 온 선생님들이 이끕니다.",
-      "瞑想・儀式・エネルギーヒーリングを長年教えてきた講師が導きます。",
-      "由多年教授冥想、仪式与能量疗愈的导师带领。",
-    ),
-  },
-  {
-    icon: "🕊",
-    title: Lx("Аялал биш — дотоод аян", "Not a tour — an inner journey", "관광이 아닌 내면의 여정", "観光ではなく内なる旅", "不是观光，而是内在之旅"),
-    text: Lx(
-      "Ариун газрууд руу хийх аялал бүр бясалгал, зан үйлтэй хослоно.",
-      "Every journey to a sacred site is woven with meditation and ritual.",
-      "성지로 향하는 모든 여정에 명상과 의식이 함께합니다.",
-      "聖地への旅はすべて瞑想と儀式とともにあります。",
-      "每一次圣地之旅都融合冥想与仪式。",
-    ),
-  },
-];
 
 const MOODBTN = Lx("Мэдрэмжээ сонгох", "Choose your mood", "기분 고르기", "気分を選ぶ", "选择心情");
 
@@ -202,17 +168,9 @@ export async function HomeSections() {
         </div>
       </div></section>
 
-      {/* Бидний тухай — хуудасны хамгийн доод хэсэг */}
+      {/* Бидний тухай — анхаарал татах жижиг баримтууд */}
       <section id="about" className="section scroll-mt-36"><div className="container-px">
-        <div className="grid gap-6 sm:grid-cols-3">
-          {ABOUT_POINTS.map((a) => (
-            <div key={a.icon} className="panel p-6">
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary-500/12 text-2xl">{a.icon}</span>
-              <h3 className="mt-4 font-display text-lg font-semibold text-ink"><Tr v={a.title} /></h3>
-              <p className="mt-2 text-[0.96rem] leading-relaxed text-muted"><Tr v={a.text} /></p>
-            </div>
-          ))}
-        </div>
+        <AboutFacts />
       </div></section>
 
       <VideoBand

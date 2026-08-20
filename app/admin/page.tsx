@@ -10,6 +10,7 @@ import { Icon } from "@/components/Icon";
 import { AdminContentManager } from "@/components/AdminContentManager";
 import { AdminSettings } from "@/components/AdminSettings";
 import { AdminPages } from "@/components/AdminPages";
+import { AdminTeachers } from "@/components/AdminTeachers";
 import type { Order, PublicUser, ContactMessage } from "@/lib/types";
 
 const nav: { id: string; k: string; label?: string; icon: string }[] = [
@@ -19,6 +20,7 @@ const nav: { id: string; k: string; label?: string; icon: string }[] = [
   { id: "services", k: "admin.servicesM", label: "Энергийн засал", icon: "star" },
   { id: "courses", k: "admin.coursesM", label: "Ариусахуйн үйл", icon: "award" },
   { id: "products", k: "admin.productsM", label: "Энергийн хамгаалалт", icon: "laptop" },
+  { id: "teachers", k: "admin.teachersM", label: "Хамт олон", icon: "user" },
   { id: "gift", k: "admin.giftM", label: "Гэгээн бэлэг", icon: "award" },
   { id: "promos", k: "admin.promosM", label: "Сурталчилгаа", icon: "star" },
   { id: "reviews", k: "admin.reviews", icon: "star" },
@@ -208,6 +210,7 @@ export default function AdminPage() {
             {tab === "courses" && <AdminContentManager kind="course" />}
             {tab === "products" && <AdminContentManager kind="product" />}
             {tab === "promos" && <AdminContentManager kind="promo" />}
+            {tab === "teachers" && <AdminTeachers />}
             {tab === "gift" && <AdminContentManager kind="free" />}
             {tab === "pages" && <AdminPages />}
             {tab === "settings" && <AdminSettings />}

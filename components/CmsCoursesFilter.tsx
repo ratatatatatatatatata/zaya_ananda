@@ -4,45 +4,58 @@ import { useState } from "react";
 import { CmsCard } from "./CmsCard";
 import { Stagger } from "./motion/Stagger";
 import { TiltCard } from "./motion/TiltCard";
-import type { CmsItem } from "@/lib/types";
+import type { CmsItem, Locale } from "@/lib/types";
 import { cx } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
-import { catLabel, COURSE_CATS } from "@/data/cms-taxonomy";
-import { CATEGORY_THEME } from "@/data/theme-map";
-import { CategoryGlyph } from "./CategoryGlyph";
 
-const TABS = [
-  { k: "online" as const, l: "Онлайн сургалт" },
-  { k: "tankhim" as const, l: "Танхимын сургалт" },
+const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
+
+/** Ганцхан түвшний ангилал — бүгд / онлайн / танхим */
+const TABS: { k: "all" | "online" | "tankhim"; icon: string; label: Record<Locale, string> }[] = [
+  { k: "all", icon: "✦", label: Lx("Бүгд", "All", "전체", "すべて", "全部") },
+  { k: "online", icon: "💻", label: Lx("Онлайн сургалт", "Online courses", "온라인 강좌", "オンライン講座", "线上课程") },
+  { k: "tankhim", icon: "🏛", label: Lx("Танхимын сургалт", "In-studio courses", "오프라인 강좌", "対面講座", "线下课程") },
 ];
-const ALL = { mn: "Бүгд", en: "All", ko: "전체", ja: "すべて", zh: "全部" };
+
+const EMPTY = Lx(
+  "Одоохондоо сургалт нэмэгдээгүй байна.",
+  "No courses yet.",
+  "아직 강좌가 없습니다.",
+  "まだ講座がありません。",
+  "暂无课程。",
+);
 
 export function CmsCoursesFilter({ items }: { items: CmsItem[] }) {
-  const { lang, tr } = useI18n();
-  const [mode, setMode] = useState<"online" | "tankhim">("online");
-  const [cat, setCat] = useState("Бүгд");
-  const byMode = items.filter((i) => i.mode === mode || i.mode === "both");
-  const shown = cat === "Бүгд" ? byMode : byMode.filter((i) => (i.category || "") === cat);
+  const { tr } = useI18n();
+  const [mode, setMode] = useState<"all" | "online" | "tankhim">("all");
+
+  const shown = mode === "all" ? items : items.filter((i) => i.mode === mode || i.mode === "both");
+
   return (
     <div>
-      <div className="mx-auto mb-6 flex w-full max-w-md rounded-full border border-line bg-white/5 p-1 shadow-sm">
+      <div className="mx-auto mb-8 flex w-full max-w-2xl flex-wrap justify-center gap-2">
         {TABS.map((tb) => (
-          <button key={tb.k} onClick={() => setMode(tb.k)} className={cx("focus-ring flex-1 rounded-full px-5 py-3 text-[1.02rem] font-semibold transition", mode === tb.k ? "bg-primary-grad text-white shadow-soft" : "text-ink/70 hover:text-primary-700")}>{tb.l}</button>
-        ))}
-      </div>
-      <div className="mb-8 flex flex-wrap justify-center gap-2">
-        {["Бүгд", ...COURSE_CATS].map((c) => (
-          <button key={c} onClick={() => setCat(c)} className={cx("focus-ring inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition", cat === c ? "bg-primary-grad text-white shadow-glow" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
-            {c !== "Бүгд" && CATEGORY_THEME[c] && (
-              <CategoryGlyph glyph={CATEGORY_THEME[c].glyph} from={cat === c ? "#ffffff" : CATEGORY_THEME[c].from} to={cat === c ? "#e9fffb" : CATEGORY_THEME[c].to} className="h-4 w-4" id={c} />
+          <button
+            key={tb.k}
+            onClick={() => setMode(tb.k)}
+            className={cx(
+              "focus-ring inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[1rem] font-semibold transition",
+              mode === tb.k ? "bg-primary-grad text-white shadow-glow" : "border border-line bg-surface-1 text-ink/70 hover:border-primary-400 hover:text-primary-700",
             )}
-            {c === "Бүгд" ? tr(ALL) : catLabel(c, lang)}
+          >
+            <span aria-hidden>{tb.icon}</span>
+            {tr(tb.label)}
           </button>
         ))}
       </div>
-      {shown.length === 0
-        ? <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-12 text-center text-muted">Одоохондоо сургалт нэмэгдээгүй байна.</p>
-        : <Stagger className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{shown.map((i) => <TiltCard key={i.id} className="h-full"><CmsCard item={i} /></TiltCard>)}</Stagger>}
+
+      {shown.length === 0 ? (
+        <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-12 text-center text-muted">{tr(EMPTY)}</p>
+      ) : (
+        <Stagger className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {shown.map((i) => <TiltCard key={i.id} className="h-full"><CmsCard item={i} /></TiltCard>)}
+        </Stagger>
+      )}
     </div>
   );
 }
