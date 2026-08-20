@@ -184,6 +184,8 @@ export interface SiteSettings {
   heroVideos?: Record<string, string>;
   /** Толгойн дэвсгэр — бичлэг эсвэл зураг. Түлхүүр: hero slot */
   heroMedia?: Record<string, { kind: "video" | "image"; src: string }>;
+  /** Нүүр хуудасны «Зурхай» слайдерын картууд */
+  zurhaiCards?: { emoji: string; title: string; desc: string; href: string }[];
   facebook?: string;
   instagram?: string;
   youtube?: string;

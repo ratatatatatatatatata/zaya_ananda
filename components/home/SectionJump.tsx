@@ -8,7 +8,7 @@ const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<
 const ITEMS: { href: string; icon: string; label: Record<Locale, string> }[] = [
   { href: "#zurhai", icon: "🔮", label: Lx("Өдрийн зурхай", "Daily reading", "오늘의 운세", "今日の運勢", "每日运势") },
   { href: "#services", icon: "✨", label: Lx("Энергийн засал", "Healing", "힐링", "ヒーリング", "能量疗愈") },
-  { href: "#courses", icon: "🧘", label: Lx("Сургалт", "Courses", "강좌", "講座", "课程") },
+  { href: "#courses", icon: "🧘", label: Lx("Ариусахуйн үйл", "Purification", "정화의 길", "浄化の道", "净化之道") },
   { href: "/ayalal", icon: "🕊", label: Lx("Сүнслэг аялал", "Journeys", "영적 여행", "聖地の旅", "心灵之旅") },
   { href: "#shop", icon: "🛡", label: Lx("Хамгаалалт", "Protection", "보호", "プロテクション", "守护") },
   { href: "#gift", icon: "🎁", label: Lx("Гэгээн бэлэг", "Free gift", "무료 선물", "無料の贈り物", "免费礼物") },

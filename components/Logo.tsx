@@ -35,7 +35,7 @@ export function Logo({ withText = true, className = "", logoSrc }: { withText?: 
             className="whitespace-nowrap bg-clip-text text-[11px] font-semibold uppercase tracking-[0.3em] text-transparent"
             style={{ backgroundImage: "linear-gradient(135deg,#2BC8BB 0%,#0F9189 100%)" }}
           >
-            Төв
+            Center
           </span>
         </span>
       )}

@@ -6,47 +6,80 @@ import type { Locale } from "@/lib/types";
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
 
 const C = {
-  eyebrow: Lx("Хоёр гол зам", "Two main paths", "두 가지 길", "二つの道", "两条主路"),
+  eyebrow: Lx("Ариусахуйн үйл", "The path of purification", "정화의 길", "浄化の道", "净化之道"),
   lead: Lx(
-    "Zaya's Ananda-д таныг угтах хоёр том систем бий — гэрээсээ суралцах йог, бясалгалын сургалт, мөн Монголын ариун газруудаар хийх сүнслэг аялал.",
-    "Two systems welcome you at Zaya's Ananda — yoga and meditation training you can follow from home, and spiritual journeys to Mongolia's sacred sites.",
-    "자야스 아난다에는 두 가지 시스템이 있습니다 — 집에서 배우는 요가·명상 교육, 그리고 몽골 성지 순례 여행.",
-    "Zaya's Anandaには2つの柱があります — 自宅で学べるヨガ・瞑想講座と、モンゴルの聖地を巡る旅。",
-    "Zaya's Ananda 有两大体系 — 在家学习的瑜伽与冥想课程，以及蒙古圣地的心灵之旅。"),
-
-  yogaTitle: Lx("Бясалгалын сургалт", "Meditation training", "명상 교육", "瞑想の講座", "冥想课程"),
-  yogaText: Lx(
-    "Биеэ сунгах йогийн дасгалаас эхлээд гүн бясалгал хүртэл — видео хичээлээр, өөрийн хэмнэлээр, гэрээсээ. Худалдан авсан хичээл тань хувийн буланд үүрд нээлттэй.",
-    "From body-opening yoga to deep meditation — video lessons at your own pace, from home. Purchased courses stay open in your personal space.",
-    "요가 동작부터 깊은 명상까지 — 영상 강의로, 집에서 내 속도로. 구매한 강좌는 개인 공간에 계속 열려 있습니다.",
-    "ヨガの動きから深い瞑想まで — 動画講座で自分のペースで、自宅から。購入した講座はマイページにいつでも。",
-    "从舒展身体的瑜伽到深层冥想 — 视频课程，在家按自己的节奏学习。已购课程永久保存在个人空间。"),
-  yogaCta: Lx("Сургалтууд үзэх", "Browse training", "강좌 보기", "講座を見る", "查看课程"),
+    "Сургалт маань дөрвөн түвшинтэй. Хаанаас ч эхэлж болно — түвшин бүр дараагийнхаа суурийг тавьж өгнө.",
+    "Our training has four levels. You can start anywhere — each level lays the ground for the next.",
+    "저희 교육은 네 단계로 이루어집니다. 어디서든 시작할 수 있으며, 각 단계가 다음 단계의 토대가 됩니다.",
+    "講座は4つの段階に分かれています。どこからでも始められ、各段階が次の土台になります。",
+    "我们的课程分为四个层级。你可以从任何一层开始——每一层都是下一层的基础。",
+  ),
 
   travelTitle: Lx("Сүнслэг аялал", "Spiritual journey", "영적 여행", "スピリチュアルの旅", "心灵之旅"),
   travelText: Lx(
-    "Шамбалын орон, Отгонтэнгэр, Амарбаясгалант — энергийн ариун газрууд руу бясалгал, зан үйлтэй хослуулсан цөөн хүнтэй аян. Багш, хөтөч тань турш нь хамт.",
-    "Shambhala Land, Otgontenger, Amarbayasgalant — small-group journeys to sacred energy sites, woven with meditation and ritual, guided by our teachers.",
-    "샴발라의 땅, 오트곤텡게르, 아마르바야스갈란트 — 명상과 의식이 함께하는 소규모 성지 순례.",
-    "シャンバラの地、オトゴンテンゲル、アマルバヤスガラント — 瞑想と儀式を織り込んだ少人数の聖地の旅。",
-    "香巴拉之地、鄂特冈腾格里、阿玛尔巴雅斯格朗 — 融合冥想与仪式的小团圣地之旅。"),
+    "Монголын энергийн ариун газрууд руу бясалгал, зан үйлтэй хослуулсан цөөн хүнтэй аян. Багш, хөтөч аяллын турш тантай хамт.",
+    "Small-group journeys to Mongolia's sacred energy sites, woven with meditation and ritual, with a teacher and guide alongside you.",
+    "명상과 의식이 함께하는 소규모 몽골 성지 순례. 선생님과 가이드가 동행합니다.",
+    "瞑想と儀式を織り込んだ少人数のモンゴル聖地の旅。講師とガイドが同行します。",
+    "融合冥想与仪式的小团蒙古圣地之旅，导师与向导全程同行。",
+  ),
   travelCta: Lx("Аяллын хөтөлбөр", "Journey programs", "여행 일정", "旅程を見る", "行程安排"),
+  browse: Lx("Сургалтууд үзэх", "Browse training", "강좌 보기", "講座を見る", "查看课程"),
 };
 
-const YOGA_POINTS = [
-  Lx("Онлайн видео хичээл", "Online video lessons", "온라인 영상 강의", "オンライン動画講座", "在线视频课程"),
-  Lx("Танхимын дасгал", "In-studio practice", "오프라인 수련", "スタジオ実践", "线下练习"),
-  Lx("Багш нарын хөтөлбөр", "Teacher-led programs", "강사 프로그램", "講師によるプログラム", "导师课程"),
-  Lx("Хувийн буланд хадгалагдана", "Saved in your space", "개인 공간에 저장", "マイページに保存", "保存在个人空间"),
-];
-const TRAVEL_POINTS = [
-  Lx("Шамбалын орон · Хамарын хийд", "Shambhala Land · Khamar", "샴발라의 땅", "シャンバラの地", "香巴拉之地"),
-  Lx("Отгонтэнгэр хайрхан", "Otgontenger", "오트곤텡게르", "オトゴンテンゲル", "鄂特冈腾格里"),
-  Lx("Амарбаясгалант хийд", "Amarbayasgalant", "아마르바야스갈란트", "アマルバヤスガラント", "阿玛尔巴雅斯格朗"),
-  Lx("Арьяабал — бясалгалын зам", "Aryapala meditation path", "아리아발 명상길", "アリアバル瞑想の道", "阿雅巴拉冥想之路"),
+/** Ариусахуйн үйлийн дөрвөн түвшин */
+const LEVELS: { step: string; icon: string; title: Record<Locale, string>; text: Record<Locale, string> }[] = [
+  {
+    step: "I",
+    icon: "🌱",
+    title: Lx("Анхан", "Beginner", "입문", "初級", "入门"),
+    text: Lx(
+      "Амьсгал, сууц, анхаарлаа барих үндэс. Өдөрт 10 минутаас эхэлнэ.",
+      "Breath, posture and holding attention. Start with ten minutes a day.",
+      "호흡·자세·집중의 기초. 하루 10분부터 시작합니다.",
+      "呼吸・姿勢・集中の基礎。1日10分から始めます。",
+      "呼吸、坐姿与专注的基础。每天从十分钟开始。",
+    ),
+  },
+  {
+    step: "II",
+    icon: "🌿",
+    title: Lx("Дунд", "Intermediate", "중급", "中級", "中级"),
+    text: Lx(
+      "Тогтмол дадал, сэтгэл хөдлөлөө ажиглах, энергийн цэвэрлэгээний үндсэн арга.",
+      "A steady habit, observing emotion, and the basics of energy clearing.",
+      "꾸준한 습관, 감정 관찰, 에너지 정화의 기초.",
+      "習慣化、感情の観察、エネルギー浄化の基本。",
+      "稳定的习惯、观察情绪，以及能量清理的基础。",
+    ),
+  },
+  {
+    step: "III",
+    icon: "🔥",
+    title: Lx("Гүнзгий", "Advanced", "심화", "上級", "进阶"),
+    text: Lx(
+      "Гүн бясалгал, зан үйл, өөрийн хэв маягийг таних урт хугацааны ажил.",
+      "Deep meditation, ritual, and the long work of seeing your own patterns.",
+      "깊은 명상과 의식, 자신의 패턴을 보는 장기 수련.",
+      "深い瞑想と儀式、自分のパターンを見る長期の取り組み。",
+      "深层冥想、仪式，以及看清自身模式的长期功课。",
+    ),
+  },
+  {
+    step: "IV",
+    icon: "✨",
+    title: Lx("Мастер", "Master", "마스터", "マスター", "大师"),
+    text: Lx(
+      "Бусдыг чиглүүлэх, зан үйл удирдах, багшийн замд бэлтгэх түвшин.",
+      "Guiding others, leading ritual, and preparing for the teacher's path.",
+      "타인을 이끌고 의식을 진행하며 스승의 길을 준비하는 단계.",
+      "他者を導き、儀式を主宰し、師の道へ備える段階。",
+      "引导他人、主持仪式，并为成为导师做准备。",
+    ),
+  },
 ];
 
-/** Нүүрний гол онцлол — Йог/сургалт ба Сүнслэг аяллын хоёр систем. */
+/** Нүүрний гол онцлол — Ариусахуйн үйлийн 4 түвшин ба сүнслэг аяллын товч танилцуулга. */
 export function PathsHighlight({ courseCount, lessonCount, teacherCount }: {
   courseCount: number; lessonCount: number; teacherCount: number;
 }) {
@@ -59,77 +92,57 @@ export function PathsHighlight({ courseCount, lessonCount, teacherCount }: {
         </div>
       </Reveal>
 
-      <div className="mt-12 grid gap-7 lg:grid-cols-2">
-        {/* Йог ба сургалт */}
-        <Reveal>
-          <article className="panel group relative flex h-full flex-col p-8 sm:p-10">
-            <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full opacity-70 transition duration-700 group-hover:scale-110"
-              style={{ background: "radial-gradient(circle, rgb(var(--c-p400) / 0.22), transparent 70%)", filter: "blur(8px)" }} />
-            <div className="relative z-10 flex flex-1 flex-col">
-              <span className="grid h-14 w-14 place-items-center rounded-2xl bg-primary-500/12 text-3xl">🧘</span>
-              <h2 className="mt-5 font-display text-2xl font-semibold text-ink sm:text-3xl"><Tr v={C.yogaTitle} /></h2>
-              <p className="mt-3 leading-relaxed text-muted"><Tr v={C.yogaText} /></p>
-
-              <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
-                {YOGA_POINTS.map((p, i) => (
-                  <li key={i} className="flex items-start gap-2 text-[0.98rem] text-ink/80">
-                    <span aria-hidden className="mt-1 text-primary-500">✦</span><Tr v={p} />
-                  </li>
-                ))}
-              </ul>
-
-              {(courseCount > 0 || lessonCount > 0 || teacherCount > 0) && (
-                <dl className="mt-7 grid grid-cols-3 gap-3 rounded-2xl bg-primary-500/[0.07] p-4 text-center">
-                  <div><dt className="text-xs text-muted">Хөтөлбөр</dt><dd className="font-display text-xl font-semibold text-primary-700">{courseCount}</dd></div>
-                  <div><dt className="text-xs text-muted">Видео хичээл</dt><dd className="font-display text-xl font-semibold text-primary-700">{lessonCount}</dd></div>
-                  <div><dt className="text-xs text-muted">Багш</dt><dd className="font-display text-xl font-semibold text-primary-700">{teacherCount}</dd></div>
-                </dl>
-              )}
-
-              <div className="mt-auto pt-7">
-                <Link href="/courses" className="btn btn-primary btn-md"><Tr v={C.yogaCta} /> →</Link>
+      {/* Дөрвөн түвшин */}
+      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {LEVELS.map((l, i) => (
+          <Reveal key={l.step} delay={i * 80}>
+            <article className="panel group relative flex h-full flex-col overflow-hidden p-7">
+              <div aria-hidden className="pointer-events-none absolute -right-14 -top-14 h-40 w-40 rounded-full opacity-70 transition duration-700 group-hover:scale-110"
+                style={{ background: "radial-gradient(circle, rgb(var(--c-p400) / 0.2), transparent 70%)", filter: "blur(6px)" }} />
+              <div className="relative z-10 flex flex-1 flex-col">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary-500/12 text-2xl">{l.icon}</span>
+                  <span className="font-display text-sm font-bold tracking-[0.2em] text-primary-700">{l.step}</span>
+                </div>
+                <h3 className="mt-4 font-display text-xl font-semibold text-ink"><Tr v={l.title} /></h3>
+                <p className="mt-2.5 flex-1 text-[0.96rem] leading-relaxed text-muted"><Tr v={l.text} /></p>
               </div>
-            </div>
-          </article>
-        </Reveal>
+            </article>
+          </Reveal>
+        ))}
+      </div>
 
-        {/* Сүнслэг аялал */}
-        <Reveal delay={110}>
-          <article className="night group relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-accent-300/25 p-8 sm:p-10"
-            style={{ backgroundImage: "linear-gradient(160deg,#0F2B26 0%,#123029 52%,#1B2E22 100%)" }}>
-            <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full transition duration-700 group-hover:scale-110"
-              style={{ background: "radial-gradient(circle, rgba(232,183,95,0.3), transparent 70%)", filter: "blur(10px)" }} />
-            <div aria-hidden className="pointer-events-none absolute -bottom-28 left-1/4 h-72 w-72 rounded-full"
-              style={{ background: "radial-gradient(circle, rgba(43,200,187,0.22), transparent 70%)", filter: "blur(12px)" }} />
-            <div className="relative z-10 flex flex-1 flex-col">
+      {(courseCount > 0 || lessonCount > 0 || teacherCount > 0) && (
+        <dl className="mx-auto mt-8 grid max-w-2xl grid-cols-3 gap-3 rounded-2xl bg-primary-500/[0.07] p-4 text-center">
+          <div><dt className="text-xs text-muted">Хөтөлбөр</dt><dd className="font-display text-xl font-semibold text-primary-700">{courseCount}</dd></div>
+          <div><dt className="text-xs text-muted">Видео хичээл</dt><dd className="font-display text-xl font-semibold text-primary-700">{lessonCount}</dd></div>
+          <div><dt className="text-xs text-muted">Багш</dt><dd className="font-display text-xl font-semibold text-primary-700">{teacherCount}</dd></div>
+        </dl>
+      )}
+
+      <div className="mt-7 text-center">
+        <Link href="/courses" className="btn btn-primary btn-md"><Tr v={C.browse} /> →</Link>
+      </div>
+
+      {/* Сүнслэг аяллын товч танилцуулга */}
+      <Reveal delay={120}>
+        <div className="night relative mt-14 overflow-hidden rounded-[1.75rem] border border-accent-300/25 p-8 sm:p-10"
+          style={{ backgroundImage: "linear-gradient(160deg,#0F2B26 0%,#123029 52%,#1B2E22 100%)" }}>
+          <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(232,183,95,0.3), transparent 70%)", filter: "blur(10px)" }} />
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-7">
+            <div className="max-w-2xl">
               <span className="grid h-14 w-14 place-items-center rounded-2xl bg-white/10 text-3xl">🕊</span>
               <h2 className="mt-5 font-display text-2xl font-semibold text-white sm:text-3xl"><Tr v={C.travelTitle} /></h2>
               <p className="mt-3 leading-relaxed text-white/75"><Tr v={C.travelText} /></p>
-
-              <ul className="mt-6 flex flex-wrap gap-2">
-                {TRAVEL_POINTS.map((p, i) => (
-                  <li key={i} className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-sm font-medium text-white/85">
-                    <Tr v={p} />
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-7 grid grid-cols-3 gap-3 rounded-2xl bg-white/[0.06] p-4 text-center">
-                <div><p className="text-xs text-white/55">Бүлэг</p><p className="font-display text-lg font-semibold text-white">Цөөн хүн</p></div>
-                <div><p className="text-xs text-white/55">Хугацаа</p><p className="font-display text-lg font-semibold text-white">2–4 өдөр</p></div>
-                <div><p className="text-xs text-white/55">Хөтөч</p><p className="font-display text-lg font-semibold text-white">Багштай</p></div>
-              </div>
-
-              <div className="mt-auto pt-7">
-                <Link href="/ayalal" className="btn btn-lg text-white shadow-glow-grape transition hover:-translate-y-0.5 hover:brightness-110"
-                  style={{ backgroundImage: "linear-gradient(120deg,#C4802A,#0F7A66)" }}>
-                  <Tr v={C.travelCta} /> →
-                </Link>
-              </div>
             </div>
-          </article>
-        </Reveal>
-      </div>
+            <Link href="/ayalal" className="btn btn-lg shrink-0 text-white transition hover:-translate-y-0.5 hover:brightness-110"
+              style={{ backgroundImage: "linear-gradient(120deg,#C4802A,#0F7A66)" }}>
+              <Tr v={C.travelCta} /> →
+            </Link>
+          </div>
+        </div>
+      </Reveal>
     </div></section>
   );
 }

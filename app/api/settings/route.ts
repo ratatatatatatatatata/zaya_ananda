@@ -34,6 +34,16 @@ export async function PATCH(req: Request) {
             ]),
           )
         : undefined,
+      zurhaiCards: Array.isArray(body.zurhaiCards)
+        ? body.zurhaiCards
+            .map((c: Record<string, unknown>) => ({
+              emoji: String(c?.emoji || "🔮"),
+              title: String(c?.title || "").trim(),
+              desc: String(c?.desc || "").trim(),
+              href: String(c?.href || "").trim(),
+            }))
+            .filter((c: { title: string }) => c.title)
+        : undefined,
       facebook: str(body.facebook),
       instagram: str(body.instagram),
       youtube: str(body.youtube),

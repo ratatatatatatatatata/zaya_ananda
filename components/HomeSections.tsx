@@ -8,13 +8,24 @@ import { T, Tr } from "./T";
 import { PathsHighlight } from "./home/PathsHighlight";
 import { DailyHoroscope } from "./home/DailyHoroscope";
 import { VideoBand } from "./video/VideoBand";
-import { HowItWorks } from "./home/HowItWorks";
 import { SectionJump } from "./home/SectionJump";
 import { SectionZoom } from "./home/SectionZoom";
+import { ZurhaiSlider } from "./home/ZurhaiSlider";
+import { ServiceCard } from "./home/ServiceCard";
+import { JourneyImage } from "./journey/SceneArt";
+import { JOURNEYS } from "@/data/journeys";
 import type { Locale } from "@/lib/types";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
 
+const JOURNEY_EYEBROW = Lx("Сүнслэг аялал", "Spiritual journeys", "영적 여행", "聖地の旅", "心灵之旅");
+const JOURNEY_DESC = Lx(
+  "Одоо бүртгэл нээлттэй аяллууд. Аялал сонгоод дарвал өдөр өдрийн хөтөлбөр, хамт явах баг бүрэн харагдана.",
+  "Journeys currently open for registration. Pick one to see the day-by-day plan and the team travelling with you.",
+  "현재 신청 가능한 여행입니다. 선택하면 일자별 일정과 동행 팀을 볼 수 있습니다.",
+  "現在申し込み受付中の旅です。選ぶと日ごとの行程と同行チームが表示されます。",
+  "目前开放报名的行程。点选后可查看逐日安排与随行团队。",
+);
 const MOODBTN = Lx("Мэдрэмжээ сонгох", "Choose your mood", "기분 고르기", "気分を選ぶ", "选择心情");
 
 /** Хэсэг бүрийн товч, ойлгомжтой танилцуулга */
@@ -72,17 +83,18 @@ export async function HomeSections() {
       {/* Хоёр гол зам — сургалт ба сүнслэг аялал */}
       <PathsHighlight courseCount={courses.length} lessonCount={lessonCount} teacherCount={teacherCount} />
 
-      {/* Өдрийн зурхай */}
-      <div id="zurhai" className="scroll-mt-36"><DailyHoroscope /></div>
-
-      {/* Хэрхэн эхлэх вэ */}
-      <HowItWorks />
+      {/* Зурхай — төрлүүдийн слайдер, доор нь өдрийн зурхайн тайлал */}
+      <section id="zurhai" className="section scroll-mt-36"><div className="container-px">
+        <ZurhaiSlider cards={settings.zurhaiCards} />
+      </div>
+      <div id="zurhai-daily" className="scroll-mt-36"><DailyHoroscope /></div>
+      </section>
 
       {/* Энергийн засал */}
       <section id="services" className="section scroll-mt-36"><div className="container-px">
         <SectionZoom eyebrow="✨" title={<T k="nav.services" />} desc={<Tr v={D.services} />} href="/services">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((i, idx) => <Reveal key={i.id} delay={idx * 60}><CmsCard item={i} /></Reveal>)}
+            {services.map((i, idx) => <Reveal key={i.id} delay={idx * 60}><ServiceCard item={i} /></Reveal>)}
           </div>
         </SectionZoom>
       </div></section>
@@ -94,6 +106,41 @@ export async function HomeSections() {
             {courses.map((i, idx) => <Reveal key={i.id} delay={idx * 60}><CmsCard item={i} /></Reveal>)}
           </div>
         </SectionZoom>
+      </div></section>
+
+      {/* Сүнслэг аялал — бүртгэлтэй аяллууд */}
+      <section id="ayalal" className="section scroll-mt-36"><div className="container-px">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="max-w-2xl">
+            <p className="eyebrow-line"><span>🕊</span></p>
+            <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><Tr v={JOURNEY_EYEBROW} /></h2>
+            <p className="mt-3 leading-relaxed text-muted"><Tr v={JOURNEY_DESC} /></p>
+          </div>
+          <Link href="/ayalal" className="btn btn-outline btn-md shrink-0">Бүх аялал →</Link>
+        </div>
+        <div aria-hidden className="khas-rule mt-6 opacity-70" />
+        <div className="mt-8 grid gap-7 lg:grid-cols-2">
+          {JOURNEYS.map((j, idx) => (
+            <Reveal key={j.slug} delay={idx * 80}>
+              <Link href={`/ayalal/${j.slug}`} className="card group block h-full overflow-hidden transition hover:-translate-y-1 hover:shadow-glow">
+                <div className="relative aspect-[16/10] w-full overflow-hidden">
+                  <JourneyImage src={j.image} scene={j.scene} alt={j.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.06]" />
+                  <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,20,17,0.88) 0%, rgba(8,20,17,0.15) 55%, transparent 100%)" }} />
+                  <div className="absolute inset-x-0 bottom-0 p-6">
+                    <p className="text-xs font-bold uppercase tracking-[0.24em] text-accent-300">{j.tagline}</p>
+                    <h3 className="mt-2 font-display text-2xl font-semibold text-white">{j.name}</h3>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-muted">
+                    <span>🗓 {j.days}</span><span>👥 {j.group}</span><span>⛺ {j.stay}</span>
+                  </div>
+                  <p className="mt-3 leading-relaxed text-muted">{j.summary}</p>
+                </div>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
       </div></section>
 
       <VideoBand

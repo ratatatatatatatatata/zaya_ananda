@@ -51,6 +51,7 @@ const EMPTY_BANK: BankInfo = { bankName: "", account: "", holder: "" };
 export function AdminSettings() {
   const [form, setForm] = useState(EMPTY);
   const [bank, setBank] = useState<BankInfo>(EMPTY_BANK);
+  const [zurhai, setZurhai] = useState<{ emoji: string; title: string; desc: string; href: string }[]>([]);
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
@@ -68,6 +69,7 @@ export function AdminSettings() {
           facebook: s.facebook || "", instagram: s.instagram || "", youtube: s.youtube || "",
         });
         if (s.bank) setBank({ ...EMPTY_BANK, ...s.bank });
+        if (Array.isArray(s.zurhaiCards)) setZurhai(s.zurhaiCards);
       })
       .catch(() => {});
   }, []);
@@ -87,7 +89,7 @@ export function AdminSettings() {
     e.preventDefault();
     setSaving(true); setErr(""); setMsg("");
     try {
-      const payload = { ...form, bank };
+      const payload = { ...form, bank, zurhaiCards: zurhai };
       const res = await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
       setMsg("Хадгаллаа. Шинэ мэдээлэл сайтад тусгагдана.");
@@ -123,6 +125,41 @@ export function AdminSettings() {
             ? <div className="flex items-center gap-3"><span className="text-sm font-medium text-primary-700">Байршуулж байна… {videoProgress}%</span><div className="h-1.5 flex-1 overflow-hidden rounded-full bg-line"><div className="h-full bg-primary-500 transition-all" style={{ width: videoProgress + "%" }} /></div></div>
             : <input type="file" accept="video/*" onChange={pickAboutVideo} className="text-sm" />}
           <p className="mt-1 text-xs text-muted">Видео нь “Бидний тухай” хуудсанд харагдана.</p>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="font-display font-semibold text-ink">Нүүр хуудасны зурхайн төрлүүд</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted">
+              Нүүр хуудасны «Зурхай» хэсэгт хажуу тийш гүйдэг слайдер болж харагдана. Хоосон орхивол өгөгдмөл 3 төрөл гарна.
+            </p>
+          </div>
+          <button type="button" onClick={() => setZurhai((z) => [...z, { emoji: "🔮", title: "", desc: "", href: "/merge" }])} className="btn btn-outline btn-sm">
+            + Төрөл нэмэх
+          </button>
+        </div>
+
+        <div className="mt-4 space-y-3">
+          {zurhai.map((c, i) => (
+            <div key={i} className="rounded-xl border border-line bg-surface-1 p-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <input className="input w-16 text-center" value={c.emoji} maxLength={4}
+                  onChange={(e) => setZurhai((z) => z.map((x, k) => (k === i ? { ...x, emoji: e.target.value } : x)))} />
+                <input className="input min-w-[12rem] flex-1" placeholder="Гарчиг — ж: Өдрийн зурхай" value={c.title}
+                  onChange={(e) => setZurhai((z) => z.map((x, k) => (k === i ? { ...x, title: e.target.value } : x)))} />
+                <input className="input w-48" placeholder="Холбоос — /merge" value={c.href}
+                  onChange={(e) => setZurhai((z) => z.map((x, k) => (k === i ? { ...x, href: e.target.value } : x)))} />
+                <button type="button" onClick={() => setZurhai((z) => z.filter((_, k) => k !== i))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">
+                  Устгах
+                </button>
+              </div>
+              <textarea className="textarea mt-2 min-h-[70px]" placeholder="Товч тайлбар" value={c.desc}
+                onChange={(e) => setZurhai((z) => z.map((x, k) => (k === i ? { ...x, desc: e.target.value } : x)))} />
+            </div>
+          ))}
+          {zurhai.length === 0 && <p className="text-sm text-muted">Одоогоор нэмээгүй — өгөгдмөл 3 төрөл харагдаж байна.</p>}
         </div>
       </div>
 

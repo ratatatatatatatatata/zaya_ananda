@@ -7,7 +7,6 @@ export const NAV_LINKS: { href: string; key: string; slot?: HeroSlot }[] = [
   { href: "/services", key: "nav.services", slot: "services" },
   { href: "/courses", key: "nav.courses", slot: "courses" },
   { href: "/ayalal", key: "nav.journey", slot: "ayalal" },
-  { href: "/merge", key: "nav.merge", slot: "merge" },
   { href: "/shop", key: "nav.shop", slot: "shop" },
   { href: "/gift", key: "nav.gift", slot: "gift" },
   { href: "/about", key: "nav.about", slot: "about" },
@@ -15,6 +14,7 @@ export const NAV_LINKS: { href: string; key: string; slot?: HeroSlot }[] = [
 
 /** Цэсэнд байхгүй ч дэвсгэртэй хэсгүүд */
 export const EXTRA_HERO_SLOTS: { slot: HeroSlot; label: string }[] = [
+  { slot: "merge", label: "Зурхай" },
   { slot: "item", label: "Дэлгэрэнгүй хуудас (бүтээгдэхүүн, сургалт)" },
   { slot: "band", label: "Нүүр хуудасны дундах ишлэлийн зурвас" },
   { slot: "resources", label: "Гэгээрлийн зам" },
