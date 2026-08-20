@@ -24,8 +24,19 @@ export function Logo({ withText = true, className = "", logoSrc }: { withText?: 
       )}
       {withText && (
         <span className="flex flex-col leading-none">
-          <span className="whitespace-nowrap font-display text-2xl font-semibold text-ink">Zaya&apos;s Ananda</span>
-          <span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.3em] text-primary-600">Төв</span>
+          {/* Нэрний өнгө — логотой ижил оюу градиент */}
+          <span
+            className="whitespace-nowrap bg-clip-text font-display text-2xl font-semibold text-transparent"
+            style={{ backgroundImage: "linear-gradient(135deg,#2BC8BB 0%,#16AFA4 45%,#0F9189 100%)" }}
+          >
+            Zaya&apos;s Ananda
+          </span>
+          <span
+            className="whitespace-nowrap bg-clip-text text-[11px] font-semibold uppercase tracking-[0.3em] text-transparent"
+            style={{ backgroundImage: "linear-gradient(135deg,#2BC8BB 0%,#0F9189 100%)" }}
+          >
+            Төв
+          </span>
         </span>
       )}
     </span>
