@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { SOCIALS } from "./SocialIcons";
 import { siteConfig } from "@/data/content";
 import { useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n";
@@ -40,11 +41,25 @@ export function Footer() {
           </Link>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">{tr(siteConfig.tagline)}</p>
           <div className="mt-5 flex gap-2">
-            {[{ k: "f", url: settings.facebook }, { k: "ig", url: settings.instagram }, { k: "yt", url: settings.youtube }].map((s) => (
-              s.url
-                ? <a key={s.k} href={s.url} target="_blank" rel="noreferrer" className="grid h-9 w-9 place-items-center rounded-full border border-line text-xs font-bold uppercase text-muted transition hover:border-primary-400 hover:text-primary-700">{s.k}</a>
-                : <span key={s.k} className="grid h-9 w-9 place-items-center rounded-full border border-line text-xs font-bold uppercase text-muted">{s.k}</span>
-            ))}
+            {SOCIALS.map(({ key, label, color, Icon }) => {
+              const url = settings[key as "facebook" | "instagram" | "youtube"];
+              if (!url) return null;
+              return (
+                <a
+                  key={key}
+                  href={url}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
+                  title={label}
+                  className="focus-ring grid h-10 w-10 place-items-center rounded-full border border-line bg-surface-1 text-muted transition hover:-translate-y-0.5 hover:border-transparent hover:text-white hover:shadow-sm"
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = color; e.currentTarget.style.color = "#fff"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = ""; e.currentTarget.style.color = ""; }}
+                >
+                  <Icon />
+                </a>
+              );
+            })}
           </div>
         </div>
 

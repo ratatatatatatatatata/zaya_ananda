@@ -225,6 +225,12 @@ export interface CmsItem {
   teacherImage?: string;
   teacherInfo?: string;
   accessDays?: number;
+  /** Сургалтын түвшин — anhan | dund | gunzgii | master */
+  level?: string;
+  /** «Дараа нь юу үзэх вэ» зөвлөмж */
+  nextNote?: string;
+  /** Дараагийн сургалтын id */
+  nextItemId?: string;
   lessons?: { title: string; path?: string; url?: string; quality?: string; subtitles?: string }[];
   moods?: string[];
   i18n?: CmsTranslations;

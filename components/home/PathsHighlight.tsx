@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Reveal } from "../Reveal";
 import { Tr } from "../T";
 import type { Locale } from "@/lib/types";
+import { LevelCourses, type LevelCourse } from "./LevelCourses";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
 
@@ -27,62 +28,8 @@ const C = {
   browse: Lx("Сургалтууд үзэх", "Browse training", "강좌 보기", "講座を見る", "查看课程"),
 };
 
-/** Ариусахуйн үйлийн дөрвөн түвшин */
-const LEVELS: { step: string; icon: string; title: Record<Locale, string>; text: Record<Locale, string> }[] = [
-  {
-    step: "I",
-    icon: "🌱",
-    title: Lx("Анхан", "Beginner", "입문", "初級", "入门"),
-    text: Lx(
-      "Амьсгал, сууц, анхаарлаа барих үндэс. Өдөрт 10 минутаас эхэлнэ.",
-      "Breath, posture and holding attention. Start with ten minutes a day.",
-      "호흡·자세·집중의 기초. 하루 10분부터 시작합니다.",
-      "呼吸・姿勢・集中の基礎。1日10分から始めます。",
-      "呼吸、坐姿与专注的基础。每天从十分钟开始。",
-    ),
-  },
-  {
-    step: "II",
-    icon: "🌿",
-    title: Lx("Дунд", "Intermediate", "중급", "中級", "中级"),
-    text: Lx(
-      "Тогтмол дадал, сэтгэл хөдлөлөө ажиглах, энергийн цэвэрлэгээний үндсэн арга.",
-      "A steady habit, observing emotion, and the basics of energy clearing.",
-      "꾸준한 습관, 감정 관찰, 에너지 정화의 기초.",
-      "習慣化、感情の観察、エネルギー浄化の基本。",
-      "稳定的习惯、观察情绪，以及能量清理的基础。",
-    ),
-  },
-  {
-    step: "III",
-    icon: "🔥",
-    title: Lx("Гүнзгий", "Advanced", "심화", "上級", "进阶"),
-    text: Lx(
-      "Гүн бясалгал, зан үйл, өөрийн хэв маягийг таних урт хугацааны ажил.",
-      "Deep meditation, ritual, and the long work of seeing your own patterns.",
-      "깊은 명상과 의식, 자신의 패턴을 보는 장기 수련.",
-      "深い瞑想と儀式、自分のパターンを見る長期の取り組み。",
-      "深层冥想、仪式，以及看清自身模式的长期功课。",
-    ),
-  },
-  {
-    step: "IV",
-    icon: "✨",
-    title: Lx("Мастер", "Master", "마스터", "マスター", "大师"),
-    text: Lx(
-      "Бусдыг чиглүүлэх, зан үйл удирдах, багшийн замд бэлтгэх түвшин.",
-      "Guiding others, leading ritual, and preparing for the teacher's path.",
-      "타인을 이끌고 의식을 진행하며 스승의 길을 준비하는 단계.",
-      "他者を導き、儀式を主宰し、師の道へ備える段階。",
-      "引导他人、主持仪式，并为成为导师做准备。",
-    ),
-  },
-];
-
 /** Нүүрний гол онцлол — Ариусахуйн үйлийн 4 түвшин ба сүнслэг аяллын товч танилцуулга. */
-export function PathsHighlight({ courseCount, lessonCount, teacherCount }: {
-  courseCount: number; lessonCount: number; teacherCount: number;
-}) {
+export function PathsHighlight({ courses }: { courses: LevelCourse[] }) {
   return (
     <section className="section"><div className="container-px">
       <Reveal>
@@ -92,36 +39,9 @@ export function PathsHighlight({ courseCount, lessonCount, teacherCount }: {
         </div>
       </Reveal>
 
-      {/* Дөрвөн түвшин */}
-      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {LEVELS.map((l, i) => (
-          <Reveal key={l.step} delay={i * 80}>
-            <article className="panel group relative flex h-full flex-col overflow-hidden p-7">
-              <div aria-hidden className="pointer-events-none absolute -right-14 -top-14 h-40 w-40 rounded-full opacity-70 transition duration-700 group-hover:scale-110"
-                style={{ background: "radial-gradient(circle, rgb(var(--c-p400) / 0.2), transparent 70%)", filter: "blur(6px)" }} />
-              <div className="relative z-10 flex flex-1 flex-col">
-                <div className="flex items-center gap-3">
-                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary-500/12 text-2xl">{l.icon}</span>
-                  <span className="font-display text-sm font-bold tracking-[0.2em] text-primary-700">{l.step}</span>
-                </div>
-                <h3 className="mt-4 font-display text-xl font-semibold text-ink"><Tr v={l.title} /></h3>
-                <p className="mt-2.5 flex-1 text-[0.96rem] leading-relaxed text-muted"><Tr v={l.text} /></p>
-              </div>
-            </article>
-          </Reveal>
-        ))}
-      </div>
-
-      {(courseCount > 0 || lessonCount > 0 || teacherCount > 0) && (
-        <dl className="mx-auto mt-8 grid max-w-2xl grid-cols-3 gap-3 rounded-2xl bg-primary-500/[0.07] p-4 text-center">
-          <div><dt className="text-xs text-muted">Хөтөлбөр</dt><dd className="font-display text-xl font-semibold text-primary-700">{courseCount}</dd></div>
-          <div><dt className="text-xs text-muted">Видео хичээл</dt><dd className="font-display text-xl font-semibold text-primary-700">{lessonCount}</dd></div>
-          <div><dt className="text-xs text-muted">Багш</dt><dd className="font-display text-xl font-semibold text-primary-700">{teacherCount}</dd></div>
-        </dl>
-      )}
-
-      <div className="mt-7 text-center">
-        <Link href="/courses" className="btn btn-primary btn-md"><Tr v={C.browse} /> →</Link>
+      {/* Дөрвөн түвшин — дарахад хичээлүүд нээгдэнэ */}
+      <div className="mt-12">
+        <LevelCourses courses={courses} />
       </div>
 
       {/* Сүнслэг аяллын товч танилцуулга */}

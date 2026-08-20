@@ -47,9 +47,7 @@ export function ServiceCard({ item }: { item: CmsItem }) {
             </span>
             <span className="min-w-0">
               <span className="block truncate font-display text-sm font-semibold text-ink">{item.teacherName}</span>
-              <span className="block truncate text-xs text-muted">
-                {item.mode === "online" ? "💻 Онлайн" : item.mode === "tankhim" ? "📍 Ирж уулзах" : "💻 Онлайн · 📍 Ирж уулзах"}
-              </span>
+              {item.teacherInfo && <span className="block truncate text-xs text-muted">{item.teacherInfo.split("\n")[0]}</span>}
             </span>
           </div>
         )}

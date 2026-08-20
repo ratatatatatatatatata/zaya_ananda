@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { embedSrc } from "@/lib/video-embed";
 
 import { useEffect, useState } from "react";
@@ -10,8 +11,32 @@ type Lesson = { title: string; url: string; quality?: string; subtitles?: string
 type Data = { status: "none" | "pending" | "active" | "expired" | "device-limit"; lessons: Lesson[]; mark?: string; maxDevices?: number };
 
 
-export function CourseLessons({ id }: { id: string }) {
+export function CourseLessons({ id, nextNote, nextItemId, nextTitle }: {
+  id: string;
+  /** Админаас тохируулсан «дараа нь юу үзэх вэ» зөвлөмж */
+  nextNote?: string;
+  nextItemId?: string;
+  nextTitle?: string;
+}) {
   const [data, setData] = useState<Data | null>(null);
+  /** Хэдэн хичээл нээгдсэн — эхнийхийг үзэж дуусгасны дараа дараагийнх нээгдэнэ */
+  const [unlocked, setUnlocked] = useState(1);
+
+  // Өмнө нь хаана хүрсэн байсныг сэргээнэ
+  useEffect(() => {
+    try {
+      const v = Number(localStorage.getItem("za_progress_" + id) || "1");
+      if (v > 1) setUnlocked(v);
+    } catch { /* localStorage хаалттай байж болно */ }
+  }, [id]);
+
+  const advance = (i: number) => {
+    setUnlocked((u) => {
+      const next = Math.max(u, i + 2);
+      try { localStorage.setItem("za_progress_" + id, String(next)); } catch { /* үл хамаарна */ }
+      return next;
+    });
+  };
   useEffect(() => {
     fetch("/api/lessons?itemId=" + encodeURIComponent(id) + "&device=" + encodeURIComponent(getDeviceId()), { cache: "no-store" })
       .then((r) => r.json())
@@ -51,6 +76,15 @@ export function CourseLessons({ id }: { id: string }) {
           <span>{notice}</span>
         </div>
       )}
+      {!locked && data.lessons.length > 1 && (
+        <p className="mt-3 text-sm text-muted">
+          Хичээлүүд дараалан нээгдэнэ — нэгийг үзэж дуусгаад <b>«Үзэж дууслаа»</b> дарвал дараагийнх нээгдэнэ.
+          <span className="ml-1 font-semibold text-primary-700">
+            {Math.min(unlocked, data.lessons.length)} / {data.lessons.length}
+          </span>
+        </p>
+      )}
+
       <div className="mt-5 space-y-5">
         {data.lessons.map((l, i) => {
           if (locked) {
@@ -62,14 +96,48 @@ export function CourseLessons({ id }: { id: string }) {
               </div>
             );
           }
-          return <LessonVideo key={i} lesson={l} index={i} mark={data.mark || ""} />;
+          if (i >= unlocked) {
+            return (
+              <div key={i} className="flex items-center gap-3 rounded-2xl border border-dashed border-line bg-surface-2/60 px-4 py-3.5">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-surface-3 text-sm font-bold text-muted">{i + 1}</span>
+                <span className="flex-1 font-medium text-muted">{l.title}</span>
+                <span className="text-xs font-semibold text-muted">Өмнөх хичээлээ дуусгана уу</span>
+              </div>
+            );
+          }
+          return (
+            <LessonVideo
+              key={i}
+              lesson={l}
+              index={i}
+              mark={data.mark || ""}
+              done={i + 1 < unlocked}
+              isLast={i === data.lessons.length - 1}
+              onDone={() => advance(i)}
+            />
+          );
         })}
       </div>
+
+      {/* Дараагийн алхмын чиглэл — бүх хичээлийг дуусгасны дараа */}
+      {!locked && (nextNote || nextItemId) && unlocked > data.lessons.length && (
+        <div className="mt-7 rounded-2xl border border-primary-500/25 bg-primary-500/[0.07] p-6">
+          <p className="text-xs font-bold uppercase tracking-wide text-primary-700">Дараагийн алхам</p>
+          {nextNote && <p className="mt-2 leading-relaxed text-ink/85">{nextNote}</p>}
+          {nextItemId && (
+            <Link href={"/item/" + nextItemId} className="btn btn-primary btn-md mt-4">
+              {nextTitle || "Дараагийн хичээл"} →
+            </Link>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-function LessonVideo({ lesson, index, mark }: { lesson: Lesson; index: number; mark: string }) {
+function LessonVideo({ lesson, index, mark, done, isLast, onDone }: {
+  lesson: Lesson; index: number; mark: string; done: boolean; isLast: boolean; onDone: () => void;
+}) {
   const [subUrl, setSubUrl] = useState<string | undefined>();
   useEffect(() => {
     if (!lesson.subtitles) { setSubUrl(undefined); return; }
@@ -85,6 +153,7 @@ function LessonVideo({ lesson, index, mark }: { lesson: Lesson; index: number; m
         <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-100 text-sm font-bold text-primary-700">{index + 1}</span>
         <span className="font-display font-semibold text-ink">{lesson.title}</span>
         {lesson.subtitles && <span className="ml-auto rounded-md bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">CC</span>}
+        {done && <span className={(lesson.subtitles ? "ml-2 " : "ml-auto ") + "rounded-md bg-jade-400/15 px-2 py-0.5 text-xs font-bold text-jade-600"}>✓ Үзсэн</span>}
       </div>
       <div className="relative aspect-video w-full bg-black">
         {lesson.quality && <span className="absolute right-2 top-2 z-10 rounded-md bg-black/70 px-2 py-0.5 text-xs font-bold text-white">{lesson.quality}</span>}
@@ -96,6 +165,12 @@ function LessonVideo({ lesson, index, mark }: { lesson: Lesson; index: number; m
       </div>
       {lesson.subtitles && e.type !== "iframe" && (
         <p className="px-4 py-2 text-xs text-muted">English хадмал бэлэн — тоглуулагчийн хадмал (CC) товчоор асаана/унтраана.</p>
+      )}
+      {!done && (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3">
+          <span className="text-sm text-muted">{isLast ? "Сүүлийн хичээл" : "Дуусгаад дараагийн хичээлээ нээнэ үү"}</span>
+          <button type="button" onClick={onDone} className="btn btn-primary btn-sm">✓ Үзэж дууслаа</button>
+        </div>
       )}
     </div>
   );

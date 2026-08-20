@@ -4,7 +4,7 @@ const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<
 
 /** Үйлчилгээний ангилал — бүлэг + дэд ангилалтай. DB-д монгол нэрээр хадгална. */
 export const SERVICE_GROUPS: { group: string; subs: string[] }[] = [
-  { group: "Оношилгоо", subs: ["Аура оношилгоо", "Сканнер оношилгоо"] },
+  { group: "Оношилгоо", subs: ["Онлайн", "Биечлэн"] },
   { group: "Засал, Эмчилгээ", subs: ["Advanced эмчилгээ", "Лаа засал үйлчилгээ", "Жэт аппарат эмчилгээ", "Озонатор эмчилгээ", "Хувь заяаны засал эмчилгээ"] },
 ];
 
@@ -14,6 +14,8 @@ export const COURSE_CATS = ["Бясалгалын сургалт", "Сүнслэ
 /** Ангилал/бүлгийн 5 хэлний орчуулга (DB-ийн монгол нэрээр түлхүүрлэнэ) */
 export const CAT_I18N: Record<string, Record<Locale, string>> = {
   "Оношилгоо": Lx("Оношилгоо", "Diagnostics", "진단", "診断", "诊断"),
+  "Онлайн": Lx("Онлайн", "Online", "온라인", "オンライン", "线上"),
+  "Биечлэн": Lx("Биечлэн", "In person", "방문", "対面", "到店"),
   "Аура оношилгоо": Lx("Аура оношилгоо", "Aura Diagnostics", "오라 진단", "オーラ診断", "气场诊断"),
   "Сканнер оношилгоо": Lx("Сканнер оношилгоо", "Scanner Diagnostics", "스캐너 진단", "スキャナー診断", "扫描诊断"),
   "Зурхай ба Мэргэ": Lx("Зурхай ба Мэргэ", "Astrology & Divination", "점성술과 점술", "占星術と占い", "占星与占卜"),
@@ -34,6 +36,18 @@ export const CAT_I18N: Record<string, Record<Locale, string>> = {
 export function catLabel(cat: string | undefined, lang: Locale): string {
   if (!cat) return "";
   return CAT_I18N[cat]?.[lang] || cat;
+}
+
+/** Ариусахуйн үйлийн түвшин */
+export const COURSE_LEVELS: { key: string; icon: string; step: string; label: Record<Locale, string> }[] = [
+  { key: "anhan", icon: "🌱", step: "I", label: Lx("Анхан", "Beginner", "입문", "初級", "入门") },
+  { key: "dund", icon: "🌿", step: "II", label: Lx("Дунд", "Intermediate", "중급", "中級", "中级") },
+  { key: "gunzgii", icon: "🔥", step: "III", label: Lx("Гүнзгий", "Advanced", "심화", "上級", "进阶") },
+  { key: "master", icon: "✨", step: "IV", label: Lx("Мастер", "Master", "마스터", "マスター", "大师") },
+];
+
+export function levelLabel(key: string | undefined, lang: Locale): string {
+  return COURSE_LEVELS.find((l) => l.key === key)?.label[lang] || "";
 }
 
 /** Үйлчилгээ авах хэлбэр — онлайн эсвэл биечлэн ирж уулзах */

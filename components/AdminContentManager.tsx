@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { formatMNT } from "@/lib/format";
 import { RichTextEditor } from "@/components/RichTextEditor";
-import { SERVICE_GROUPS, COURSE_CATS, MOODS } from "@/data/cms-taxonomy";
+import { SERVICE_GROUPS, COURSE_CATS, MOODS, COURSE_LEVELS } from "@/data/cms-taxonomy";
 import type { CmsItem, TeacherPreset, CmsTranslations } from "@/lib/types";
 
 function compressImage(file: File, maxW = 1200, quality = 0.82): Promise<string> {
@@ -29,7 +29,7 @@ function compressImage(file: File, maxW = 1200, quality = 0.82): Promise<string>
   });
 }
 
-const EMPTY = { title: "", category: "", summary: "", body: "", price: "", mode: "online", link: "", videoLessons: "", students: "", views: "", teacherName: "", teacherImage: "", teacherRole: "", teacherInfo: "", accessDays: "" };
+const EMPTY = { title: "", category: "", summary: "", body: "", price: "", mode: "online", link: "", videoLessons: "", students: "", views: "", teacherName: "", teacherImage: "", teacherRole: "", teacherInfo: "", accessDays: "", level: "anhan", nextNote: "", nextItemId: "" };
 
 const LANG_TABS = [
   { k: "mn" as const, l: "🇲🇳 Монгол" },
@@ -149,6 +149,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
     setForm({
       title: it.title || "", category: it.category || "", summary: it.summary || "", body: it.body || "",
       price: it.price != null ? String(it.price) : "", mode: it.mode || "online", link: it.link || "",
+      level: it.level || "anhan", nextNote: it.nextNote || "", nextItemId: it.nextItemId || "",
       videoLessons: it.videoLessons != null ? String(it.videoLessons) : "",
       students: it.students != null ? String(it.students) : "", views: it.views != null ? String(it.views) : "",
       teacherName: it.teacherName || "", teacherImage: it.teacherImage || "",
@@ -174,7 +175,10 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
       images,
       i18n,
       moods,
-      mode: kind === "course" || kind === "service" ? form.mode : undefined,
+      mode: kind === "course" ? form.mode : undefined,
+      level: kind === "course" ? form.level : undefined,
+      nextNote: kind === "course" ? form.nextNote : undefined,
+      nextItemId: kind === "course" ? form.nextItemId : undefined,
       lessons: lessons.filter((l) => l.title.trim() && (l.path || (l.url || "").trim())).map((l) => ({ title: l.title.trim(), path: l.path, url: (l.url || "").trim(), quality: l.quality, subtitles: l.subtitles || "" })),
     };
     try {
@@ -322,8 +326,58 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
                 )}
                 {kind !== "resource" && !isFree && <div><label className="field-label">Үнэ (₮)</label><input className="input" type="number" value={form.price} onChange={(e) => set("price", e.target.value)} /></div>}
                 {isCourse && <div><label className="field-label">Хэлбэр</label><select className="input" value={form.mode} onChange={(e) => set("mode", e.target.value)}><option value="online">Онлайн сургалт</option><option value="tankhim">Танхимын сургалт</option><option value="both">Онлайн + Танхим</option></select></div>}
-                {kind === "service" && <div><label className="field-label">Хэлбэр *</label><select className="input" value={form.mode} onChange={(e) => set("mode", e.target.value)}><option value="online">💻 Онлайн</option><option value="tankhim">📍 Ирж уулзах</option><option value="both">Онлайн + Ирж уулзах</option></select><p className="mt-1 text-xs text-muted">Хэрэглэгч үйлчилгээний жагсаалтаас энэ хэлбэрээр шүүнэ.</p></div>}
               </div>
+
+              {isCourse && (
+                <div className="rounded-2xl border border-primary-500/30 bg-primary-50/60 p-4">
+                  <p className="font-display font-semibold text-ink">Түвшин *</p>
+                  <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">
+                    Нүүр хуудасны «Анхан · Дунд · Гүнзгий · Мастер» картуудад энэ сонголтоор орж харагдана.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {COURSE_LEVELS.map((l) => (
+                      <button
+                        key={l.key}
+                        type="button"
+                        onClick={() => set("level", l.key)}
+                        className={
+                          "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition " +
+                          (form.level === l.key
+                            ? "bg-primary-grad text-white shadow-soft"
+                            : "border border-line bg-surface-1 text-ink/70 hover:border-primary-400")
+                        }
+                      >
+                        <span aria-hidden>{l.icon}</span>
+                        {l.label.mn}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {isCourse && (
+                <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+                  <p className="font-display font-semibold text-ink">Дараагийн алхмын чиглэл</p>
+                  <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">
+                    Энэ хичээлийг үзэж дууссан хэрэглэгчид «дараа нь юу үзэх вэ» гэсэн зөвлөмж харагдана.
+                  </p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="field-label">Зөвлөмжийн текст</label>
+                      <textarea className="textarea min-h-[80px]" value={form.nextNote} onChange={(e) => set("nextNote", e.target.value)}
+                        placeholder="Жишээ: Энэ хичээлийг дуусгасны дараа «Гүн бясалгал II» хичээлийг үзээрэй." />
+                    </div>
+                    <div>
+                      <label className="field-label">Дараагийн сургалт</label>
+                      <select className="input" value={form.nextItemId} onChange={(e) => set("nextItemId", e.target.value)}>
+                        <option value="">— Сонгохгүй —</option>
+                        {items.filter((x) => x.id !== editingId).map((x) => <option key={x.id} value={x.id}>{x.title}</option>)}
+                      </select>
+                      <p className="mt-1 text-xs text-muted">Сонговол зөвлөмж дээр шууд очих товч гарна.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {hasMoods && (
                 <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
@@ -408,7 +462,15 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
             {items.map((i) => (
               <tr key={i.id} className="border-b border-line last:border-0">
                 <td className="px-4 py-2">{i.image ? <img src={i.image} alt="" className="h-10 w-14 rounded-lg object-cover" /> : <span className="text-muted">—</span>}</td>
-                <td className="px-4 py-3 text-sm font-medium text-ink">{i.title}</td>
+                <td className="px-4 py-3 text-sm font-medium text-ink">
+                  {i.title}
+                  {isCourse && (
+                    <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-primary-100 px-2 py-0.5 text-[11px] font-bold text-primary-700">
+                      {COURSE_LEVELS.find((l) => l.key === (i.level || "anhan"))?.icon}
+                      {COURSE_LEVELS.find((l) => l.key === (i.level || "anhan"))?.label.mn}
+                    </span>
+                  )}
+                </td>
                 {isPromo && <td className="px-4 py-3 text-sm text-ink/80">{i.link || "—"}</td>}
                 {!isPromo && <td className="px-4 py-3 text-sm text-ink/80">{typeof i.price === "number" ? formatMNT(i.price) : "—"}</td>}
                 <td className="px-4 py-3 text-right"><div className="flex justify-end gap-3"><button onClick={() => startEdit(i)} className="text-sm font-semibold text-primary-700 hover:underline">Засах</button><button onClick={() => del(i.id)} className="text-sm font-semibold text-rose-500 hover:underline">Устгах</button></div></td>

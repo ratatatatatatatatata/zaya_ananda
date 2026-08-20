@@ -59,6 +59,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
   const isCourse = item.kind === "course";
   const isProduct = item.kind === "product";
   const isFree = item.kind === "free";
+  const nextItem = item.nextItemId ? await getCmsByIdCached(item.nextItemId).catch(() => null) : null;
   const gallery = item.images && item.images.length ? item.images : item.image ? [item.image] : [];
   const publicVideos = !isCourse && item.lessons?.length
     ? await Promise.all(item.lessons.map(async (l) => {
@@ -120,7 +121,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
               <RichBody html={item.body} i18n={item.i18n} className="mt-3 leading-relaxed text-muted" />
             </>
           )}
-          {isCourse && <CourseLessons id={item.id} />}
+          {isCourse && <CourseLessons id={item.id} nextNote={item.nextNote} nextItemId={item.nextItemId} nextTitle={nextItem?.title} />}
           {!isCourse && publicVideos.length > 0 && <ItemVideos videos={publicVideos} />}
         </div>
 
