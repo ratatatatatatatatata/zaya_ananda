@@ -1,5 +1,7 @@
 "use client";
 
+import { embedSrc } from "@/lib/video-embed";
+
 import { useEffect, useState } from "react";
 import { ProtectedVideo } from "./ProtectedVideo";
 import { getDeviceId } from "@/lib/device";
@@ -7,13 +9,6 @@ import { getDeviceId } from "@/lib/device";
 type Lesson = { title: string; url: string; quality?: string; subtitles?: string };
 type Data = { status: "none" | "pending" | "active" | "expired" | "device-limit"; lessons: Lesson[]; mark?: string; maxDevices?: number };
 
-function embed(url: string): { type: "iframe" | "video"; src: string } {
-  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/);
-  if (yt) return { type: "iframe", src: "https://www.youtube.com/embed/" + yt[1] };
-  const vm = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-  if (vm) return { type: "iframe", src: "https://player.vimeo.com/video/" + vm[1] };
-  return { type: "video", src: url };
-}
 
 export function CourseLessons({ id }: { id: string }) {
   const [data, setData] = useState<Data | null>(null);
@@ -83,7 +78,7 @@ function LessonVideo({ lesson, index, mark }: { lesson: Lesson; index: number; m
     setSubUrl(u);
     return () => URL.revokeObjectURL(u);
   }, [lesson.subtitles]);
-  const e = embed(lesson.url);
+  const e = embedSrc(lesson.url);
   return (
     <div className="overflow-hidden rounded-2xl border border-line bg-surface-1 shadow-card">
       <div className="flex items-center gap-3 border-b border-line px-4 py-3">

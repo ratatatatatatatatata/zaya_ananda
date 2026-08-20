@@ -25,7 +25,7 @@ export default async function ServicesPage() {
         cta={[{ href: "#services", label: "Үйлчилгээ үзэх" }, { href: "/about#contact", label: "Цаг захиалах" }]}
       />
       <section id="services" className="section"><div className="container-px">
-        <CmsFilterGrid items={items} groups={SERVICE_GROUPS} emptyText="Одоохондоо үйлчилгээ нэмэгдээгүй байна." />
+        <CmsFilterGrid items={items} groups={SERVICE_GROUPS} modeFilter emptyText="Одоохондоо үйлчилгээ нэмэгдээгүй байна." />
       </div></section>
     </>
   );

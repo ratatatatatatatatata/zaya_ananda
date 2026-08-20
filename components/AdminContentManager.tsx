@@ -174,7 +174,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
       images,
       i18n,
       moods,
-      mode: kind === "course" ? form.mode : undefined,
+      mode: kind === "course" || kind === "service" ? form.mode : undefined,
       lessons: lessons.filter((l) => l.title.trim() && (l.path || (l.url || "").trim())).map((l) => ({ title: l.title.trim(), path: l.path, url: (l.url || "").trim(), quality: l.quality, subtitles: l.subtitles || "" })),
     };
     try {
@@ -322,6 +322,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
                 )}
                 {kind !== "resource" && !isFree && <div><label className="field-label">Үнэ (₮)</label><input className="input" type="number" value={form.price} onChange={(e) => set("price", e.target.value)} /></div>}
                 {isCourse && <div><label className="field-label">Хэлбэр</label><select className="input" value={form.mode} onChange={(e) => set("mode", e.target.value)}><option value="online">Онлайн сургалт</option><option value="tankhim">Танхимын сургалт</option><option value="both">Онлайн + Танхим</option></select></div>}
+                {kind === "service" && <div><label className="field-label">Хэлбэр *</label><select className="input" value={form.mode} onChange={(e) => set("mode", e.target.value)}><option value="online">💻 Онлайн</option><option value="tankhim">📍 Ирж уулзах</option><option value="both">Онлайн + Ирж уулзах</option></select><p className="mt-1 text-xs text-muted">Хэрэглэгч үйлчилгээний жагсаалтаас энэ хэлбэрээр шүүнэ.</p></div>}
               </div>
 
               {hasMoods && (

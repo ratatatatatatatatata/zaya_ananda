@@ -1,16 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { embedSrc } from "@/lib/video-embed";
 
 type Video = { title: string; url: string; quality?: string; subtitles?: string };
-
-function embed(url: string): { type: "iframe" | "video"; src: string } {
-  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([\w-]{11})/);
-  if (yt) return { type: "iframe", src: "https://www.youtube.com/embed/" + yt[1] };
-  const vm = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-  if (vm) return { type: "iframe", src: "https://player.vimeo.com/video/" + vm[1] };
-  return { type: "video", src: url };
-}
 
 function Player({ v, index }: { v: Video; index: number }) {
   const [subUrl, setSubUrl] = useState<string | undefined>();
@@ -21,7 +14,7 @@ function Player({ v, index }: { v: Video; index: number }) {
     setSubUrl(u);
     return () => URL.revokeObjectURL(u);
   }, [v.subtitles]);
-  const e = embed(v.url);
+  const e = embedSrc(v.url);
   return (
     <div className="overflow-hidden rounded-2xl border border-line bg-surface-1 shadow-card">
       <div className="flex items-center gap-3 border-b border-line px-4 py-3">

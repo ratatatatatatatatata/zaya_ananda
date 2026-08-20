@@ -1,7 +1,7 @@
 import { listCmsCached } from "@/lib/repo";
 import { VideoHero } from "@/components/video/VideoHero";
 import { heroMediaFor } from "@/lib/hero-video";
-import { CmsCard } from "@/components/CmsCard";
+import { GiftGrid } from "@/components/GiftGrid";
 import { T } from "@/components/T";
 
 export const revalidate = 300;
@@ -22,9 +22,7 @@ export default async function GiftPage() {
         desc="Үнэгүй нээлттэй хичээлүүд — эхлэхэд тань зориулсан бидний бэлэг. Бүртгэлгүйгээр үзнэ."
       />
       <section className="section"><div className="container-px">
-        {items.length === 0
-          ? <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-14 text-center text-muted">Бэлэг болгон өргөх хичээлүүд удахгүй нэмэгдэнэ. 🎁</p>
-          : <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{items.map((i) => <CmsCard key={i.id} item={i} />)}</div>}
+        <GiftGrid items={items} emptyText="Бэлэг болгон өргөх хичээлүүд удахгүй нэмэгдэнэ. 🎁" />
       </div></section>
     </>
   );

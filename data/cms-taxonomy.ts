@@ -5,7 +5,6 @@ const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<
 /** Үйлчилгээний ангилал — бүлэг + дэд ангилалтай. DB-д монгол нэрээр хадгална. */
 export const SERVICE_GROUPS: { group: string; subs: string[] }[] = [
   { group: "Оношилгоо", subs: ["Аура оношилгоо", "Сканнер оношилгоо"] },
-  { group: "Зурхай ба Мэргэ", subs: ["Тоон зурхайн матрикс", "Шагайн мэргэ"] },
   { group: "Засал, Эмчилгээ", subs: ["Advanced эмчилгээ", "Лаа засал үйлчилгээ", "Жэт аппарат эмчилгээ", "Озонатор эмчилгээ", "Хувь заяаны засал эмчилгээ"] },
 ];
 
@@ -36,6 +35,12 @@ export function catLabel(cat: string | undefined, lang: Locale): string {
   if (!cat) return "";
   return CAT_I18N[cat]?.[lang] || cat;
 }
+
+/** Үйлчилгээ авах хэлбэр — онлайн эсвэл биечлэн ирж уулзах */
+export const SERVICE_MODES: { key: "online" | "tankhim"; emoji: string; label: Record<Locale, string> }[] = [
+  { key: "online", emoji: "💻", label: Lx("Онлайн", "Online", "온라인", "オンライン", "线上") },
+  { key: "tankhim", emoji: "📍", label: Lx("Ирж уулзах", "In person", "방문 상담", "対面", "到店面谈") },
+];
 
 /** Сэтгэл санааны сонголтууд (Сэтгэлийн туяа) */
 export const MOODS: { key: string; emoji: string; label: Record<Locale, string> }[] = [

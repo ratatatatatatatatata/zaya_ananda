@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listCmsCached, getSettingsCached } from "@/lib/repo";
 import { heroMediaFor } from "@/lib/hero-video";
 import { CmsCard } from "./CmsCard";
+import { GiftGrid } from "./GiftGrid";
 import { Reveal } from "./Reveal";
 import { T, Tr } from "./T";
 import { PathsHighlight } from "./home/PathsHighlight";
@@ -9,9 +10,12 @@ import { DailyHoroscope } from "./home/DailyHoroscope";
 import { VideoBand } from "./video/VideoBand";
 import { HowItWorks } from "./home/HowItWorks";
 import { SectionJump } from "./home/SectionJump";
+import { SectionZoom } from "./home/SectionZoom";
 import type { Locale } from "@/lib/types";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
+
+const MOODBTN = Lx("Мэдрэмжээ сонгох", "Choose your mood", "기분 고르기", "気分を選ぶ", "选择心情");
 
 /** Хэсэг бүрийн товч, ойлгомжтой танилцуулга */
 const D = {
@@ -47,24 +51,6 @@ const D = {
     "免费公开课程 — 助你起步的礼物，无需注册。"),
 };
 
-const OPEN = Lx("Хэсэг рүү орох", "Open this section", "이 섹션 열기", "このセクションへ", "进入此板块");
-
-function SectionHead({ titleKey, desc, href, icon }: { titleKey: string; desc: Record<Locale, string>; href: string; icon: string }) {
-  return (
-    <div>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="max-w-2xl">
-          <p className="eyebrow-line"><span>{icon}</span></p>
-          <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><T k={titleKey} /></h2>
-          <p className="mt-3 leading-relaxed text-muted"><Tr v={desc} /></p>
-        </div>
-        <Link href={href} className="btn btn-primary btn-md shrink-0"><Tr v={OPEN} /> →</Link>
-      </div>
-      <div aria-hidden className="khas-rule mt-6 opacity-70" />
-    </div>
-  );
-}
-
 /** Нүүр хуудас — хэсэг бүр товч мэдээлэл, шууд орох товчтой. */
 export async function HomeSections() {
   const [services, courses, products, free, settings, bandMedia] = await Promise.all([
@@ -94,22 +80,20 @@ export async function HomeSections() {
 
       {/* Энергийн засал */}
       <section id="services" className="section scroll-mt-36"><div className="container-px">
-        <SectionHead titleKey="nav.services" desc={D.services} href="/services" icon="✨" />
-        {services.length > 0 && (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {services.slice(0, 3).map((i, idx) => <Reveal key={i.id} delay={idx * 70}><CmsCard item={i} /></Reveal>)}
+        <SectionZoom eyebrow="✨" title={<T k="nav.services" />} desc={<Tr v={D.services} />} href="/services">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {services.map((i, idx) => <Reveal key={i.id} delay={idx * 60}><CmsCard item={i} /></Reveal>)}
           </div>
-        )}
+        </SectionZoom>
       </div></section>
 
       {/* Ариусахуйн үйл */}
       <section id="courses" className="section scroll-mt-36 bg-surface-2"><div className="container-px">
-        <SectionHead titleKey="nav.courses" desc={D.courses} href="/courses" icon="🧘" />
-        {courses.length > 0 && (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {courses.slice(0, 3).map((i, idx) => <Reveal key={i.id} delay={idx * 70}><CmsCard item={i} /></Reveal>)}
+        <SectionZoom eyebrow="🧘" title={<T k="nav.courses" />} desc={<Tr v={D.courses} />} href="/courses">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {courses.map((i, idx) => <Reveal key={i.id} delay={idx * 60}><CmsCard item={i} /></Reveal>)}
           </div>
-        )}
+        </SectionZoom>
       </div></section>
 
       <VideoBand
@@ -122,22 +106,18 @@ export async function HomeSections() {
 
       {/* Энергийн хамгаалалт */}
       <section id="shop" className="section scroll-mt-36 bg-surface-2"><div className="container-px">
-        <SectionHead titleKey="nav.shop" desc={D.shop} href="/shop" icon="🛡" />
-        {products.length > 0 && (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {products.slice(0, 4).map((i, idx) => <Reveal key={i.id} delay={idx * 70}><CmsCard item={i} /></Reveal>)}
+        <SectionZoom eyebrow="🛡" title={<T k="nav.shop" />} desc={<Tr v={D.shop} />} href="/shop">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {products.map((i, idx) => <Reveal key={i.id} delay={idx * 60}><CmsCard item={i} /></Reveal>)}
           </div>
-        )}
+        </SectionZoom>
       </div></section>
 
       {/* Гэгээн бэлэг */}
       <section id="gift" className="section scroll-mt-36"><div className="container-px">
-        <SectionHead titleKey="nav.gift" desc={D.gift} href="/gift" icon="🎁" />
-        {free.length > 0 && (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {free.slice(0, 3).map((i, idx) => <Reveal key={i.id} delay={idx * 70}><CmsCard item={i} /></Reveal>)}
-          </div>
-        )}
+        <SectionZoom eyebrow="🎁" title={<T k="nav.gift" />} desc={<Tr v={D.gift} />} href="/gift">
+          <GiftGrid items={free} emptyText="Бэлэг болгон өргөх хичээлүүд удахгүй нэмэгдэнэ. 🎁" />
+        </SectionZoom>
       </div></section>
 
       {/* Сэтгэлийн туяа — хуудасны хамгийн доод хэсэг */}
@@ -149,7 +129,7 @@ export async function HomeSections() {
             <p className="eyebrow-line"><span>🌅</span></p>
             <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><T k="nav.mood" /></h2>
             <p className="mt-3 leading-relaxed text-muted"><Tr v={D.mood} /></p>
-            <Link href="/mood" className="btn btn-primary btn-lg mt-7"><Tr v={OPEN} /> →</Link>
+            <Link href="/mood" className="btn btn-primary btn-lg mt-7"><Tr v={MOODBTN} /> →</Link>
           </div>
         </div>
       </div></section>
