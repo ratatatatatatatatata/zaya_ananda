@@ -307,7 +307,14 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
           </div>
 
           {isPromo ? (
-            <div><label className="field-label">Холбоос (заавал биш)</label><input className="input" value={form.link} onChange={(e) => set("link", e.target.value)} placeholder="https://... эсвэл /courses" /></div>
+            <div className="rounded-2xl border border-primary-500/30 bg-primary-50/60 p-4">
+              <label className="field-label">Очих холбоос *</label>
+              <input className="input" value={form.link} onChange={(e) => set("link", e.target.value)} placeholder="https://... эсвэл /courses" />
+              <p className="mt-2 text-xs leading-relaxed text-muted">
+                Энэ сурталчилгаа сайт нээгдэхэд <b>дарангуйлсан цонх</b> болж нэг удаа гарна. Хэрэглэгч баннер дээр дарвал энэ холбоос руу очно.
+                Нэг хүнд нэг л удаа харагдана — хаасны дараа дахин гарахгүй.
+              </p>
+            </div>
           ) : (
             <>
               <div className="grid gap-3 sm:grid-cols-2">

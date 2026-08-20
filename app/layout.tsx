@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { FooterGate } from "@/components/FooterGate";
 import { CosmicBackdrop } from "@/components/CosmicBackdrop";
 import { Interactions } from "@/components/Interactions";
+import { PromoModal } from "@/components/PromoModal";
 import { BottomNav } from "@/components/BottomNav";
 import { siteConfig } from "@/data/content";
 import { pick } from "@/lib/i18n-core";
@@ -79,6 +80,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <FooterGate />
             <div className="h-20 lg:hidden" aria-hidden />
           </div>
+          <PromoModal />
           <Interactions />
           <BottomNav />
         </Providers>

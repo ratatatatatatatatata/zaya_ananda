@@ -5,7 +5,7 @@ import type { CmsItem } from "@/lib/types";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const ALLOWED: CmsItem["kind"][] = ["service", "course", "product", "resource", "free"];
+const ALLOWED: CmsItem["kind"][] = ["service", "course", "product", "resource", "free", "promo"];
 
 /** Нийтэд нээлттэй контентын жагсаалт (Сэтгэлийн туяа г.м. client хуудсууд ашиглана). */
 export async function GET(req: Request) {
