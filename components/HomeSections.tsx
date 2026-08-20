@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { listCmsCached, getSettingsCached } from "@/lib/repo";
 import { heroMediaFor } from "@/lib/hero-video";
-import { CmsCard } from "./CmsCard";
-import { GiftGrid } from "./GiftGrid";
+import { ReelsSlider } from "./home/ReelsSlider";
+import { StoneReading } from "./StoneReading";
 import { Reveal } from "./Reveal";
 import { T, Tr } from "./T";
 import { PathsHighlight } from "./home/PathsHighlight";
@@ -66,8 +66,8 @@ const D = {
 
 /** Нүүр хуудас — хэсэг бүр товч мэдээлэл, шууд орох товчтой. */
 export async function HomeSections() {
-  const [services, courses, products, free, settings, bandMedia] = await Promise.all([
-    listCmsCached("service"), listCmsCached("course"), listCmsCached("product"),
+  const [services, courses, free, settings, bandMedia] = await Promise.all([
+    listCmsCached("service"), listCmsCached("course"),
     listCmsCached("free"), getSettingsCached(), heroMediaFor("band"),
   ]);
 
@@ -87,12 +87,10 @@ export async function HomeSections() {
         }))}
       />
 
-      {/* Зурхай — төрлүүдийн слайдер, доор нь өдрийн зурхайн тайлал */}
+      {/* Зурхай — слайдер. Сонгож дарахад доор нь тухайн тайлал нээгдэнэ. */}
       <section id="zurhai" className="section scroll-mt-36"><div className="container-px">
-        <ZurhaiSlider cards={settings.zurhaiCards} />
-      </div>
-      <div id="zurhai-daily" className="scroll-mt-36"><DailyHoroscope /></div>
-      </section>
+        <ZurhaiSlider cards={settings.zurhaiCards} daily={<DailyHoroscope />} />
+      </div></section>
 
       {/* Энергийн засал */}
       <section id="services" className="section scroll-mt-36"><div className="container-px">
@@ -141,16 +139,14 @@ export async function HomeSections() {
       {/* Энергийн хамгаалалт */}
       <section id="shop" className="section scroll-mt-36 bg-surface-2"><div className="container-px">
         <SectionZoom eyebrow="🛡" title={<T k="nav.shop" />} desc={<Tr v={D.shop} />} href="/shop">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {products.map((i, idx) => <Reveal key={i.id} delay={idx * 60}><CmsCard item={i} /></Reveal>)}
-          </div>
+          <StoneReading />
         </SectionZoom>
       </div></section>
 
       {/* Гэгээн бэлэг */}
       <section id="gift" className="section scroll-mt-36"><div className="container-px">
         <SectionZoom eyebrow="🎁" title={<T k="nav.gift" />} desc={<Tr v={D.gift} />} href="/gift">
-          <GiftGrid items={free} emptyText="Бэлэг болгон өргөх хичээлүүд удахгүй нэмэгдэнэ. 🎁" />
+          <ReelsSlider items={free} />
         </SectionZoom>
       </div></section>
 

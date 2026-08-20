@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
@@ -46,7 +46,11 @@ const TONES = [
 ];
 
 /** Нүүр хуудасны зурхайн төрлүүд — гулсдаг баннер. Дарахад доор нь алхмууд нээгдэнэ. */
-export function ZurhaiSlider({ cards }: { cards?: ZurhaiCard[] }) {
+export function ZurhaiSlider({ cards, daily }: {
+  cards?: ZurhaiCard[];
+  /** «Өдрийн зурхай» карт сонгогдоход задаргаанд гарах тайлал */
+  daily?: ReactNode;
+}) {
   const { tr, lang } = useI18n();
   const list = cards && cards.length ? cards : DEFAULT_ZURHAI;
   const [i, setI] = useState(0);
@@ -58,7 +62,7 @@ export function ZurhaiSlider({ cards }: { cards?: ZurhaiCard[] }) {
   };
 
   const c = list[i];
-  const tone = TONES[i % TONES.length];
+  const isDaily = c.href.startsWith("#");
 
   return (
     <div>
@@ -147,34 +151,30 @@ export function ZurhaiSlider({ cards }: { cards?: ZurhaiCard[] }) {
       {/* Дарахад доор нь гарч ирэх алхмууд — хуудас үсрэхгүй */}
       <div
         className="overflow-hidden transition-[max-height,opacity] duration-500 ease-out"
-        style={{ maxHeight: open ? "40rem" : 0, opacity: open ? 1 : 0 }}
+        style={{ maxHeight: open ? "500rem" : 0, opacity: open ? 1 : 0 }}
       >
-        <div className="panel mt-6 p-6 sm:p-8">
-          <p className="text-xs font-bold uppercase tracking-wide text-primary-700">{tr(WHAT)}</p>
-          <ol className="mt-4 grid gap-4 sm:grid-cols-3">
-            {STEPS[lang].map((step, k) => (
-              <li key={k} className="flex gap-3">
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-100 font-display text-sm font-bold text-primary-700">
-                  {k + 1}
-                </span>
-                <span className="text-[0.98rem] leading-relaxed text-ink/85">{step}</span>
-              </li>
-            ))}
-          </ol>
-          <div className="mt-6">
-            <Link
-              href={c.href}
-              onClick={(e) => {
-                if (!c.href.startsWith("#")) return;
-                e.preventDefault();
-                document.querySelector(c.href)?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-              className="btn btn-primary btn-md"
-            >
-              {c.emoji} {c.title} →
-            </Link>
+        {isDaily && daily ? (
+          <div className="mt-2">{daily}</div>
+        ) : (
+          <div className="panel mt-6 p-6 sm:p-8">
+            <p className="text-xs font-bold uppercase tracking-wide text-primary-700">{tr(WHAT)}</p>
+            <ol className="mt-4 grid gap-4 sm:grid-cols-3">
+              {STEPS[lang].map((step, k) => (
+                <li key={k} className="flex gap-3">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-100 font-display text-sm font-bold text-primary-700">
+                    {k + 1}
+                  </span>
+                  <span className="text-[0.98rem] leading-relaxed text-ink/85">{step}</span>
+                </li>
+              ))}
+            </ol>
+            <div className="mt-6">
+              <Link href={c.href} className="btn btn-primary btn-md">
+                {c.emoji} {c.title} →
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
