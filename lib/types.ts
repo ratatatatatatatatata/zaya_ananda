@@ -155,6 +155,24 @@ export interface Notification {
   createdAt: string;
 }
 
+/** Энергийн заслын цаг захиалга */
+export interface ServiceBooking {
+  id: string;
+  userId?: string | null;
+  itemId: string;
+  serviceName: string;
+  /** YYYY-MM-DD */
+  date: string;
+  /** HH:00 — 10..17 */
+  time: string;
+  name: string;
+  phone: string;
+  email?: string;
+  note?: string | null;
+  status: "pending" | "confirmed" | "done" | "cancelled";
+  createdAt: string;
+}
+
 /** Сүнслэг аяллын захиалга */
 export interface JourneyBooking {
   id: string;
@@ -233,6 +251,8 @@ export interface SiteSettings {
   customMoods?: { key: string; emoji: string; label: string }[];
   /** Зурхайн тайллын гар бичвэрүүд — түлхүүр: zodiac:leo, life:7, arcana:12, day:mon, element:fire */
   zurhaiRules?: { key: string; text: string }[];
+  /** Холбоо барих мэдээлэл — админаас шинэчилнэ */
+  contact?: { phone?: string; email?: string; address?: string; hours?: string; mapQuery?: string };
   facebook?: string;
   instagram?: string;
   youtube?: string;

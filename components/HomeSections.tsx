@@ -8,7 +8,6 @@ import { T, Tr } from "./T";
 import { PathsHighlight } from "./home/PathsHighlight";
 import { DailyHoroscope } from "./home/DailyHoroscope";
 import { VideoBand } from "./video/VideoBand";
-import { SectionJump } from "./home/SectionJump";
 import { SectionZoom } from "./home/SectionZoom";
 import { ZurhaiSlider } from "./home/ZurhaiSlider";
 import { ServiceCard } from "./home/ServiceCard";
@@ -73,9 +72,6 @@ export async function HomeSections() {
 
   return (
     <>
-      {/* Хурдан шилжих товчнууд */}
-      <SectionJump />
-
       {/* Хоёр гол зам — сургалт ба сүнслэг аялал */}
       <PathsHighlight
         courses={courses.map((c) => ({
@@ -112,11 +108,24 @@ export async function HomeSections() {
 
       {/* Энергийн засал */}
       <section id="services" className="section scroll-mt-36"><div className="container-px">
-        <SectionZoom eyebrow="✨" title={<T k="nav.services" />} desc={<Tr v={D.services} />} href="/services">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((i, idx) => <Reveal key={i.id} delay={idx * 60}><ServiceCard item={i} /></Reveal>)}
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="max-w-2xl">
+            <p className="eyebrow-line"><span>✨</span></p>
+            <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><T k="nav.services" /></h2>
+            <p className="mt-3 leading-relaxed text-muted"><Tr v={D.services} /></p>
           </div>
-        </SectionZoom>
+          <Link href="/services" className="btn btn-primary btn-md shrink-0">Бүтэн хуудас →</Link>
+        </div>
+        <div aria-hidden className="khas-rule mt-6 opacity-70" />
+
+        {/* Хажуу тийш цувдаг жагсаалт */}
+        <div className="mt-8 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {services.map((i) => (
+            <div key={i.id} className="w-[19rem] shrink-0 snap-start sm:w-[21rem]">
+              <ServiceCard item={i} />
+            </div>
+          ))}
+        </div>
       </div></section>
 
       {/* Сүнслэг аялал — бүртгэлтэй аяллууд */}

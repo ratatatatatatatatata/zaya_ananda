@@ -93,3 +93,54 @@ export async function deleteReview(id: string) {
   await sbDelete("journey_reviews", id);
   return true;
 }
+
+/* ---------- Энергийн заслын цаг захиалга ---------- */
+
+export async function createServiceBooking(input: {
+  userId: string | null;
+  itemId: string;
+  serviceName: string;
+  date: string;
+  time: string;
+  name: string;
+  phone: string;
+  email?: string;
+  note?: string;
+}) {
+  return sbInsert("service_bookings", {
+    id: randomUUID(),
+    userId: input.userId,
+    itemId: input.itemId,
+    serviceName: input.serviceName,
+    date: input.date,
+    time: input.time,
+    name: input.name,
+    phone: input.phone,
+    email: input.email || null,
+    note: input.note || null,
+    status: "pending",
+    createdAt: new Date().toISOString(),
+  });
+}
+
+export async function listServiceBookings() {
+  return sbSelect("service_bookings", "order=date.asc");
+}
+
+/** Тухайн өдөр аль цагууд аль хэдийн захиалагдсан бэ */
+export async function takenSlots(itemId: string, date: string): Promise<string[]> {
+  const rows = await sbSelect<{ time: string; status: string }>(
+    "service_bookings",
+    `item_id=eq.${enc(itemId)}&date=eq.${enc(date)}&limit=50`,
+  );
+  return rows.filter((r) => r.status !== "cancelled").map((r) => r.time);
+}
+
+export async function setServiceBookingStatus(id: string, status: string) {
+  return sbUpdate("service_bookings", id, { status });
+}
+
+export async function deleteServiceBooking(id: string) {
+  await sbDelete("service_bookings", id);
+  return true;
+}

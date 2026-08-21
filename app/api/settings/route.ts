@@ -58,6 +58,15 @@ export async function PATCH(req: Request) {
             .map((r: Record<string, unknown>) => ({ key: String(r?.key || "").trim(), text: String(r?.text || "").trim() }))
             .filter((r: { key: string; text: string }) => r.key && r.text)
         : undefined,
+      contact: body.contact && typeof body.contact === "object"
+        ? {
+            phone: str(body.contact.phone),
+            email: str(body.contact.email),
+            address: str(body.contact.address),
+            hours: str(body.contact.hours),
+            mapQuery: str(body.contact.mapQuery),
+          }
+        : undefined,
       facebook: str(body.facebook),
       instagram: str(body.instagram),
       youtube: str(body.youtube),

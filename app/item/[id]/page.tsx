@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getCmsByIdCached, listCmsCached } from "@/lib/repo";
 import { T } from "@/components/T";
 import { PurchaseBox } from "@/components/PurchaseBox";
+import { ServiceBooking } from "@/components/ServiceBooking";
 import { ProductBuyBox } from "@/components/ProductBuyBox";
 import { CourseLessons } from "@/components/CourseLessons";
 import { ItemVideos } from "@/components/ItemVideos";
@@ -58,6 +59,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
   const lines = (item.teacherInfo || "").split("\n").map((s) => s.trim()).filter(Boolean);
   const isCourse = item.kind === "course";
   const isProduct = item.kind === "product";
+  const isService = item.kind === "service";
   const isFree = item.kind === "free";
   const nextItem = item.nextItemId ? await getCmsByIdCached(item.nextItemId).catch(() => null) : null;
   const gallery = item.images && item.images.length ? item.images : item.image ? [item.image] : [];
@@ -128,6 +130,8 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
           {isProduct
             ? <ProductBuyBox id={item.id} title={item.title} price={item.price} />
+            : isService
+            ? <ServiceBooking itemId={item.id} serviceName={item.title} />
             : isFree
             ? <div className="card p-6 text-center"><p className="text-3xl">🎁</p><p className="mt-2 font-display text-lg font-semibold text-jade-600">Нээлттэй хичээл</p><p className="mt-1 text-sm text-muted">Энэ хичээл танд бэлэг — чөлөөтэй үзээрэй.</p></div>
             : <PurchaseBox id={item.id} title={item.title} price={item.price} />}

@@ -18,11 +18,6 @@ export function HomeHero({ media }: { media?: { kind: "video" | "image"; url: st
         </>
       }
       desc={t("home.heroDescription")}
-      cta={[
-        { href: "/courses", label: t("home.heroStart") },
-        { href: "/ayalal", label: t("home.heroJourney") },
-        { href: "/merge", label: `🔮 ${t("nav.merge")}`, variant: "gold" as const },
-      ]}
     />
   );
 }

@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { sbSelect, sbInsert, sbUpdate } from "@/lib/supabase";
-import type { Notification } from "@/lib/types";
+import type { Notification, User } from "@/lib/types";
+import { isAdminEmail } from "@/lib/repo";
 
 const enc = (s: string) => encodeURIComponent(s);
 
@@ -53,4 +54,22 @@ export async function markRead(id: string, userId: string): Promise<void> {
 export async function markAllRead(userId: string): Promise<void> {
   const rows = await sbSelect<Notification>("notifications", `user_id=eq.${enc(userId)}&read=is.false&limit=100`);
   await Promise.all(rows.map((r) => sbUpdate("notifications", r.id, { read: true })));
+}
+
+/** Бүх админд мэдэгдэл илгээх */
+export async function notifyAdmins(input: { kind: Notification["kind"]; title: string; body?: string; link?: string; dedupeKey?: string }) {
+  const users = await sbSelect<User>("users", "limit=500").catch(() => [] as User[]);
+  const admins = users.filter((u) => u.isAdmin || isAdminEmail(u.email));
+  await Promise.all(
+    admins.map((a) =>
+      createNotification({
+        userId: a.id,
+        kind: input.kind,
+        title: input.title,
+        body: input.body,
+        link: input.link,
+        dedupeKey: input.dedupeKey ? input.dedupeKey + ":" + a.id : undefined,
+      }).catch(() => null),
+    ),
+  );
 }

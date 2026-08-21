@@ -5,6 +5,7 @@ import { JourneyImage } from "@/components/journey/SceneArt";
 import { LeadCard, CrewRow } from "@/components/journey/PersonCard";
 import { JourneyBooking } from "@/components/journey/JourneyBooking";
 import { JourneyReviews } from "@/components/journey/JourneyReviews";
+import { ContactSection } from "@/components/ContactSection";
 
 export const revalidate = 600;
 
@@ -164,11 +165,8 @@ export default function JourneyPage({ params }: { params: { slug: string } }) {
             </details>
           ))}
         </div>
-        <div className="mt-10 text-center">
-          <p className="text-muted">Өөр асуулт байна уу?</p>
-          <Link href="/about#contact" className="btn btn-outline btn-md mt-4">Бидэнтэй холбогдох</Link>
-        </div>
       </div></section>
+      <ContactSection />
     </>
   );
 }
