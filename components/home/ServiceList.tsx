@@ -8,10 +8,11 @@ function initials(name: string) {
   return name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
 }
 
-/** Нэг үйлчилгээний мөр — зүүн талд зураг, баруун талд бүх мэдээлэл. */
+/** Нэг үйлчилгээний мөр — зүүн талд зураг, баруун талд бүх мэдээлэл, доор нь цаг захиалга. */
 function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
   const cover = item.image || item.images?.[0];
   const paragraphs = (item.body || "").split("\n").map((p) => p.trim()).filter(Boolean);
+  const [booking, setBooking] = useState(false);
 
   return (
     <article id={"service-" + item.id} className="card grid gap-0 overflow-hidden scroll-mt-32 lg:grid-cols-[minmax(0,24rem)_1fr]">
@@ -70,6 +71,26 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
             </div>
           </div>
         )}
+
+        {/* Цаг захиалга — энэ заслын дотроо нээгдэнэ */}
+        <button
+          type="button"
+          onClick={() => setBooking((v) => !v)}
+          aria-expanded={booking}
+          className="btn btn-primary btn-md mt-6"
+        >
+          🗓 {booking ? "Захиалгыг хаах" : "Цаг захиалах"}
+          <span aria-hidden className={"ml-1.5 inline-block transition-transform " + (booking ? "rotate-180" : "")}>⌄</span>
+        </button>
+
+        <div
+          className="overflow-hidden transition-[max-height,opacity] duration-500 ease-out"
+          style={{ maxHeight: booking ? "500rem" : 0, opacity: booking ? 1 : 0 }}
+        >
+          <div className="mt-5">
+            {booking && <ServiceBooking itemId={item.id} serviceName={item.title} />}
+          </div>
+        </div>
       </div>
     </article>
   );
@@ -77,11 +98,9 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
 
 /**
  * Энергийн заслын жагсаалт — мэдээлэл бүр доошоо бүтнээрээ харагдаж,
- * хамгийн сүүлд нь цаг захиалгын систем гарна.
+ * засал тус бүр дээрээ өөрийн цаг захиалгын товчтой.
  */
 export function ServiceList({ items }: { items: CmsItem[] }) {
-  const [sel, setSel] = useState(0);
-
   if (items.length === 0) {
     return (
       <p className="rounded-2xl border border-dashed border-line px-5 py-14 text-center text-muted">
@@ -90,54 +109,9 @@ export function ServiceList({ items }: { items: CmsItem[] }) {
     );
   }
 
-  const active = items[Math.min(sel, items.length - 1)];
-
   return (
-    <div>
-      <div className="space-y-8">
-        {items.map((it, i) => <ServiceRow key={it.id} item={it} index={i} />)}
-      </div>
-
-      {/* Хамгийн ард — цаг захиалга */}
-      <div id="service-booking" className="mt-14 scroll-mt-32 rounded-4xl border border-line bg-surface-2 p-6 sm:p-10">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="eyebrow-line justify-center"><span>🗓</span></p>
-          <h3 className="mt-3 font-display text-3xl font-semibold text-ink">Цаг захиалах</h3>
-          <p className="mt-3 leading-relaxed text-muted">
-            Дээрх заслуудаас сонгоод, өдөр цагаа тохируулан захиалгаа өгнө үү.
-          </p>
-        </div>
-
-        {/* Аль засалд цаг авахаа сонгоно */}
-        {items.length > 1 && (
-          <div className="mt-8">
-            <p className="text-center text-xs font-bold uppercase tracking-wide text-muted">Ямар засал вэ?</p>
-            <div className="mt-3 flex flex-wrap justify-center gap-2.5">
-              {items.map((it, i) => (
-                <button
-                  key={it.id}
-                  type="button"
-                  onClick={() => setSel(i)}
-                  aria-pressed={i === sel}
-                  className={
-                    "focus-ring rounded-full px-4 py-2 text-sm font-semibold transition " +
-                    (i === sel
-                      ? "bg-primary-grad text-white shadow-soft"
-                      : "border border-line bg-surface-1 text-ink/75 hover:border-primary-400 hover:text-primary-700")
-                  }
-                >
-                  {it.title}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="mx-auto mt-8 max-w-xl">
-          {/* key — засал солиход маягт цэвэр эхэлнэ */}
-          <ServiceBooking key={active.id} itemId={active.id} serviceName={active.title} />
-        </div>
-      </div>
+    <div className="space-y-8">
+      {items.map((it, i) => <ServiceRow key={it.id} item={it} index={i} />)}
     </div>
   );
 }

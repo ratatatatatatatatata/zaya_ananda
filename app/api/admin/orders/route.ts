@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth";
 import { checkAdmin, updateOrder, getOrderById, getCmsById, deleteOrder } from "@/lib/repo";
 import { MERGE_ITEMS } from "@/data/merge-toorog";
+import { createNotification } from "@/lib/notifications";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -36,6 +37,25 @@ export async function PATCH(req: Request) {
       patch.expiresAt = null;
     }
     const order = await updateOrder(id, patch);
+
+    // Төлбөр баталгаажмагц эзэнд нь «эрх нээгдлээ» мэдэгдэл очно
+    if (status === "paid" && order?.userId) {
+      const itemId = order.items?.[0]?.slug;
+      const merge = Object.values(MERGE_ITEMS).find((m) => m.id === itemId);
+      const label = merge
+        ? merge.id === MERGE_ITEMS.year.id ? "Жилийн зурхай" : "Сарын зурхай"
+        : order.items?.[0]?.title || "Худалдан авалт";
+      const until = patch.expiresAt ? new Date(patch.expiresAt).toISOString().slice(0, 10) : "";
+      await createNotification({
+        userId: order.userId,
+        kind: "system",
+        title: label + " үзэх эрх нээгдлээ 🔓",
+        body: until ? `Хүчинтэй хугацаа: ${until} хүртэл.` : "Одооноос үзэх боломжтой.",
+        link: merge ? "/merge" : "/account",
+        dedupeKey: "paid:" + order.id,
+      }).catch(() => null);
+    }
+
     return NextResponse.json({ ok: true, order });
   } catch (e) {
     return NextResponse.json({ error: "Серверийн алдаа: " + (e instanceof Error ? e.message : String(e)) }, { status: 500 });

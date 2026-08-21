@@ -118,13 +118,28 @@ export function MergeToorog() {
   const [bm, setBm] = useState<number | "">("");
   const [bd, setBd] = useState<number | "">("");
 
-  /** Нүүр хуудсанд оруулсан огноог хаягаар дамжуулж авна: /merge?y=1994&m=7&d=21 */
+  /** Огноог сануулна: эхлээд хаягийн /merge?y=&m=&d=, байхгүй бол сүүлд оруулсан утга. */
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     const n = (k: string) => { const v = Number(q.get(k)); return Number.isFinite(v) && v > 0 ? v : null; };
-    const y = n("y"), m = n("m"), d = n("d");
-    if (y && m && d && m <= 12 && d <= 31) { setBy(y); setBm(m); setBd(d); }
+    const valid = (y: number, m: number, d: number) => m >= 1 && m <= 12 && d >= 1 && d <= 31 && y > 1900;
+
+    const qy = n("y"), qm = n("m"), qd = n("d");
+    if (qy && qm && qd && valid(qy, qm, qd)) { setBy(qy); setBm(qm); setBd(qd); return; }
+
+    try {
+      const saved = JSON.parse(localStorage.getItem("za_birth") || "null");
+      if (saved && valid(Number(saved.y), Number(saved.m), Number(saved.d))) {
+        setBy(Number(saved.y)); setBm(Number(saved.m)); setBd(Number(saved.d));
+      }
+    } catch { /* хадгалалт байхгүй бол алгасна */ }
   }, []);
+
+  /** Бүтэн огноо орсон даруйд сануулж хадгална */
+  useEffect(() => {
+    if (typeof by !== "number" || typeof bm !== "number" || typeof bd !== "number") return;
+    try { localStorage.setItem("za_birth", JSON.stringify({ y: by, m: bm, d: bd })); } catch { /* хаалттай бол алгасна */ }
+  }, [by, bm, bd]);
 
   const [calY, setCalY] = useState(now.getFullYear());
   const [calM, setCalM] = useState(now.getMonth() + 1);

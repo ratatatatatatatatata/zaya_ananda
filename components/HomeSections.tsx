@@ -6,11 +6,11 @@ import { StoneReading } from "./StoneReading";
 import { Reveal } from "./Reveal";
 import { T, Tr } from "./T";
 import { PathsHighlight } from "./home/PathsHighlight";
-import { DailyHoroscope } from "./home/DailyHoroscope";
+import { MergeToorog } from "./MergeToorog";
 import { VideoBand } from "./video/VideoBand";
 import { SectionZoom } from "./home/SectionZoom";
 import { ZurhaiSlider } from "./home/ZurhaiSlider";
-import { ServiceList } from "./home/ServiceList";
+import { ServiceCard } from "./home/ServiceCard";
 import { HomeAbout } from "./home/HomeAbout";
 import { JourneyImage } from "./journey/SceneArt";
 import { JOURNEYS } from "@/data/journeys";
@@ -78,7 +78,7 @@ export async function HomeSections() {
 
       {/* Зурхай — слайдер. Сонгож дарахад доор нь тухайн тайлал нээгдэнэ. */}
       <section id="zurhai" className="section scroll-mt-36"><div className="container-px">
-        <ZurhaiSlider cards={settings.zurhaiCards} daily={<DailyHoroscope />} />
+        <ZurhaiSlider cards={settings.zurhaiCards} daily={<MergeToorog />} />
       </div></section>
 
       {/* Энергийн засал */}
@@ -93,9 +93,13 @@ export async function HomeSections() {
         </div>
         <div aria-hidden className="khas-rule mt-6 opacity-70" />
 
-        {/* Мэдээлэл бүр доошоо бүтнээрээ, хамгийн ард нь цаг захиалга */}
-        <div className="mt-8">
-          <ServiceList items={services} />
+        {/* Хажуу тийш цувдаг жагсаалт */}
+        <div className="mt-8 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {services.map((i) => (
+            <div key={i.id} className="w-[19rem] shrink-0 snap-start sm:w-[21rem]">
+              <ServiceCard item={i} />
+            </div>
+          ))}
         </div>
       </div></section>
 
