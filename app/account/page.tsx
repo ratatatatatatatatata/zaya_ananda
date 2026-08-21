@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useI18n } from "@/lib/i18n";
 import { formatMNT } from "@/lib/format";
-import type { Order } from "@/lib/types";
+import type { JourneyBooking, Order, ServiceBooking } from "@/lib/types";
 import { Journey3D } from "@/components/three/Journey3D";
 
 type HeroMedia = { kind: "video" | "image"; url: string };
@@ -17,6 +17,8 @@ export default function AccountPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const [serviceBookings, setServiceBookings] = useState<ServiceBooking[]>([]);
+  const [journeyBookings, setJourneyBookings] = useState<JourneyBooking[]>([]);
   const [heroMedia, setHeroMedia] = useState<HeroMedia | null>(null);
 
   const [editing, setEditing] = useState(false);
@@ -38,10 +40,16 @@ export default function AccountPage() {
 
   useEffect(() => {
     if (!user) return;
-    fetch("/api/orders", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((d) => setOrders(d.orders || []))
-      .catch(() => setOrders([]))
+    Promise.all([
+      fetch("/api/orders", { cache: "no-store" }).then((r) => r.json()),
+      fetch("/api/account/bookings", { cache: "no-store" }).then((r) => r.json()),
+    ])
+      .then(([orderData, bookingData]) => {
+        setOrders(orderData.orders || []);
+        setServiceBookings(bookingData.services || []);
+        setJourneyBookings(bookingData.journeys || []);
+      })
+      .catch(() => { setOrders([]); setServiceBookings([]); setJourneyBookings([]); })
       .finally(() => setOrdersLoading(false));
   }, [user]);
 
@@ -166,13 +174,31 @@ export default function AccountPage() {
             <h2 className="font-display text-lg font-semibold text-ink">{t("account.myOrders")}</h2>
             {ordersLoading ? (
               <p className="mt-4 text-muted">{t("account.loading")}</p>
-            ) : orders.length === 0 ? (
+            ) : orders.length === 0 && serviceBookings.length === 0 && journeyBookings.length === 0 ? (
               <div className="mt-4 rounded-2xl bg-cream p-8 text-center">
                 <p className="text-muted">{t("account.noOrders")}</p>
                 <Link href="/services" className="btn btn-primary btn-sm mt-4">{t("nav.services")}</Link>
               </div>
             ) : (
               <div className="mt-4 space-y-4">
+                {serviceBookings.map((b) => (
+                  <div key={b.id} className="rounded-2xl border border-line p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="font-semibold text-ink">🗓 {b.serviceName}</span>
+                      <span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">{b.status === "pending" ? "Хүлээгдэж буй" : b.status === "confirmed" ? "Баталгаажсан" : b.status === "done" ? "Дууссан" : "Цуцалсан"}</span>
+                    </div>
+                    <p className="mt-2 text-sm text-muted">{b.date} · {b.time}</p>
+                  </div>
+                ))}
+                {journeyBookings.map((b) => (
+                  <div key={b.id} className="rounded-2xl border border-line p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="font-semibold text-ink">🧭 {b.journeyName}</span>
+                      <span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">{b.status === "pending" ? "Хүлээгдэж буй" : b.status === "confirmed" ? "Баталгаажсан" : b.status === "done" ? "Дууссан" : "Цуцалсан"}</span>
+                    </div>
+                    <p className="mt-2 text-sm text-muted">{b.date} · {b.people} хүн</p>
+                  </div>
+                ))}
                 {orders.map((o) => (
                   <div key={o.id} className="rounded-2xl border border-line p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
