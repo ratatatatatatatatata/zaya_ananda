@@ -182,8 +182,9 @@ export function DailyHoroscope() {
           </div>
 
           <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Link href="/merge" className="btn btn-primary btn-md">🔮 {d("ctaMerge")}</Link>
-            <Link href="/services" className="btn btn-outline btn-md">{d("ctaDeep")}</Link>
+            <Link href={`/merge?y=${year}&m=${month}&d=${day}`} className="btn btn-primary btn-md">
+              🔮 {d("ctaMerge")}
+            </Link>
           </div>
           <p className="mt-4 text-center text-xs text-muted">{d("note")}</p>
         </div>

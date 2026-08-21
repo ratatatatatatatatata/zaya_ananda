@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
 
@@ -50,9 +49,6 @@ export function ZurhaiSlider({ cards, daily }: {
     setOpen(false);
     setI((v) => (v + dir + list.length) % list.length);
   };
-
-  const c = list[i];
-  const isDaily = c.href.startsWith("#");
 
   return (
     <div>
@@ -145,15 +141,6 @@ export function ZurhaiSlider({ cards, daily }: {
       >
         {/* Төрсөн он, сар, өдрөө оруулах хэсэг — үргэлж эндээ гарна */}
         {daily && <div className="mt-2">{daily}</div>}
-
-        {/* Тухайн зурхайн бүтэн хувилбар руу очих */}
-        {!isDaily && (
-          <div className="mt-6 text-center">
-            <Link href={c.href} className="btn btn-primary btn-md">
-              {c.emoji} {c.title} →
-            </Link>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { PromoBanner } from "@/components/PromoBanner";
 import { VideoHero } from "@/components/video/VideoHero";
-import { ServiceCard } from "@/components/home/ServiceCard";
+import { ServiceList } from "@/components/home/ServiceList";
 import { heroMediaFor } from "@/lib/hero-video";
 import { listCmsCached } from "@/lib/repo";
 import { T } from "@/components/T";
@@ -24,9 +24,7 @@ export default async function ServicesPage() {
         cta={[{ href: "#services", label: "Үйлчилгээ үзэх" }]}
       />
       <section id="services" className="section"><div className="container-px">
-        {items.length === 0
-          ? <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-14 text-center text-muted">Одоохондоо үйлчилгээ нэмэгдээгүй байна.</p>
-          : <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{items.map((i) => <ServiceCard key={i.id} item={i} />)}</div>}
+        <ServiceList items={items} />
       </div></section>
     </>
   );

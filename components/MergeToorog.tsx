@@ -118,6 +118,14 @@ export function MergeToorog() {
   const [bm, setBm] = useState<number | "">("");
   const [bd, setBd] = useState<number | "">("");
 
+  /** Нүүр хуудсанд оруулсан огноог хаягаар дамжуулж авна: /merge?y=1994&m=7&d=21 */
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const n = (k: string) => { const v = Number(q.get(k)); return Number.isFinite(v) && v > 0 ? v : null; };
+    const y = n("y"), m = n("m"), d = n("d");
+    if (y && m && d && m <= 12 && d <= 31) { setBy(y); setBm(m); setBd(d); }
+  }, []);
+
   const [calY, setCalY] = useState(now.getFullYear());
   const [calM, setCalM] = useState(now.getMonth() + 1);
   const [selDay, setSelDay] = useState(now.getDate());
