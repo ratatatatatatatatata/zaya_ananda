@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { sbSelect, sbInsert, sbUpdate, sbDelete } from "@/lib/supabase";
-import type { JourneyBooking, JourneyReview } from "@/lib/types";
+import type { JourneyBooking, JourneyReview, ServiceBooking } from "@/lib/types";
 
 const enc = (s: string) => encodeURIComponent(s);
 
@@ -106,6 +106,7 @@ export async function createServiceBooking(input: {
   phone: string;
   email?: string;
   note?: string;
+  status?: ServiceBooking["status"];
 }) {
   return sbInsert("service_bookings", {
     id: randomUUID(),
@@ -118,13 +119,17 @@ export async function createServiceBooking(input: {
     phone: input.phone,
     email: input.email || null,
     note: input.note || null,
-    status: "pending",
+    status: input.status || "pending",
     createdAt: new Date().toISOString(),
   });
 }
 
 export async function listServiceBookings() {
   return sbSelect("service_bookings", "order=date.asc");
+}
+
+export async function listUserServiceBookings(userId: string): Promise<ServiceBooking[]> {
+  return sbSelect<ServiceBooking>("service_bookings", `user_id=eq.${enc(userId)}&order=date.desc`);
 }
 
 /** Тухайн өдөр аль цагууд аль хэдийн захиалагдсан бэ */
@@ -137,7 +142,7 @@ export async function takenSlots(itemId: string, date: string): Promise<string[]
 }
 
 export async function setServiceBookingStatus(id: string, status: string) {
-  return sbUpdate("service_bookings", id, { status });
+  return sbUpdate<ServiceBooking>("service_bookings", id, { status });
 }
 
 export async function deleteServiceBooking(id: string) {
