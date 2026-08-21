@@ -4,6 +4,7 @@ import { checkAdmin } from "@/lib/repo";
 import {
   listBookings, setBookingStatus, deleteBooking,
   listReviews, setReviewFeatured, deleteReview, listFeaturedReviews,
+  listServiceBookings, setServiceBookingStatus, deleteServiceBooking,
 } from "@/lib/journeys-db";
 import { createNotification } from "@/lib/notifications";
 
@@ -19,10 +20,10 @@ async function guard() {
 export async function GET() {
   if (!(await guard())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
-    const [bookings, reviews] = await Promise.all([listBookings(), listReviews()]);
-    return NextResponse.json({ bookings, reviews });
+    const [bookings, reviews, services] = await Promise.all([listBookings(), listReviews(), listServiceBookings()]);
+    return NextResponse.json({ bookings, reviews, services });
   } catch {
-    return NextResponse.json({ bookings: [], reviews: [] });
+    return NextResponse.json({ bookings: [], reviews: [], services: [] });
   }
 }
 
@@ -42,6 +43,11 @@ export async function PATCH(req: Request) {
           dedupeKey: "booking-confirm:" + updated.id,
         }).catch(() => null);
       }
+      return NextResponse.json({ ok: true });
+    }
+
+    if (b?.serviceBookingId && b?.status) {
+      await setServiceBookingStatus(String(b.serviceBookingId), String(b.status));
       return NextResponse.json({ ok: true });
     }
 
@@ -68,9 +74,11 @@ export async function DELETE(req: Request) {
   const u = new URL(req.url);
   const bookingId = u.searchParams.get("bookingId");
   const reviewId = u.searchParams.get("reviewId");
+  const serviceBookingId = u.searchParams.get("serviceBookingId");
   try {
     if (bookingId) await deleteBooking(bookingId);
     if (reviewId) await deleteReview(reviewId);
+    if (serviceBookingId) await deleteServiceBooking(serviceBookingId);
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ ok: false });

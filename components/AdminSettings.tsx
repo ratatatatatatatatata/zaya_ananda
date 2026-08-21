@@ -48,9 +48,13 @@ async function uploadVideo(file: File, onProgress: (p: number) => void): Promise
 const EMPTY = { logo: "", aboutTitle: "", aboutBody: "", aboutVideo: "", facebook: "", instagram: "", youtube: "" };
 const EMPTY_BANK: BankInfo = { bankName: "", account: "", holder: "" };
 
+type ContactInfo = { phone: string; email: string; address: string; hours: string; mapQuery: string };
+const EMPTY_CONTACT: ContactInfo = { phone: "", email: "", address: "", hours: "", mapQuery: "" };
+
 export function AdminSettings() {
   const [form, setForm] = useState(EMPTY);
   const [bank, setBank] = useState<BankInfo>(EMPTY_BANK);
+  const [contact, setContact] = useState<ContactInfo>(EMPTY_CONTACT);
   const [moods, setMoods] = useState<{ key: string; emoji: string; label: string }[]>([]);
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
@@ -69,6 +73,7 @@ export function AdminSettings() {
           facebook: s.facebook || "", instagram: s.instagram || "", youtube: s.youtube || "",
         });
         if (s.bank) setBank({ ...EMPTY_BANK, ...s.bank });
+        if (s.contact) setContact({ ...EMPTY_CONTACT, ...s.contact });
         if (Array.isArray(s.customMoods)) setMoods(s.customMoods);
       })
       .catch(() => {});
@@ -89,7 +94,7 @@ export function AdminSettings() {
     e.preventDefault();
     setSaving(true); setErr(""); setMsg("");
     try {
-      const payload = { ...form, bank, customMoods: moods };
+      const payload = { ...form, bank, contact, customMoods: moods };
       const res = await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
       setMsg("Хадгаллаа. Шинэ мэдээлэл сайтад тусгагдана.");
@@ -170,6 +175,39 @@ export function AdminSettings() {
           <div><label className="field-label">Банк</label><input className="input" value={bank.bankName || ""} onChange={(e) => setBank((b) => ({ ...b, bankName: e.target.value }))} placeholder="Хаан банк" /></div>
           <div><label className="field-label">Дансны дугаар</label><input className="input" value={bank.account || ""} onChange={(e) => setBank((b) => ({ ...b, account: e.target.value }))} placeholder="5304611250" /></div>
           <div><label className="field-label">Хүлээн авагч</label><input className="input" value={bank.holder || ""} onChange={(e) => setBank((b) => ({ ...b, holder: e.target.value }))} placeholder="Заяа Бат-Эрдэнэ" /></div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+        <p className="font-display font-semibold text-ink">Холбоо барих мэдээлэл</p>
+        <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">
+          Энд оруулсан мэдээлэл нүүр хуудасны «Бидний тухай», сүнслэг аяллын хуудас болон холбоо барих хэсэгт харагдана.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className="field-label">Утас</label>
+            <input className="input" value={contact.phone} onChange={(e) => setContact((c) => ({ ...c, phone: e.target.value }))} placeholder="+976 9900 0000" />
+          </div>
+          <div>
+            <label className="field-label">Имэйл</label>
+            <input className="input" type="email" value={contact.email} onChange={(e) => setContact((c) => ({ ...c, email: e.target.value }))} placeholder="info@zayasananda.mn" />
+          </div>
+        </div>
+        <div className="mt-3">
+          <label className="field-label">Хаяг</label>
+          <textarea className="textarea" rows={2} value={contact.address} onChange={(e) => setContact((c) => ({ ...c, address: e.target.value }))}
+            placeholder="Улаанбаатар хот, Сүхбаатар дүүрэг, 1-р хороо…" />
+        </div>
+        <div className="mt-3">
+          <label className="field-label">Ажиллах цаг</label>
+          <input className="input" value={contact.hours} onChange={(e) => setContact((c) => ({ ...c, hours: e.target.value }))}
+            placeholder="Да–Ба: 10:00–18:00 · Бя–Ня: амарна" />
+        </div>
+        <div className="mt-3">
+          <label className="field-label">Газрын зургийн хайлт</label>
+          <input className="input" value={contact.mapQuery} onChange={(e) => setContact((c) => ({ ...c, mapQuery: e.target.value }))}
+            placeholder="Zaya's Ananda, Ulaanbaatar" />
+          <p className="mt-1 text-xs text-muted">Google Maps дээр хайх нэр эсвэл хаяг. Хоосон бол газрын зураг харагдахгүй.</p>
         </div>
       </div>
 

@@ -3,12 +3,11 @@ import { getSessionUserId } from "@/lib/auth";
 import { getCmsByIdCached } from "@/lib/repo";
 import { createServiceBooking, takenSlots } from "@/lib/journeys-db";
 import { createNotification, notifyAdmins } from "@/lib/notifications";
+import { SLOTS } from "@/lib/booking-slots";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Ажлын өдөр 10:00–17:00 (18 цагт дуусна) */
-export const SLOTS = ["10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 
 const isWeekday = (d: string) => {
   const day = new Date(d + "T00:00:00").getDay();

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { JourneyBooking, JourneyReview } from "@/lib/types";
+import type { JourneyBooking, JourneyReview, ServiceBooking } from "@/lib/types";
 
 const STATUS_LABEL: Record<JourneyBooking["status"], string> = {
   pending: "Хүлээгдэж буй",
@@ -20,13 +20,14 @@ const STATUS_CLASS: Record<JourneyBooking["status"], string> = {
 export function AdminJourney() {
   const [bookings, setBookings] = useState<JourneyBooking[]>([]);
   const [reviews, setReviews] = useState<JourneyReview[]>([]);
-  const [tab, setTab] = useState<"bookings" | "reviews">("bookings");
+  const [services, setServices] = useState<ServiceBooking[]>([]);
+  const [tab, setTab] = useState<"bookings" | "services" | "reviews">("bookings");
   const [err, setErr] = useState("");
 
   const load = useCallback(() => {
     fetch("/api/admin/journey", { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : { bookings: [], reviews: [] }))
-      .then((d) => { setBookings(d.bookings || []); setReviews(d.reviews || []); })
+      .then((r) => (r.ok ? r.json() : { bookings: [], reviews: [], services: [] }))
+      .then((d) => { setBookings(d.bookings || []); setReviews(d.reviews || []); setServices(d.services || []); })
       .catch(() => {});
   }, []);
   useEffect(() => { load(); }, [load]);
@@ -50,10 +51,10 @@ export function AdminJourney() {
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap gap-2">
-        {([["bookings", "Захиалга"], ["reviews", "Сэтгэгдэл"]] as const).map(([k, l]) => (
+        {([["bookings", "Аяллын захиалга"], ["services", "Заслын цаг"], ["reviews", "Сэтгэгдэл"]] as const).map(([k, l]) => (
           <button key={k} onClick={() => setTab(k)}
             className={"rounded-full px-5 py-2 text-sm font-semibold transition " + (tab === k ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-surface-1 text-ink/70 hover:border-primary-300")}>
-            {l} ({k === "bookings" ? bookings.length : reviews.length})
+            {l} ({k === "bookings" ? bookings.length : k === "services" ? services.length : reviews.length})
           </button>
         ))}
       </div>
@@ -99,6 +100,50 @@ export function AdminJourney() {
                 </tr>
               ))}
               {bookings.length === 0 && <tr><td className="px-4 py-6 text-sm text-muted" colSpan={7}>Захиалга алга.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {tab === "services" && (
+        <div className="card overflow-x-auto">
+          <table className="w-full min-w-[820px]">
+            <thead className="border-b border-line bg-aqua">
+              <tr>
+                {["Огноо", "Цаг", "Үйлчилгээ", "Нэр", "Утас", "Төлөв", "Үйлдэл"].map((h) => (
+                  <th key={h} className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-muted">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {services.map((b) => (
+                <tr key={b.id} className="border-b border-line last:border-0">
+                  <td className="px-4 py-3 text-sm font-semibold text-ink">{b.date}</td>
+                  <td className="px-4 py-3 text-sm font-semibold text-primary-700">{b.time}</td>
+                  <td className="px-4 py-3 text-sm text-ink/80">{b.serviceName}</td>
+                  <td className="px-4 py-3 text-sm text-ink/80">{b.name}</td>
+                  <td className="px-4 py-3 text-sm text-ink/80">{b.phone}</td>
+                  <td className="px-4 py-3">
+                    <span className={"rounded-full px-2.5 py-1 text-xs font-semibold " + STATUS_CLASS[b.status]}>{STATUS_LABEL[b.status]}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-2">
+                      {b.status !== "confirmed" && (
+                        <button onClick={() => patch({ serviceBookingId: b.id, status: "confirmed" })} className="rounded-md bg-jade-400/15 px-2 py-1 text-xs font-semibold text-jade-600 hover:bg-jade-400/25">Баталгаажуулах</button>
+                      )}
+                      {b.status !== "done" && (
+                        <button onClick={() => patch({ serviceBookingId: b.id, status: "done" })} className="rounded-md bg-primary-100 px-2 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-200">Дууссан</button>
+                      )}
+                      {b.status !== "cancelled" && (
+                        <button onClick={() => patch({ serviceBookingId: b.id, status: "cancelled" })} className="rounded-md bg-rose-100 px-2 py-1 text-xs font-semibold text-rose-500 hover:bg-rose-200">Цуцлах</button>
+                      )}
+                      <button onClick={() => remove("serviceBookingId=" + b.id)} className="rounded-md border border-line px-2 py-1 text-xs font-semibold text-ink/60 hover:bg-line/40">Устгах</button>
+                    </div>
+                    {b.note && <p className="mt-1.5 text-xs text-muted">📝 {b.note}</p>}
+                  </td>
+                </tr>
+              ))}
+              {services.length === 0 && <tr><td className="px-4 py-6 text-sm text-muted" colSpan={7}>Цаг захиалга алга.</td></tr>}
             </tbody>
           </table>
         </div>
