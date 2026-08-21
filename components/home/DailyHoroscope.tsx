@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
+import { useZurhaiRules, matchRule } from "@/lib/zurhai-rules";
 import { ZODIAC_SIGNS, zodiacOf, pickIndex, energyScore } from "@/data/daily-horoscope";
 import { WORK_L, LOVE_L, HEALTH_L, ADVICE_L, COLORS_L, DUI } from "@/data/daily-i18n";
 import { DAY_THEMES_L, UI } from "@/data/merge-i18n2";
@@ -28,6 +29,7 @@ function Stars({ n, label }: { n: number; label: string }) {
 /** Өдрийн зурхай — төрсөн он, сар, өдрөө оруулахад тухайн өдрийн тайлал гарна. */
 export function DailyHoroscope() {
   const { tr } = useI18n();
+  const rules = useZurhaiRules();
   const d = (k: string) => tr(DUI[k]);
 
   const now = useMemo(() => new Date(), []);
@@ -122,7 +124,9 @@ export function DailyHoroscope() {
               </div>
             </div>
             <p className="relative z-10 mt-6 font-display text-xl text-white">{tr(reading.theme.t)}</p>
-            <p className="relative z-10 mt-2 text-lg leading-relaxed text-white/90">{tr(reading.theme.s)}</p>
+            <p className="relative z-10 mt-2 text-lg leading-relaxed text-white/90">
+              {matchRule(rules, { zodiacKey: z.key, element: z.element, date: now }) || tr(reading.theme.s)}
+            </p>
           </div>
 
           {/* Эрчмийн хэмжүүр */}

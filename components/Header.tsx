@@ -7,6 +7,7 @@ import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth-context";
 import { useI18n } from "@/lib/i18n";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { NotificationBell } from "./NotificationBell";
 import { Logo } from "./Logo";
 import { cx } from "@/lib/format";
 import { NAV_LINKS as links } from "@/lib/nav-links";
@@ -62,6 +63,7 @@ export function Header() {
             🛒
             {count > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-[20px] place-items-center rounded-full bg-primary px-1 text-[11px] font-bold text-white">{count}</span>}
           </button>
+          <NotificationBell />
           <Link href={user ? "/account" : "/login"} className="grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-primary-50 hover:text-primary-700" aria-label="Account">
             {user ? <span className="grid h-8 w-8 place-items-center rounded-full bg-primary-grad text-sm font-bold text-white">{user.name.charAt(0).toUpperCase()}</span> : "👤"}
           </Link>

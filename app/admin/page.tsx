@@ -11,6 +11,8 @@ import { AdminContentManager } from "@/components/AdminContentManager";
 import { AdminSettings } from "@/components/AdminSettings";
 import { AdminPages } from "@/components/AdminPages";
 import { AdminTeachers } from "@/components/AdminTeachers";
+import { AdminJourney } from "@/components/AdminJourney";
+import { AdminZurhai } from "@/components/AdminZurhai";
 import type { Order, PublicUser, ContactMessage } from "@/lib/types";
 
 const nav: { id: string; k: string; label?: string; icon: string }[] = [
@@ -20,6 +22,8 @@ const nav: { id: string; k: string; label?: string; icon: string }[] = [
   { id: "services", k: "admin.servicesM", label: "Энергийн засал", icon: "star" },
   { id: "courses", k: "admin.coursesM", label: "Ариусахуйн үйл", icon: "award" },
   { id: "products", k: "admin.productsM", label: "Энергийн хамгаалалт", icon: "laptop" },
+  { id: "journey", k: "admin.journeyM", label: "Аяллын захиалга", icon: "calendar" },
+  { id: "zurhai", k: "admin.zurhaiM", label: "Зурхай", icon: "star" },
   { id: "teachers", k: "admin.teachersM", label: "Хамт олон", icon: "user" },
   { id: "gift", k: "admin.giftM", label: "Гэгээн бэлэг", icon: "award" },
   { id: "promos", k: "admin.promosM", label: "Сурталчилгаа", icon: "star" },
@@ -38,6 +42,26 @@ export default function AdminPage() {
   const [cmsCount, setCmsCount] = useState(0);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [confirmDays, setConfirmDays] = useState("30");
+  const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [replyBusy, setReplyBusy] = useState(false);
+  const [replyMsg, setReplyMsg] = useState("");
+  const [replyErr, setReplyErr] = useState("");
+
+  async function sendReply(email: string, subject: string) {
+    setReplyBusy(true); setReplyMsg(""); setReplyErr("");
+    try {
+      const res = await fetch("/api/admin/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, subject, reply: replyText.trim() }),
+      });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
+      setReplyMsg("Мэдэгдэл илгээгдлээ ✓");
+      setReplyText("");
+      setTimeout(() => { setReplyTo(null); setReplyMsg(""); }, 1800);
+    } catch (e) { setReplyErr(e instanceof Error ? e.message : "Алдаа гарлаа."); } finally { setReplyBusy(false); }
+  }
 
   useEffect(() => {
     if (!user) return;
@@ -210,6 +234,8 @@ export default function AdminPage() {
             {tab === "courses" && <AdminContentManager kind="course" />}
             {tab === "products" && <AdminContentManager kind="product" />}
             {tab === "promos" && <AdminContentManager kind="promo" />}
+            {tab === "journey" && <AdminJourney />}
+            {tab === "zurhai" && <AdminZurhai />}
             {tab === "teachers" && <AdminTeachers />}
             {tab === "gift" && <AdminContentManager kind="free" />}
             {tab === "pages" && <AdminPages />}
@@ -217,9 +243,28 @@ export default function AdminPage() {
             {tab === "messages" && (
               <div className="card overflow-x-auto"><table className="w-full min-w-[680px]">
                 <thead className="border-b border-line bg-aqua"><tr><Th>{t("admin.colName")}</Th><Th>{t("admin.colEmail")}</Th><Th>{t("form.phone")}</Th><Th>{t("contact.subject")}</Th><Th>{t("contact.message")}</Th><Th>{t("admin.colDate")}</Th><Th>Үйлдэл</Th></tr></thead>
-                <tbody>{(data?.messages ?? []).map((m) => (<tr key={m.id} className="border-b border-line last:border-0"><Td className="font-medium text-ink">{m.name}</Td><Td>{m.email || "—"}</Td><Td>{m.phone || "—"}</Td><Td>{m.subject}</Td><Td className="max-w-md truncate">{m.message}</Td><Td>{m.createdAt.slice(0, 10)}</Td><Td className="text-right"><button onClick={() => deleteMessage(m.id)} className="text-sm font-semibold text-rose-500 hover:underline">Устгах</button></Td></tr>))}
+                <tbody>{(data?.messages ?? []).map((m) => (<tr key={m.id} className="border-b border-line last:border-0"><Td className="font-medium text-ink">{m.name}</Td><Td>{m.email || "—"}</Td><Td>{m.phone || "—"}</Td><Td>{m.subject}</Td><Td className="max-w-md truncate">{m.message}</Td><Td>{m.createdAt.slice(0, 10)}</Td><Td className="text-right"><div className="flex flex-col items-end gap-1.5"><button onClick={() => setReplyTo(replyTo === m.id ? null : m.id)} className="text-sm font-semibold text-primary-700 hover:underline">{replyTo === m.id ? "Болих" : "Хариу бичих"}</button><button onClick={() => deleteMessage(m.id)} className="text-sm font-semibold text-rose-500 hover:underline">Устгах</button></div></Td></tr>))}
                 {(!data || data.messages.length === 0) && <tr><Td className="text-muted">{t("admin.empty")}</Td></tr>}</tbody>
-              </table></div>
+              </table>
+              {replyTo && (() => {
+                const msg = (data?.messages ?? []).find((x) => x.id === replyTo);
+                if (!msg) return null;
+                return (
+                  <div className="border-t border-line bg-primary-50/50 p-5">
+                    <p className="font-display font-semibold text-ink">{msg.name} — «{msg.subject}»</p>
+                    <p className="mt-1 text-sm text-muted">{msg.email || "имэйлгүй"}</p>
+                    <textarea className="textarea mt-3" rows={4} value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Хариугаа бичнэ үү. Хэрэглэгчид мэдэгдэл болж очно." />
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      <button onClick={() => sendReply(msg.email, msg.subject)} disabled={replyBusy || !replyText.trim()} className="btn btn-primary btn-sm disabled:opacity-60">
+                        {replyBusy ? "Илгээж байна…" : "Мэдэгдэл илгээх"}
+                      </button>
+                      {replyMsg && <span className="text-sm font-semibold text-jade-600">{replyMsg}</span>}
+                      {replyErr && <span className="text-sm text-rose-500">{replyErr}</span>}
+                    </div>
+                  </div>
+                );
+              })()}
+              </div>
             )}
             {tab === "reviews" && (
               <div className="card overflow-x-auto"><table className="w-full min-w-[480px]">

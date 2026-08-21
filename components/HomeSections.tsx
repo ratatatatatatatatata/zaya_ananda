@@ -87,6 +87,24 @@ export async function HomeSections() {
         }))}
       />
 
+      {/* Сэтгэлийн туяа — мэдрэмжүүд шууд харагдана */}
+      <section id="mood" className="section scroll-mt-36 bg-surface-2"><div className="container-px">
+        <div className="relative overflow-hidden rounded-4xl border border-line bg-surface-1 p-8 sm:p-12">
+          <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(240,156,188,0.25), transparent 70%)" }} />
+          <div className="relative z-10">
+            <div className="max-w-2xl">
+              <p className="eyebrow-line"><span>🌅</span></p>
+              <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><T k="nav.mood" /></h2>
+              <p className="mt-3 leading-relaxed text-muted"><Tr v={D.mood} /></p>
+            </div>
+            <div className="mt-8">
+              <MoodPicker />
+            </div>
+          </div>
+        </div>
+      </div></section>
+
       {/* Зурхай — слайдер. Сонгож дарахад доор нь тухайн тайлал нээгдэнэ. */}
       <section id="zurhai" className="section scroll-mt-36"><div className="container-px">
         <ZurhaiSlider cards={settings.zurhaiCards} daily={<DailyHoroscope />} />
@@ -148,24 +166,6 @@ export async function HomeSections() {
         <SectionZoom eyebrow="🎁" title={<T k="nav.gift" />} desc={<Tr v={D.gift} />} href="/gift">
           <ReelsSlider items={free} />
         </SectionZoom>
-      </div></section>
-
-      {/* Сэтгэлийн туяа — мэдрэмжүүд шууд харагдана */}
-      <section id="mood" className="section scroll-mt-36 bg-surface-2"><div className="container-px">
-        <div className="relative overflow-hidden rounded-4xl border border-line bg-surface-1 p-8 sm:p-12">
-          <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full"
-            style={{ background: "radial-gradient(circle, rgba(240,156,188,0.25), transparent 70%)" }} />
-          <div className="relative z-10">
-            <div className="max-w-2xl">
-              <p className="eyebrow-line"><span>🌅</span></p>
-              <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><T k="nav.mood" /></h2>
-              <p className="mt-3 leading-relaxed text-muted"><Tr v={D.mood} /></p>
-            </div>
-            <div className="mt-8">
-              <MoodPicker />
-            </div>
-          </div>
-        </div>
       </div></section>
 
       <VideoBand

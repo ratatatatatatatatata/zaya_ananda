@@ -4,6 +4,7 @@ import { T, Tr } from "../T";
 import { AboutFacts } from "./AboutFacts";
 import { aboutContent, team, faqs } from "@/data/content";
 import { getSettingsCached } from "@/lib/repo";
+import { ContactSection } from "@/components/ContactSection";
 import { signedDownloadUrl } from "@/lib/supabase";
 
 /** Нүүр хуудасны «Бидний тухай» — Бидний тухай цэсний бүх мэдээллийг нэг дор харуулна. */
@@ -134,6 +135,11 @@ export async function HomeAbout() {
         <div className="mt-8 text-center">
           <Link href="/about" className="btn btn-outline btn-md">Бидний тухай бүтэн хуудас →</Link>
         </div>
+      </div>
+
+      {/* Холбоо барих мэдээлэл */}
+      <div className="-mx-4 sm:-mx-6 lg:-mx-8">
+        <ContactSection />
       </div>
     </div>
   );

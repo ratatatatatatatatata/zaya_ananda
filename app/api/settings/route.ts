@@ -53,6 +53,11 @@ export async function PATCH(req: Request) {
             }))
             .filter((m: { key: string; label: string }) => m.key && m.label)
         : undefined,
+      zurhaiRules: Array.isArray(body.zurhaiRules)
+        ? body.zurhaiRules
+            .map((r: Record<string, unknown>) => ({ key: String(r?.key || "").trim(), text: String(r?.text || "").trim() }))
+            .filter((r: { key: string; text: string }) => r.key && r.text)
+        : undefined,
       facebook: str(body.facebook),
       instagram: str(body.instagram),
       youtube: str(body.youtube),

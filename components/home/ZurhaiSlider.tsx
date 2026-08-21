@@ -16,15 +16,6 @@ export const DEFAULT_ZURHAI: ZurhaiCard[] = [
   { emoji: "🔮", title: "Бүтэн зурхай", desc: "Астрологи, тоон судлал, матрикс, Human Design — дөрвөн системийг нэгтгэсэн гүнзгий тайлал.", href: "/merge" },
 ];
 
-/** Карт бүрийн доор гарах «юу хийх вэ» алхмууд */
-const STEPS: Record<Locale, string[]> = {
-  mn: ["Төрсөн он, сар, өдрөө оруулна", "Тайллаа шууд эндээ уншина", "Хүсвэл гүнзгий хувилбарыг нээнэ"],
-  en: ["Enter your birth year, month and day", "Read the result right here", "Open the deeper version if you wish"],
-  ko: ["생년월일을 입력하세요", "결과를 이 자리에서 확인하세요", "원하면 심화 버전을 여세요"],
-  ja: ["生年月日を入力します", "結果はこの場で読めます", "希望すれば詳細版を開けます"],
-  zh: ["输入出生年月日", "结果就在这里查看", "如需可开启深度版本"],
-};
-
 const EYEBROW = Lx("Зурхай", "Astrology", "점성술", "占い", "占星");
 const LEAD = Lx(
   "Хажуу тийш гүйлгэн төрлөө сонгоно уу. «Эхлэх» дарвал доор нь төрсөн огноогоо оруулах хэсэг гарна.",
@@ -36,7 +27,6 @@ const LEAD = Lx(
 const OPEN = Lx("Эхлэх", "Start", "시작", "はじめる", "开始");
 const PREV = Lx("Өмнөх", "Previous", "이전", "前へ", "上一个");
 const NEXT = Lx("Дараах", "Next", "다음", "次へ", "下一个");
-const WHAT = Lx("Юу хийх вэ", "What you'll do", "무엇을 하나요", "何をするか", "你要做什么");
 
 const TONES = [
   { from: "#3B2450", via: "#7A3B2E", to: "#D9762F" },
@@ -51,7 +41,7 @@ export function ZurhaiSlider({ cards, daily }: {
   /** «Өдрийн зурхай» карт сонгогдоход задаргаанд гарах тайлал */
   daily?: ReactNode;
 }) {
-  const { tr, lang } = useI18n();
+  const { tr } = useI18n();
   const list = cards && cards.length ? cards : DEFAULT_ZURHAI;
   const [i, setI] = useState(0);
   const [open, setOpen] = useState(false);
@@ -158,23 +148,10 @@ export function ZurhaiSlider({ cards, daily }: {
 
         {/* Тухайн зурхайн бүтэн хувилбар руу очих */}
         {!isDaily && (
-          <div className="panel mt-6 p-6 sm:p-8">
-            <p className="text-xs font-bold uppercase tracking-wide text-primary-700">{tr(WHAT)}</p>
-            <ol className="mt-4 grid gap-4 sm:grid-cols-3">
-              {STEPS[lang].map((step, k) => (
-                <li key={k} className="flex gap-3">
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-100 font-display text-sm font-bold text-primary-700">
-                    {k + 1}
-                  </span>
-                  <span className="text-[0.98rem] leading-relaxed text-ink/85">{step}</span>
-                </li>
-              ))}
-            </ol>
-            <div className="mt-6">
-              <Link href={c.href} className="btn btn-primary btn-md">
-                {c.emoji} {c.title} →
-              </Link>
-            </div>
+          <div className="mt-6 text-center">
+            <Link href={c.href} className="btn btn-primary btn-md">
+              {c.emoji} {c.title} →
+            </Link>
           </div>
         )}
       </div>

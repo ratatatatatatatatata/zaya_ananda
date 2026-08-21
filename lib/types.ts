@@ -142,6 +142,49 @@ export interface ContactMessage {
   createdAt: string;
 }
 
+/** Хэрэглэгчид очих мэдэгдэл */
+export interface Notification {
+  id: string;
+  userId: string;
+  kind: "reply" | "expiry" | "booking" | "system";
+  title: string;
+  body?: string | null;
+  link?: string | null;
+  dedupeKey?: string | null;
+  read: boolean;
+  createdAt: string;
+}
+
+/** Сүнслэг аяллын захиалга */
+export interface JourneyBooking {
+  id: string;
+  userId?: string | null;
+  slug: string;
+  journeyName: string;
+  /** Аялах өдөр — YYYY-MM-DD */
+  date: string;
+  people: number;
+  name: string;
+  phone: string;
+  email: string;
+  note?: string | null;
+  status: "pending" | "confirmed" | "done" | "cancelled";
+  createdAt: string;
+}
+
+/** Аяллын дараах сэтгэгдэл */
+export interface JourneyReview {
+  id: string;
+  userId?: string | null;
+  slug: string;
+  name: string;
+  rating: number;
+  text: string;
+  /** Админаас сонгосон эсэх — зөвхөн сонгогдсон нь нийтэд харагдана */
+  featured: boolean;
+  createdAt: string;
+}
+
 export interface EventItem {
   id: string;
   type: L;
@@ -188,6 +231,8 @@ export interface SiteSettings {
   zurhaiCards?: { emoji: string; title: string; desc: string; href: string }[];
   /** Админаас нэмсэн нэмэлт мэдрэмжүүд (Сэтгэлийн туяа) */
   customMoods?: { key: string; emoji: string; label: string }[];
+  /** Зурхайн тайллын гар бичвэрүүд — түлхүүр: zodiac:leo, life:7, arcana:12, day:mon, element:fire */
+  zurhaiRules?: { key: string; text: string }[];
   facebook?: string;
   instagram?: string;
   youtube?: string;

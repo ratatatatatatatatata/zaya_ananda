@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { JOURNEYS, journeyBySlug, JOURNEY_FAQ } from "@/data/journeys";
 import { JourneyImage } from "@/components/journey/SceneArt";
 import { LeadCard, CrewRow } from "@/components/journey/PersonCard";
+import { JourneyBooking } from "@/components/journey/JourneyBooking";
+import { JourneyReviews } from "@/components/journey/JourneyReviews";
 
 export const revalidate = 600;
 
@@ -46,6 +48,7 @@ export default function JourneyPage({ params }: { params: { slug: string } }) {
           {[
             { id: "hutulbur", label: "Өдөр өдрийн хөтөлбөр" },
             { id: "baga", label: "Хариуцах баг" },
+            { id: "zahialga", label: "Цаг захиалах" },
             { id: "faq", label: "Асуулт хариулт" },
           ].map((n) => (
             <a key={n.id} href={"#" + n.id} className="shrink-0 whitespace-nowrap text-sm font-semibold text-white/70 transition hover:text-primary-300">{n.label}</a>
@@ -127,6 +130,23 @@ export default function JourneyPage({ params }: { params: { slug: string } }) {
               {j.crew.map((c) => <CrewRow key={c.name} person={c} />)}
             </div>
           </div>
+        </div>
+
+        {/* Аялсан хүмүүсийн сэтгэгдэл */}
+        <JourneyReviews slug={j.slug} />
+      </div></section>
+
+      {/* Цаг захиалга */}
+      <section id="zahialga" className="section scroll-mt-32 bg-surface-2"><div className="container-px">
+        <div className="max-w-2xl">
+          <p className="eyebrow-line"><span>🗓</span></p>
+          <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl">Аялах өдрөө сонгож захиалах</h2>
+          <p className="mt-3 leading-relaxed text-muted">
+            Хуанлиас өдрөө сонгоод бүртгүүлээрэй. Админ баталгаажуулсны дараа танд мэдэгдэл ирнэ.
+          </p>
+        </div>
+        <div className="mt-8">
+          <JourneyBooking slug={j.slug} journeyName={j.name} />
         </div>
       </div></section>
 

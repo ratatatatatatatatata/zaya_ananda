@@ -230,14 +230,14 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
               <div className="flex flex-wrap items-center gap-3">
                 {images.map((img, i) => (
                   <div key={i} className="relative">
-                    <img src={img} alt="" className={"rounded-xl object-cover " + (isPromo ? "h-20 w-40" : "h-24 w-32")} />
+                    <img src={img} alt="" className={"rounded-xl object-cover " + (isPromo ? "h-40 w-full max-w-md" : "h-24 w-32")} />
                     <button type="button" onClick={() => setImages((arr) => arr.filter((_, x) => x !== i))}
                       className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs font-bold text-white shadow">✕</button>
                     {i === 0 && images.length > 1 && <span className="absolute bottom-1 left-1 rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-bold text-primary-700">Нүүр</span>}
                   </div>
                 ))}
                 {(multiImage ? images.length < MAX_IMAGES : images.length === 0) && (
-                  <label className={"grid cursor-pointer place-items-center rounded-xl border border-dashed border-line text-2xl text-muted hover:bg-white/10" + (isPromo ? "h-20 w-40" : "h-24 w-32")}>
+                  <label className={"grid cursor-pointer place-items-center rounded-xl border border-dashed border-line text-2xl text-muted hover:bg-white/10 " + (isPromo ? "h-40 w-full max-w-md" : "h-24 w-32")}>
                     🖼+
                     <input type="file" accept="image/*" multiple={multiImage} onChange={addImage} className="hidden" />
                   </label>
