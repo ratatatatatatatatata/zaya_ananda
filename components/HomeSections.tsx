@@ -12,7 +12,8 @@ import { SectionJump } from "./home/SectionJump";
 import { SectionZoom } from "./home/SectionZoom";
 import { ZurhaiSlider } from "./home/ZurhaiSlider";
 import { ServiceCard } from "./home/ServiceCard";
-import { AboutFacts } from "./home/AboutFacts";
+import { HomeAbout } from "./home/HomeAbout";
+import { MoodPicker } from "./home/MoodPicker";
 import { JourneyImage } from "./journey/SceneArt";
 import { JOURNEYS } from "@/data/journeys";
 import type { Locale } from "@/lib/types";
@@ -27,8 +28,6 @@ const JOURNEY_DESC = Lx(
   "現在申し込み受付中の旅です。選ぶと日ごとの行程と同行チームが表示されます。",
   "目前开放报名的行程。点选后可查看逐日安排与随行团队。",
 );
-
-const MOODBTN = Lx("Мэдрэмжээ сонгох", "Choose your mood", "기분 고르기", "気分を選ぶ", "选择心情");
 
 /** Хэсэг бүрийн товч, ойлгомжтой танилцуулга */
 const D = {
@@ -70,6 +69,7 @@ export async function HomeSections() {
     listCmsCached("service"), listCmsCached("course"),
     listCmsCached("free"), getSettingsCached(), heroMediaFor("band"),
   ]);
+
 
   return (
     <>
@@ -150,23 +150,22 @@ export async function HomeSections() {
         </SectionZoom>
       </div></section>
 
-      {/* Сэтгэлийн туяа — хуудасны хамгийн доод хэсэг */}
+      {/* Сэтгэлийн туяа — мэдрэмжүүд шууд харагдана */}
       <section id="mood" className="section scroll-mt-36 bg-surface-2"><div className="container-px">
         <div className="relative overflow-hidden rounded-4xl border border-line bg-surface-1 p-8 sm:p-12">
           <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full"
             style={{ background: "radial-gradient(circle, rgba(240,156,188,0.25), transparent 70%)" }} />
-          <div className="relative z-10 max-w-2xl">
-            <p className="eyebrow-line"><span>🌅</span></p>
-            <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><T k="nav.mood" /></h2>
-            <p className="mt-3 leading-relaxed text-muted"><Tr v={D.mood} /></p>
-            <Link href="/mood" className="btn btn-primary btn-lg mt-7"><Tr v={MOODBTN} /> →</Link>
+          <div className="relative z-10">
+            <div className="max-w-2xl">
+              <p className="eyebrow-line"><span>🌅</span></p>
+              <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><T k="nav.mood" /></h2>
+              <p className="mt-3 leading-relaxed text-muted"><Tr v={D.mood} /></p>
+            </div>
+            <div className="mt-8">
+              <MoodPicker />
+            </div>
           </div>
         </div>
-      </div></section>
-
-      {/* Бидний тухай — анхаарал татах жижиг баримтууд */}
-      <section id="about" className="section scroll-mt-36"><div className="container-px">
-        <AboutFacts />
       </div></section>
 
       <VideoBand
@@ -176,6 +175,11 @@ export async function HomeSections() {
         author="Zaya's Ananda"
         cta={{ href: "/about", label: "Бидний тухай" }}
       />
+
+      {/* Бидний тухай — ишлэлийн зурвасын дараа, бүх мэдээллээрээ */}
+      <section id="about" className="section scroll-mt-36"><div className="container-px">
+        <HomeAbout />
+      </div></section>
 
     </>
   );

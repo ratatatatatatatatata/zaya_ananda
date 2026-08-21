@@ -52,6 +52,7 @@ export function AdminSettings() {
   const [form, setForm] = useState(EMPTY);
   const [bank, setBank] = useState<BankInfo>(EMPTY_BANK);
   const [zurhai, setZurhai] = useState<{ emoji: string; title: string; desc: string; href: string }[]>([]);
+  const [moods, setMoods] = useState<{ key: string; emoji: string; label: string }[]>([]);
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
@@ -70,6 +71,7 @@ export function AdminSettings() {
         });
         if (s.bank) setBank({ ...EMPTY_BANK, ...s.bank });
         if (Array.isArray(s.zurhaiCards)) setZurhai(s.zurhaiCards);
+        if (Array.isArray(s.customMoods)) setMoods(s.customMoods);
       })
       .catch(() => {});
   }, []);
@@ -89,7 +91,7 @@ export function AdminSettings() {
     e.preventDefault();
     setSaving(true); setErr(""); setMsg("");
     try {
-      const payload = { ...form, bank, zurhaiCards: zurhai };
+      const payload = { ...form, bank, zurhaiCards: zurhai, customMoods: moods };
       const res = await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
       setMsg("Хадгаллаа. Шинэ мэдээлэл сайтад тусгагдана.");
@@ -160,6 +162,38 @@ export function AdminSettings() {
             </div>
           ))}
           {zurhai.length === 0 && <p className="text-sm text-muted">Одоогоор нэмээгүй — өгөгдмөл 3 төрөл харагдаж байна.</p>}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="font-display font-semibold text-ink">Сэтгэлийн туяа — нэмэлт мэдрэмжүүд</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted">
+              Системийн үндсэн 9 мэдрэмж дээр нэмж өөрийн мэдрэмж үүсгэнэ. Энд нэмсэн мэдрэмж «Сэтгэлийн туяа» хэсэг
+              болон контент нэмэх хуудсанд шууд гарч ирнэ.
+            </p>
+          </div>
+          <button type="button" onClick={() => setMoods((m) => [...m, { key: "mood-" + (m.length + 1), emoji: "✨", label: "" }])} className="btn btn-outline btn-sm">
+            + Мэдрэмж нэмэх
+          </button>
+        </div>
+
+        <div className="mt-4 space-y-2.5">
+          {moods.map((m, i) => (
+            <div key={i} className="flex flex-wrap items-center gap-2 rounded-xl border border-line bg-surface-1 px-3 py-2.5">
+              <input className="input w-16 text-center" value={m.emoji} maxLength={4}
+                onChange={(e) => setMoods((z) => z.map((x, k) => (k === i ? { ...x, emoji: e.target.value } : x)))} />
+              <input className="input min-w-[12rem] flex-1" placeholder="Мэдрэмжийн нэр — ж: Урам хугарсан" value={m.label}
+                onChange={(e) => setMoods((z) => z.map((x, k) => (k === i ? { ...x, label: e.target.value } : x)))} />
+              <input className="input w-40" placeholder="Түлхүүр (латинаар)" value={m.key}
+                onChange={(e) => setMoods((z) => z.map((x, k) => (k === i ? { ...x, key: e.target.value.trim() } : x)))} />
+              <button type="button" onClick={() => setMoods((z) => z.filter((_, k) => k !== i))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">
+                Устгах
+              </button>
+            </div>
+          ))}
+          {moods.length === 0 && <p className="text-sm text-muted">Одоогоор нэмэлт мэдрэмж алга — үндсэн 9 мэдрэмж ажиллаж байна.</p>}
         </div>
       </div>
 

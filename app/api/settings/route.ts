@@ -44,6 +44,15 @@ export async function PATCH(req: Request) {
             }))
             .filter((c: { title: string }) => c.title)
         : undefined,
+      customMoods: Array.isArray(body.customMoods)
+        ? body.customMoods
+            .map((m: Record<string, unknown>) => ({
+              key: String(m?.key || "").trim() || String(m?.label || "").trim().toLowerCase().replace(/\s+/g, "-"),
+              emoji: String(m?.emoji || "✨"),
+              label: String(m?.label || "").trim(),
+            }))
+            .filter((m: { key: string; label: string }) => m.key && m.label)
+        : undefined,
       facebook: str(body.facebook),
       instagram: str(body.instagram),
       youtube: str(body.youtube),

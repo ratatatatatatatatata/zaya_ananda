@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { formatMNT } from "@/lib/format";
 import { RichTextEditor } from "@/components/RichTextEditor";
-import { SERVICE_GROUPS, COURSE_CATS, MOODS, COURSE_LEVELS } from "@/data/cms-taxonomy";
+import { SERVICE_GROUPS, COURSE_CATS, COURSE_LEVELS } from "@/data/cms-taxonomy";
+import { useMoods } from "@/lib/moods";
+import { embedSrc } from "@/lib/video-embed";
 import type { CmsItem, TeacherPreset, CmsTranslations } from "@/lib/types";
 
 function compressImage(file: File, maxW = 1200, quality = 0.82): Promise<string> {
@@ -70,6 +72,7 @@ type LessonRow = { title: string; path: string; url?: string; quality: string; s
 const MAX_IMAGES = 3;
 
 export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
+  const MOODS = useMoods();
   const [items, setItems] = useState<CmsItem[]>([]);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -269,10 +272,27 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
                       {l.uploading && <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-line"><div className="h-full bg-primary-500 transition-all" style={{ width: (l.progress ?? 0) + "%" }} /></div>}
                     </div>
                     {!l.path && !l.uploading && (
-                      <div className="flex items-center gap-2 pl-9">
-                        <span className="shrink-0 text-xs font-medium text-muted">эсвэл YouTube линк:</span>
-                        <input className="input flex-1 !py-1.5 text-sm" placeholder="https://www.youtube.com/watch?v=... эсвэл https://youtu.be/..." value={l.url || ""} onChange={(e) => updLesson(idx, { url: e.target.value })} />
-                        {(l.url || "").trim() && <span className="shrink-0 text-sm font-medium text-jade-600">✓</span>}
+                      <div className="pl-9">
+                        <div className="flex items-center gap-2">
+                          <span className="shrink-0 text-xs font-medium text-muted">YouTube / Shorts линк:</span>
+                          <input className="input flex-1 !py-1.5 text-sm" placeholder="https://www.youtube.com/watch?v=… эсвэл https://youtu.be/… эсвэл /shorts/…" value={l.url || ""} onChange={(e) => updLesson(idx, { url: e.target.value })} />
+                        </div>
+                        {(() => {
+                          const e2 = embedSrc((l.url || "").trim());
+                          if (!(l.url || "").trim() || e2.type !== "iframe") {
+                            return (l.url || "").trim()
+                              ? <p className="mt-1.5 text-xs font-semibold text-rose-500">Линк танигдсангүй — YouTube эсвэл Vimeo хаяг оруулна уу.</p>
+                              : null;
+                          }
+                          return (
+                            <div className="mt-2 flex flex-wrap items-center gap-3">
+                              <span className="text-xs font-semibold text-jade-600">✓ Бичлэг танигдлаа</span>
+                              <div className="overflow-hidden rounded-xl border border-line">
+                                <iframe src={e2.src} title="preview" className="h-[7.5rem] w-[13.5rem]" allow="encrypted-media" allowFullScreen />
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
                     <div className="flex flex-wrap items-center gap-2 pl-9">

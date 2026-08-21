@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { CmsCard } from "@/components/CmsCard";
 import { T } from "@/components/T";
-import { MOODS } from "@/data/cms-taxonomy";
+import { useMoods } from "@/lib/moods";
 import { useI18n } from "@/lib/i18n";
 import { cx } from "@/lib/format";
 import type { CmsItem } from "@/lib/types";
@@ -17,6 +17,7 @@ const NONE = Lx("Энэ мэдрэмжид тохирох контент одо�
 
 export default function MoodPage() {
   const { lang, tr } = useI18n();
+  const MOODS = useMoods();
   const [items, setItems] = useState<CmsItem[]>([]);
   const [mood, setMood] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);

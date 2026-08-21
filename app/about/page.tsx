@@ -1,7 +1,5 @@
 import { VideoHero } from "@/components/video/VideoHero";
 import { heroMediaFor } from "@/lib/hero-video";
-import { CtaBand } from "@/components/CtaBand";
-import { CalmBand } from "@/components/CalmBand";
 import { SectionHeading } from "@/components/ui";
 import { GlyphTile } from "@/components/GlyphTile";
 import { Reveal } from "@/components/Reveal";
@@ -133,9 +131,6 @@ export default async function AboutPage() {
       </section>
 
       <ContactSection />
-
-      <CalmBand />
-      <CtaBand />
     </>
   );
 }

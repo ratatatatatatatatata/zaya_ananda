@@ -3,6 +3,7 @@ import { VideoHero } from "@/components/video/VideoHero";
 import { heroMediaFor } from "@/lib/hero-video";
 import { JOURNEYS, JOURNEY_FAQ } from "@/data/journeys";
 import { JourneyImage } from "@/components/journey/SceneArt";
+import { ContactSection } from "@/components/ContactSection";
 
 export const metadata = {
   title: "Сүнслэг аялал — Spiritual Journey Mongolia",
@@ -225,11 +226,10 @@ export default async function AyalalPage() {
             </details>
           ))}
         </div>
-        <div className="mt-10 text-center">
-          <p className="text-muted">Өөр асуулт байна уу?</p>
-          <Link href="/about#contact" className="btn btn-outline btn-md mt-4">Бидэнтэй холбогдох</Link>
-        </div>
       </div></section>
+
+      {/* Холбоо барих — аяллын тухай асуухад бэлэн */}
+      <ContactSection />
     </>
   );
 }

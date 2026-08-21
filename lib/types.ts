@@ -186,6 +186,8 @@ export interface SiteSettings {
   heroMedia?: Record<string, { kind: "video" | "image"; src: string }>;
   /** Нүүр хуудасны «Зурхай» слайдерын картууд */
   zurhaiCards?: { emoji: string; title: string; desc: string; href: string }[];
+  /** Админаас нэмсэн нэмэлт мэдрэмжүүд (Сэтгэлийн туяа) */
+  customMoods?: { key: string; emoji: string; label: string }[];
   facebook?: string;
   instagram?: string;
   youtube?: string;
