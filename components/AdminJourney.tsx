@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { JourneyBooking, JourneyReview, ServiceBooking } from "@/lib/types";
+import type { JourneyBooking, JourneyReview, Order, ServiceBooking } from "@/lib/types";
+import type { CmsItem } from "@/lib/types";
+import { SLOTS } from "@/lib/booking-slots";
 
 const STATUS_LABEL: Record<JourneyBooking["status"], string> = {
   pending: "Хүлээгдэж буй",
@@ -17,12 +19,18 @@ const STATUS_CLASS: Record<JourneyBooking["status"], string> = {
 };
 
 /** Аяллын захиалга ба сэтгэгдлийн удирдлага. */
-export function AdminJourney() {
+export function AdminJourney({ courseOrders = [], onOrderStatus, onDeleteOrder }: {
+  courseOrders?: Order[];
+  onOrderStatus?: (id: string, status: string, days?: string) => void;
+  onDeleteOrder?: (id: string) => void;
+}) {
   const [bookings, setBookings] = useState<JourneyBooking[]>([]);
   const [reviews, setReviews] = useState<JourneyReview[]>([]);
   const [services, setServices] = useState<ServiceBooking[]>([]);
-  const [tab, setTab] = useState<"bookings" | "services" | "reviews">("bookings");
+  const [tab, setTab] = useState<"bookings" | "services" | "courses" | "reviews">("bookings");
   const [err, setErr] = useState("");
+  const [serviceItems, setServiceItems] = useState<CmsItem[]>([]);
+  const [manual, setManual] = useState({ itemId: "", date: "", time: "", name: "", phone: "", note: "" });
 
   const load = useCallback(() => {
     fetch("/api/admin/journey", { cache: "no-store" })
@@ -31,6 +39,23 @@ export function AdminJourney() {
       .catch(() => {});
   }, []);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    fetch("/api/admin/content", { cache: "no-store" }).then((r) => r.json())
+      .then((d) => setServiceItems((d.items || []).filter((i: CmsItem) => i.kind === "service"))).catch(() => {});
+  }, []);
+
+  async function blockSlot(e: React.FormEvent) {
+    e.preventDefault();
+    setErr("");
+    const item = serviceItems.find((i) => i.id === manual.itemId);
+    const res = await fetch("/api/admin/journey", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...manual, serviceName: item?.title || "" }),
+    });
+    if (!res.ok) { const d = await res.json().catch(() => ({})); setErr(d.error || "Алдаа гарлаа."); return; }
+    setManual({ itemId: "", date: "", time: "", name: "", phone: "", note: "" });
+    load();
+  }
 
   async function patch(body: Record<string, unknown>) {
     setErr("");
@@ -51,10 +76,10 @@ export function AdminJourney() {
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap gap-2">
-        {([["bookings", "Аяллын захиалга"], ["services", "Заслын цаг"], ["reviews", "Сэтгэгдэл"]] as const).map(([k, l]) => (
+        {([["bookings", "Аяллын захиалга"], ["services", "Заслын цаг"], ["courses", "Сургалтын захиалга"], ["reviews", "Аяллын сэтгэгдэл"]] as const).map(([k, l]) => (
           <button key={k} onClick={() => setTab(k)}
             className={"rounded-full px-5 py-2 text-sm font-semibold transition " + (tab === k ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-surface-1 text-ink/70 hover:border-primary-300")}>
-            {l} ({k === "bookings" ? bookings.length : k === "services" ? services.length : reviews.length})
+            {l} ({k === "bookings" ? bookings.length : k === "services" ? services.length : k === "courses" ? courseOrders.length : reviews.length})
           </button>
         ))}
       </div>
@@ -106,7 +131,19 @@ export function AdminJourney() {
       )}
 
       {tab === "services" && (
-        <div className="card overflow-x-auto">
+        <div className="space-y-4">
+          <form onSubmit={blockSlot} className="card grid gap-3 p-4 md:grid-cols-3">
+            <div className="md:col-span-3"><h3 className="font-display font-semibold text-ink">Админаас цаг захиалгатай болгох</h3><p className="mt-1 text-sm text-muted">Утсаар авсан захиалга эсвэл хаах шаардлагатай цагийг энд бүртгэнэ.</p></div>
+            <select required className="input" value={manual.itemId} onChange={(e) => setManual({ ...manual, itemId: e.target.value })}>
+              <option value="">Үйлчилгээ сонгох</option>{serviceItems.map((i) => <option key={i.id} value={i.id}>{i.title}</option>)}
+            </select>
+            <input required type="date" className="input" value={manual.date} onChange={(e) => setManual({ ...manual, date: e.target.value })} />
+            <select required className="input" value={manual.time} onChange={(e) => setManual({ ...manual, time: e.target.value })}><option value="">Цаг сонгох</option>{SLOTS.map((s) => <option key={s}>{s}</option>)}</select>
+            <input className="input" placeholder="Захиалагчийн нэр (заавал биш)" value={manual.name} onChange={(e) => setManual({ ...manual, name: e.target.value })} />
+            <input className="input" placeholder="Утас (заавал биш)" value={manual.phone} onChange={(e) => setManual({ ...manual, phone: e.target.value })} />
+            <button className="btn btn-primary btn-sm" type="submit">Захиалгатай болгох</button>
+          </form>
+          <div className="card overflow-x-auto">
           <table className="w-full min-w-[820px]">
             <thead className="border-b border-line bg-aqua">
               <tr>
@@ -144,6 +181,26 @@ export function AdminJourney() {
                 </tr>
               ))}
               {services.length === 0 && <tr><td className="px-4 py-6 text-sm text-muted" colSpan={7}>Цаг захиалга алга.</td></tr>}
+            </tbody>
+          </table>
+          </div>
+        </div>
+      )}
+
+      {tab === "courses" && (
+        <div className="card overflow-x-auto">
+          <table className="w-full min-w-[760px]">
+            <thead className="border-b border-line bg-aqua"><tr>{["Огноо", "Сургалт", "Нэр", "Утас", "Дүн", "Төлөв", "Үйлдэл"].map((h) => <th key={h} className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-muted">{h}</th>)}</tr></thead>
+            <tbody>
+              {courseOrders.map((o) => <tr key={o.id} className="border-b border-line last:border-0">
+                <td className="px-4 py-3 text-sm text-ink/80">{o.createdAt.slice(0, 10)}</td>
+                <td className="px-4 py-3 text-sm font-semibold text-ink">{o.items.filter((i) => i.kind === "course").map((i) => i.title).join(", ")}</td>
+                <td className="px-4 py-3 text-sm text-ink/80">{o.customer.name}</td><td className="px-4 py-3 text-sm text-ink/80">{o.customer.phone || "—"}</td>
+                <td className="px-4 py-3 text-sm font-semibold text-ink">{o.total.toLocaleString("mn-MN")}₮</td>
+                <td className="px-4 py-3"><span className="rounded-full bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-700">{o.status === "pending" ? "Хүлээгдэж буй" : o.status === "paid" ? "Баталгаажсан" : "Цуцалсан"}</span></td>
+                <td className="px-4 py-3"><div className="flex flex-wrap gap-2">{o.status === "pending" && <button onClick={() => onOrderStatus?.(o.id, "paid", "30")} className="rounded-md bg-jade-400/15 px-2 py-1 text-xs font-semibold text-jade-600">Баталгаажуулах</button>}{o.status !== "cancelled" && <button onClick={() => onOrderStatus?.(o.id, "cancelled")} className="rounded-md bg-rose-100 px-2 py-1 text-xs font-semibold text-rose-500">Цуцлах</button>}<button onClick={() => onDeleteOrder?.(o.id)} className="rounded-md border border-line px-2 py-1 text-xs font-semibold text-ink/60">Устгах</button></div></td>
+              </tr>)}
+              {courseOrders.length === 0 && <tr><td colSpan={7} className="px-4 py-6 text-sm text-muted">Сургалтын захиалга алга.</td></tr>}
             </tbody>
           </table>
         </div>
