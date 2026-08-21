@@ -18,11 +18,10 @@ import type { Order, PublicUser, ContactMessage } from "@/lib/types";
 const nav: { id: string; k: string; label?: string; icon: string }[] = [
   { id: "overview", k: "admin.overview", icon: "sparkles" },
   { id: "users", k: "admin.users", icon: "user" },
-  { id: "orders", k: "admin.orders", icon: "calendar" },
+  { id: "orders", k: "admin.orders", label: "Захиалгууд", icon: "calendar" },
   { id: "services", k: "admin.servicesM", label: "Энергийн засал", icon: "star" },
   { id: "courses", k: "admin.coursesM", label: "Ариусахуйн үйл", icon: "award" },
   { id: "products", k: "admin.productsM", label: "Энергийн хамгаалалт", icon: "laptop" },
-  { id: "journey", k: "admin.journeyM", label: "Аяллын захиалга", icon: "calendar" },
   { id: "zurhai", k: "admin.zurhaiM", label: "Зурхай", icon: "star" },
   { id: "teachers", k: "admin.teachersM", label: "Хамт олон", icon: "user" },
   { id: "gift", k: "admin.giftM", label: "Гэгээн бэлэг", icon: "award" },
@@ -40,8 +39,6 @@ export default function AdminPage() {
   const [data, setData] = useState<{ stats: any; users: PublicUser[]; orders: Order[]; messages: ContactMessage[] } | null>(null);
   const [denied, setDenied] = useState(false);
   const [cmsCount, setCmsCount] = useState(0);
-  const [confirmId, setConfirmId] = useState<string | null>(null);
-  const [confirmDays, setConfirmDays] = useState("30");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [replyBusy, setReplyBusy] = useState(false);
@@ -207,34 +204,13 @@ export default function AdminPage() {
             )}
 
             {tab === "orders" && (
-              <div className="card overflow-x-auto">
-                <table className="w-full min-w-[640px]">
-                  <thead className="border-b border-line bg-aqua"><tr><Th>#</Th><Th>{t("admin.colName")}</Th><Th>{t("admin.colEmail")}</Th><Th>{t("form.phone")}</Th><Th>{t("admin.colItems")}</Th><Th>{t("admin.colAmount")}</Th><Th>{t("admin.colStatus")}</Th></tr></thead>
-                  <tbody>
-                    {(data?.orders ?? []).map((o) => (
-                      <tr key={o.id} className="border-b border-line last:border-0"><Td className="font-mono text-xs text-primary-700">{o.id.slice(0, 6).toUpperCase()}</Td><Td>{o.customer.name}</Td><Td>{o.customer.email}</Td><Td>{o.customer.phone || "—"}</Td><Td>{o.items.map((i) => i.title).join(", ")}</Td><Td className="font-semibold text-ink">{formatMNT(o.total)}</Td><Td><div className="flex flex-col gap-1.5">
-                    <span className={cx("w-fit rounded-full px-2.5 py-1 text-xs font-semibold", o.status === "paid" ? "bg-jade-400/15 text-jade-600" : o.status === "cancelled" ? "bg-rose-100 text-rose-500" : "bg-amber-100 text-amber-600")}>{t("status." + o.status)}</span>
-                    {o.status === "paid" && o.expiresAt && (Math.ceil((new Date(o.expiresAt).getTime() - Date.now()) / 86400000) > 0
-                      ? <span className="w-fit text-xs font-semibold text-primary-700">⏳ {Math.ceil((new Date(o.expiresAt).getTime() - Date.now()) / 86400000)} хоног үлдсэн</span>
-                      : <span className="w-fit rounded-full bg-rose-100 px-2.5 py-1 text-xs font-semibold text-rose-500">Эрх дууслаа</span>)}
-                    {confirmId === o.id ? (
-                      <div className="flex items-center gap-1.5"><input type="number" value={confirmDays} onChange={(e) => setConfirmDays(e.target.value)} className="w-16 rounded-md border border-line px-2 py-1 text-xs outline-none focus:border-primary-400" /><span className="text-xs text-muted">хоног</span><button onClick={() => { setOrderStatus(o.id, "paid", confirmDays); setConfirmId(null); }} className="rounded-md bg-jade-400/15 px-2 py-1 text-xs font-semibold text-jade-600 hover:bg-jade-400/25">Батлах</button><button onClick={() => setConfirmId(null)} className="text-xs text-muted hover:text-ink">Болих</button></div>
-                    ) : (
-                      <div className="flex flex-wrap gap-1.5">{o.status === "pending" && <button onClick={() => { setConfirmId(o.id); setConfirmDays("30"); }} className="rounded-md bg-jade-400/15 px-2 py-1 text-xs font-semibold text-jade-600 hover:bg-jade-400/25">Баталгаажуулах</button>}{o.status !== "cancelled" && <button onClick={() => setOrderStatus(o.id, "cancelled")} className="rounded-md bg-rose-100 px-2 py-1 text-xs font-semibold text-rose-500 hover:bg-rose-200">Цуцлах</button>}<button onClick={() => deleteOrder(o.id)} className="rounded-md border border-line px-2 py-1 text-xs font-semibold text-ink/60 hover:bg-line/40">Устгах</button></div>
-                    )}
-                  </div></Td></tr>
-                    ))}
-                    {(!data || data.orders.length === 0) && <tr><Td className="text-muted">{t("admin.empty")}</Td></tr>}
-                  </tbody>
-                </table>
-              </div>
+              <AdminJourney courseOrders={(data?.orders ?? []).filter((o) => o.items.some((i) => i.kind === "course"))} onOrderStatus={setOrderStatus} onDeleteOrder={deleteOrder} />
             )}
 
             {tab === "services" && <AdminContentManager kind="service" />}
             {tab === "courses" && <AdminContentManager kind="course" />}
             {tab === "products" && <AdminContentManager kind="product" />}
             {tab === "promos" && <AdminContentManager kind="promo" />}
-            {tab === "journey" && <AdminJourney />}
             {tab === "zurhai" && <AdminZurhai />}
             {tab === "teachers" && <AdminTeachers />}
             {tab === "gift" && <AdminContentManager kind="free" />}
