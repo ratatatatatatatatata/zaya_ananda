@@ -1,14 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { siteConfig } from "@/data/content";
 import { useI18n } from "@/lib/i18n";
+
+type ContactInfo = { phone?: string; email?: string; address?: string; hours?: string; mapQuery?: string };
 
 /** Холбоо барих хэсэг — "Бидний тухай" хуудсанд нэгтгэгдсэн. */
 export function ContactSection() {
   const { t, tr } = useI18n();
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState("");
+  /** Админаас оруулсан холбоо барих мэдээлэл — байхгүй бол өгөгдмөл рүү шилжинэ. */
+  const [cfg, setCfg] = useState<ContactInfo>({});
+
+  useEffect(() => {
+    fetch("/api/settings", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d?.settings?.contact) setCfg(d.settings.contact); })
+      .catch(() => {});
+  }, []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -31,14 +42,20 @@ export function ContactSection() {
     }
   }
 
-  const digits = siteConfig.phone.replace(/\D/g, "");
-  const mapUrl = "https://www.google.com/maps?q=" + encodeURIComponent(siteConfig.mapQuery);
+  const phone = cfg.phone?.trim() || siteConfig.phone;
+  const email = cfg.email?.trim() || siteConfig.email;
+  const address = cfg.address?.trim() || tr(siteConfig.address);
+  const hours = cfg.hours?.trim() || tr(siteConfig.workingHours);
+  const mapQuery = cfg.mapQuery?.trim() || siteConfig.mapQuery;
+
+  const digits = phone.replace(/\D/g, "");
+  const mapUrl = "https://www.google.com/maps?q=" + encodeURIComponent(mapQuery);
   const mapEmbed = mapUrl + "&z=17&output=embed";
   const info = [
-    { icon: "📞", label: t("form.phone"), value: siteConfig.phone, href: "tel:" + digits },
-    { icon: "✉️", label: t("form.email"), value: siteConfig.email, href: "mailto:" + siteConfig.email },
-    { icon: "📍", label: t("contact.address"), value: tr(siteConfig.address), href: mapUrl },
-    { icon: "🕒", label: t("contact.hours"), value: tr(siteConfig.workingHours), href: "" },
+    { icon: "📞", label: t("form.phone"), value: phone, href: "tel:" + digits },
+    { icon: "✉️", label: t("form.email"), value: email, href: "mailto:" + email },
+    { icon: "📍", label: t("contact.address"), value: address, href: mapUrl },
+    { icon: "🕒", label: t("contact.hours"), value: hours, href: "" },
   ];
 
   return (
