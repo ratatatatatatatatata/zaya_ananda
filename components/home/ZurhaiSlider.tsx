@@ -27,8 +27,8 @@ const STEPS: Record<Locale, string[]> = {
 
 const EYEBROW = Lx("Зурхай", "Astrology", "점성술", "占い", "占星");
 const LEAD = Lx(
-  "Хажуу тийш гүйлгэн төрлөө сонгоно уу. Дарахад доор нь юу хийхийг харуулна.",
-  "Slide sideways to choose a type. Tap it and the steps appear below.",
+  "Хажуу тийш гүйлгэн төрлөө сонгоно уу. «Эхлэх» дарвал доор нь төрсөн огноогоо оруулах хэсэг гарна.",
+  "Slide sideways to choose a type. Tap Start and the birth-date form opens below.",
   "옆으로 밀어 유형을 고르세요. 누르면 아래에 단계가 나타납니다.",
   "横にスライドして種類を選び、押すと下に手順が表示されます。",
   "左右滑动选择类型，点击后下方会显示步骤。",
@@ -153,9 +153,11 @@ export function ZurhaiSlider({ cards, daily }: {
         className="overflow-hidden transition-[max-height,opacity] duration-500 ease-out"
         style={{ maxHeight: open ? "500rem" : 0, opacity: open ? 1 : 0 }}
       >
-        {isDaily && daily ? (
-          <div className="mt-2">{daily}</div>
-        ) : (
+        {/* Төрсөн он, сар, өдрөө оруулах хэсэг — үргэлж эндээ гарна */}
+        {daily && <div className="mt-2">{daily}</div>}
+
+        {/* Тухайн зурхайн бүтэн хувилбар руу очих */}
+        {!isDaily && (
           <div className="panel mt-6 p-6 sm:p-8">
             <p className="text-xs font-bold uppercase tracking-wide text-primary-700">{tr(WHAT)}</p>
             <ol className="mt-4 grid gap-4 sm:grid-cols-3">

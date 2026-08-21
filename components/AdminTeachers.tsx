@@ -36,7 +36,16 @@ export function AdminTeachers() {
   useEffect(() => {
     fetch("/api/settings", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (Array.isArray(d?.settings?.teachers)) setTeachers(d.settings.teachers); })
+      .then((d) => {
+        const st = d?.settings;
+        if (!st) return;
+        // Хуучин «team» бичлэгүүдийг мөн оруулж ирнэ — нэрээр давхардлыг арилгана
+        const list: TeacherPreset[] = Array.isArray(st.teachers) ? [...st.teachers] : [];
+        for (const m of Array.isArray(st.team) ? st.team : []) {
+          if (m?.name && !list.some((t) => t.name === m.name)) list.push(m as TeacherPreset);
+        }
+        setTeachers(list);
+      })
       .catch(() => {});
   }, []);
 
@@ -51,7 +60,7 @@ export function AdminTeachers() {
     try {
       const res = await fetch("/api/settings", {
         method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ teachers: teachers.filter((t) => t.name?.trim()) }),
+        body: JSON.stringify({ teachers: teachers.filter((t) => t.name?.trim()), team: [] }),
       });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
       setMsg("Хадгаллаа. «Хамт олон» хуудсанд шинэчлэгдлээ.");
