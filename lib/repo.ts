@@ -176,7 +176,7 @@ export async function getSettings(): Promise<SiteSettings> {
     const rows = await sbSelect<SiteSettings>("site_settings", "id=eq.main&limit=1");
     const r = (rows[0] || {}) as SiteSettings;
     return {
-      logo: r.logo, aboutTitle: r.aboutTitle, aboutBody: r.aboutBody, aboutVideo: r.aboutVideo, heroVideos: r.heroVideos, heroMedia: r.heroMedia, zurhaiCards: r.zurhaiCards, customMoods: r.customMoods, zurhaiRules: r.zurhaiRules, contact: r.contact,
+      logo: r.logo, aboutTitle: r.aboutTitle, aboutBody: r.aboutBody, aboutVideo: r.aboutVideo, heroVideos: r.heroVideos, heroMedia: r.heroMedia, zurhaiCards: r.zurhaiCards, customMoods: r.customMoods, zurhaiRules: r.zurhaiRules, contact: r.contact, servicePrepay: r.servicePrepay,
       facebook: r.facebook, instagram: r.instagram, youtube: r.youtube,
       team: Array.isArray(r.team) ? r.team : [],
       teachers: Array.isArray(r.teachers) ? r.teachers : [],

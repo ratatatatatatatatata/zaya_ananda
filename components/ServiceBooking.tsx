@@ -27,6 +27,24 @@ export function ServiceBooking({ itemId, serviceName }: { itemId: string; servic
   const [done, setDone] = useState(false);
   const [err, setErr] = useState("");
 
+  /** Урьдчилгаа төлбөр ба дансны мэдээлэл — админы тохиргооноос */
+  const [prepay, setPrepay] = useState(0);
+  const [bank, setBank] = useState<{ bankName?: string; account?: string; holder?: string }>({});
+  useEffect(() => {
+    fetch("/api/settings", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!d?.settings) return;
+        setPrepay(Number(d.settings.servicePrepay) || 0);
+        if (d.settings.bank) setBank(d.settings.bank);
+      })
+      .catch(() => {});
+  }, []);
+
+  const money = (n: number) => n.toLocaleString("mn-MN") + "₮";
+  /** Гүйлгээний утга — админ таних кодтой */
+  const payRef = (form.phone || "").replace(/\D/g, "").slice(-8);
+
   const grid = useMemo(() => ({
     total: daysIn(calY, calM),
     lead: (new Date(calY, calM - 1, 1).getDay() + 6) % 7,
@@ -74,8 +92,44 @@ export function ServiceBooking({ itemId, serviceName }: { itemId: string; servic
         <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-jade-400/15 text-2xl text-jade-600">✓</div>
         <p className="mt-3 font-display text-lg font-semibold text-ink">Цаг захиаллаа</p>
         <p className="mt-1.5 text-sm leading-relaxed text-muted">
-          <b>{date}</b> {time} — «{serviceName}». Админ баталгаажуулсны дараа{user ? " мэдэгдэл ирнэ." : " бид тантай холбогдоно."}
+          <b>{date}</b> {time} — «{serviceName}».
         </p>
+
+        {prepay > 0 ? (
+          <div className="mt-5 rounded-2xl border-2 border-primary-400/50 bg-primary-50/50 p-5 text-left">
+            <p className="text-center font-display text-base font-semibold text-ink">
+              Урьдчилгаа <span className="text-primary-700">{money(prepay)}</span>
+            </p>
+            <p className="mt-1 text-center text-xs leading-relaxed text-muted">
+              Доорх данс руу шилжүүлснээр таны цаг баталгаажна.
+            </p>
+            <dl className="mt-4 space-y-2 text-sm">
+              {bank.bankName && (
+                <div className="flex justify-between gap-3"><dt className="text-muted">Банк</dt><dd className="font-semibold text-ink">{bank.bankName}</dd></div>
+              )}
+              {bank.account && (
+                <div className="flex justify-between gap-3"><dt className="text-muted">Данс</dt><dd className="font-semibold text-ink">{bank.account}</dd></div>
+              )}
+              {bank.holder && (
+                <div className="flex justify-between gap-3"><dt className="text-muted">Хүлээн авагч</dt><dd className="font-semibold text-ink">{bank.holder}</dd></div>
+              )}
+              <div className="flex justify-between gap-3 border-t border-line pt-2">
+                <dt className="text-muted">Гүйлгээний утга</dt>
+                <dd className="font-semibold text-primary-700">{payRef || form.name}</dd>
+              </div>
+            </dl>
+            {!bank.account && (
+              <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                Дансны мэдээлэл оруулаагүй байна — бид тантай утсаар холбогдож төлбөрийн мэдээллийг өгнө.
+              </p>
+            )}
+          </div>
+        ) : (
+          <p className="mt-3 text-sm leading-relaxed text-muted">
+            Админ баталгаажуулсны дараа{user ? " мэдэгдэл ирнэ." : " бид тантай холбогдоно."}
+          </p>
+        )}
+
         {user && <Link href="/account" className="btn btn-outline btn-sm mt-4">Миний булан →</Link>}
       </div>
     );
@@ -87,6 +141,12 @@ export function ServiceBooking({ itemId, serviceName }: { itemId: string; servic
       <p className="mt-2 text-sm leading-relaxed text-muted">
         Ажлын өдрүүдэд <b className="text-ink">10:00–18:00</b> цагийн хооронд хүлээн авна.
       </p>
+      {prepay > 0 && (
+        <p className="mt-3 rounded-xl bg-primary-50 px-4 py-2.5 text-sm leading-relaxed text-ink/85">
+          💳 Цаг баталгаажуулахад <b className="text-primary-700">{money(prepay)}</b> урьдчилгаа шаардана.
+          Захиалга илгээсний дараа дансны мэдээлэл харагдана.
+        </p>
+      )}
 
       {/* Хуанли */}
       <div className="mt-5 rounded-2xl border border-line p-4">

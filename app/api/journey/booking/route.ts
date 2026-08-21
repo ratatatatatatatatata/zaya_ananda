@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth";
 import { createBooking, listBookingsByUser } from "@/lib/journeys-db";
 import { journeyBySlug } from "@/data/journeys";
-import { createNotification } from "@/lib/notifications";
+import { createNotification, notifyAdmins } from "@/lib/notifications";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -38,6 +38,15 @@ export async function POST(req: Request) {
       userId: uid, slug, journeyName: journey.name, date, people, name, phone, email,
       note: b?.note ? String(b.note) : "",
     });
+
+    // Бүх админд мэдэгдэнэ
+    await notifyAdmins({
+      kind: "booking",
+      title: "Шинэ аяллын захиалга — " + journey.name,
+      body: `${date} · ${people} хүн · ${name} · ${phone}`,
+      link: "/admin",
+      dedupeKey: "jbooking:" + booking.id,
+    }).catch(() => null);
 
     if (uid) {
       await createNotification({

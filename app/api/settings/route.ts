@@ -67,6 +67,7 @@ export async function PATCH(req: Request) {
             mapQuery: str(body.contact.mapQuery),
           }
         : undefined,
+      servicePrepay: body.servicePrepay !== undefined ? Math.max(0, Number(body.servicePrepay) || 0) : undefined,
       facebook: str(body.facebook),
       instagram: str(body.instagram),
       youtube: str(body.youtube),

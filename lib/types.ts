@@ -253,6 +253,8 @@ export interface SiteSettings {
   zurhaiRules?: { key: string; text: string }[];
   /** Холбоо барих мэдээлэл — админаас шинэчилнэ */
   contact?: { phone?: string; email?: string; address?: string; hours?: string; mapQuery?: string };
+  /** Энергийн заслын цаг захиалгын урьдчилгаа төлбөр (₮). 0 бол урьдчилгаа авахгүй. */
+  servicePrepay?: number;
   facebook?: string;
   instagram?: string;
   youtube?: string;

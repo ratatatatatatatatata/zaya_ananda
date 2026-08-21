@@ -12,7 +12,6 @@ import { SectionZoom } from "./home/SectionZoom";
 import { ZurhaiSlider } from "./home/ZurhaiSlider";
 import { ServiceCard } from "./home/ServiceCard";
 import { HomeAbout } from "./home/HomeAbout";
-import { MoodPicker } from "./home/MoodPicker";
 import { JourneyImage } from "./journey/SceneArt";
 import { JOURNEYS } from "@/data/journeys";
 import type { Locale } from "@/lib/types";
@@ -48,12 +47,6 @@ const D = {
     "생년월일을 입력해 나의 탄생석과 맞는 제품을 찾아보세요.",
     "生年月日から守護石と相性の良い製品を見つけましょう。",
     "输入出生日期，找到你的宝石与匹配产品。"),
-  mood: Lx(
-    "Өнөөдөр сэтгэл тань ямар байна? Мэдрэмжээ сонгоход яг танд хэрэгтэйг санал болгоно.",
-    "How do you feel today? Pick a mood and we'll suggest exactly what you need.",
-    "오늘 기분은 어떠신가요? 기분을 고르면 꼭 맞는 것을 추천합니다.",
-    "今日の気分は？選ぶとぴったりの内容をご提案します。",
-    "今天心情如何？选择心情，为你推荐最合适的内容。"),
   gift: Lx(
     "Үнэгүй нээлттэй хичээлүүд — эхлэхэд тань зориулсан бэлэг. Бүртгэлгүйгээр үзнэ.",
     "Free open lessons — a gift to help you begin. No registration needed.",
@@ -82,24 +75,6 @@ export async function HomeSections() {
           level: c.level || "anhan",
         }))}
       />
-
-      {/* Сэтгэлийн туяа — мэдрэмжүүд шууд харагдана */}
-      <section id="mood" className="section scroll-mt-36 bg-surface-2"><div className="container-px">
-        <div className="relative overflow-hidden rounded-4xl border border-line bg-surface-1 p-8 sm:p-12">
-          <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full"
-            style={{ background: "radial-gradient(circle, rgba(240,156,188,0.25), transparent 70%)" }} />
-          <div className="relative z-10">
-            <div className="max-w-2xl">
-              <p className="eyebrow-line"><span>🌅</span></p>
-              <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><T k="nav.mood" /></h2>
-              <p className="mt-3 leading-relaxed text-muted"><Tr v={D.mood} /></p>
-            </div>
-            <div className="mt-8">
-              <MoodPicker />
-            </div>
-          </div>
-        </div>
-      </div></section>
 
       {/* Зурхай — слайдер. Сонгож дарахад доор нь тухайн тайлал нээгдэнэ. */}
       <section id="zurhai" className="section scroll-mt-36"><div className="container-px">

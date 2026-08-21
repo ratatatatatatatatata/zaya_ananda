@@ -55,6 +55,7 @@ export function AdminSettings() {
   const [form, setForm] = useState(EMPTY);
   const [bank, setBank] = useState<BankInfo>(EMPTY_BANK);
   const [contact, setContact] = useState<ContactInfo>(EMPTY_CONTACT);
+  const [prepay, setPrepay] = useState("");
   const [moods, setMoods] = useState<{ key: string; emoji: string; label: string }[]>([]);
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
@@ -74,6 +75,7 @@ export function AdminSettings() {
         });
         if (s.bank) setBank({ ...EMPTY_BANK, ...s.bank });
         if (s.contact) setContact({ ...EMPTY_CONTACT, ...s.contact });
+        if (s.servicePrepay) setPrepay(String(s.servicePrepay));
         if (Array.isArray(s.customMoods)) setMoods(s.customMoods);
       })
       .catch(() => {});
@@ -94,7 +96,7 @@ export function AdminSettings() {
     e.preventDefault();
     setSaving(true); setErr(""); setMsg("");
     try {
-      const payload = { ...form, bank, contact, customMoods: moods };
+      const payload = { ...form, bank, contact, servicePrepay: Number(prepay) || 0, customMoods: moods };
       const res = await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
       setMsg("Хадгаллаа. Шинэ мэдээлэл сайтад тусгагдана.");
@@ -175,6 +177,19 @@ export function AdminSettings() {
           <div><label className="field-label">Банк</label><input className="input" value={bank.bankName || ""} onChange={(e) => setBank((b) => ({ ...b, bankName: e.target.value }))} placeholder="Хаан банк" /></div>
           <div><label className="field-label">Дансны дугаар</label><input className="input" value={bank.account || ""} onChange={(e) => setBank((b) => ({ ...b, account: e.target.value }))} placeholder="5304611250" /></div>
           <div><label className="field-label">Хүлээн авагч</label><input className="input" value={bank.holder || ""} onChange={(e) => setBank((b) => ({ ...b, holder: e.target.value }))} placeholder="Заяа Бат-Эрдэнэ" /></div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+        <p className="font-display font-semibold text-ink">Энергийн заслын урьдчилгаа төлбөр</p>
+        <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">
+          Цаг захиалахад шаардах урьдчилгаа дүн. Захиалагчид дансны мэдээлэл, гүйлгээний утга харагдана.
+          <b className="text-ink"> 0</b> бол урьдчилгаа авахгүй.
+        </p>
+        <div className="max-w-xs">
+          <label className="field-label">Урьдчилгаа дүн (₮)</label>
+          <input className="input" inputMode="numeric" value={prepay}
+            onChange={(e) => setPrepay(e.target.value.replace(/[^\d]/g, ""))} placeholder="20000" />
         </div>
       </div>
 

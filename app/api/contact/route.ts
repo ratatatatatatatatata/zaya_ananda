@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createMessage } from "@/lib/repo";
+import { notifyAdmins } from "@/lib/notifications";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,5 +19,14 @@ export async function POST(req: Request) {
     subject: subject ? String(subject) : "Холбоо барих хүсэлт",
     message: String(message),
   });
+  // Бүх админд мэдэгдэнэ
+  await notifyAdmins({
+    kind: "system",
+    title: "Шинэ зурвас — " + msg.name,
+    body: [msg.subject, msg.phone || msg.email].filter(Boolean).join(" · "),
+    link: "/admin",
+    dedupeKey: "msg:" + msg.id,
+  }).catch(() => null);
+
   return NextResponse.json({ ok: true, id: msg.id });
 }
