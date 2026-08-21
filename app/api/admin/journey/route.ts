@@ -5,6 +5,7 @@ import {
   listBookings, setBookingStatus, deleteBooking,
   listReviews, setReviewFeatured, deleteReview, listFeaturedReviews,
   listServiceBookings, setServiceBookingStatus, deleteServiceBooking,
+  createServiceBooking, takenSlots,
 } from "@/lib/journeys-db";
 import { createNotification } from "@/lib/notifications";
 
@@ -24,6 +25,37 @@ export async function GET() {
     return NextResponse.json({ bookings, reviews, services });
   } catch {
     return NextResponse.json({ bookings: [], reviews: [], services: [] });
+  }
+}
+
+export async function POST(req: Request) {
+  if (!(await guard())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const b = await req.json().catch(() => ({}));
+  const itemId = String(b?.itemId || "");
+  const serviceName = String(b?.serviceName || "").trim();
+  const date = String(b?.date || "");
+  const time = String(b?.time || "");
+  if (!itemId || !serviceName || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) {
+    return NextResponse.json({ error: "Үйлчилгээ, өдөр, цагийг бүрэн сонгоно уу." }, { status: 400 });
+  }
+  try {
+    if ((await takenSlots(itemId, date)).includes(time)) {
+      return NextResponse.json({ error: "Энэ цаг аль хэдийн захиалгатай байна." }, { status: 409 });
+    }
+    await createServiceBooking({
+      userId: null,
+      itemId,
+      serviceName,
+      date,
+      time,
+      name: String(b?.name || "Админаас хаасан цаг"),
+      phone: String(b?.phone || "—"),
+      note: String(b?.note || "Админ гараар захиалгатай болгосон"),
+      status: "confirmed",
+    });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Алдаа" }, { status: 500 });
   }
 }
 
@@ -47,7 +79,17 @@ export async function PATCH(req: Request) {
     }
 
     if (b?.serviceBookingId && b?.status) {
-      await setServiceBookingStatus(String(b.serviceBookingId), String(b.status));
+      const updated = await setServiceBookingStatus(String(b.serviceBookingId), String(b.status));
+      if (updated?.userId && b.status === "confirmed") {
+        await createNotification({
+          userId: updated.userId,
+          kind: "booking",
+          title: "«" + updated.serviceName + "» цаг баталгаажлаа",
+          body: updated.date + " " + updated.time + " — уулзацгаая!",
+          link: "/account",
+          dedupeKey: "service-confirm:" + updated.id,
+        }).catch(() => null);
+      }
       return NextResponse.json({ ok: true });
     }
 
