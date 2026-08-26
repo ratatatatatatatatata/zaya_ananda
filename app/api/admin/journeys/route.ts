@@ -50,7 +50,7 @@ function parseItinerary(raw: any) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseInput(body: any) {
   return {
-    slug: str(body.slug) || slugify(str(body.name)),
+    slug: slugify(str(body.slug)) || slugify(str(body.name)),
     name: str(body.name),
     tagline: str(body.tagline),
     scene: asScene(body.scene),

@@ -1,19 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JOURNEY_FAQ, JOURNEY_PREP } from "@/data/journeys";
-import { listJourneysCached, getJourneyBySlugCached } from "@/lib/journeys-db";
+import { getJourneyBySlugCached } from "@/lib/journeys-db";
 import { JourneyImage } from "@/components/journey/SceneArt";
 import { LeadCard, CrewRow } from "@/components/journey/PersonCard";
 import { JourneyBooking } from "@/components/journey/JourneyBooking";
 import { JourneyReviews } from "@/components/journey/JourneyReviews";
 import { ContactSection } from "@/components/ContactSection";
 
-export const revalidate = 600;
-
-export async function generateStaticParams() {
-  const journeys = await listJourneysCached().catch(() => []);
-  return journeys.map((j) => ({ slug: j.slug }));
-}
+// Админ шинэ аялал нэмэнгүүт (эсвэл slug өөрчлөгдөнгүүт) шууд нээгдэж харагдахын тулд
+// статик param урьдчилан үүсгэхийг больж, хүсэлт болгонд шинэчлэн уншина (доод давхаргад unstable_cache 5 минут кэшилнэ).
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const j = await getJourneyBySlugCached(params.slug).catch(() => null);
