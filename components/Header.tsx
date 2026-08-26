@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth-context";
 import { useI18n } from "@/lib/i18n";
@@ -15,11 +15,14 @@ import { NAV_LINKS as links } from "@/lib/nav-links";
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { count, open } = useCart();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { t, lang } = useI18n();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
   const [logo, setLogo] = useState<string>();
   const [customPages, setCustomPages] = useState<{ id: string; navLabel: string; i18n?: Record<string, { navLabel?: string }> | null }[]>([]);
   const pageLabel = (p: { navLabel: string; i18n?: Record<string, { navLabel?: string }> | null }) =>
@@ -31,7 +34,14 @@ export function Header() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-  useEffect(() => { setMenuOpen(false); }, [pathname]);
+  useEffect(() => { setMenuOpen(false); setAccountOpen(false); }, [pathname]);
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) setAccountOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, []);
   useEffect(() => { fetch("/api/settings", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((d) => { if (d?.settings?.logo) setLogo(d.settings.logo); }).catch(() => {}); }, []);
   useEffect(() => { fetch("/api/pages", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((d) => { if (Array.isArray(d?.pages)) setCustomPages(d.pages); }).catch(() => {}); }, []);
 
@@ -64,9 +74,43 @@ export function Header() {
             {count > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-[20px] place-items-center rounded-full bg-primary px-1 text-[11px] font-bold text-white">{count}</span>}
           </button>
           <NotificationBell />
-          <Link href={user ? "/account" : "/login"} className="grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-primary-50 hover:text-primary-700" aria-label="Account">
-            {user ? <span className="grid h-8 w-8 place-items-center rounded-full bg-primary-grad text-sm font-bold text-white">{user.name.charAt(0).toUpperCase()}</span> : "👤"}
-          </Link>
+          {user ? (
+            <div ref={accountRef} className="relative">
+              <button
+                onClick={() => setAccountOpen((o) => !o)}
+                className="grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-primary-50 hover:text-primary-700"
+                aria-label="Account"
+                aria-expanded={accountOpen}
+              >
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-primary-grad text-sm font-bold text-white">{user.name.charAt(0).toUpperCase()}</span>
+              </button>
+              {accountOpen && (
+                <div className="absolute right-0 z-50 mt-2 w-52 overflow-hidden rounded-2xl border border-line bg-surface-1 p-1.5 shadow-lift">
+                  <p className="truncate px-3 py-2 text-sm font-semibold text-ink">{user.name}</p>
+                  <div className="my-1 border-t border-line" />
+                  <Link href="/account" onClick={() => setAccountOpen(false)}
+                    className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-ink/80 transition hover:bg-primary-50 hover:text-primary-700">
+                    👤 {t("nav.account")}
+                  </Link>
+                  {user.isAdmin && (
+                    <Link href="/admin" onClick={() => setAccountOpen(false)}
+                      className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-ink/80 transition hover:bg-primary-50 hover:text-primary-700">
+                      ⚙ {t("admin.title")}
+                    </Link>
+                  )}
+                  <div className="my-1 border-t border-line" />
+                  <button
+                    onClick={() => { setAccountOpen(false); logout().then(() => router.push("/")); }}
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm text-rose-600 transition hover:bg-rose-50"
+                  >
+                    ⏻ {t("account.logout")}
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link href="/login" className="grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-primary-50 hover:text-primary-700" aria-label="Account">👤</Link>
+          )}
           <button onClick={() => setMenuOpen((o) => !o)} className="grid h-10 w-10 place-items-center rounded-full text-ink/80 xl:hidden" aria-label="Menu">{menuOpen ? "✕" : "☰"}</button>
         </div>
       </div>
@@ -86,8 +130,14 @@ export function Header() {
               {pageLabel(p)}
             </Link>
           ))}
-          <div className="mt-2">
+          <div className="mt-2 flex flex-col gap-2">
             <Link href={user ? "/account" : "/login"} className="btn btn-outline btn-md w-full">{user ? t("nav.account") : t("auth.login")}</Link>
+            {user?.isAdmin && <Link href="/admin" className="btn btn-outline btn-md w-full">⚙ {t("admin.title")}</Link>}
+            {user && (
+              <button onClick={() => logout().then(() => router.push("/"))} className="btn btn-outline btn-md w-full text-rose-600">
+                ⏻ {t("account.logout")}
+              </button>
+            )}
           </div>
           <div className="mt-2"><LanguageSwitcher /></div>
         </nav>

@@ -14,7 +14,7 @@ export function Footer() {
   useEffect(() => { fetch("/api/settings", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((d) => { if (d?.settings) setSettings(d.settings); }).catch(() => {}); }, []);
   const cols = [
     { title: t("nav.services"), links: [
-      { href: "/services", label: t("common.allServices") },
+      { href: "/services", label: t("nav.services") },
       { href: "/courses", label: t("nav.courses") },
       { href: "/ayalal", label: t("nav.journey") },
       { href: "/shop", label: t("nav.shop") },
