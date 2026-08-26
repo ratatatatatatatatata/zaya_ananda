@@ -13,7 +13,7 @@ import { ZurhaiSlider } from "./home/ZurhaiSlider";
 import { ServiceCard } from "./home/ServiceCard";
 import { HomeAbout } from "./home/HomeAbout";
 import { JourneyImage } from "./journey/SceneArt";
-import { JOURNEYS } from "@/data/journeys";
+import { listJourneysCached } from "@/lib/journeys-db";
 import type { Locale } from "@/lib/types";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
@@ -57,9 +57,10 @@ const D = {
 
 /** Нүүр хуудас — хэсэг бүр товч мэдээлэл, шууд орох товчтой. */
 export async function HomeSections() {
-  const [services, courses, free, settings, bandMedia] = await Promise.all([
+  const [services, courses, free, settings, bandMedia, JOURNEYS] = await Promise.all([
     listCmsCached("service"), listCmsCached("course"),
     listCmsCached("free"), getSettingsCached(), heroMediaFor("band"),
+    listJourneysCached().catch(() => []),
   ]);
 
 
@@ -128,7 +129,7 @@ export async function HomeSections() {
                 </div>
                 <div className="p-6">
                   <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-muted">
-                    <span>🗓 {j.days}</span><span>👥 {j.group}</span><span>⛺ {j.stay}</span>
+                    <span>🗓 {j.days}</span><span>👥 {j.groupSize}</span><span>⛺ {j.stay}</span>
                   </div>
                   <p className="mt-3 leading-relaxed text-muted">{j.summary}</p>
                 </div>

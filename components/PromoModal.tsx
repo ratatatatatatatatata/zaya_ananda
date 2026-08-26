@@ -95,7 +95,7 @@ export function PromoModal() {
       onClick={close}
     >
       <div
-        className="animate-fade-rise w-full max-w-3xl overflow-hidden rounded-3xl bg-surface-1 shadow-[0_40px_100px_-30px_rgba(0,0,0,0.6)]"
+        className="animate-fade-rise w-full max-w-5xl overflow-hidden rounded-3xl bg-surface-1 shadow-[0_40px_100px_-30px_rgba(0,0,0,0.6)]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative p-4 sm:p-5">
@@ -113,9 +113,9 @@ export function PromoModal() {
           <Wrap p={main} className="block overflow-hidden rounded-2xl">
             <div className="relative">
               {main.image ? (
-                <img src={main.image} alt={mainTitle} className="max-h-[22rem] w-full object-cover" />
+                <img src={main.image} alt={mainTitle} className="max-h-[32rem] w-full object-cover" />
               ) : (
-                <div className="grid min-h-[14rem] w-full place-items-center px-6 text-center"
+                <div className="grid min-h-[20rem] w-full place-items-center px-6 text-center"
                   style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#155248 55%,#2BC8BB)" }}>
                   <p className="font-display text-2xl font-semibold text-white sm:text-3xl">{mainTitle}</p>
                 </div>
@@ -142,9 +142,9 @@ export function PromoModal() {
                 return (
                   <Wrap key={p.id} p={p} className="group block overflow-hidden rounded-2xl border border-line bg-surface-2 transition hover:-translate-y-0.5 hover:shadow-sm">
                     {p.image ? (
-                      <img src={p.image} alt={t} className="h-24 w-full object-cover transition duration-500 group-hover:scale-105" />
+                      <img src={p.image} alt={t} className="h-32 w-full object-cover transition duration-500 group-hover:scale-105" />
                     ) : (
-                      <div className="h-24 w-full" style={{ backgroundImage: "linear-gradient(140deg,#0F2B26,#2BC8BB)" }} />
+                      <div className="h-32 w-full" style={{ backgroundImage: "linear-gradient(140deg,#0F2B26,#2BC8BB)" }} />
                     )}
                     {t && <p className="px-3 py-2.5 text-sm font-semibold text-ink">{t}</p>}
                   </Wrap>

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth";
-import { createBooking, listBookingsByUser } from "@/lib/journeys-db";
-import { journeyBySlug } from "@/data/journeys";
+import { createBooking, listBookingsByUser, getJourneyBySlugCached } from "@/lib/journeys-db";
 import { createNotification, notifyAdmins } from "@/lib/notifications";
 
 export const runtime = "nodejs";
@@ -28,7 +27,7 @@ export async function POST(req: Request) {
   const email = String(b?.email || "").trim();
   const people = Math.max(1, Math.min(20, Number(b?.people) || 1));
 
-  const journey = journeyBySlug(slug);
+  const journey = await getJourneyBySlugCached(slug).catch(() => null);
   if (!journey) return NextResponse.json({ error: "Аялал олдсонгүй." }, { status: 404 });
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return NextResponse.json({ error: "Огноогоо сонгоно уу." }, { status: 400 });
   if (!name || !phone) return NextResponse.json({ error: "Нэр, утсаа оруулна уу." }, { status: 400 });

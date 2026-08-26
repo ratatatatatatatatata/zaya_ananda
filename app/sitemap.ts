@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { listCmsCached, listPagesCached } from "@/lib/repo";
-import { JOURNEYS } from "@/data/journeys";
+import { listJourneysCached } from "@/lib/journeys-db";
 
 export const revalidate = 3600;
 
@@ -26,8 +26,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { p: "/register", pr: 0.3, ch: "monthly" },
   ];
 
-  for (const j of JOURNEYS) staticPaths.push({ p: "/ayalal/" + j.slug, pr: 0.8, ch: "monthly" });
-
   const now = new Date();
   const out: MetadataRoute.Sitemap = staticPaths.map((s) => ({
     url: BASE + s.p,
@@ -37,6 +35,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   try {
+    const journeys = await listJourneysCached();
+    for (const j of journeys) out.push({ url: `${BASE}/ayalal/${j.slug}`, lastModified: j.createdAt ? new Date(j.createdAt) : now, changeFrequency: "monthly", priority: 0.8 });
+
     const kinds = ["service", "course", "product", "resource", "free"] as const;
     for (const k of kinds) {
       const items = await listCmsCached(k);

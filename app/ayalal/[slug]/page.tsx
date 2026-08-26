@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { JOURNEYS, journeyBySlug, JOURNEY_FAQ, JOURNEY_PREP } from "@/data/journeys";
+import { JOURNEY_FAQ, JOURNEY_PREP } from "@/data/journeys";
+import { listJourneysCached, getJourneyBySlugCached } from "@/lib/journeys-db";
 import { JourneyImage } from "@/components/journey/SceneArt";
 import { LeadCard, CrewRow } from "@/components/journey/PersonCard";
 import { JourneyBooking } from "@/components/journey/JourneyBooking";
@@ -9,18 +10,19 @@ import { ContactSection } from "@/components/ContactSection";
 
 export const revalidate = 600;
 
-export function generateStaticParams() {
-  return JOURNEYS.map((j) => ({ slug: j.slug }));
+export async function generateStaticParams() {
+  const journeys = await listJourneysCached().catch(() => []);
+  return journeys.map((j) => ({ slug: j.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const j = journeyBySlug(params.slug);
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+  const j = await getJourneyBySlugCached(params.slug).catch(() => null);
   if (!j) return { title: "Аялал олдсонгүй" };
   return { title: `${j.name} — Сүнслэг аялал`, description: j.summary };
 }
 
-export default function JourneyPage({ params }: { params: { slug: string } }) {
-  const j = journeyBySlug(params.slug);
+export default async function JourneyPage({ params }: { params: { slug: string } }) {
+  const j = await getJourneyBySlugCached(params.slug).catch(() => null);
   if (!j) notFound();
 
   return (
@@ -38,7 +40,7 @@ export default function JourneyPage({ params }: { params: { slug: string } }) {
           <h1 className="mt-3 max-w-3xl text-balance font-display text-4xl font-semibold leading-tight text-white sm:text-5xl">{j.name}</h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/85">{j.summary}</p>
           <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/75">
-            <span>🗓 {j.days}</span><span>👥 {j.group}</span><span>🚌 {j.transport}</span><span>⛺ {j.stay}</span>
+            <span>🗓 {j.days}</span><span>👥 {j.groupSize}</span><span>🚌 {j.transport}</span><span>⛺ {j.stay}</span>
           </div>
         </div>
       </section>
@@ -148,7 +150,7 @@ export default function JourneyPage({ params }: { params: { slug: string } }) {
           </p>
         </div>
         <div className="mt-8">
-          <JourneyBooking slug={j.slug} journeyName={j.name} />
+          <JourneyBooking slug={j.slug} journeyName={j.name} prepay={j.prepay} />
         </div>
       </div></section>
 

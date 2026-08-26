@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { VideoHero } from "@/components/video/VideoHero";
 import { heroMediaFor } from "@/lib/hero-video";
-import { JOURNEYS, JOURNEY_FAQ } from "@/data/journeys";
+import { JOURNEY_FAQ } from "@/data/journeys";
+import { listJourneysCached } from "@/lib/journeys-db";
 import { JourneyImage } from "@/components/journey/SceneArt";
 import { ContactSection } from "@/components/ContactSection";
 
@@ -57,7 +58,7 @@ const PLACES = [
 ];
 
 export default async function AyalalPage() {
-  const heroMedia = await heroMediaFor("ayalal");
+  const [heroMedia, JOURNEYS] = await Promise.all([heroMediaFor("ayalal"), listJourneysCached().catch(() => [])]);
   return (
     <>
       {/* Ариун хөндий — гэрлийн зам дагуу камер урагшилж, алсын нар мандалт руу аялна */}
@@ -97,6 +98,9 @@ export default async function AyalalPage() {
       <section id="tours" className="section scroll-mt-32 bg-surface-2"><div className="container-px">
         <h2 className="font-display text-3xl font-semibold text-ink">Аяллын хөтөлбөрүүд</h2>
         <p className="mt-2 max-w-2xl text-muted">Аялал сонгоод дарвал өдөр өдрийн хөтөлбөр, хариуцах багш, хамт явах баг зэрэг бүх мэдээлэл дэлгэрэнгүй нээгдэнэ.</p>
+        {JOURNEYS.length === 0 && (
+          <p className="mt-10 rounded-2xl border border-dashed border-line bg-white/5 px-5 py-14 text-center text-muted">Одоохондоо аялал нэмэгдээгүй байна.</p>
+        )}
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
           {JOURNEYS.map((j) => (
             <Link key={j.slug} href={`/ayalal/${j.slug}`} className="card group block overflow-hidden transition hover:-translate-y-1 hover:shadow-glow">
@@ -110,7 +114,7 @@ export default async function AyalalPage() {
               </div>
               <div className="p-6">
                 <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-muted">
-                  <span>🗓 {j.days}</span><span>👥 {j.group}</span><span>⛺ {j.stay}</span>
+                  <span>🗓 {j.days}</span><span>👥 {j.groupSize}</span><span>⛺ {j.stay}</span>
                 </div>
                 <p className="mt-3 leading-relaxed text-muted">{j.summary}</p>
                 <span className="btn btn-primary btn-sm mt-5">Дэлгэрэнгүй үзэх →</span>

@@ -27,6 +27,65 @@ export default function AccountPage() {
   const [saveErr, setSaveErr] = useState("");
   const [saved, setSaved] = useState(false);
 
+  /** Захиалга цуцлах / огноо өөрчлөх */
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [reschedId, setReschedId] = useState<string | null>(null);
+  const [reschedDate, setReschedDate] = useState("");
+  const [reschedTime, setReschedTime] = useState("");
+  const [actionErr, setActionErr] = useState<Record<string, string>>({});
+
+  const statusLabel = (s: string) => s === "pending" ? "Хүлээгдэж буй" : s === "confirmed" ? "Баталгаажсан" : s === "done" ? "Дууссан" : "Цуцалсан";
+  const miniInputCls = "focus-ring rounded-xl border-2 border-line bg-surface-1 px-3 py-2 text-sm text-ink outline-none transition hover:border-primary-400/60 focus:border-primary-500";
+
+  function openResched(id: string, date: string, time?: string) {
+    setReschedId(id); setReschedDate(date); setReschedTime(time || "");
+    setActionErr((e) => ({ ...e, [id]: "" }));
+  }
+
+  async function doCancel(kind: "journey" | "service", id: string) {
+    if (!confirm("Захиалгаа цуцлах уу?")) return;
+    setBusyId(id); setActionErr((e) => ({ ...e, [id]: "" }));
+    try {
+      const res = await fetch("/api/account/bookings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind, id, action: "cancel" }),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || "Алдаа гарлаа.");
+      if (kind === "service") setServiceBookings((bs) => bs.map((b) => (b.id === id ? { ...b, status: "cancelled" } : b)));
+      else setJourneyBookings((bs) => bs.map((b) => (b.id === id ? { ...b, status: "cancelled" } : b)));
+    } catch (e) {
+      setActionErr((er) => ({ ...er, [id]: e instanceof Error ? e.message : "Алдаа гарлаа." }));
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function doResched(kind: "journey" | "service", id: string) {
+    if (!reschedDate || (kind === "service" && !reschedTime)) {
+      setActionErr((e) => ({ ...e, [id]: "Огноо" + (kind === "service" ? ", цагаа" : "оо") + " сонгоно уу." }));
+      return;
+    }
+    setBusyId(id); setActionErr((e) => ({ ...e, [id]: "" }));
+    try {
+      const res = await fetch("/api/account/bookings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind, id, action: "reschedule", date: reschedDate, time: reschedTime }),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || "Алдаа гарлаа.");
+      if (kind === "service") setServiceBookings((bs) => bs.map((b) => (b.id === id ? { ...b, date: reschedDate, time: reschedTime, status: "pending" } : b)));
+      else setJourneyBookings((bs) => bs.map((b) => (b.id === id ? { ...b, date: reschedDate, status: "pending" } : b)));
+      setReschedId(null);
+    } catch (e) {
+      setActionErr((er) => ({ ...er, [id]: e instanceof Error ? e.message : "Алдаа гарлаа." }));
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   useEffect(() => {
     if (user) setForm({ name: user.name, phone: user.phone || "", email: user.email });
   }, [user]);
@@ -181,24 +240,59 @@ export default function AccountPage() {
               </div>
             ) : (
               <div className="mt-4 space-y-4">
-                {serviceBookings.map((b) => (
-                  <div key={b.id} className="rounded-2xl border border-line p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="font-semibold text-ink">🗓 {b.serviceName}</span>
-                      <span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">{b.status === "pending" ? "Хүлээгдэж буй" : b.status === "confirmed" ? "Баталгаажсан" : b.status === "done" ? "Дууссан" : "Цуцалсан"}</span>
+                {serviceBookings.map((b) => {
+                  const editable = b.status !== "cancelled" && b.status !== "done";
+                  return (
+                    <div key={b.id} className="rounded-2xl border border-line p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="font-semibold text-ink">🗓 {b.serviceName}</span>
+                        <span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">{statusLabel(b.status)}</span>
+                      </div>
+                      <p className="mt-2 text-sm text-muted">{b.date} · {b.time}</p>
+                      {editable && reschedId !== b.id && (
+                        <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
+                          <button type="button" disabled={busyId === b.id} onClick={() => openResched(b.id, b.date, b.time)} className="text-xs font-semibold text-primary-700 transition hover:underline disabled:opacity-50">Огноо/цаг өөрчлөх</button>
+                          <button type="button" disabled={busyId === b.id} onClick={() => doCancel("service", b.id)} className="text-xs font-semibold text-rose-600 transition hover:underline disabled:opacity-50">Цуцлах</button>
+                        </div>
+                      )}
+                      {reschedId === b.id && (
+                        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl bg-cream p-3">
+                          <input type="date" className={miniInputCls} value={reschedDate} onChange={(e) => setReschedDate(e.target.value)} />
+                          <input type="time" className={miniInputCls} value={reschedTime} onChange={(e) => setReschedTime(e.target.value)} />
+                          <button type="button" disabled={busyId === b.id} onClick={() => doResched("service", b.id)} className="btn btn-primary btn-sm disabled:opacity-60">{busyId === b.id ? "…" : "Хадгалах"}</button>
+                          <button type="button" onClick={() => setReschedId(null)} className="btn btn-outline btn-sm">Болих</button>
+                        </div>
+                      )}
+                      {actionErr[b.id] && <p className="mt-2 text-xs text-rose-600">{actionErr[b.id]}</p>}
                     </div>
-                    <p className="mt-2 text-sm text-muted">{b.date} · {b.time}</p>
-                  </div>
-                ))}
-                {journeyBookings.map((b) => (
-                  <div key={b.id} className="rounded-2xl border border-line p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="font-semibold text-ink">🧭 {b.journeyName}</span>
-                      <span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">{b.status === "pending" ? "Хүлээгдэж буй" : b.status === "confirmed" ? "Баталгаажсан" : b.status === "done" ? "Дууссан" : "Цуцалсан"}</span>
+                  );
+                })}
+                {journeyBookings.map((b) => {
+                  const editable = b.status !== "cancelled" && b.status !== "done";
+                  return (
+                    <div key={b.id} className="rounded-2xl border border-line p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="font-semibold text-ink">🧭 {b.journeyName}</span>
+                        <span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">{statusLabel(b.status)}</span>
+                      </div>
+                      <p className="mt-2 text-sm text-muted">{b.date} · {b.people} хүн</p>
+                      {editable && reschedId !== b.id && (
+                        <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
+                          <button type="button" disabled={busyId === b.id} onClick={() => openResched(b.id, b.date)} className="text-xs font-semibold text-primary-700 transition hover:underline disabled:opacity-50">Огноо өөрчлөх</button>
+                          <button type="button" disabled={busyId === b.id} onClick={() => doCancel("journey", b.id)} className="text-xs font-semibold text-rose-600 transition hover:underline disabled:opacity-50">Цуцлах</button>
+                        </div>
+                      )}
+                      {reschedId === b.id && (
+                        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl bg-cream p-3">
+                          <input type="date" className={miniInputCls} value={reschedDate} onChange={(e) => setReschedDate(e.target.value)} />
+                          <button type="button" disabled={busyId === b.id} onClick={() => doResched("journey", b.id)} className="btn btn-primary btn-sm disabled:opacity-60">{busyId === b.id ? "…" : "Хадгалах"}</button>
+                          <button type="button" onClick={() => setReschedId(null)} className="btn btn-outline btn-sm">Болих</button>
+                        </div>
+                      )}
+                      {actionErr[b.id] && <p className="mt-2 text-xs text-rose-600">{actionErr[b.id]}</p>}
                     </div>
-                    <p className="mt-2 text-sm text-muted">{b.date} · {b.people} хүн</p>
-                  </div>
-                ))}
+                  );
+                })}
                 {orders.map((o) => (
                   <div key={o.id} className="rounded-2xl border border-line p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">

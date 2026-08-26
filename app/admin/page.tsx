@@ -12,6 +12,7 @@ import { AdminSettings } from "@/components/AdminSettings";
 import { AdminPages } from "@/components/AdminPages";
 import { AdminTeachers } from "@/components/AdminTeachers";
 import { AdminJourney } from "@/components/AdminJourney";
+import { AdminJourneys } from "@/components/AdminJourneys";
 import { AdminZurhai } from "@/components/AdminZurhai";
 import type { Order, PublicUser, ContactMessage } from "@/lib/types";
 
@@ -19,6 +20,7 @@ const nav: { id: string; k: string; label?: string; icon: string }[] = [
   { id: "overview", k: "admin.overview", icon: "sparkles" },
   { id: "users", k: "admin.users", icon: "user" },
   { id: "orders", k: "admin.orders", label: "Захиалгууд", icon: "calendar" },
+  { id: "journeys", k: "admin.journeysM", label: "Сүнслэг аялал", icon: "bag" },
   { id: "services", k: "admin.servicesM", label: "Энергийн засал", icon: "star" },
   { id: "courses", k: "admin.coursesM", label: "Ариусахуйн үйл", icon: "award" },
   { id: "products", k: "admin.productsM", label: "Энергийн хамгаалалт", icon: "laptop" },
@@ -212,6 +214,7 @@ export default function AdminPage() {
               />
             )}
 
+            {tab === "journeys" && <AdminJourneys />}
             {tab === "services" && <AdminContentManager kind="service" />}
             {tab === "courses" && <AdminContentManager kind="course" />}
             {tab === "products" && <AdminContentManager kind="product" />}

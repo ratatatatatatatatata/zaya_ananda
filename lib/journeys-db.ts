@@ -1,6 +1,8 @@
 import { randomUUID } from "crypto";
+import { unstable_cache } from "next/cache";
 import { sbSelect, sbInsert, sbUpdate, sbDelete } from "@/lib/supabase";
 import type { JourneyBooking, JourneyReview, ServiceBooking } from "@/lib/types";
+import type { Journey } from "@/data/journeys";
 
 const enc = (s: string) => encodeURIComponent(s);
 
@@ -43,6 +45,16 @@ export async function listBookingsByUser(userId: string): Promise<JourneyBooking
 
 export async function setBookingStatus(id: string, status: JourneyBooking["status"]) {
   return sbUpdate<JourneyBooking>("journey_bookings", id, { status });
+}
+
+export async function getBookingById(id: string): Promise<JourneyBooking | null> {
+  const rows = await sbSelect<JourneyBooking>("journey_bookings", `id=eq.${enc(id)}&limit=1`);
+  return rows[0] || null;
+}
+
+/** Аялах өдрөө өөрчилнө — дахин баталгаажуулах шаардлагатай тул төлөв "pending" болно */
+export async function rescheduleBooking(id: string, date: string) {
+  return sbUpdate<JourneyBooking>("journey_bookings", id, { date, status: "pending" });
 }
 
 export async function deleteBooking(id: string) {
@@ -145,7 +157,75 @@ export async function setServiceBookingStatus(id: string, status: string) {
   return sbUpdate<ServiceBooking>("service_bookings", id, { status });
 }
 
+export async function getServiceBookingById(id: string): Promise<ServiceBooking | null> {
+  const rows = await sbSelect<ServiceBooking>("service_bookings", `id=eq.${enc(id)}&limit=1`);
+  return rows[0] || null;
+}
+
+/** Захиалгын өдөр/цагийг өөрчилнө — дахин баталгаажуулах шаардлагатай тул төлөв "pending" болно */
+export async function rescheduleServiceBooking(id: string, date: string, time: string) {
+  return sbUpdate<ServiceBooking>("service_bookings", id, { date, time, status: "pending" });
+}
+
 export async function deleteServiceBooking(id: string) {
   await sbDelete("service_bookings", id);
   return true;
 }
+
+/* ---------- Сүнслэг аяллын каталог (админаас удирдана) ---------- */
+
+function journeyRow(input: Omit<Journey, "id" | "createdAt">): Record<string, unknown> {
+  return {
+    slug: input.slug.trim(),
+    name: input.name.trim(),
+    tagline: input.tagline?.trim() || "",
+    scene: input.scene || "steppe",
+    image: input.image || null,
+    days: input.days?.trim() || "",
+    groupSize: input.groupSize?.trim() || "",
+    transport: input.transport?.trim() || "",
+    stay: input.stay?.trim() || "",
+    audience: input.audience?.trim() || "",
+    summary: input.summary?.trim() || "",
+    included: input.included?.trim() || "",
+    excluded: input.excluded?.trim() || "",
+    price: input.price?.trim() || "",
+    prepay: typeof input.prepay === "number" && input.prepay > 0 ? input.prepay : 0,
+    itinerary: input.itinerary || [],
+    lead: input.lead || { name: "", role: "", info: "" },
+    crew: input.crew || [],
+  };
+}
+
+export async function listJourneys(): Promise<Journey[]> {
+  return sbSelect<Journey>("journeys", "order=created_at.asc");
+}
+
+export async function getJourneyBySlug(slug: string): Promise<Journey | null> {
+  const rows = await sbSelect<Journey>("journeys", `slug=eq.${enc(slug)}&limit=1`);
+  return rows[0] || null;
+}
+
+export async function getJourneyById(id: string): Promise<Journey | null> {
+  const rows = await sbSelect<Journey>("journeys", `id=eq.${enc(id)}&limit=1`);
+  return rows[0] || null;
+}
+
+export async function createJourney(input: Omit<Journey, "id" | "createdAt">): Promise<Journey> {
+  return sbInsert<Journey>("journeys", { id: randomUUID(), ...journeyRow(input), createdAt: new Date().toISOString() });
+}
+
+export async function updateJourney(id: string, input: Omit<Journey, "id" | "createdAt">): Promise<Journey | null> {
+  return sbUpdate<Journey>("journeys", id, journeyRow(input));
+}
+
+export async function deleteJourney(id: string): Promise<boolean> {
+  await sbDelete("journeys", id);
+  return true;
+}
+
+// ---------- Кэштэй уншилтууд (админ засварласны дараа revalidateTag("journeys") дуудна) ----------
+export const listJourneysCached = () =>
+  unstable_cache(() => listJourneys(), ["journeys-list"], { tags: ["journeys"], revalidate: 300 })();
+export const getJourneyBySlugCached = (slug: string) =>
+  unstable_cache(() => getJourneyBySlug(slug), ["journey-by-slug", slug], { tags: ["journeys"], revalidate: 300 })();
