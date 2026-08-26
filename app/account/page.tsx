@@ -30,17 +30,46 @@ export default function AccountPage() {
   /** Захиалга цуцлах / огноо өөрчлөх */
   const [busyId, setBusyId] = useState<string | null>(null);
   const [reschedId, setReschedId] = useState<string | null>(null);
+  const [reschedKind, setReschedKind] = useState<"journey" | "service" | null>(null);
+  const [reschedItemId, setReschedItemId] = useState("");
+  const [reschedOrig, setReschedOrig] = useState<{ date: string; time: string } | null>(null);
   const [reschedDate, setReschedDate] = useState("");
   const [reschedTime, setReschedTime] = useState("");
+  const [reschedSlots, setReschedSlots] = useState<string[]>([]);
+  const [reschedSlotsLoading, setReschedSlotsLoading] = useState(false);
   const [actionErr, setActionErr] = useState<Record<string, string>>({});
 
   const statusLabel = (s: string) => s === "pending" ? "Хүлээгдэж буй" : s === "confirmed" ? "Баталгаажсан" : s === "done" ? "Дууссан" : "Цуцалсан";
   const miniInputCls = "focus-ring rounded-xl border-2 border-line bg-surface-1 px-3 py-2 text-sm text-ink outline-none transition hover:border-primary-400/60 focus:border-primary-500";
+  const todayISO = () => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`; };
 
-  function openResched(id: string, date: string, time?: string) {
-    setReschedId(id); setReschedDate(date); setReschedTime(time || "");
+  function openResched(kind: "journey" | "service", id: string, date: string, time?: string, itemId?: string) {
+    setReschedId(id); setReschedKind(kind); setReschedItemId(itemId || "");
+    setReschedOrig({ date, time: time || "" });
+    setReschedDate(date); setReschedTime(""); setReschedSlots([]);
     setActionErr((e) => ({ ...e, [id]: "" }));
   }
+
+  // Тухайн зүйлийн admin тохируулсан ажлын өдөр/цагийг дагаж — зөвхөн бодит сул цагуудыг харуулна
+  useEffect(() => {
+    if (reschedKind !== "service" || !reschedId || !reschedDate || !reschedItemId) { setReschedSlots([]); return; }
+    let alive = true;
+    setReschedSlotsLoading(true);
+    fetch(`/api/service/booking?itemId=${encodeURIComponent(reschedItemId)}&date=${encodeURIComponent(reschedDate)}`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { slots: [] }))
+      .then((d) => {
+        if (!alive) return;
+        let slots: string[] = d.slots || [];
+        // Хэрэглэгчийн одоогийн захиалсан цаг өөрөө "авсан" тул шүүлтэд орохгүй байж болно — үүнийг буцааж нэмнэ
+        if (reschedOrig && reschedDate === reschedOrig.date && reschedOrig.time && !slots.includes(reschedOrig.time)) {
+          slots = [...slots, reschedOrig.time].sort();
+        }
+        setReschedSlots(slots);
+      })
+      .catch(() => alive && setReschedSlots([]))
+      .finally(() => alive && setReschedSlotsLoading(false));
+    return () => { alive = false; };
+  }, [reschedKind, reschedId, reschedDate, reschedItemId, reschedOrig]);
 
   async function doCancel(kind: "journey" | "service", id: string) {
     if (!confirm("Захиалгаа цуцлах уу?")) return;
@@ -78,7 +107,7 @@ export default function AccountPage() {
       if (!res.ok) throw new Error(d.error || "Алдаа гарлаа.");
       if (kind === "service") setServiceBookings((bs) => bs.map((b) => (b.id === id ? { ...b, date: reschedDate, time: reschedTime, status: "pending" } : b)));
       else setJourneyBookings((bs) => bs.map((b) => (b.id === id ? { ...b, date: reschedDate, status: "pending" } : b)));
-      setReschedId(null);
+      setReschedId(null); setReschedKind(null); setReschedItemId(""); setReschedOrig(null);
     } catch (e) {
       setActionErr((er) => ({ ...er, [id]: e instanceof Error ? e.message : "Алдаа гарлаа." }));
     } finally {
@@ -251,16 +280,38 @@ export default function AccountPage() {
                       <p className="mt-2 text-sm text-muted">{b.date} · {b.time}</p>
                       {editable && reschedId !== b.id && (
                         <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
-                          <button type="button" disabled={busyId === b.id} onClick={() => openResched(b.id, b.date, b.time)} className="text-xs font-semibold text-primary-700 transition hover:underline disabled:opacity-50">Огноо/цаг өөрчлөх</button>
+                          <button type="button" disabled={busyId === b.id} onClick={() => openResched("service", b.id, b.date, b.time, b.itemId)} className="text-xs font-semibold text-primary-700 transition hover:underline disabled:opacity-50">Огноо/цаг өөрчлөх</button>
                           <button type="button" disabled={busyId === b.id} onClick={() => doCancel("service", b.id)} className="text-xs font-semibold text-rose-600 transition hover:underline disabled:opacity-50">Цуцлах</button>
                         </div>
                       )}
                       {reschedId === b.id && (
-                        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl bg-cream p-3">
-                          <input type="date" className={miniInputCls} value={reschedDate} onChange={(e) => setReschedDate(e.target.value)} />
-                          <input type="time" className={miniInputCls} value={reschedTime} onChange={(e) => setReschedTime(e.target.value)} />
-                          <button type="button" disabled={busyId === b.id} onClick={() => doResched("service", b.id)} className="btn btn-primary btn-sm disabled:opacity-60">{busyId === b.id ? "…" : "Хадгалах"}</button>
-                          <button type="button" onClick={() => setReschedId(null)} className="btn btn-outline btn-sm">Болих</button>
+                        <div className="mt-3 rounded-xl bg-cream p-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <input type="date" min={todayISO()} className={miniInputCls} value={reschedDate} onChange={(e) => setReschedDate(e.target.value)} />
+                            <button type="button" disabled={busyId === b.id || !reschedTime} onClick={() => doResched("service", b.id)} className="btn btn-primary btn-sm disabled:opacity-60">{busyId === b.id ? "…" : "Хадгалах"}</button>
+                            <button type="button" onClick={() => { setReschedId(null); setReschedKind(null); setReschedItemId(""); setReschedOrig(null); }} className="btn btn-outline btn-sm">Болих</button>
+                          </div>
+                          <div className="mt-2.5">
+                            {reschedSlotsLoading ? (
+                              <p className="text-xs text-muted">Сул цаг шалгаж байна…</p>
+                            ) : reschedSlots.length === 0 ? (
+                              <p className="text-xs text-amber-700">Энэ өдөр сул цаг алга. Өөр өдөр сонгоно уу.</p>
+                            ) : (
+                              <div className="flex flex-wrap gap-1.5">
+                                {reschedSlots.map((s) => (
+                                  <button
+                                    key={s}
+                                    type="button"
+                                    onClick={() => setReschedTime(s)}
+                                    aria-pressed={reschedTime === s}
+                                    className={"focus-ring rounded-full px-3 py-1.5 text-xs font-semibold transition " + (reschedTime === s ? "bg-primary-grad text-white" : "border border-line bg-surface-1 text-ink/75 hover:border-primary-400 hover:text-primary-700")}
+                                  >
+                                    {s}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )}
                       {actionErr[b.id] && <p className="mt-2 text-xs text-rose-600">{actionErr[b.id]}</p>}
@@ -278,15 +329,15 @@ export default function AccountPage() {
                       <p className="mt-2 text-sm text-muted">{b.date} · {b.people} хүн</p>
                       {editable && reschedId !== b.id && (
                         <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
-                          <button type="button" disabled={busyId === b.id} onClick={() => openResched(b.id, b.date)} className="text-xs font-semibold text-primary-700 transition hover:underline disabled:opacity-50">Огноо өөрчлөх</button>
+                          <button type="button" disabled={busyId === b.id} onClick={() => openResched("journey", b.id, b.date)} className="text-xs font-semibold text-primary-700 transition hover:underline disabled:opacity-50">Огноо өөрчлөх</button>
                           <button type="button" disabled={busyId === b.id} onClick={() => doCancel("journey", b.id)} className="text-xs font-semibold text-rose-600 transition hover:underline disabled:opacity-50">Цуцлах</button>
                         </div>
                       )}
                       {reschedId === b.id && (
                         <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl bg-cream p-3">
-                          <input type="date" className={miniInputCls} value={reschedDate} onChange={(e) => setReschedDate(e.target.value)} />
+                          <input type="date" min={todayISO()} className={miniInputCls} value={reschedDate} onChange={(e) => setReschedDate(e.target.value)} />
                           <button type="button" disabled={busyId === b.id} onClick={() => doResched("journey", b.id)} className="btn btn-primary btn-sm disabled:opacity-60">{busyId === b.id ? "…" : "Хадгалах"}</button>
-                          <button type="button" onClick={() => setReschedId(null)} className="btn btn-outline btn-sm">Болих</button>
+                          <button type="button" onClick={() => { setReschedId(null); setReschedKind(null); }} className="btn btn-outline btn-sm">Болих</button>
                         </div>
                       )}
                       {actionErr[b.id] && <p className="mt-2 text-xs text-rose-600">{actionErr[b.id]}</p>}

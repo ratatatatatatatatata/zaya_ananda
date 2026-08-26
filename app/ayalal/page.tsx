@@ -6,6 +6,9 @@ import { listJourneysCached } from "@/lib/journeys-db";
 import { JourneyImage } from "@/components/journey/SceneArt";
 import { ContactSection } from "@/components/ContactSection";
 
+// Клиент талын Router Cache-д удаан "зогсчихдоггүй" байхаар — админ шинэ аялал нэмэнгүүт шинэчлэгдэж харагдана
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Сүнслэг аялал — Spiritual Journey Mongolia",
   description:
