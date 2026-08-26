@@ -19,7 +19,6 @@ const NAV = [
   { id: "tours", label: "Аяллын хөтөлбөрүүд" },
   { id: "places", label: "Энергийн газрууд" },
   { id: "guides", label: "Багш, хөтөч нар" },
-  { id: "prep", label: "Аялагчдын зөвлөмж" },
   { id: "faq", label: "Асуулт хариулт" },
 ];
 
@@ -57,30 +56,6 @@ const PLACES = [
   },
 ];
 
-const PREP = {
-  etiquette: [
-    "Ариун газарт чанга ярихгүй, хог хаяхгүй, юу ч авч явахгүй (чулуу, мод ч мөн адил)",
-    "Суварга, овоог нар зөв (цагийн зүүний дагуу) тойрно",
-    "Сүм дугана орохдоо малгайгаа авч, босгон дээр гишгэхгүй",
-    "Зан үйлийн үеэр зураг авахын өмнө хөтөчөөс зөвшөөрөл асууна",
-    "Нутгийн иргэд, лам хуврагуудтай хүндэтгэлтэй харилцана",
-  ],
-  packing: [
-    "Даавуун, сул хувцас (цагаан өнгө зан үйлд тохиромжтой), дулаан давхарга",
-    "Иогийн дэвсгэр эсвэл суух жижиг дэвсгэр",
-    "Усны сав, нарны малгай, тос",
-    "Хувийн эм, гарын ариутгагч",
-    "Тэмдэглэлийн дэвтэр, үзэг — сэтгэгдлээ буулгахад",
-  ],
-  mind: [
-    "Аяллын турш утсаа аль болох унтраах буюу нисэх горимд байлгах (дижитал детокс)",
-    "Чимээгүй цагуудыг эвгүйрхэлгүй хүлээж авах — энэ бол аяллын гол бэлэг",
-    "Хүлээлт багатай, нээлттэй сэтгэлээр ирэх",
-  ],
-  food: "Аяллын хоол нь голдуу цагаан (вегетариан) чиглэлтэй, өдөрт 3 удаа, нутгийн цэвэр түүхий эдээр бэлтгэгдэнэ. Махан хоолны сонголт урьдчилан мэдэгдсэн тохиолдолд боломжтой.",
-};
-
-
 export default async function AyalalPage() {
   const heroMedia = await heroMediaFor("ayalal");
   return (
@@ -92,7 +67,6 @@ export default async function AyalalPage() {
         eyebrow="Spiritual Journey Mongolia"
         title="Сүнслэг аялал"
         desc="Монголын энергийн ариун газрууд руу хийх энэ аян бол зүгээр нэг зам биш — таны дотоод амар амгалан руу хийх аялал юм."
-        cta={[{ href: "#tours", label: "Хөтөлбөр үзэх" }, { href: "#faq", label: "Түгээмэл асуултууд" }]}
       />
       {/* Дотоод цэс — гүйлгэхэд толгойн доор наалдаж, хамт хөдөлнө */}
       <nav className="night sticky top-16 z-30 border-y border-white/10 bg-[#0B1714]/90 backdrop-blur lg:top-[72px]">
@@ -178,37 +152,6 @@ export default async function AyalalPage() {
           {JOURNEYS.map((j) => (
             <Link key={j.slug} href={`/ayalal/${j.slug}#baga`} className="btn btn-outline btn-md">{j.name} →</Link>
           ))}
-        </div>
-      </div></section>
-
-      {/* Аялагчдын зөвлөмж */}
-      <section id="prep" className="section scroll-mt-32"><div className="container-px">
-        <h2 className="font-display text-3xl font-semibold text-ink">Аялагчдын зөвлөмж</h2>
-        <div className="mt-10 grid gap-6 lg:grid-cols-3">
-          <div className="card p-6">
-            <h3 className="font-display text-lg font-semibold text-ink">🙏 Соёлын дүрэм</h3>
-            <ul className="mt-4 space-y-2.5">
-              {PREP.etiquette.map((e, i) => <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-ink/80"><span className="mt-0.5 text-primary-400">•</span><span>{e}</span></li>)}
-            </ul>
-          </div>
-          <div className="card p-6">
-            <h3 className="font-display text-lg font-semibold text-ink">🎒 Цүнхэндээ юу авах вэ</h3>
-            <ul className="mt-4 space-y-2.5">
-              {PREP.packing.map((e, i) => <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-ink/80"><span className="mt-0.5 text-primary-400">•</span><span>{e}</span></li>)}
-            </ul>
-          </div>
-          <div className="flex flex-col gap-6">
-            <div className="card p-6">
-              <h3 className="font-display text-lg font-semibold text-ink">🧘 Сэтгэлзүйн бэлтгэл</h3>
-              <ul className="mt-4 space-y-2.5">
-                {PREP.mind.map((e, i) => <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-ink/80"><span className="mt-0.5 text-primary-400">•</span><span>{e}</span></li>)}
-              </ul>
-            </div>
-            <div className="card p-6">
-              <h3 className="font-display text-lg font-semibold text-ink">🥗 Хоол</h3>
-              <p className="mt-3 text-sm leading-relaxed text-ink/80">{PREP.food}</p>
-            </div>
-          </div>
         </div>
       </div></section>
 

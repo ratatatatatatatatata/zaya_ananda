@@ -204,7 +204,12 @@ export default function AdminPage() {
             )}
 
             {tab === "orders" && (
-              <AdminJourney courseOrders={(data?.orders ?? []).filter((o) => o.items.some((i) => i.kind === "course"))} onOrderStatus={setOrderStatus} onDeleteOrder={deleteOrder} />
+              <AdminJourney
+                courseOrders={(data?.orders ?? []).filter((o) => o.items.some((i) => i.kind === "course"))}
+                productOrders={(data?.orders ?? []).filter((o) => o.items.some((i) => i.kind === "product"))}
+                onOrderStatus={setOrderStatus}
+                onDeleteOrder={deleteOrder}
+              />
             )}
 
             {tab === "services" && <AdminContentManager kind="service" />}

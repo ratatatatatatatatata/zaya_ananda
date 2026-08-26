@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { JourneyBooking, JourneyReview, Order, ServiceBooking } from "@/lib/types";
 import type { CmsItem } from "@/lib/types";
-import { SLOTS } from "@/lib/booking-slots";
+import { slotsOf } from "@/lib/booking-slots";
 
 const STATUS_LABEL: Record<JourneyBooking["status"], string> = {
   pending: "Хүлээгдэж буй",
@@ -19,15 +19,16 @@ const STATUS_CLASS: Record<JourneyBooking["status"], string> = {
 };
 
 /** Аяллын захиалга ба сэтгэгдлийн удирдлага. */
-export function AdminJourney({ courseOrders = [], onOrderStatus, onDeleteOrder }: {
+export function AdminJourney({ courseOrders = [], productOrders = [], onOrderStatus, onDeleteOrder }: {
   courseOrders?: Order[];
+  productOrders?: Order[];
   onOrderStatus?: (id: string, status: string, days?: string) => void;
   onDeleteOrder?: (id: string) => void;
 }) {
   const [bookings, setBookings] = useState<JourneyBooking[]>([]);
   const [reviews, setReviews] = useState<JourneyReview[]>([]);
   const [services, setServices] = useState<ServiceBooking[]>([]);
-  const [tab, setTab] = useState<"bookings" | "services" | "courses" | "reviews">("bookings");
+  const [tab, setTab] = useState<"bookings" | "services" | "courses" | "products" | "reviews">("bookings");
   const [err, setErr] = useState("");
   const [serviceItems, setServiceItems] = useState<CmsItem[]>([]);
   const [manual, setManual] = useState({ itemId: "", date: "", time: "", name: "", phone: "", note: "" });
@@ -76,10 +77,10 @@ export function AdminJourney({ courseOrders = [], onOrderStatus, onDeleteOrder }
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap gap-2">
-        {([["bookings", "Аяллын захиалга"], ["services", "Заслын цаг"], ["courses", "Сургалтын захиалга"], ["reviews", "Аяллын сэтгэгдэл"]] as const).map(([k, l]) => (
+        {([["bookings", "Аяллын захиалга"], ["services", "Заслын цаг"], ["courses", "Сургалтын захиалга"], ["products", "Бүтээгдэхүүний захиалга"], ["reviews", "Аяллын сэтгэгдэл"]] as const).map(([k, l]) => (
           <button key={k} onClick={() => setTab(k)}
             className={"rounded-full px-5 py-2 text-sm font-semibold transition " + (tab === k ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-surface-1 text-ink/70 hover:border-primary-300")}>
-            {l} ({k === "bookings" ? bookings.length : k === "services" ? services.length : k === "courses" ? courseOrders.length : reviews.length})
+            {l} ({k === "bookings" ? bookings.length : k === "services" ? services.length : k === "courses" ? courseOrders.length : k === "products" ? productOrders.length : reviews.length})
           </button>
         ))}
       </div>
@@ -138,7 +139,10 @@ export function AdminJourney({ courseOrders = [], onOrderStatus, onDeleteOrder }
               <option value="">Үйлчилгээ сонгох</option>{serviceItems.map((i) => <option key={i.id} value={i.id}>{i.title}</option>)}
             </select>
             <input required type="date" className="input" value={manual.date} onChange={(e) => setManual({ ...manual, date: e.target.value })} />
-            <select required className="input" value={manual.time} onChange={(e) => setManual({ ...manual, time: e.target.value })}><option value="">Цаг сонгох</option>{SLOTS.map((s) => <option key={s}>{s}</option>)}</select>
+            <select required className="input" value={manual.time} onChange={(e) => setManual({ ...manual, time: e.target.value })}>
+              <option value="">Цаг сонгох</option>
+              {slotsOf(serviceItems.find((i) => i.id === manual.itemId)).map((s) => <option key={s}>{s}</option>)}
+            </select>
             <input className="input" placeholder="Захиалагчийн нэр (заавал биш)" value={manual.name} onChange={(e) => setManual({ ...manual, name: e.target.value })} />
             <input className="input" placeholder="Утас (заавал биш)" value={manual.phone} onChange={(e) => setManual({ ...manual, phone: e.target.value })} />
             <button className="btn btn-primary btn-sm" type="submit">Захиалгатай болгох</button>
@@ -203,6 +207,63 @@ export function AdminJourney({ courseOrders = [], onOrderStatus, onDeleteOrder }
               {courseOrders.length === 0 && <tr><td colSpan={7} className="px-4 py-6 text-sm text-muted">Сургалтын захиалга алга.</td></tr>}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {tab === "products" && (
+        <div className="space-y-3">
+          {productOrders.map((o) => (
+            <div key={o.id} className="card p-5">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="font-display font-semibold text-ink">{o.customer.name} <span className="font-mono text-xs font-normal text-muted">#{o.id.slice(0, 6).toUpperCase()}</span></p>
+                  <p className="mt-0.5 text-sm text-muted">{o.customer.phone || "—"} · {o.customer.email || "—"}</p>
+                  <p className="mt-0.5 text-xs text-muted">{o.createdAt.slice(0, 10)}</p>
+                </div>
+                <span className={
+                  "rounded-full px-2.5 py-1 text-xs font-semibold " +
+                  (o.status === "paid" ? "bg-jade-400/15 text-jade-600" : o.status === "cancelled" ? "bg-rose-100 text-rose-500" : "bg-amber-100 text-amber-700")
+                }>
+                  {o.status === "pending" ? "Хүлээгдэж буй" : o.status === "paid" ? "Баталгаажсан" : "Цуцалсан"}
+                </span>
+              </div>
+
+              {/* Захиалсан бүтээгдэхүүн бүрийн дэлгэрэнгүй */}
+              <div className="mt-4 overflow-x-auto rounded-xl border border-line">
+                <table className="w-full min-w-[520px]">
+                  <thead className="border-b border-line bg-aqua">
+                    <tr>
+                      {["Бүтээгдэхүүн", "Тоо ширхэг", "Нэгжийн үнэ", "Дүн"].map((h) => (
+                        <th key={h} className="px-3 py-2 text-left text-xs font-bold uppercase tracking-wide text-muted">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {o.items.filter((i) => i.kind === "product").map((i, idx) => (
+                      <tr key={idx} className="border-b border-line last:border-0">
+                        <td className="px-3 py-2 text-sm font-medium text-ink">{i.title}</td>
+                        <td className="px-3 py-2 text-sm text-ink/80">{i.qty}</td>
+                        <td className="px-3 py-2 text-sm text-ink/80">{i.price.toLocaleString("mn-MN")}₮</td>
+                        <td className="px-3 py-2 text-sm font-semibold text-ink">{(i.price * i.qty).toLocaleString("mn-MN")}₮</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-muted">{o.customer.note && <>📝 {o.customer.note}</>}</p>
+                <p className="font-display text-lg font-semibold text-primary-700">Нийт: {o.total.toLocaleString("mn-MN")}₮</p>
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                {o.status === "pending" && <button onClick={() => onOrderStatus?.(o.id, "paid")} className="rounded-md bg-jade-400/15 px-3 py-1.5 text-xs font-semibold text-jade-600 hover:bg-jade-400/25">Баталгаажуулах</button>}
+                {o.status !== "cancelled" && <button onClick={() => onOrderStatus?.(o.id, "cancelled")} className="rounded-md bg-rose-100 px-3 py-1.5 text-xs font-semibold text-rose-500 hover:bg-rose-200">Цуцлах</button>}
+                <button onClick={() => onDeleteOrder?.(o.id)} className="rounded-md border border-line px-3 py-1.5 text-xs font-semibold text-ink/60 hover:bg-line/40">Устгах</button>
+              </div>
+            </div>
+          ))}
+          {productOrders.length === 0 && <p className="card p-6 text-sm text-muted">Бүтээгдэхүүний захиалга алга.</p>}
         </div>
       )}
 

@@ -300,6 +300,12 @@ export interface CmsItem {
   nextNote?: string;
   /** Дараагийн сургалтын id */
   nextItemId?: string;
+  /** Энергийн заслын цаг захиалгын өдрүүд — JS Date.getDay() индекс (0=Ням..6=Бямба). Хоосон бол Даа–Ба өгөгдмөл. */
+  bookingDays?: number[];
+  /** Захиалгын цагийн эхлэл — 24ц формат (жишээ: 10). Хоосон бол 10. */
+  bookingStartHour?: number;
+  /** Захиалгын цагийн төгсгөл — сүүлчийн цаг нь энэ дугаараас 1 цаг өмнө эхэлнэ (жишээ: 18 → сүүлчийн цаг 17:00). Хоосон бол 18. */
+  bookingEndHour?: number;
   lessons?: { title: string; path?: string; url?: string; quality?: string; subtitles?: string }[];
   moods?: string[];
   i18n?: CmsTranslations;

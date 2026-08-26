@@ -24,7 +24,6 @@ export default async function ShopPage() {
         title={<T k="nav.shop" />}
         desc="Урсгалын хажууд өрсөн чулуу шиг — таны энергийг тогтвортой байлгах эрдэнэ, сахиус, хамгаалалтууд."
         height="mid"
-        cta={[{ href: "#shop", label: "Бүтээгдэхүүн үзэх" }]}
       />
       <section id="shop" className="section"><div className="container-px">
         <ShopSplit

@@ -126,7 +126,10 @@ export function ServiceCard({ item }: { item: CmsItem }) {
               )}
 
               <div className="mt-6">
-                <ServiceBooking itemId={item.id} serviceName={item.title} />
+                <ServiceBooking
+                  itemId={item.id} serviceName={item.title}
+                  workDays={item.bookingDays} startHour={item.bookingStartHour} endHour={item.bookingEndHour}
+                />
               </div>
             </div>
           </div>

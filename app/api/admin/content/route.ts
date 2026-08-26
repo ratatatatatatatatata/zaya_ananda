@@ -58,6 +58,11 @@ function parseInput(body: any) {
     level: body.level ? String(body.level) : undefined,
     nextNote: body.nextNote ? String(body.nextNote) : undefined,
     nextItemId: body.nextItemId ? String(body.nextItemId) : undefined,
+    bookingDays: Array.isArray(body.bookingDays)
+      ? body.bookingDays.map((d: unknown) => Number(d)).filter((d: number) => Number.isInteger(d) && d >= 0 && d <= 6)
+      : undefined,
+    bookingStartHour: num(body.bookingStartHour),
+    bookingEndHour: num(body.bookingEndHour),
     lessons,
     moods: Array.isArray(body.moods) ? body.moods.map((m: unknown) => String(m)).filter(Boolean) : undefined,
     i18n: parseI18n(body.i18n),

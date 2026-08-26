@@ -277,6 +277,7 @@ type CmsInput = {
   image?: string; images?: string[]; link?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherRole?: string; teacherInfo?: string; accessDays?: number; lessons?: { title: string; path?: string; url?: string; quality?: string; subtitles?: string }[];
   moods?: string[]; i18n?: CmsTranslations;
   level?: string; nextNote?: string; nextItemId?: string;
+  bookingDays?: number[]; bookingStartHour?: number; bookingEndHour?: number;
 };
 function cmsRow(input: CmsInput): Record<string, unknown> {
   return {
@@ -298,6 +299,9 @@ function cmsRow(input: CmsInput): Record<string, unknown> {
     level: input.kind === "course" ? input.level || "anhan" : null,
     nextNote: input.nextNote?.trim() || null,
     nextItemId: input.nextItemId?.trim() || null,
+    bookingDays: input.kind === "service" && input.bookingDays && input.bookingDays.length ? input.bookingDays : null,
+    bookingStartHour: input.kind === "service" ? numOrNull(input.bookingStartHour) : null,
+    bookingEndHour: input.kind === "service" ? numOrNull(input.bookingEndHour) : null,
     lessons: input.lessons && input.lessons.length ? input.lessons : null,
     moods: input.moods && input.moods.length ? input.moods : null,
     i18n: input.i18n && Object.keys(input.i18n).length ? input.i18n : null,

@@ -3,29 +3,27 @@ import { getSessionUserId } from "@/lib/auth";
 import { getCmsByIdCached } from "@/lib/repo";
 import { createServiceBooking, takenSlots } from "@/lib/journeys-db";
 import { createNotification, notifyAdmins } from "@/lib/notifications";
-import { SLOTS } from "@/lib/booking-slots";
+import { isAllowedDay, slotsOf, dropPastSlots } from "@/lib/booking-slots";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-
-const isWeekday = (d: string) => {
-  const day = new Date(d + "T00:00:00").getDay();
-  return day >= 1 && day <= 5;
-};
-
-/** Тухайн өдрийн сул цагууд */
+/** Тухайн өдрийн сул цагууд — зүйл бүрийн админаас тохируулсан хуваарийг дагана */
 export async function GET(req: Request) {
   const u = new URL(req.url);
   const itemId = u.searchParams.get("itemId") || "";
   const date = u.searchParams.get("date") || "";
   if (!itemId || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return NextResponse.json({ slots: [] });
-  if (!isWeekday(date)) return NextResponse.json({ slots: [], weekend: true });
+
+  const item = await getCmsByIdCached(itemId).catch(() => null);
+  if (!isAllowedDay(item, date)) return NextResponse.json({ slots: [], weekend: true });
+
+  const all = slotsOf(item);
   try {
     const taken = await takenSlots(itemId, date);
-    return NextResponse.json({ slots: SLOTS.filter((s) => !taken.includes(s)) });
+    return NextResponse.json({ slots: dropPastSlots(all.filter((s) => !taken.includes(s)), date) });
   } catch {
-    return NextResponse.json({ slots: SLOTS });
+    return NextResponse.json({ slots: dropPastSlots(all, date) });
   }
 }
 
@@ -41,9 +39,10 @@ export async function POST(req: Request) {
 
   const item = await getCmsByIdCached(itemId).catch(() => null);
   if (!item) return NextResponse.json({ error: "Үйлчилгээ олдсонгүй." }, { status: 404 });
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !isWeekday(date))
-    return NextResponse.json({ error: "Ажлын өдөр (Да–Ба) сонгоно уу." }, { status: 400 });
-  if (!SLOTS.includes(time)) return NextResponse.json({ error: "Цагаа сонгоно уу." }, { status: 400 });
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !isAllowedDay(item, date))
+    return NextResponse.json({ error: "Энэ өдөр захиалга авахгүй байна. Өөр өдөр сонгоно уу." }, { status: 400 });
+  if (!slotsOf(item).includes(time) || !dropPastSlots(slotsOf(item), date).includes(time))
+    return NextResponse.json({ error: "Цагаа сонгоно уу." }, { status: 400 });
   if (!name || !phone) return NextResponse.json({ error: "Нэр, утсаа оруулна уу." }, { status: 400 });
 
   try {

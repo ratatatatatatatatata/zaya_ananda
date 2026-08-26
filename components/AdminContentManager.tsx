@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { formatMNT } from "@/lib/format";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { SERVICE_GROUPS, COURSE_CATS, COURSE_LEVELS } from "@/data/cms-taxonomy";
+import { weekdayLabels, DEFAULT_BOOKING_DAYS, DEFAULT_START_HOUR, DEFAULT_END_HOUR } from "@/lib/booking-slots";
 import { useMoods } from "@/lib/moods";
 import { embedSrc } from "@/lib/video-embed";
 import type { CmsItem, TeacherPreset, CmsTranslations } from "@/lib/types";
@@ -85,6 +86,10 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
   const [langTab, setLangTab] = useState<"mn" | TrLang>("mn");
   const [i18n, setI18n] = useState<CmsTranslations>({});
   const [moods, setMoods] = useState<string[]>([]);
+  /** Энергийн заслын цаг захиалгын хуваарь — зөвхөн kind === "service" үед ашиглана */
+  const [bookingDays, setBookingDays] = useState<number[]>(DEFAULT_BOOKING_DAYS);
+  const [bookingStart, setBookingStart] = useState(String(DEFAULT_START_HOUR));
+  const [bookingEnd, setBookingEnd] = useState(String(DEFAULT_END_HOUR));
   const set = (k: keyof typeof EMPTY, v: string) => setForm((f) => ({ ...f, [k]: v }));
   const setTr = (l: TrLang, field: "title" | "body", v: string) =>
     setI18n((prev) => ({ ...prev, [l]: { ...(prev[l] || {}), [field]: v } }));
@@ -146,8 +151,16 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
     setForm((f) => ({ ...f, teacherName: t.name, teacherImage: t.image || "", teacherRole: t.role || "", teacherInfo: t.info || "" }));
   }
 
-  function resetForm() { setForm(EMPTY); setImages([]); setLessons([]); setI18n({}); setMoods([]); setLangTab("mn"); setEditingId(null); setErr(""); setOpen(false); }
-  function startNew() { setForm(EMPTY); setImages([]); setLessons([]); setI18n({}); setMoods([]); setLangTab("mn"); setEditingId(null); setErr(""); setOpen(true); }
+  function resetForm() {
+    setForm(EMPTY); setImages([]); setLessons([]); setI18n({}); setMoods([]);
+    setBookingDays(DEFAULT_BOOKING_DAYS); setBookingStart(String(DEFAULT_START_HOUR)); setBookingEnd(String(DEFAULT_END_HOUR));
+    setLangTab("mn"); setEditingId(null); setErr(""); setOpen(false);
+  }
+  function startNew() {
+    setForm(EMPTY); setImages([]); setLessons([]); setI18n({}); setMoods([]);
+    setBookingDays(DEFAULT_BOOKING_DAYS); setBookingStart(String(DEFAULT_START_HOUR)); setBookingEnd(String(DEFAULT_END_HOUR));
+    setLangTab("mn"); setEditingId(null); setErr(""); setOpen(true);
+  }
   function startEdit(it: CmsItem) {
     setForm({
       title: it.title || "", category: it.category || "", summary: it.summary || "", body: it.body || "",
@@ -162,6 +175,9 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
     setImages(it.images && it.images.length ? it.images.slice(0, MAX_IMAGES) : it.image ? [it.image] : []);
     setI18n(it.i18n || {});
     setMoods(it.moods || []);
+    setBookingDays(it.bookingDays && it.bookingDays.length ? it.bookingDays : DEFAULT_BOOKING_DAYS);
+    setBookingStart(String(it.bookingStartHour ?? DEFAULT_START_HOUR));
+    setBookingEnd(String(it.bookingEndHour ?? DEFAULT_END_HOUR));
     setLangTab("mn");
     setLessons((it.lessons || []).map((l) => ({ title: l.title || "", path: l.path || "", url: l.url || "", quality: l.quality || "1080p", subtitles: l.subtitles || "" })));
     setEditingId(it.id); setErr(""); setOpen(true);
@@ -182,6 +198,9 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
       level: kind === "course" ? form.level : undefined,
       nextNote: kind === "course" ? form.nextNote : undefined,
       nextItemId: kind === "course" ? form.nextItemId : undefined,
+      bookingDays: kind === "service" ? bookingDays : undefined,
+      bookingStartHour: kind === "service" ? Number(bookingStart) : undefined,
+      bookingEndHour: kind === "service" ? Number(bookingEnd) : undefined,
       lessons: lessons.filter((l) => l.title.trim() && (l.path || (l.url || "").trim())).map((l) => ({ title: l.title.trim(), path: l.path, url: (l.url || "").trim(), quality: l.quality, subtitles: l.subtitles || "" })),
     };
     try {
@@ -200,6 +219,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
   }
 
   const isCourse = kind === "course";
+  const isService = kind === "service";
   const isPromo = kind === "promo";
   const isFree = kind === "free";
   const hasTeacher = kind === "course" || kind === "service";
@@ -354,6 +374,52 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
                 {kind !== "resource" && !isFree && <div><label className="field-label">Үнэ (₮)</label><input className="input" type="number" value={form.price} onChange={(e) => set("price", e.target.value)} /></div>}
                 {isCourse && <div><label className="field-label">Хэлбэр</label><select className="input" value={form.mode} onChange={(e) => set("mode", e.target.value)}><option value="online">Онлайн сургалт</option><option value="tankhim">Танхимын сургалт</option><option value="both">Онлайн + Танхим</option></select></div>}
               </div>
+
+              {isService && (
+                <div className="rounded-2xl border border-primary-500/30 bg-primary-50/60 p-4">
+                  <p className="font-display font-semibold text-ink">Цаг захиалгын хуваарь</p>
+                  <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">
+                    Энэ заслыг ямар өдрүүдэд, хэдээс хэд хүртэл цагаар захиалж болохыг тохируулна.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {weekdayLabels().map((label, day) => (
+                      <button
+                        key={day}
+                        type="button"
+                        onClick={() => setBookingDays((ds) => (ds.includes(day) ? ds.filter((d) => d !== day) : [...ds, day].sort()))}
+                        className={
+                          "inline-flex h-9 w-12 items-center justify-center rounded-xl text-sm font-semibold transition " +
+                          (bookingDays.includes(day)
+                            ? "bg-primary-grad text-white shadow-soft"
+                            : "border border-line bg-surface-1 text-ink/60 hover:border-primary-400")
+                        }
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="field-label">Эхлэх цаг</label>
+                      <select className="input" value={bookingStart} onChange={(e) => setBookingStart(e.target.value)}>
+                        {Array.from({ length: 24 }, (_, h) => h).map((h) => <option key={h} value={h}>{String(h).padStart(2, "0")}:00</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="field-label">Дуусах цаг</label>
+                      <select className="input" value={bookingEnd} onChange={(e) => setBookingEnd(e.target.value)}>
+                        {Array.from({ length: 24 }, (_, h) => h + 1).map((h) => <option key={h} value={h}>{String(h).padStart(2, "0")}:00</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  {Number(bookingEnd) <= Number(bookingStart) && (
+                    <p className="mt-2 text-xs font-semibold text-rose-500">Дуусах цаг эхлэх цагаас хойш байх ёстой.</p>
+                  )}
+                  {bookingDays.length === 0 && (
+                    <p className="mt-2 text-xs font-semibold text-rose-500">Дор хаяж нэг өдөр сонгоно уу.</p>
+                  )}
+                </div>
+              )}
 
               {isCourse && (
                 <div className="rounded-2xl border border-primary-500/30 bg-primary-50/60 p-4">

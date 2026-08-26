@@ -139,7 +139,10 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
               )}
 
               <div className="mt-6">
-                <ServiceBooking itemId={item.id} serviceName={item.title} />
+                <ServiceBooking
+                  itemId={item.id} serviceName={item.title}
+                  workDays={item.bookingDays} startHour={item.bookingStartHour} endHour={item.bookingEndHour}
+                />
               </div>
             </div>
           </div>

@@ -3,14 +3,24 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
+import { DEFAULT_BOOKING_DAYS, DEFAULT_START_HOUR, DEFAULT_END_HOUR } from "@/lib/booking-slots";
 
 const MONTHS = ["1-р сар", "2-р сар", "3-р сар", "4-р сар", "5-р сар", "6-р сар", "7-р сар", "8-р сар", "9-р сар", "10-р сар", "11-р сар", "12-р сар"];
 const WD = ["Да", "Мя", "Лх", "Пү", "Ба", "Бя", "Ня"];
+/** Хуанлийн долоо хоногийн эгнээ (Даа=1..Ня=0) → энгийн долоо хоногийн индекс рүү хөрвүүлнэ */
+const WD_INDEX = [1, 2, 3, 4, 5, 6, 0];
 const daysIn = (y: number, m: number) => new Date(y, m, 0).getDate();
 const pad = (n: number) => String(n).padStart(2, "0");
 
-/** Энергийн заслын цаг захиалга — ажлын өдөр, 10:00–17:00. */
-export function ServiceBooking({ itemId, serviceName }: { itemId: string; serviceName: string }) {
+/** Энергийн заслын цаг захиалга — тухайн заслын админаас тохируулсан хуваарийг дагана. */
+export function ServiceBooking({
+  itemId, serviceName,
+  workDays = DEFAULT_BOOKING_DAYS, startHour = DEFAULT_START_HOUR, endHour = DEFAULT_END_HOUR,
+}: {
+  itemId: string; serviceName: string;
+  /** Зөвшөөрөгдсөн өдрүүд — JS Date.getDay() индекс (0=Ням..6=Бямба) */
+  workDays?: number[]; startHour?: number; endHour?: number;
+}) {
   const { user } = useAuth();
   const today = useMemo(() => new Date(), []);
   const todayKey = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
@@ -139,7 +149,10 @@ export function ServiceBooking({ itemId, serviceName }: { itemId: string; servic
     <div className="card p-5 sm:p-6">
       <p className="eyebrow-line">Цаг захиалах</p>
       <p className="mt-2 text-sm leading-relaxed text-muted">
-        Ажлын өдрүүдэд <b className="text-ink">10:00–18:00</b> цагийн хооронд хүлээн авна.
+        {WD_INDEX.filter((d) => workDays.includes(d)).length === 7
+          ? "Өдөр бүр"
+          : WD.filter((_, i) => workDays.includes(WD_INDEX[i])).join(", ")}{" "}
+        <b className="text-ink">{pad(startHour)}:00–{pad(endHour)}:00</b> цагийн хооронд хүлээн авна.
       </p>
       {prepay > 0 && (
         <p className="mt-3 rounded-xl bg-primary-50 px-4 py-2.5 text-sm leading-relaxed text-ink/85">
@@ -164,9 +177,9 @@ export function ServiceBooking({ itemId, serviceName }: { itemId: string; servic
           {Array.from({ length: grid.total }, (_, i) => i + 1).map((d) => {
             const key = `${calY}-${pad(calM)}-${pad(d)}`;
             const dow = new Date(calY, calM - 1, d).getDay();
-            const weekend = dow === 0 || dow === 6;
+            const notWorkday = !workDays.includes(dow);
             const past = key < todayKey;
-            const off = weekend || past;
+            const off = notWorkday || past;
             const sel = key === date;
             return (
               <button
@@ -187,7 +200,7 @@ export function ServiceBooking({ itemId, serviceName }: { itemId: string; servic
             );
           })}
         </div>
-        <p className="mt-3 text-center text-[0.7rem] text-muted">Бямба, Ням амарна.</p>
+        <p className="mt-3 text-center text-[0.7rem] text-muted">Саарал өдрүүдэд захиалга авахгүй.</p>
       </div>
 
       {/* Цагийн сонголт */}

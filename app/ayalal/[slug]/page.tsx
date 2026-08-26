@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { JOURNEYS, journeyBySlug, JOURNEY_FAQ } from "@/data/journeys";
+import { JOURNEYS, journeyBySlug, JOURNEY_FAQ, JOURNEY_PREP } from "@/data/journeys";
 import { JourneyImage } from "@/components/journey/SceneArt";
 import { LeadCard, CrewRow } from "@/components/journey/PersonCard";
 import { JourneyBooking } from "@/components/journey/JourneyBooking";
@@ -50,6 +50,7 @@ export default function JourneyPage({ params }: { params: { slug: string } }) {
             { id: "hutulbur", label: "Өдөр өдрийн хөтөлбөр" },
             { id: "baga", label: "Хариуцах баг" },
             { id: "zahialga", label: "Цаг захиалах" },
+            { id: "zuvlumj", label: "Аялагчдын зөвлөмж" },
             { id: "faq", label: "Асуулт хариулт" },
           ].map((n) => (
             <a key={n.id} href={"#" + n.id} className="shrink-0 whitespace-nowrap text-sm font-semibold text-white/70 transition hover:text-primary-300">{n.label}</a>
@@ -148,6 +149,38 @@ export default function JourneyPage({ params }: { params: { slug: string } }) {
         </div>
         <div className="mt-8">
           <JourneyBooking slug={j.slug} journeyName={j.name} />
+        </div>
+      </div></section>
+
+      {/* Аялагчдын зөвлөмж */}
+      <section id="zuvlumj" className="section scroll-mt-32"><div className="container-px">
+        <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Аялагчдын зөвлөмж</h2>
+        <p className="mt-2 max-w-2xl text-muted">Аяллын өмнө бэлдэхэд туслах зөвлөмжүүд.</p>
+        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+          <div className="card p-6">
+            <h3 className="font-display text-lg font-semibold text-ink">🙏 Соёлын дүрэм</h3>
+            <ul className="mt-4 space-y-2.5">
+              {JOURNEY_PREP.etiquette.map((e, i) => <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-ink/80"><span className="mt-0.5 text-primary-400">•</span><span>{e}</span></li>)}
+            </ul>
+          </div>
+          <div className="card p-6">
+            <h3 className="font-display text-lg font-semibold text-ink">🎒 Цүнхэндээ юу авах вэ</h3>
+            <ul className="mt-4 space-y-2.5">
+              {JOURNEY_PREP.packing.map((e, i) => <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-ink/80"><span className="mt-0.5 text-primary-400">•</span><span>{e}</span></li>)}
+            </ul>
+          </div>
+          <div className="flex flex-col gap-6">
+            <div className="card p-6">
+              <h3 className="font-display text-lg font-semibold text-ink">🧘 Сэтгэлзүйн бэлтгэл</h3>
+              <ul className="mt-4 space-y-2.5">
+                {JOURNEY_PREP.mind.map((e, i) => <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-ink/80"><span className="mt-0.5 text-primary-400">•</span><span>{e}</span></li>)}
+              </ul>
+            </div>
+            <div className="card p-6">
+              <h3 className="font-display text-lg font-semibold text-ink">🥗 Хоол</h3>
+              <p className="mt-3 text-sm leading-relaxed text-ink/80">{JOURNEY_PREP.food}</p>
+            </div>
+          </div>
         </div>
       </div></section>
 
