@@ -95,6 +95,21 @@ export function ServiceBooking({
   }
 
   const inputCls = "focus-ring w-full rounded-2xl border-2 border-line bg-surface-1 px-4 py-3 text-[1rem] text-ink outline-none transition hover:border-primary-400/60 focus:border-primary-500";
+  const yearOptions = useMemo(() => Array.from({ length: 3 }, (_, i) => today.getFullYear() + i), [today]);
+
+  if (!user) {
+    return (
+      <div className="card p-6 text-center">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-primary-50 text-2xl">🔐</div>
+        <p className="mt-3 font-display text-lg font-semibold text-ink">Цаг захиалахын тулд нэвтэрнэ үү</p>
+        <p className="mt-1.5 text-sm leading-relaxed text-muted">Захиалгаа хадгалж, төлөв өөрчлөгдөх бүрд мэдэгдэл авахын тулд эхлээд бүртгэлдээ нэвтэрнэ үү.</p>
+        <div className="mt-5 flex justify-center gap-2">
+          <Link href="/login" className="btn btn-primary btn-sm">Нэвтрэх</Link>
+          <Link href="/register" className="btn btn-outline btn-sm">Бүртгүүлэх</Link>
+        </div>
+      </div>
+    );
+  }
 
   if (done) {
     return (
@@ -136,11 +151,11 @@ export function ServiceBooking({
           </div>
         ) : (
           <p className="mt-3 text-sm leading-relaxed text-muted">
-            Админ баталгаажуулсны дараа{user ? " мэдэгдэл ирнэ." : " бид тантай холбогдоно."}
+            Админ баталгаажуулсны дараа мэдэгдэл ирнэ.
           </p>
         )}
 
-        {user && <Link href="/account" className="btn btn-outline btn-sm mt-4">Миний булан →</Link>}
+        <Link href="/account" className="btn btn-outline btn-sm mt-4">Миний булан →</Link>
       </div>
     );
   }
@@ -163,12 +178,21 @@ export function ServiceBooking({
 
       {/* Хуанли */}
       <div className="mt-5 rounded-2xl border border-line p-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-1.5">
           <button type="button" onClick={() => shift(-1)} aria-label="Өмнөх сар"
-            className="focus-ring grid h-8 w-8 place-items-center rounded-lg border border-line text-ink transition hover:bg-primary-500/10">‹</button>
-          <p className="font-display text-sm font-semibold text-ink">{calY} · {MONTHS[calM - 1]}</p>
+            className="focus-ring grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-line text-ink transition hover:bg-primary-500/10">‹</button>
+          <div className="flex min-w-0 items-center gap-1">
+            <select value={calM} onChange={(e) => { setCalM(Number(e.target.value)); setDate(""); setTime(""); }} aria-label="Сар сонгох"
+              className="focus-ring min-w-0 rounded-lg border border-line bg-surface-1 px-1.5 py-1 text-sm font-semibold text-ink">
+              {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
+            </select>
+            <select value={calY} onChange={(e) => { setCalY(Number(e.target.value)); setDate(""); setTime(""); }} aria-label="Жил сонгох"
+              className="focus-ring rounded-lg border border-line bg-surface-1 px-1.5 py-1 text-sm font-semibold text-ink">
+              {yearOptions.map((y) => <option key={y} value={y}>{y}</option>)}
+            </select>
+          </div>
           <button type="button" onClick={() => shift(1)} aria-label="Дараах сар"
-            className="focus-ring grid h-8 w-8 place-items-center rounded-lg border border-line text-ink transition hover:bg-primary-500/10">›</button>
+            className="focus-ring grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-line text-ink transition hover:bg-primary-500/10">›</button>
         </div>
 
         <div className="mt-3 grid grid-cols-7 gap-1 text-center">

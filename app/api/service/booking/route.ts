@@ -29,6 +29,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const uid = await getSessionUserId();
+  if (!uid) return NextResponse.json({ error: "Захиалга хийхийн тулд эхлээд нэвтэрнэ үү." }, { status: 401 });
   const b = await req.json().catch(() => ({}));
 
   const itemId = String(b?.itemId || "");
