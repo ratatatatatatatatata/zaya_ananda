@@ -145,10 +145,25 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
     } catch { setErr("Хадмал файл уншихад алдаа."); }
   }
 
-  function applyTeacher(name: string) {
-    const t = teachers.find((x) => x.name === name);
-    if (!t) return;
-    setForm((f) => ({ ...f, teacherName: t.name, teacherImage: t.image || "", teacherRole: t.role || "", teacherInfo: t.info || "" }));
+  function selectedTeacherNames(): string[] {
+    return form.teacherName.split(",").map((s) => s.trim()).filter(Boolean);
+  }
+
+  function toggleTeacher(name: string) {
+    const cur = selectedTeacherNames();
+    const isOn = cur.includes(name);
+    const next = isOn ? cur.filter((n) => n !== name) : [...cur, name];
+    setForm((f) => {
+      // Зураг/тайлбар талбарууд ганц хэвээр — эхний сонгосон багшийнхаар автоматаар бөглөнө.
+      const first = !isOn ? teachers.find((x) => x.name === name) : undefined;
+      return {
+        ...f,
+        teacherName: next.join(", "),
+        teacherImage: first ? (first.image || f.teacherImage) : f.teacherImage,
+        teacherRole: first ? (first.role || f.teacherRole) : f.teacherRole,
+        teacherInfo: first ? (first.info || f.teacherInfo) : f.teacherInfo,
+      };
+    });
   }
 
   function resetForm() {
@@ -505,16 +520,31 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
 
               {hasTeacher && (
                 <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
-                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                    <p className="font-display font-semibold text-ink">Заах багшийн мэдээлэл</p>
-                    {teachers.length > 0 && (
-                      <select className="input w-56" value="" onChange={(e) => applyTeacher(e.target.value)}>
-                        <option value="">— Өмнөх багш сонгох —</option>
-                        {teachers.map((t) => <option key={t.name} value={t.name}>{t.name}</option>)}
-                      </select>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3">
+                  <p className="font-display font-semibold text-ink">Заах багшийн мэдээлэл</p>
+                  {teachers.length > 0 && (
+                    <div className="mt-3">
+                      <label className="field-label">Багш сонгох (нэгээс олноор сонгож болно)</label>
+                      <div className="mt-1.5 flex flex-wrap gap-2">
+                        {teachers.map((t) => {
+                          const on = selectedTeacherNames().includes(t.name);
+                          return (
+                            <button
+                              key={t.name}
+                              type="button"
+                              onClick={() => toggleTeacher(t.name)}
+                              className={
+                                "rounded-full border px-3.5 py-1.5 text-sm font-medium transition " +
+                                (on ? "border-primary-600 bg-primary-600 text-white" : "border-line bg-white text-ink/70 hover:border-primary-300")
+                              }
+                            >
+                              {on ? "✓ " : ""}{t.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  <div className="mt-4 flex items-center gap-3">
                     {form.teacherImage
                       ? <img src={form.teacherImage} alt="" className="h-20 w-20 rounded-full object-cover" />
                       : <div className="grid h-20 w-20 place-items-center rounded-full border border-dashed border-line text-xl text-muted">👤</div>}
@@ -524,7 +554,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
                     </div>
                   </div>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    <div><label className="field-label">Багшийн нэр</label><input className="input" value={form.teacherName} onChange={(e) => set("teacherName", e.target.value)} /></div>
+                    <div><label className="field-label">Багшийн нэр (таслалаар тусгаарлан гараар нэмж болно)</label><input className="input" value={form.teacherName} onChange={(e) => set("teacherName", e.target.value)} /></div>
                     <div><label className="field-label">Албан тушаал / чиглэл</label><input className="input" value={form.teacherRole} onChange={(e) => set("teacherRole", e.target.value)} placeholder="Жишээ: Энерги засалч, Багш" /></div>
                   </div>
                   <div className="mt-3"><label className="field-label">Мэдээлэл (мөр бүрд нэг мэдээлэл)</label><textarea className="textarea" rows={4} placeholder="Үүсгэн байгуулагч, Сургагч багш&#10;Далд ухамсрын шинжээч&#10;..." value={form.teacherInfo} onChange={(e) => set("teacherInfo", e.target.value)} /></div>

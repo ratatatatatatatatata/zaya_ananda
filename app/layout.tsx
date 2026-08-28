@@ -48,8 +48,9 @@ const orgJsonLd = {
   email: "zayasanandacentre@gmail.com",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "Хан-Уул дүүрэг, Намуун төгөл хотхон, 8Б",
+    streetAddress: "Хан-Уул дүүрэг, 15-р хороо, Махатма Ганди гудамж",
     addressLocality: "Улаанбаатар",
+    postalCode: "17010",
     addressCountry: "MN",
   },
   openingHours: "Mo-Sa 09:00-19:00",

@@ -48,7 +48,10 @@ export function CmsFilterGrid({ items, categories, groups, emptyText, modeFilter
     const g = groups.find((x) => x.group === tab);
     if (g) {
       subTabs = g.subs;
-      shown = sub === "Бүгд" ? items.filter((i) => g.subs.includes(i.category || "") || (i.category || "") === g.group) : items.filter((i) => (i.category || "") === sub);
+      shown = sub === "Бүгд"
+        ? items.filter((i) => g.subs.includes(i.category || "") || (i.category || "") === g.group)
+        // "Онлайн ба Биечлэн" ангилалтай зүйл "Онлайн" болон "Биечлэн" аль алины шүүлтэд харагдана.
+        : items.filter((i) => (i.category || "") === sub || ((sub === "Онлайн" || sub === "Биечлэн") && (i.category || "") === "Онлайн ба Биечлэн"));
     }
   } else if (categories && tab !== "Бүгд") {
     shown = items.filter((i) => (i.category || "") === tab);

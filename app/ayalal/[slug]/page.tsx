@@ -85,7 +85,7 @@ export default async function JourneyPage({ params }: { params: { slug: string }
         <p className="mt-2 max-w-2xl text-muted">Өдөр бүрийн урсгал, юу үзэж, юу хийхийг дарааллаар нь харуулав.</p>
 
         <div className="mt-10 space-y-8">
-          {j.itinerary.map((d, i) => (
+          {(j.itinerary || []).map((d, i) => (
             <article key={i} className="card grid gap-0 overflow-hidden lg:grid-cols-[minmax(0,22rem)_1fr]">
               {/* Урд тал — зураг */}
               <div className="relative aspect-[4/3] w-full overflow-hidden lg:aspect-auto lg:h-full">
@@ -124,11 +124,11 @@ export default async function JourneyPage({ params }: { params: { slug: string }
         <p className="mt-2 max-w-2xl text-muted">Аяллын турш тантай хамт явж, хөтөлбөрийг удирдах хүмүүс.</p>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,24rem)_1fr]">
-          <LeadCard person={j.lead} />
+          <LeadCard person={j.lead || { name: "", role: "", info: "" }} />
           <div>
             <p className="text-xs font-bold uppercase tracking-wide text-muted">Хамт явах баг</p>
             <div className="mt-4 space-y-4">
-              {j.crew.map((c) => <CrewRow key={c.name} person={c} />)}
+              {(j.crew || []).map((c) => <CrewRow key={c.name} person={c} />)}
             </div>
           </div>
         </div>

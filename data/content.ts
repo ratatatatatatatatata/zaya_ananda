@@ -22,11 +22,11 @@ export const siteConfig = {
   phone: "7202-2002",
   email: "zayasanandacentre@gmail.com",
   address: l(
-    "Улаанбаатар хот, Хан-Уул дүүрэг, Намуун төгөл хотхон, 8Б",
-    "Namuun Tögöl residence 8B, Khan-Uul District, Ulaanbaatar",
-    "울란바토르 한올구 나문투굴 단지 8B",
-    "ウランバートル ハンウール区 ナムーン・トゥグル団地 8B",
-    "乌兰巴托 汗乌拉区 纳穆恩图格勒小区 8Б"
+    "Улаанбаатар хот, Хан-Уул дүүрэг, 15-р хороо, Махатма Ганди гудамж, 17010",
+    "Mahatma Gandhi St, Khan-Uul District, 15th khoroo, Ulaanbaatar 17010",
+    "울란바토르 한올구 15호로, 마하트마 간디 거리, 17010",
+    "ウランバートル ハンウール区15区、マハトマ・ガンジー通り、17010",
+    "乌兰巴托 汗乌拉区15区 甘地大街 17010"
   ),
   mapQuery: "WW49+4X3 Mahatma Gandhi St, HUD - 15 khoroo, Ulaanbaatar 17010, Mongolia",
   workingHours: l(

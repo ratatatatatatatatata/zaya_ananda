@@ -16,7 +16,7 @@ export default async function TeacherDetailPage({ params }: { params: { slug: st
 
   const [courses, services] = await Promise.all([listCmsCached("course"), listCmsCached("service")]);
   const classes: TeacherClass[] = [...courses, ...services]
-    .filter((i) => (i.teacherName || "").trim() === teacher.name.trim())
+    .filter((i) => (i.teacherName || "").split(",").map((s) => s.trim()).includes(teacher.name.trim()))
     .map((i) => ({
       id: i.id, kind: i.kind, title: i.title, summary: i.summary, image: i.image,
       price: i.price, lessonsCount: i.lessons?.length ?? i.videoLessons, i18n: i.i18n,
