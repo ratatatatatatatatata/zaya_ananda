@@ -246,7 +246,7 @@ export interface SiteSettings {
   /** Толгойн дэвсгэр — бичлэг эсвэл зураг. Түлхүүр: hero slot */
   heroMedia?: Record<string, { kind: "video" | "image"; src: string }>;
   /** Нүүр хуудасны «Зурхай» слайдерын картууд */
-  zurhaiCards?: { emoji: string; title: string; desc: string; href: string }[];
+  zurhaiCards?: { emoji: string; title: string; desc: string; href: string; image?: string }[];
   /** Админаас нэмсэн нэмэлт мэдрэмжүүд (Сэтгэлийн туяа) */
   customMoods?: { key: string; emoji: string; label: string }[];
   /** Зурхайн тайллын гар бичвэрүүд — түлхүүр: zodiac:leo, life:7, arcana:12, day:mon, element:fire */

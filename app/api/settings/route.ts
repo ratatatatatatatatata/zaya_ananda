@@ -41,6 +41,7 @@ export async function PATCH(req: Request) {
               title: String(c?.title || "").trim(),
               desc: String(c?.desc || "").trim(),
               href: String(c?.href || "").trim(),
+              image: c?.image ? String(c.image) : "",
             }))
             .filter((c: { title: string }) => c.title)
         : undefined,

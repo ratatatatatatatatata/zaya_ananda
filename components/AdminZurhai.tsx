@@ -2,10 +2,33 @@
 
 import { useEffect, useState } from "react";
 
-type Card = { emoji: string; title: string; desc: string; href: string };
+type Card = { emoji: string; title: string; desc: string; href: string; image?: string };
 type Rule = { key: string; text: string };
 
-const EMPTY_CARD: Card = { emoji: "🔮", title: "", desc: "", href: "/merge" };
+const EMPTY_CARD: Card = { emoji: "🔮", title: "", desc: "", href: "/merge", image: "" };
+
+function compressImage(file: File, maxW = 800, quality = 0.85): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Зураг уншиж чадсангүй."));
+    reader.onload = () => {
+      const img = new window.Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxW / img.width);
+        const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("canvas алдаа"));
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = () => reject(new Error("Зураг буруу байна."));
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 /** Нүүр хуудасны зурхайн төрлүүд ба тайллын үндсэн алгоритм. */
 export function AdminZurhai() {
@@ -47,6 +70,13 @@ export function AdminZurhai() {
   const updCard = (i: number, p: Partial<Card>) => setCards((cs) => cs.map((c, k) => (k === i ? { ...c, ...p } : c)));
   const updRule = (i: number, p: Partial<Rule>) => setRules((rs) => rs.map((r, k) => (k === i ? { ...r, ...p } : r)));
 
+  async function pickCardImage(e: React.ChangeEvent<HTMLInputElement>, i: number) {
+    const file = e.target.files?.[0]; if (!file) return;
+    try { updCard(i, { image: await compressImage(file) }); }
+    catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
+    e.target.value = "";
+  }
+
   return (
     <div className="space-y-5">
       {/* Төрлүүд */}
@@ -67,12 +97,19 @@ export function AdminZurhai() {
           {cards.map((c, i) => (
             <div key={i} className="rounded-xl border border-line bg-surface-2 p-3">
               <div className="flex flex-wrap items-center gap-2">
-                <input className="input w-16 text-center" maxLength={4} value={c.emoji} onChange={(e) => updCard(i, { emoji: e.target.value })} />
+                <input className="input w-16 text-center" maxLength={4} value={c.emoji} onChange={(e) => updCard(i, { emoji: e.target.value })} title="Зураг оруулаагүй үед харагдах icon" />
                 <input className="input min-w-[12rem] flex-1" placeholder="Гарчиг — ж: Өдрийн зурхай" value={c.title} onChange={(e) => updCard(i, { title: e.target.value })} />
                 <input className="input w-52" placeholder="Холбоос — /merge эсвэл #zurhai-daily" value={c.href} onChange={(e) => updCard(i, { href: e.target.value })} />
                 <button type="button" onClick={() => setCards((cs) => cs.filter((_, k) => k !== i))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
               </div>
               <textarea className="textarea mt-2 min-h-[70px]" placeholder="Товч тайлбар" value={c.desc} onChange={(e) => updCard(i, { desc: e.target.value })} />
+              <div className="mt-2 flex items-center gap-3">
+                {c.image
+                  ? <img src={c.image} alt="" className="h-14 w-20 rounded-lg object-cover" />
+                  : <div className="grid h-14 w-20 place-items-center rounded-lg bg-surface-3 text-xs text-muted">Зураггүй</div>}
+                <input type="file" accept="image/*" className="text-sm" onChange={(e) => pickCardImage(e, i)} />
+                {c.image && <button type="button" onClick={() => updCard(i, { image: "" })} className="text-xs font-semibold text-rose-500 hover:underline">Зураг хасах</button>}
+              </div>
             </div>
           ))}
           {cards.length === 0 && <p className="text-sm text-muted">Одоогоор нэмээгүй — өгөгдмөл 3 төрөл харагдаж байна.</p>}

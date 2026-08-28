@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { siteConfig } from "@/data/content";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/lib/auth-context";
 
 type ContactInfo = { phone?: string; email?: string; address?: string; hours?: string; mapQuery?: string };
 
 /** Холбоо барих хэсэг — "Бидний тухай" хуудсанд нэгтгэгдсэн. */
 export function ContactSection() {
   const { t, tr } = useI18n();
+  const { user } = useAuth();
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState("");
   /** Админаас оруулсан холбоо барих мэдээлэл — байхгүй бол өгөгдмөл рүү шилжинэ. */
@@ -111,7 +113,7 @@ export function ContactSection() {
           </div>
         )}
 
-        <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr_1fr]">
+        <div className={"grid gap-10 " + (user ? "lg:grid-cols-[1fr_1.3fr]" : "lg:grid-cols-[1fr_1.3fr_1fr]")}>
           <div className="space-y-4">
             {info.map((i) => (
               <div key={i.label} className="flex items-center gap-4 rounded-3xl border border-line bg-cream p-5">
@@ -167,7 +169,7 @@ export function ContactSection() {
             )}
           </div>
 
-          <div className="card p-6 sm:p-8">
+          {!user && <div className="card p-6 sm:p-8">
             <h3 className="font-display text-lg font-semibold text-ink">Манай төвийн тухай сэтгэгдэл үлдээх</h3>
             <p className="mt-1 text-sm text-muted">Zaya&apos;s Ananda төвтэй холбоотой ерөнхий сэтгэгдэл, туршлагаа энд хуваалцаарай. Нэвтрэх шаардлагагүй.</p>
             {tStatus === "done" ? (
@@ -206,7 +208,7 @@ export function ContactSection() {
                 </button>
               </form>
             )}
-          </div>
+          </div>}
         </div>
         <div className="mt-12">
           <div className="overflow-hidden rounded-3xl border border-line shadow-card">

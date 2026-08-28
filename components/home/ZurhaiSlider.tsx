@@ -7,7 +7,7 @@ import { Coverflow3D } from "./Coverflow3D";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
 
-export type ZurhaiCard = { emoji: string; title: string; desc: string; href: string };
+export type ZurhaiCard = { emoji: string; title: string; desc: string; href: string; image?: string };
 
 /** Админ юу ч нэмээгүй үед харагдах өгөгдмөл 3 төрөл */
 export const DEFAULT_ZURHAI: ZurhaiCard[] = [
@@ -61,16 +61,24 @@ export function ZurhaiSlider({ cards, daily }: {
             return (
               <div
                 className="night relative flex min-h-[14rem] flex-col justify-center overflow-hidden rounded-[1.75rem] p-7 shadow-card sm:min-h-[15rem] sm:p-8"
-                style={{ backgroundImage: `linear-gradient(115deg, ${t.from} 0%, ${t.via} 52%, ${t.to} 100%)` }}
+                style={
+                  card.image
+                    ? { backgroundImage: `linear-gradient(180deg, rgba(11,23,20,0.35) 0%, rgba(11,23,20,0.86) 100%), url(${card.image})`, backgroundSize: "cover", backgroundPosition: "center" }
+                    : { backgroundImage: `linear-gradient(115deg, ${t.from} 0%, ${t.via} 52%, ${t.to} 100%)` }
+                }
               >
-                <div aria-hidden className="pointer-events-none absolute -right-16 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full"
-                  style={{ background: "radial-gradient(circle, rgba(255,255,255,0.3), transparent 70%)", filter: "blur(14px)" }} />
-                <div aria-hidden className="pointer-events-none absolute -bottom-16 left-1/3 h-56 w-56 rounded-full"
-                  style={{ background: "radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%)", filter: "blur(18px)" }} />
+                {!card.image && (
+                  <>
+                    <div aria-hidden className="pointer-events-none absolute -right-16 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full"
+                      style={{ background: "radial-gradient(circle, rgba(255,255,255,0.3), transparent 70%)", filter: "blur(14px)" }} />
+                    <div aria-hidden className="pointer-events-none absolute -bottom-16 left-1/3 h-56 w-56 rounded-full"
+                      style={{ background: "radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%)", filter: "blur(18px)" }} />
+                  </>
+                )}
 
                 <div className="relative z-10">
-                  <span className="text-3xl sm:text-4xl">{card.emoji}</span>
-                  <h3 className="mt-3 font-display text-xl font-semibold text-white sm:text-2xl">{card.title}</h3>
+                  {!card.image && <span className="text-3xl sm:text-4xl">{card.emoji}</span>}
+                  <h3 className={"font-display text-xl font-semibold text-white sm:text-2xl " + (card.image ? "" : "mt-3")}>{card.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-white/85">{card.desc}</p>
                   <button
                     type="button"
