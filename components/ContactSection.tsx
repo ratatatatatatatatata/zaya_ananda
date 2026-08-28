@@ -14,6 +14,39 @@ export function ContactSection() {
   /** Админаас оруулсан холбоо барих мэдээлэл — байхгүй бол өгөгдмөл рүү шилжинэ. */
   const [cfg, setCfg] = useState<ContactInfo>({});
 
+  // Сэтгэгдэл үлдээх — нэвтрэлгүйгээр хэн ч бичиж болно
+  const [tName, setTName] = useState("");
+  const [tRating, setTRating] = useState(5);
+  const [tText, setTText] = useState("");
+  const [tCompany, setTCompany] = useState(""); // honeypot — жинхэнэ хэрэглэгч бөглөхгүй
+  const [tStatus, setTStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [tError, setTError] = useState("");
+  const [publicT, setPublicT] = useState<{ id: string; name: string; rating: number; text: string }[]>([]);
+
+  useEffect(() => {
+    fetch("/api/testimonial", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { items: [] }))
+      .then((d) => setPublicT(d.items || []))
+      .catch(() => {});
+  }, [tStatus]);
+
+  async function submitTestimonial(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!tName.trim() || !tText.trim()) { setTStatus("error"); setTError("Нэр болон сэтгэгдлээ бичнэ үү."); return; }
+    setTStatus("sending"); setTError("");
+    try {
+      const res = await fetch("/api/testimonial", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: tName.trim(), rating: tRating, text: tText.trim(), company: tCompany }),
+      });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Error"); }
+      setTStatus("done"); setTName(""); setTRating(5); setTText(""); setTCompany("");
+    } catch (err) {
+      setTStatus("error");
+      setTError(err instanceof Error ? err.message : "Error");
+    }
+  }
+
   useEffect(() => {
     fetch("/api/settings", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
@@ -65,7 +98,20 @@ export function ContactSection() {
           <h2 className="font-display text-3xl font-semibold text-ink">{t("contact.title")}</h2>
           <p className="mt-2 text-muted">{t("contact.desc")}</p>
         </div>
-        <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr]">
+
+        {publicT.length > 0 && (
+          <div className="mx-auto mb-10 grid max-w-4xl gap-4 sm:grid-cols-3">
+            {publicT.map((r) => (
+              <blockquote key={r.id} className="rounded-2xl border border-line bg-cream p-5">
+                <span className="text-accent-300">{"★".repeat(r.rating)}</span>
+                <p className="mt-2 text-sm leading-relaxed text-ink/85">«{r.text}»</p>
+                <footer className="mt-3 text-sm font-semibold text-primary-700">— {r.name}</footer>
+              </blockquote>
+            ))}
+          </div>
+        )}
+
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr_1fr]">
           <div className="space-y-4">
             {info.map((i) => (
               <div key={i.label} className="flex items-center gap-4 rounded-3xl border border-line bg-cream p-5">
@@ -116,6 +162,47 @@ export function ContactSection() {
                 {status === "error" && <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</p>}
                 <button type="submit" disabled={status === "sending"} className="btn btn-primary btn-lg w-full">
                   {status === "sending" ? t("contact.sending") : t("contact.send")}
+                </button>
+              </form>
+            )}
+          </div>
+
+          <div className="card p-6 sm:p-8">
+            <h3 className="font-display text-lg font-semibold text-ink">Сэтгэгдэл үлдээх</h3>
+            <p className="mt-1 text-sm text-muted">Манай төвтэй холбоотой сэтгэгдэл, туршлагаа хуваалцаарай. Нэвтрэх шаардлагагүй.</p>
+            {tStatus === "done" ? (
+              <div className="flex flex-col items-center justify-center py-10 text-center">
+                <div className="grid h-16 w-16 place-items-center rounded-full bg-jade-400/15 text-3xl text-jade-600">✓</div>
+                <p className="mt-4 font-semibold text-ink">Баярлалаа!</p>
+                <p className="mt-1 text-sm text-muted">Админ шалгаад нийтэд харуулна.</p>
+                <button onClick={() => setTStatus("idle")} className="btn btn-outline btn-sm mt-5">Дахин бичих</button>
+              </div>
+            ) : (
+              <form onSubmit={submitTestimonial} className="mt-4 space-y-4">
+                <div>
+                  <label className="field-label" htmlFor="t-name">{t("form.name")} *</label>
+                  <input id="t-name" className="input" value={tName} onChange={(e) => setTName(e.target.value)} required />
+                </div>
+                {/* honeypot — жинхэнэ хэрэглэгчид харагдахгүй, ботууд бөглөж алдана */}
+                <input type="text" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden value={tCompany} onChange={(e) => setTCompany(e.target.value)} name="company" />
+                <div>
+                  <label className="field-label">Үнэлгээ</label>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <button key={i} type="button" onClick={() => setTRating(i)} aria-label={i + " од"}
+                        className={"text-2xl transition " + (i <= tRating ? "text-accent-300" : "text-line hover:text-accent-300/60")}>
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="t-text">Сэтгэгдэл *</label>
+                  <textarea id="t-text" className="textarea" rows={4} value={tText} onChange={(e) => setTText(e.target.value)} required />
+                </div>
+                {tStatus === "error" && <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-600">{tError}</p>}
+                <button type="submit" disabled={tStatus === "sending"} className="btn btn-primary btn-md w-full">
+                  {tStatus === "sending" ? "Илгээж байна…" : "Илгээх"}
                 </button>
               </form>
             )}
