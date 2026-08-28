@@ -6,6 +6,9 @@ const MAX_TILT_DEG = 26;
 const MAX_SCALE_DROP = 0.13;
 const MAX_OPACITY_DROP = 0.3;
 const AUTOPLAY_MS = 3000;
+// Хүн гараараа чирж/гүйлгэж байсны дараа автомат шилжилт хэсэг хугацаанд
+// (энэ хэдэн мс) орж ирэхгүй — удирдлагыг эхлээд түүнд бүрэн өгнө.
+const RESUME_DELAY_MS = 4000;
 
 /**
  * Ерөнхий 3D "coverflow" зөөвөрлөгч — карт бүрийг render хийх функцийг дамжуулбал
@@ -28,11 +31,28 @@ export function Coverflow3D<T>({
   const trackRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const rafId = useRef<number | null>(null);
-  const pausedRef = useRef(false);
+  const hoveringRef = useRef(false);
+  const lastUserInteractRef = useRef(0);
+  const markInteraction = useCallback(() => { lastUserInteractRef.current = Date.now(); }, []);
 
   const tilt = useCallback(() => {
     const el = trackRef.current;
     if (!el) return;
+
+    // Жижиг дэлгэц дээр (утас) нэг карт бараг бүтэн өргөнийг эзэлдэг тул
+    // 3D хазайлт хэвийн бус, "хазгай" харагдана — тэнд яг урдаас, шулуун харуулна.
+    const flat = typeof window !== "undefined" && window.innerWidth < 640;
+    if (flat) {
+      cardRefs.current.forEach((card) => {
+        if (!card) return;
+        card.style.transform = "none";
+        card.style.opacity = "1";
+        card.style.zIndex = "1";
+      });
+      rafId.current = null;
+      return;
+    }
+
     const rect = el.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const half = rect.width / 2 || 1;
@@ -98,26 +118,34 @@ export function Coverflow3D<T>({
   const next = useCallback(() => goTo(nearestIndex() + 1), [goTo, nearestIndex]);
   const prev = useCallback(() => goTo(nearestIndex() - 1), [goTo, nearestIndex]);
 
-  // 3 секунд тутам дараагийн карт руу өөрөө шилжинэ — hover/хүрэлт үед зогсоно
+  // 3 секунд тутам дараагийн карт руу өөрөө шилжинэ — хүн idle үед л ажиллана.
+  // Hover хийж байгаа, эсвэл сая гараараа чирж/гүйлгэсэн бол автомат шилжилт
+  // тухайн хүний удирдлагатай мөргөлдөхгүйн тулд хэсэг хугацаагаар түр зогсоно.
   useEffect(() => {
     if (!autoPlay || items.length < 2) return;
     if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => { if (!pausedRef.current) next(); }, AUTOPLAY_MS);
+    const t = setInterval(() => {
+      if (hoveringRef.current) return;
+      if (Date.now() - lastUserInteractRef.current < RESUME_DELAY_MS) return;
+      next();
+    }, AUTOPLAY_MS);
     return () => clearInterval(t);
   }, [autoPlay, items.length, next]);
 
   return (
     <div
       className="relative"
-      onMouseEnter={() => { pausedRef.current = true; }}
-      onMouseLeave={() => { pausedRef.current = false; }}
-      onTouchStart={() => { pausedRef.current = true; }}
+      onMouseEnter={() => { hoveringRef.current = true; }}
+      onMouseLeave={() => { hoveringRef.current = false; }}
+      onPointerDown={markInteraction}
+      onWheel={markInteraction}
+      onTouchMove={markInteraction}
     >
       {items.length > 1 && (
         <>
           <button
             type="button"
-            onClick={prev}
+            onClick={() => { markInteraction(); prev(); }}
             aria-label="Өмнөх"
             className="focus-ring absolute left-0 top-1/2 z-20 grid h-11 w-11 -translate-x-1/3 -translate-y-1/2 place-items-center rounded-full border border-line bg-surface-1 text-lg text-ink shadow-sm transition hover:border-primary-500/45 hover:text-primary-700 sm:-translate-x-1/2"
           >
@@ -125,7 +153,7 @@ export function Coverflow3D<T>({
           </button>
           <button
             type="button"
-            onClick={next}
+            onClick={() => { markInteraction(); next(); }}
             aria-label="Дараах"
             className="focus-ring absolute right-0 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 translate-x-1/3 place-items-center rounded-full border border-line bg-surface-1 text-lg text-ink shadow-sm transition hover:border-primary-500/45 hover:text-primary-700 sm:translate-x-1/2"
           >

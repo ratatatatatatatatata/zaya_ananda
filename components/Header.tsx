@@ -111,7 +111,7 @@ export function Header() {
           ) : (
             <Link href="/login" className="grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-primary-50 hover:text-primary-700" aria-label="Account">👤</Link>
           )}
-          <button onClick={() => setMenuOpen((o) => !o)} className="grid h-10 w-10 place-items-center rounded-full text-ink/80 xl:hidden" aria-label="Menu">{menuOpen ? "✕" : "☰"}</button>
+          <button onClick={() => setMenuOpen((o) => !o)} className="grid h-11 w-11 place-items-center rounded-full text-2xl text-ink/80 xl:hidden" aria-label="Menu">{menuOpen ? "✕" : "☰"}</button>
         </div>
       </div>
 
@@ -130,15 +130,6 @@ export function Header() {
               {pageLabel(p)}
             </Link>
           ))}
-          <div className="mt-2 flex flex-col gap-2">
-            <Link href={user ? "/account" : "/login"} className="btn btn-outline btn-md w-full">{user ? t("nav.account") : t("auth.login")}</Link>
-            {user?.isAdmin && <Link href="/admin" className="btn btn-outline btn-md w-full">⚙ {t("admin.title")}</Link>}
-            {user && (
-              <button onClick={() => logout().then(() => router.push("/"))} className="btn btn-outline btn-md w-full text-rose-600">
-                {t("account.logout")}
-              </button>
-            )}
-          </div>
           <div className="mt-2"><LanguageSwitcher /></div>
         </nav>
       </div>
