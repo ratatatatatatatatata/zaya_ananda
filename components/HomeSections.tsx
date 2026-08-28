@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { listCmsCached, getSettingsCached } from "@/lib/repo";
 import { heroMediaFor } from "@/lib/hero-video";
-import { ReelsSlider } from "./home/ReelsSlider";
+import { GiftCoverflow } from "./home/GiftCoverflow";
+import { JourneyCoverflow } from "./home/JourneyCoverflow";
 import { StoneReading } from "./StoneReading";
-import { Reveal } from "./Reveal";
 import { T, Tr } from "./T";
 import { PathsHighlight } from "./home/PathsHighlight";
 import { MergeToorog } from "./MergeToorog";
@@ -12,7 +12,6 @@ import { SectionZoom } from "./home/SectionZoom";
 import { ZurhaiSlider } from "./home/ZurhaiSlider";
 import { ServiceCoverflow } from "./home/ServiceCoverflow";
 import { HomeAbout } from "./home/HomeAbout";
-import { JourneyImage } from "./journey/SceneArt";
 import { listJourneysCached } from "@/lib/journeys-db";
 import type { Locale } from "@/lib/types";
 
@@ -109,28 +108,7 @@ export async function HomeSections() {
           <Link href="/ayalal" className="btn btn-outline btn-md shrink-0">Бүх аялал →</Link>
         </div>
         <div aria-hidden className="khas-rule mt-6 opacity-70" />
-        <div className="mt-8 grid gap-7 lg:grid-cols-2">
-          {JOURNEYS.map((j, idx) => (
-            <Reveal key={j.slug} delay={idx * 80}>
-              <Link href={`/ayalal/${j.slug}`} className="card group block h-full overflow-hidden transition hover:-translate-y-1 hover:shadow-glow">
-                <div className="relative aspect-[16/10] w-full overflow-hidden">
-                  <JourneyImage src={j.image} scene={j.scene} alt={j.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.06]" />
-                  <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,20,17,0.88) 0%, rgba(8,20,17,0.15) 55%, transparent 100%)" }} />
-                  <div className="absolute inset-x-0 bottom-0 p-6">
-                    <p className="text-xs font-bold uppercase tracking-[0.24em] text-accent-300">{j.tagline}</p>
-                    <h3 className="mt-2 font-display text-2xl font-semibold text-white">{j.name}</h3>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-muted">
-                    <span>🗓 {j.days}</span><span>👥 {j.groupSize}</span><span>⛺ {j.stay}</span>
-                  </div>
-                  <p className="mt-3 leading-relaxed text-muted">{j.summary}</p>
-                </div>
-              </Link>
-            </Reveal>
-          ))}
-        </div>
+        <JourneyCoverflow items={JOURNEYS} />
       </div></section>
 
       {/* Энергийн хамгаалалт */}
@@ -143,7 +121,7 @@ export async function HomeSections() {
       {/* Гэгээн бэлэг */}
       <section id="gift" className="section scroll-mt-36"><div className="container-px">
         <SectionZoom eyebrow="🎁" title={<T k="nav.gift" />} desc={<Tr v={D.gift} />} href="/gift">
-          <ReelsSlider items={free} />
+          <GiftCoverflow items={free} />
         </SectionZoom>
       </div></section>
 

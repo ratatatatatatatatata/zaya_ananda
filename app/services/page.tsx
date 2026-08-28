@@ -1,4 +1,3 @@
-import { PromoBanner } from "@/components/PromoBanner";
 import { VideoHero } from "@/components/video/VideoHero";
 import { ServiceList } from "@/components/home/ServiceList";
 import { heroMediaFor } from "@/lib/hero-video";
@@ -10,10 +9,9 @@ export const metadata = { title: "Үйлчилгээ" };
 
 export default async function ServicesPage() {
   const heroMedia = await heroMediaFor("services");
-  const [items, promos] = await Promise.all([listCmsCached("service"), listCmsCached("promo")]);
+  const items = await listCmsCached("service");
   return (
     <>
-      <PromoBanner items={promos} />
       {/* Ойн сүмийн болор — камер болор руу ойртож, гэрлийн бөөмс болон бутарна */}
       <VideoHero
         media={heroMedia}
