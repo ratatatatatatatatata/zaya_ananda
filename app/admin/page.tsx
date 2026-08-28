@@ -23,7 +23,8 @@ const nav: { id: string; k: string; label?: string; icon: string }[] = [
   { id: "journeys", k: "admin.journeysM", label: "Сүнслэг аялал", icon: "bag" },
   { id: "services", k: "admin.servicesM", label: "Энергийн засал", icon: "star" },
   { id: "courses", k: "admin.coursesM", label: "Ариусахуйн үйл", icon: "award" },
-  { id: "products", k: "admin.productsM", label: "Энергийн хамгаалалт", icon: "laptop" },
+  { id: "products", k: "admin.productsM", label: "Бүтээгдэхүүн", icon: "laptop" },
+  { id: "stones", k: "admin.productsM", label: "Чулуунууд", icon: "star" },
   { id: "zurhai", k: "admin.zurhaiM", label: "Зурхай", icon: "star" },
   { id: "teachers", k: "admin.teachersM", label: "Хамт олон", icon: "user" },
   { id: "gift", k: "admin.giftM", label: "Гэгээн бэлэг", icon: "award" },
@@ -217,7 +218,8 @@ export default function AdminPage() {
             {tab === "journeys" && <AdminJourneys />}
             {tab === "services" && <AdminContentManager kind="service" />}
             {tab === "courses" && <AdminContentManager kind="course" />}
-            {tab === "products" && <AdminContentManager kind="product" />}
+            {tab === "products" && <AdminContentManager kind="product" fixedCategory="Бүтээгдэхүүн" />}
+            {tab === "stones" && <AdminContentManager kind="product" fixedCategory="Чулуунууд" />}
             {tab === "promos" && <AdminContentManager kind="promo" />}
             {tab === "zurhai" && <AdminZurhai />}
             {tab === "teachers" && <AdminTeachers />}

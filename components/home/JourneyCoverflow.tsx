@@ -6,9 +6,11 @@ import { JourneyImage } from "../journey/SceneArt";
 import type { Journey } from "@/data/journeys";
 
 /** Нэг аяллын карт — Энергийн заслын карттай ижил дизайны хэлээр (badge, зураг, гарчиг, мэдээллийн мөр, CTA). */
-function JourneyCard({ j }: { j: Journey }) {
+export function JourneyCard({ j }: { j: Journey }) {
   return (
-    <Link href={`/ayalal/${j.slug}`} className="card group flex h-full w-full flex-col overflow-hidden text-left transition hover:-translate-y-1 hover:shadow-glow">
+    // prefetch={false}: урьдчилан татсан хуучин RSC өгөгдөл slug-той таарахгүй үед
+    // "дэлгэрэнгүй" рүү орохад 404 үзүүлэх эрсдэлийг арилгана — дарахад л шинээр татна.
+    <Link href={`/ayalal/${j.slug}`} prefetch={false} className="card group flex h-full w-full flex-col overflow-hidden text-left transition hover:-translate-y-1 hover:shadow-glow">
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-3">
         <JourneyImage src={j.image} scene={j.scene} alt={j.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
         <span className="absolute left-4 top-4 rounded-full bg-[#0B1714]/75 px-3 py-1 text-xs font-semibold text-accent-300 backdrop-blur">
@@ -38,5 +40,15 @@ export function JourneyCoverflow({ items }: { items: Journey[] }) {
       renderItem={(j) => <JourneyCard j={j} />}
       cardWidthClassName="w-[19rem] sm:w-[21rem]"
     />
+  );
+}
+
+/** Сүнслэг аяллын статик жагсаалт — гулгалтгүй, доод тал нь 3 аяллыг эгнүүлж харуулна. */
+export function JourneyStaticGrid({ items }: { items: Journey[] }) {
+  if (items.length === 0) return null;
+  return (
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((j) => <JourneyCard key={j.slug} j={j} />)}
+    </div>
   );
 }

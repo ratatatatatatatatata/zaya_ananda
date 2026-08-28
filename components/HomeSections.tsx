@@ -2,7 +2,7 @@ import Link from "next/link";
 import { listCmsCached, getSettingsCached } from "@/lib/repo";
 import { heroMediaFor } from "@/lib/hero-video";
 import { GiftCoverflow } from "./home/GiftCoverflow";
-import { JourneyCoverflow } from "./home/JourneyCoverflow";
+import { JourneyStaticGrid } from "./home/JourneyCoverflow";
 import { ProductCoverflow } from "./home/ProductCoverflow";
 import { StoneReading } from "./StoneReading";
 import { T, Tr } from "./T";
@@ -110,7 +110,7 @@ export async function HomeSections() {
           <Link href="/ayalal" className="btn btn-outline btn-md shrink-0">Бүх аялал →</Link>
         </div>
         <div aria-hidden className="khas-rule mt-6 opacity-70" />
-        <JourneyCoverflow items={JOURNEYS} />
+        <JourneyStaticGrid items={JOURNEYS.slice(0, 3)} />
       </div></section>
 
       {/* Энергийн хамгаалалт — эхлээд бүтээгдэхүүн (Энергийн засалтай адилхан гулддаг), доор нь төрсөн огноогоор чулуу тааруулах хэсэг */}

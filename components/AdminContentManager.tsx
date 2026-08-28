@@ -73,7 +73,7 @@ type LessonRow = { title: string; path: string; url?: string; quality: string; s
 
 const MAX_IMAGES = 3;
 
-export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
+export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["kind"]; fixedCategory?: string }) {
   const MOODS = useMoods();
   const [items, setItems] = useState<CmsItem[]>([]);
   const [open, setOpen] = useState(false);
@@ -98,9 +98,9 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
   const load = useCallback(() => {
     fetch("/api/admin/content", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : { items: [] }))
-      .then((d) => setItems((d.items || []).filter((i: CmsItem) => i.kind === kind)))
+      .then((d) => setItems((d.items || []).filter((i: CmsItem) => i.kind === kind && (!fixedCategory || i.category === fixedCategory))))
       .catch(() => {});
-  }, [kind]);
+  }, [kind, fixedCategory]);
   useEffect(() => { load(); }, [load]);
   useEffect(() => {
     fetch("/api/settings", { cache: "no-store" })
@@ -168,12 +168,12 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
   }
 
   function resetForm() {
-    setForm(EMPTY); setImages([]); setLessons([]); setI18n({}); setMoods([]);
+    setForm({ ...EMPTY, category: fixedCategory || "" }); setImages([]); setLessons([]); setI18n({}); setMoods([]);
     setBookingDays(DEFAULT_BOOKING_DAYS); setBookingStart(String(DEFAULT_START_HOUR)); setBookingEnd(String(DEFAULT_END_HOUR));
     setLangTab("mn"); setEditingId(null); setErr(""); setOpen(false);
   }
   function startNew() {
-    setForm(EMPTY); setImages([]); setLessons([]); setI18n({}); setMoods([]);
+    setForm({ ...EMPTY, category: fixedCategory || "" }); setImages([]); setLessons([]); setI18n({}); setMoods([]);
     setBookingDays(DEFAULT_BOOKING_DAYS); setBookingStart(String(DEFAULT_START_HOUR)); setBookingEnd(String(DEFAULT_END_HOUR));
     setLangTab("mn"); setEditingId(null); setErr(""); setOpen(true);
   }
@@ -355,6 +355,26 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
             </div>
           </div>
 
+          {/* Чулуу: зурган доор шууд ээлтэй орд сонгоно (дараа нь гарчиг/мэдээлэл оруулна) */}
+          {isStoneCategory && (
+            <div className="rounded-2xl border border-accent-400/40 bg-accent-300/[0.06] p-4">
+              <p className="mb-1 font-display font-semibold text-ink">💎 Ээлтэй орд</p>
+              <p className="mb-3 text-xs text-muted">Энэ чулуу аль орд(уудад) ээлтэйг сонговол «Ордуудын ээлтэй чулуу» хэсэгт тухайн ордоор хайхад санал болгогдоно.</p>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={() => toggleZodiac(ALL_ZODIACS_KEY)}
+                  className={"rounded-full px-3.5 py-1.5 text-sm font-medium transition " + (moods.includes(ALL_ZODIACS_KEY) ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
+                  ✨ Бүх орд
+                </button>
+                {ZODIACS.map((z) => (
+                  <button key={z.key} type="button" onClick={() => toggleZodiac(z.key)} disabled={moods.includes(ALL_ZODIACS_KEY)}
+                    className={"rounded-full px-3.5 py-1.5 text-sm font-medium transition disabled:opacity-40 " + (moods.includes(z.key) ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
+                    {z.symbol} {z.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Хэлний таб — гарчиг, дэлгэрэнгүй мэдээллийг хэл бүрээр оруулна */}
           <div className="flex flex-wrap gap-1.5">
             {LANG_TABS.map((lt) => (
@@ -385,7 +405,7 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
           ) : (
             <>
               <div className="grid gap-3 sm:grid-cols-2">
-                {catOptions.length > 0 && (
+                {catOptions.length > 0 && !fixedCategory && (
                   <div>
                     <label className="field-label">Ангилал</label>
                     <select className="input" value={form.category} onChange={(e) => set("category", e.target.value)}>
@@ -509,25 +529,6 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
                         onClick={() => setMoods((ms) => (ms.includes(m.key) ? ms.filter((x) => x !== m.key) : [...ms, m.key]))}
                         className={"rounded-full px-3.5 py-1.5 text-sm font-medium transition " + (moods.includes(m.key) ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
                         {m.emoji} {m.label.mn}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {isStoneCategory && (
-                <div className="rounded-2xl border border-accent-400/40 bg-accent-300/[0.06] p-4">
-                  <p className="mb-1 font-display font-semibold text-ink">💎 Ээлтэй орд</p>
-                  <p className="mb-3 text-xs text-muted">Энэ чулуу аль орд(уудад) ээлтэйг сонговол «Ордуудын ээлтэй чулуу» хэсэгт тухайн ордоор хайхад санал болгогдоно.</p>
-                  <div className="flex flex-wrap gap-2">
-                    <button type="button" onClick={() => toggleZodiac(ALL_ZODIACS_KEY)}
-                      className={"rounded-full px-3.5 py-1.5 text-sm font-medium transition " + (moods.includes(ALL_ZODIACS_KEY) ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
-                      ✨ Бүх орд
-                    </button>
-                    {ZODIACS.map((z) => (
-                      <button key={z.key} type="button" onClick={() => toggleZodiac(z.key)} disabled={moods.includes(ALL_ZODIACS_KEY)}
-                        className={"rounded-full px-3.5 py-1.5 text-sm font-medium transition disabled:opacity-40 " + (moods.includes(z.key) ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
-                        {z.symbol} {z.name}
                       </button>
                     ))}
                   </div>
