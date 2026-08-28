@@ -52,6 +52,10 @@ export function PurchaseBox({ id, price }: { id: string; title: string; price?: 
 
   const st = access?.status;
 
+  // Аль хэдийн худалдаж авсан бол энд юу ч харуулахгүй — үнэ, идэвхтэй эрхийн мэдээлэл
+  // "Миний булан" (профайл) хэсэгт захиалгын жагсаалтад үлдсэн хоногийн хамт харагдана.
+  if (!loadingAccess && st === "active" && step === "idle") return null;
+
   return (
     <div className="card p-6">
       {typeof price === "number" && <p className="price mb-4 text-center text-3xl">{formatMNT(price)}</p>}
@@ -60,11 +64,6 @@ export function PurchaseBox({ id, price }: { id: string; title: string; price?: 
         <>
           {loadingAccess ? (
             <div className="flex justify-center py-4"><div className="h-8 w-8 animate-spinSlow rounded-full border-2 border-primary-200 border-t-primary-600" /></div>
-          ) : st === "active" ? (
-            <div className="rounded-2xl bg-jade-400/15 p-5 text-center">
-              <p className="font-display text-lg font-semibold text-jade-600">✓ Танд энэ эрх идэвхтэй байна</p>
-              {typeof access?.daysLeft === "number" && <p className="mt-1.5 text-sm text-ink/70">Үзэх хугацаа дуусахад: <span className="font-semibold text-ink">{access.daysLeft} хоног</span> үлдсэн</p>}
-            </div>
           ) : st === "pending" ? (
             <div className="rounded-2xl bg-amber-100 p-5 text-center text-amber-700">
               <p className="font-semibold">Захиалга баталгаажихыг хүлээж байна</p>

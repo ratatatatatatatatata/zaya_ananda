@@ -344,25 +344,39 @@ export default function AccountPage() {
                     </div>
                   );
                 })}
-                {orders.map((o) => (
-                  <div key={o.id} className="rounded-2xl border border-line p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="font-mono text-sm text-primary-700">#{o.id.slice(0, 8).toUpperCase()}</span>
-                      <span className="rounded-full bg-jade-400/10 px-3 py-1 text-xs font-semibold text-jade-600">{t("status." + o.status)}</span>
+                {orders.map((o) => {
+                  const daysLeft = o.status === "paid" && o.expiresAt
+                    ? Math.ceil((new Date(o.expiresAt).getTime() - Date.now()) / 86400000)
+                    : null;
+                  return (
+                    <div key={o.id} className="rounded-2xl border border-line p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="font-mono text-sm text-primary-700">#{o.id.slice(0, 8).toUpperCase()}</span>
+                        <span className="rounded-full bg-jade-400/10 px-3 py-1 text-xs font-semibold text-jade-600">{t("status." + o.status)}</span>
+                      </div>
+                      <div className="mt-3 space-y-1 border-t border-line pt-3">
+                        {o.items.map((it) => (
+                          <div key={it.kind + it.slug} className="flex justify-between text-sm">
+                            <span className="text-ink/80">{it.title} × {it.qty}</span>
+                            <span className="font-medium text-ink">{formatMNT(it.price * it.qty)}</span>
+                          </div>
+                        ))}
+                      </div>
+                      {daysLeft !== null && (
+                        daysLeft > 0 ? (
+                          <p className="mt-3 rounded-xl bg-jade-400/10 px-3 py-2 text-sm text-jade-600">
+                            ✓ Идэвхтэй — Үзэх хугацаа дуусахад <span className="font-semibold">{daysLeft} хоног</span> үлдсэн
+                          </p>
+                        ) : (
+                          <p className="mt-3 rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-600">Үзэх хугацаа дууссан байна.</p>
+                        )
+                      )}
+                      <div className="mt-3 flex justify-between border-t border-line pt-3 font-semibold text-ink">
+                        <span>{t("cart.total")}</span><span>{formatMNT(o.total)}</span>
+                      </div>
                     </div>
-                    <div className="mt-3 space-y-1 border-t border-line pt-3">
-                      {o.items.map((it) => (
-                        <div key={it.kind + it.slug} className="flex justify-between text-sm">
-                          <span className="text-ink/80">{it.title} × {it.qty}</span>
-                          <span className="font-medium text-ink">{formatMNT(it.price * it.qty)}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-3 flex justify-between border-t border-line pt-3 font-semibold text-ink">
-                      <span>{t("cart.total")}</span><span>{formatMNT(o.total)}</span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
