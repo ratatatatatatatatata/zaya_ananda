@@ -6,6 +6,9 @@ import { PurchaseBox } from "@/components/PurchaseBox";
 import { ServiceBooking } from "@/components/ServiceBooking";
 import { ProductBuyBox } from "@/components/ProductBuyBox";
 import { CourseLessons } from "@/components/CourseLessons";
+import { CourseTabs } from "@/components/course/CourseTabs";
+import { CourseReactions } from "@/components/course/CourseReactions";
+import { CourseComments } from "@/components/course/CourseComments";
 import { ItemVideos } from "@/components/ItemVideos";
 import { ImageGallery } from "@/components/ImageGallery";
 import { ProductStage } from "@/components/product/ProductStage";
@@ -108,23 +111,88 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
             {item.category && <span className="chip"><CatLabel cat={item.category} /></span>}
           </div>
           <h1 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><CmsText mn={item.title} i18n={item.i18n} field="title" /></h1>
-          {isCourse && (
-            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-muted">
-              {((item.lessons?.length ?? 0) > 0 || typeof item.videoLessons === "number") && <span>🎬 {item.lessons?.length ?? item.videoLessons} видео хичээл</span>}
-              {typeof item.students === "number" && <span>👤 {item.students} суралцагч</span>}
-              {typeof item.views === "number" && <span>👁 {item.views.toLocaleString()} үзсэн</span>}
-              {item.mode && <span className="font-semibold text-primary-700">{modeLabel[item.mode]}</span>}
-            </div>
-          )}
-          {item.summary && <p className="mt-5 text-lg leading-relaxed text-ink/80"><CmsText mn={item.summary} i18n={item.i18n} field="summary" /></p>}
-          {item.body && (
+
+          {isCourse ? (
             <>
-              <h2 className="mt-8 font-display text-xl font-semibold text-ink">Дэлгэрэнгүй</h2>
-              <RichBody html={item.body} i18n={item.i18n} className="mt-3 leading-relaxed text-muted" />
+              <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
+                <div className="flex flex-wrap gap-x-8 gap-y-3 text-sm">
+                  {item.teacherName && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wide text-muted">Хөтлөгч</p>
+                      <p className="font-semibold text-ink">{item.teacherName}</p>
+                    </div>
+                  )}
+                  {item.category && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wide text-muted">Сэдэв</p>
+                      <p className="font-semibold text-primary-700"><CatLabel cat={item.category} /></p>
+                    </div>
+                  )}
+                  {((item.lessons?.length ?? 0) > 0 || typeof item.videoLessons === "number") && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wide text-muted">Үргэлжлэх хугацаа</p>
+                      <p className="font-semibold text-ink">{item.lessons?.length ?? item.videoLessons} алхам</p>
+                    </div>
+                  )}
+                </div>
+                <CourseReactions id={item.id} />
+              </div>
+
+              <CourseTabs
+                practiceCount={item.lessons?.length ?? item.videoLessons ?? 0}
+                overview={
+                  <div>
+                    <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-muted">
+                      {typeof item.students === "number" && <span>👤 {item.students} суралцагч</span>}
+                      {typeof item.views === "number" && <span>👁 {item.views.toLocaleString()} үзсэн</span>}
+                      {item.mode && <span className="font-semibold text-primary-700">{modeLabel[item.mode]}</span>}
+                    </div>
+                    {item.summary && <p className="mt-4 text-lg leading-relaxed text-ink/80"><CmsText mn={item.summary} i18n={item.i18n} field="summary" /></p>}
+                    {item.body && (
+                      <>
+                        <h2 className="mt-8 font-display text-xl font-semibold text-ink">Дэлгэрэнгүй</h2>
+                        <RichBody html={item.body} i18n={item.i18n} className="mt-3 leading-relaxed text-muted" />
+                      </>
+                    )}
+                    {(item.teacherName || item.teacherImage || lines.length > 0) && (
+                      <div className="mt-8 rounded-2xl border border-line bg-surface-1 p-6">
+                        <h3 className="font-display text-lg font-semibold text-ink">Хөтлөгчийн тухай</h3>
+                        <div className="mt-4 flex items-center gap-4">
+                          {item.teacherImage
+                            ? <img src={item.teacherImage} alt="" className="h-20 w-20 shrink-0 rounded-full object-cover shadow-card" />
+                            : <div className="grid h-20 w-20 shrink-0 place-items-center rounded-full bg-primary-50 text-2xl">👤</div>}
+                          {item.teacherName && <p className="font-display text-lg font-semibold text-ink">{item.teacherName}</p>}
+                        </div>
+                        {lines.length > 0 && (
+                          <ul className="mt-4 space-y-1.5">
+                            {lines.map((l, i) => <li key={i} className="flex gap-2 text-[1.02rem] leading-relaxed text-ink/80"><span className="text-primary-500">•</span><span>{l}</span></li>)}
+                          </ul>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                }
+                practice={<CourseLessons id={item.id} nextNote={item.nextNote} nextItemId={item.nextItemId} nextTitle={nextItem?.title} />}
+                resources={
+                  <p className="rounded-2xl border border-dashed border-line bg-surface-2/60 px-5 py-10 text-center text-sm text-muted">
+                    Одоогоор нэмэлт материал алга.
+                  </p>
+                }
+                comments={<CourseComments itemId={item.id} />}
+              />
+            </>
+          ) : (
+            <>
+              {item.summary && <p className="mt-5 text-lg leading-relaxed text-ink/80"><CmsText mn={item.summary} i18n={item.i18n} field="summary" /></p>}
+              {item.body && (
+                <>
+                  <h2 className="mt-8 font-display text-xl font-semibold text-ink">Дэлгэрэнгүй</h2>
+                  <RichBody html={item.body} i18n={item.i18n} className="mt-3 leading-relaxed text-muted" />
+                </>
+              )}
+              {publicVideos.length > 0 && <ItemVideos videos={publicVideos} />}
             </>
           )}
-          {isCourse && <CourseLessons id={item.id} nextNote={item.nextNote} nextItemId={item.nextItemId} nextTitle={nextItem?.title} />}
-          {!isCourse && publicVideos.length > 0 && <ItemVideos videos={publicVideos} />}
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
@@ -136,7 +204,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
             ? <div className="card p-6 text-center"><p className="text-3xl">🎁</p><p className="mt-2 font-display text-lg font-semibold text-jade-600">Нээлттэй хичээл</p><p className="mt-1 text-sm text-muted">Энэ хичээл танд бэлэг — чөлөөтэй үзээрэй.</p></div>
             : <PurchaseBox id={item.id} title={item.title} price={item.price} />}
 
-          {(item.teacherName || item.teacherImage || lines.length > 0) && (
+          {!isCourse && (item.teacherName || item.teacherImage || lines.length > 0) && (
             <div className="card p-6">
               <h3 className="font-display text-lg font-semibold text-ink">Заах багш</h3>
               <div className="mt-4 flex flex-col items-center text-center">

@@ -278,7 +278,9 @@ export function AdminJourney({ courseOrders = [], productOrders = [], onOrderSta
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="font-display font-semibold text-ink">{r.name}</span>
                   <span className="text-accent-300">{"★".repeat(r.rating)}</span>
-                  <span className="rounded-full bg-surface-2 px-2.5 py-0.5 text-xs font-semibold text-muted">{r.slug === "home" ? "🏠 Нүүр хуудас" : r.slug}</span>
+                  <span className="rounded-full bg-surface-2 px-2.5 py-0.5 text-xs font-semibold text-muted">
+                    {r.slug === "home" ? "🏠 Нүүр хуудас" : r.slug.startsWith("item-") ? "💬 Хичээлийн сэтгэгдэл" : r.slug}
+                  </span>
                   <span className="text-xs text-muted">{r.createdAt.slice(0, 10)}</span>
                 </div>
                 <p className="mt-2 leading-relaxed text-ink/85">{r.text}</p>
