@@ -10,7 +10,7 @@ import { MergeToorog } from "./MergeToorog";
 import { VideoBand } from "./video/VideoBand";
 import { SectionZoom } from "./home/SectionZoom";
 import { ZurhaiSlider } from "./home/ZurhaiSlider";
-import { ServiceCard } from "./home/ServiceCard";
+import { ServiceCoverflow } from "./home/ServiceCoverflow";
 import { HomeAbout } from "./home/HomeAbout";
 import { JourneyImage } from "./journey/SceneArt";
 import { listJourneysCached } from "@/lib/journeys-db";
@@ -94,14 +94,8 @@ export async function HomeSections() {
         </div>
         <div aria-hidden className="khas-rule mt-6 opacity-70" />
 
-        {/* Хажуу тийш цувдаг жагсаалт */}
-        <div className="mt-8 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {services.map((i) => (
-            <div key={i.id} className="w-[19rem] shrink-0 snap-start sm:w-[21rem]">
-              <ServiceCard item={i} />
-            </div>
-          ))}
-        </div>
+        {/* Хажуу тийш цувдаг, 3D перспектив бүхий жагсаалт */}
+        <ServiceCoverflow items={services} />
       </div></section>
 
       {/* Сүнслэг аялал — бүртгэлтэй аяллууд */}
