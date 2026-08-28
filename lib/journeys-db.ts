@@ -1,5 +1,4 @@
 import { randomUUID } from "crypto";
-import { unstable_cache } from "next/cache";
 import { sbSelect, sbInsert, sbUpdate, sbDelete } from "@/lib/supabase";
 import type { JourneyBooking, JourneyReview, ServiceBooking } from "@/lib/types";
 import type { Journey } from "@/data/journeys";
@@ -224,8 +223,9 @@ export async function deleteJourney(id: string): Promise<boolean> {
   return true;
 }
 
-// ---------- Кэштэй уншилтууд (админ засварласны дараа revalidateTag("journeys") дуудна) ----------
-export const listJourneysCached = () =>
-  unstable_cache(() => listJourneys(), ["journeys-list"], { tags: ["journeys"], revalidate: 300 })();
-export const getJourneyBySlugCached = (slug: string) =>
-  unstable_cache(() => getJourneyBySlug(slug), ["journey-by-slug", slug], { tags: ["journeys"], revalidate: 300 })();
+// ---------- Аялалын мэдээлэл админаас байнга шинэчлэгддэг тул кэшлэхгүй, шууд DB-ээс уншина ----------
+// (Өмнө unstable_cache ашигладаг байсан ч кэш сэргээлт (revalidateTag) instance хооронд саатдаг тул
+//  "буруу/хуучин аяллын мэдээлэл харагдах", "дэлгэрэнгүй хуудас 404 өгөх" гэсэн алдаанууд давтагдсан.
+//  Аяллын тоо цөөн, засвар ховор тул шууд DB унших нь илүү найдвартай.)
+export const listJourneysCached = () => listJourneys();
+export const getJourneyBySlugCached = (slug: string) => getJourneyBySlug(slug);

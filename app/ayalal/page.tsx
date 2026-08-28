@@ -22,7 +22,6 @@ export const metadata = {
 const NAV = [
   { id: "tours", label: "Аяллын хөтөлбөрүүд" },
   { id: "places", label: "Энергийн газрууд" },
-  { id: "guides", label: "Багш, хөтөч нар" },
   { id: "faq", label: "Асуулт хариулт" },
 ];
 
@@ -144,20 +143,6 @@ export default async function AyalalPage() {
                 <p className="mt-1.5 text-sm leading-relaxed text-ink/80">{pl.ritual}</p>
               </div>
             </div>
-          ))}
-        </div>
-      </div></section>
-
-      {/* Багш, хөтөч нар */}
-      <section id="guides" className="section scroll-mt-32 bg-surface-2"><div className="container-px text-center">
-        <h2 className="font-display text-3xl font-semibold text-ink">Багш, хөтөч нар</h2>
-        <p className="mx-auto mt-3 max-w-2xl text-muted">
-          Аялал бүрийг бясалгалын туршлагатай багш болон нутаг усаа мэддэг хөтөч нар хамтран удирдана.
-          Тухайн аяллыг хэн хариуцаж, хэн хамт явахыг аяллын дэлгэрэнгүй хуудаснаас харна уу.
-        </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          {JOURNEYS.map((j) => (
-            <Link key={j.slug} href={`/ayalal/${j.slug}#baga`} prefetch={false} className="btn btn-outline btn-md">{j.name} →</Link>
           ))}
         </div>
       </div></section>
