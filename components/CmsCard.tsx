@@ -7,6 +7,7 @@ import { locText } from "@/lib/cms-i18n";
 import { catLabel } from "@/data/cms-taxonomy";
 import { themeFor } from "@/data/theme-map";
 import { CategoryGlyph } from "./CategoryGlyph";
+import { ZODIACS, ALL_ZODIACS_KEY } from "@/data/zodiac";
 import type { CmsItem } from "@/lib/types";
 
 const modeLabel: Record<string, string> = { online: "Онлайн сургалт", tankhim: "Танхимын сургалт", both: "Онлайн + Танхим" };
@@ -15,12 +16,19 @@ export function CmsCard({ item }: { item: CmsItem }) {
   const { lang } = useI18n();
   const isCourse = item.kind === "course";
   const isProduct = item.kind === "product";
+  const isStone = isProduct && item.category === "Чулуунууд";
   const hasCounts = typeof item.videoLessons === "number" || typeof item.students === "number" || typeof item.views === "number";
   const title = locText(lang, item.title, item.i18n, "title");
   const summary = locText(lang, item.summary, item.i18n, "summary");
   const cat = catLabel(item.category, lang);
   // Агуулгад тохирсон бэлгэдэл, өнгө
   const th = themeFor(item.kind, item.category);
+  // Чулуу бүтээгдэхүүний ээлтэй орд(ууд) — moods талбарт зурхайн түлхүүрээр хадгалагдсан
+  const stoneZodiacs = isStone && item.moods?.length
+    ? item.moods.includes(ALL_ZODIACS_KEY)
+      ? [{ key: ALL_ZODIACS_KEY, symbol: "✨", name: "Бүх орд" }]
+      : ZODIACS.filter((z) => item.moods!.includes(z.key))
+    : [];
 
   // Бүтээгдэхүүн: зураг → нэр → үнэ гэсэн энгийн байрлал
   if (isProduct) {
@@ -29,10 +37,20 @@ export function CmsCard({ item }: { item: CmsItem }) {
         {item.image && (
           <div className="relative h-60 w-full overflow-hidden">
             <img src={item.image} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+            {stoneZodiacs.length > 0 && (
+              <div className="absolute left-3 top-3 flex flex-wrap gap-1">
+                {stoneZodiacs.map((z) => (
+                  <span key={z.key} title={z.name} className="grid h-7 w-7 place-items-center rounded-full bg-[#15302C]/80 text-sm text-accent-300 shadow-sm backdrop-blur-sm">
+                    {z.symbol}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         )}
         <div className="flex flex-1 flex-col items-center p-5 text-center">
           <h3 className="font-display text-lg font-semibold leading-snug text-ink transition group-hover:text-primary-700">{title}</h3>
+          {summary && isStone && <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted">{summary}</p>}
           {typeof item.price === "number" && <span className="price mt-2 text-lg">{formatMNT(item.price)}</span>}
         </div>
       </Link>

@@ -11,6 +11,9 @@ export const SERVICE_GROUPS: { group: string; subs: string[] }[] = [
 /** Сургалтын ангилал */
 export const COURSE_CATS = ["Бясалгалын сургалт", "Сүнслэг аялал"];
 
+/** Энергийн хамгаалалтын ангилал — энгийн бүтээгдэхүүн, эсвэл ордод ээлтэй эрдэнийн чулуу */
+export const PRODUCT_CATS = ["Бүтээгдэхүүн", "Чулуунууд"];
+
 /** Ангилал/бүлгийн 5 хэлний орчуулга (DB-ийн монгол нэрээр түлхүүрлэнэ) */
 export const CAT_I18N: Record<string, Record<Locale, string>> = {
   "Оношилгоо": Lx("Оношилгоо", "Diagnostics", "진단", "診断", "诊断"),
@@ -32,6 +35,8 @@ export const CAT_I18N: Record<string, Record<Locale, string>> = {
   "Сүнслэг аялал": Lx("Сүнслэг аялал", "Spiritual Journeys", "영적 여행", "スピリチュアルな旅", "灵性之旅"),
   "Зөвлөгөө": Lx("Зөвлөгөө", "Advice", "조언", "アドバイス", "建议"),
   "Видео зөвлөгөө": Lx("Видео зөвлөгөө", "Video Advice", "영상 조언", "動画アドバイス", "视频建议"),
+  "Бүтээгдэхүүн": Lx("Бүтээгдэхүүн", "Products", "제품", "商品", "产品"),
+  "Чулуунууд": Lx("Чулуунууд", "Stones", "원석", "パワーストーン", "宝石"),
 };
 
 export function catLabel(cat: string | undefined, lang: Locale): string {

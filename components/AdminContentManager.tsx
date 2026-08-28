@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { formatMNT } from "@/lib/format";
 import { RichTextEditor } from "@/components/RichTextEditor";
-import { SERVICE_GROUPS, COURSE_CATS, COURSE_LEVELS } from "@/data/cms-taxonomy";
+import { SERVICE_GROUPS, COURSE_CATS, COURSE_LEVELS, PRODUCT_CATS } from "@/data/cms-taxonomy";
+import { ZODIACS, ALL_ZODIACS_KEY } from "@/data/zodiac";
 import { weekdayLabels, DEFAULT_BOOKING_DAYS, DEFAULT_START_HOUR, DEFAULT_END_HOUR } from "@/lib/booking-slots";
 import { useMoods } from "@/lib/moods";
 import { embedSrc } from "@/lib/video-embed";
@@ -237,13 +238,24 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
   const isService = kind === "service";
   const isPromo = kind === "promo";
   const isFree = kind === "free";
+  const isProduct = kind === "product";
+  const isStoneCategory = isProduct && form.category === "Чулуунууд";
   const hasTeacher = kind === "course" || kind === "service";
   const hasMoods = kind === "course" || kind === "resource" || kind === "free";
   const catOptions: { group?: string; opts: string[] }[] =
     kind === "service" ? SERVICE_GROUPS.map((g) => ({ group: g.group, opts: g.subs }))
     : kind === "course" ? [{ opts: COURSE_CATS }]
     : kind === "resource" ? [{ opts: ["Зөвлөгөө", "Видео зөвлөгөө"] }]
+    : kind === "product" ? [{ opts: PRODUCT_CATS }]
     : [];
+
+  function toggleZodiac(key: string) {
+    setMoods((ms) => {
+      if (key === ALL_ZODIACS_KEY) return ms.includes(ALL_ZODIACS_KEY) ? [] : [ALL_ZODIACS_KEY];
+      const withoutAll = ms.filter((m) => m !== ALL_ZODIACS_KEY);
+      return withoutAll.includes(key) ? withoutAll.filter((m) => m !== key) : [...withoutAll, key];
+    });
+  }
 
   return (
     <div className="space-y-5">
@@ -497,6 +509,25 @@ export function AdminContentManager({ kind }: { kind: CmsItem["kind"] }) {
                         onClick={() => setMoods((ms) => (ms.includes(m.key) ? ms.filter((x) => x !== m.key) : [...ms, m.key]))}
                         className={"rounded-full px-3.5 py-1.5 text-sm font-medium transition " + (moods.includes(m.key) ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
                         {m.emoji} {m.label.mn}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {isStoneCategory && (
+                <div className="rounded-2xl border border-accent-400/40 bg-accent-300/[0.06] p-4">
+                  <p className="mb-1 font-display font-semibold text-ink">💎 Ээлтэй орд</p>
+                  <p className="mb-3 text-xs text-muted">Энэ чулуу аль орд(уудад) ээлтэйг сонговол «Ордуудын ээлтэй чулуу» хэсэгт тухайн ордоор хайхад санал болгогдоно.</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={() => toggleZodiac(ALL_ZODIACS_KEY)}
+                      className={"rounded-full px-3.5 py-1.5 text-sm font-medium transition " + (moods.includes(ALL_ZODIACS_KEY) ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
+                      ✨ Бүх орд
+                    </button>
+                    {ZODIACS.map((z) => (
+                      <button key={z.key} type="button" onClick={() => toggleZodiac(z.key)} disabled={moods.includes(ALL_ZODIACS_KEY)}
+                        className={"rounded-full px-3.5 py-1.5 text-sm font-medium transition disabled:opacity-40 " + (moods.includes(z.key) ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-white/5 text-ink/70 hover:border-primary-300")}>
+                        {z.symbol} {z.name}
                       </button>
                     ))}
                   </div>

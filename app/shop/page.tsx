@@ -13,7 +13,10 @@ export const metadata = { title: "Дэлгүүр" };
 
 export default async function ShopPage() {
   const heroMedia = await heroMediaFor("shop");
-  const items = await listCmsCached("product");
+  const all = await listCmsCached("product");
+  // "Чулуунууд" ангиллын зүйлс зөвхөн "Ордуудын ээлтэй чулуу" таб дотор харагдана —
+  // давхардуулахгүйн тулд "Бүтээгдэхүүн" табаас хасна.
+  const items = all.filter((i) => i.category !== "Чулуунууд");
   return (
     <>
       {/* Тансаг галерей — гялгар шалтай танхимд эрдэнийн чулуу эргэлдэнэ */}

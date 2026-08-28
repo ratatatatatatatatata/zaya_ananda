@@ -3,35 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { CmsCard } from "./CmsCard";
 import { STONE_LORE, type StoneLore } from "@/data/stone-lore";
+import { ZODIACS, zodiacOf, ALL_ZODIACS_KEY } from "@/data/zodiac";
 import type { CmsItem } from "@/lib/types";
-
-type Zodiac = { key: string; name: string; symbol: string; from: [number, number]; to: [number, number] };
-
-const ZODIACS: Zodiac[] = [
-  { key: "aries", name: "Хонь", symbol: "♈", from: [3, 21], to: [4, 19] },
-  { key: "taurus", name: "Үхэр", symbol: "♉", from: [4, 20], to: [5, 20] },
-  { key: "gemini", name: "Ихэр", symbol: "♊", from: [5, 21], to: [6, 21] },
-  { key: "cancer", name: "Мэлхий", symbol: "♋", from: [6, 22], to: [7, 22] },
-  { key: "leo", name: "Арслан", symbol: "♌", from: [7, 23], to: [8, 22] },
-  { key: "virgo", name: "Охин", symbol: "♍", from: [8, 23], to: [9, 22] },
-  { key: "libra", name: "Жинлүүр", symbol: "♎", from: [9, 23], to: [10, 23] },
-  { key: "scorpio", name: "Хилэнц", symbol: "♏", from: [10, 24], to: [11, 22] },
-  { key: "sagittarius", name: "Нум", symbol: "♐", from: [11, 23], to: [12, 21] },
-  { key: "capricorn", name: "Матар", symbol: "♑", from: [12, 22], to: [1, 19] },
-  { key: "aquarius", name: "Хумх", symbol: "♒", from: [1, 20], to: [2, 18] },
-  { key: "pisces", name: "Загас", symbol: "♓", from: [2, 19], to: [3, 20] },
-];
 
 const MONTHS = ["1-р сар", "2-р сар", "3-р сар", "4-р сар", "5-р сар", "6-р сар", "7-р сар", "8-р сар", "9-р сар", "10-р сар", "11-р сар", "12-р сар"];
 
-function zodiacOf(month: number, day: number): Zodiac {
-  for (const z of ZODIACS) {
-    const [fm, fd] = z.from, [tm, td] = z.to;
-    if (fm <= tm) { if ((month === fm && day >= fd) || (month === tm && day <= td) || (month > fm && month < tm)) return z; }
-    else { if ((month === fm && day >= fd) || (month === tm && day <= td) || month > fm || month < tm) return z; }
-  }
-  return ZODIACS[0];
-}
 function daysIn(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
 }
@@ -105,19 +81,24 @@ export function StoneReading() {
   const universalStones = useMemo(() => STONE_LORE.filter((s) => s.zodiacs === "all"), []);
   const otherStones = useMemo(() => STONE_LORE.filter((s) => Array.isArray(s.zodiacs) && (!z || !s.zodiacs.includes(z.key)) && s.zodiacs.length === 0), [z]);
 
-  /** Танд санал болгох: эхлээд таны ордын болон бүх ордын чулуунд таарсан бүтээгдэхүүн,
-   *  таараагүй бол дэлгүүрийн бусад бүтээгдэхүүнээр нөхнө. */
+  /** Админаас "Чулуунууд" ангилалд шууд нэмсэн, ээлтэй орд tag-тай бодит бүтээгдэхүүнүүд. */
+  const stoneProducts = useMemo(() => products.filter((p) => p.category === "Чулуунууд"), [products]);
+
+  /** Танд санал болгох: эхлээд админ шууд тэмдэглэсэн ээлтэй-орд бүхий чулуу бүтээгдэхүүн,
+   *  дараа нь ЛОРЕ-ийн түлхүүр үгээр таарсан бусад бүтээгдэхүүн, эцэст нь дэлгүүрийн үлдэгдлээр нөхнө. */
   const suggested = useMemo(() => {
     if (!z || products.length === 0) return [];
+    const tagHit = stoneProducts.filter((p) => (p.moods || []).includes(z.key) || (p.moods || []).includes(ALL_ZODIACS_KEY));
     const keys = [...zodiacStones, ...universalStones].flatMap((s) => s.match.map((k) => k.toLowerCase()));
-    const hit: CmsItem[] = [];
+    const keywordHit: CmsItem[] = [];
     const rest: CmsItem[] = [];
     for (const p of products) {
+      if (tagHit.includes(p)) continue;
       const hay = ((p.title || "") + " " + (p.summary || "") + " " + (p.body || "")).toLowerCase();
-      (keys.some((k) => hay.includes(k)) ? hit : rest).push(p);
+      (keys.some((k) => hay.includes(k)) ? keywordHit : rest).push(p);
     }
-    return [...hit, ...rest].slice(0, 8);
-  }, [z, products, zodiacStones, universalStones]);
+    return [...tagHit, ...keywordHit, ...rest].slice(0, 8);
+  }, [z, products, stoneProducts, zodiacStones, universalStones]);
 
   const selCls = "focus-ring rounded-2xl border-2 border-line bg-surface-3 px-4 py-3 font-display text-base font-semibold text-ink outline-none transition focus:border-accent-400 hover:border-accent-400/60";
 
@@ -154,6 +135,17 @@ export function StoneReading() {
           </div>
         </div>
       </div>
+
+      {/* Манай чулуунууд — огноо оруулахгүйгээр шууд харагдана: зураг, ээлтэй орд, мэдээлэл */}
+      {stoneProducts.length > 0 && (
+        <div className="mt-10">
+          <h3 className="font-display text-xl font-semibold text-ink sm:text-2xl">💎 Манай эрдэнийн чулуунууд</h3>
+          <p className="mt-2 max-w-2xl text-muted">Чулуу бүрийн зураг дээр ямар оронд ээлтэйг тэмдэглэсэн, доор нь дэлгэрэнгүй мэдээлэл.</p>
+          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {stoneProducts.map((p) => <CmsCard key={p.id} item={p} />)}
+          </div>
+        </div>
+      )}
 
       {z && (
         <>

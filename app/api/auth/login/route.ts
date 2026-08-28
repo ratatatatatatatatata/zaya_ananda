@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     if (!user)
       return NextResponse.json({ error: "Имэйл эсвэл нууц үг буруу байна." }, { status: 401 });
     await createSession(user.id);
-    return NextResponse.json({ user: { ...toPublicUser(user), isAdmin: isAdminEmail(user.email) } });
+    return NextResponse.json({ user: { ...toPublicUser(user), isAdmin: isAdminEmail(user.email) || !!user.isAdmin, isSuper: isAdminEmail(user.email) } });
   } catch (e) {
     return NextResponse.json({ error: "Серверийн алдаа: " + (e instanceof Error ? e.message : String(e)) }, { status: 500 });
   }
