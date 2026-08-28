@@ -160,7 +160,7 @@ export function ContactSection() {
                   <textarea id="c-message" name="message" required className="textarea" />
                 </div>
                 {status === "error" && <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</p>}
-                <button type="submit" disabled={status === "sending"} className="btn btn-primary btn-lg w-full">
+                <button type="submit" disabled={status === "sending"} className="btn btn-primary btn-md w-full">
                   {status === "sending" ? t("contact.sending") : t("contact.send")}
                 </button>
               </form>
@@ -168,14 +168,14 @@ export function ContactSection() {
           </div>
 
           <div className="card p-6 sm:p-8">
-            <h3 className="font-display text-lg font-semibold text-ink">Сэтгэгдэл үлдээх</h3>
-            <p className="mt-1 text-sm text-muted">Манай төвтэй холбоотой сэтгэгдэл, туршлагаа хуваалцаарай. Нэвтрэх шаардлагагүй.</p>
+            <h3 className="font-display text-lg font-semibold text-ink">Манай төвийн тухай сэтгэгдэл үлдээх</h3>
+            <p className="mt-1 text-sm text-muted">Zaya&apos;s Ananda төвтэй холбоотой ерөнхий сэтгэгдэл, туршлагаа энд хуваалцаарай. Нэвтрэх шаардлагагүй.</p>
             {tStatus === "done" ? (
               <div className="flex flex-col items-center justify-center py-10 text-center">
                 <div className="grid h-16 w-16 place-items-center rounded-full bg-jade-400/15 text-3xl text-jade-600">✓</div>
                 <p className="mt-4 font-semibold text-ink">Баярлалаа!</p>
                 <p className="mt-1 text-sm text-muted">Админ шалгаад нийтэд харуулна.</p>
-                <button onClick={() => setTStatus("idle")} className="btn btn-outline btn-sm mt-5">Дахин бичих</button>
+                <button onClick={() => setTStatus("idle")} className="btn btn-outline btn-md mt-5">Дахин бичих</button>
               </div>
             ) : (
               <form onSubmit={submitTestimonial} className="mt-4 space-y-4">

@@ -98,7 +98,14 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
   const load = useCallback(() => {
     fetch("/api/admin/content", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : { items: [] }))
-      .then((d) => setItems((d.items || []).filter((i: CmsItem) => i.kind === kind && (!fixedCategory || i.category === fixedCategory))))
+      .then((d) => setItems((d.items || []).filter((i: CmsItem) => {
+        if (i.kind !== kind) return false;
+        if (!fixedCategory) return true;
+        // "Бүтээгдэхүүн" таб: "Чулуунууд" биш бүх бүтээгдэхүүнийг харуулна (ангилал огт
+        // онооогүй хуучин бичлэгүүд ч энд харагдаж, админ дараа нь олж засварлах боломжтой байх ёстой)
+        if (fixedCategory === "Бүтээгдэхүүн") return i.category !== "Чулуунууд";
+        return i.category === fixedCategory;
+      })))
       .catch(() => {});
   }, [kind, fixedCategory]);
   useEffect(() => { load(); }, [load]);
