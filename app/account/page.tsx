@@ -93,7 +93,7 @@ export default function AccountPage() {
 
   async function doResched(kind: "journey" | "service", id: string) {
     if (!reschedDate || (kind === "service" && !reschedTime)) {
-      setActionErr((e) => ({ ...e, [id]: "Огноо" + (kind === "service" ? ", цагаа" : "оо") + " сонгоно уу." }));
+      setActionErr((e) => ({ ...e, [id]: kind === "service" ? "Огноо, цагаа сонгоно уу." : "Огноогоо сонгоно уу." }));
       return;
     }
     setBusyId(id); setActionErr((e) => ({ ...e, [id]: "" }));

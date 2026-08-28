@@ -90,9 +90,9 @@ export function JourneyBooking({ slug, journeyName, prepay: prepayPerPerson = 0 
       <div className="panel p-8 text-center sm:p-10">
         <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-jade-400/15 text-3xl text-jade-600">✓</div>
         <p className="mt-4 font-display text-xl font-semibold text-ink">Захиалга хүлээж авлаа</p>
-        <p className="mt-2 leading-relaxed text-muted">
-          <b>{picked}</b>-нд «{journeyName}» аялалд бүртгүүллээ.{prepayTotal <= 0 && " Админ баталгаажуулсны дараа мэдэгдэл ирнэ."}
-        </p>
+        <p className="mt-2 font-display text-lg font-semibold text-ink">«{journeyName}»</p>
+        <p className="mt-1 text-muted">{picked}</p>
+        {prepayTotal <= 0 && <p className="mt-3 leading-relaxed text-muted">Админ баталгаажуулсны дараа мэдэгдэл ирнэ.</p>}
 
         {prepayTotal > 0 && (
           <div className="mt-5 rounded-2xl border-2 border-primary-400/50 bg-primary-50/50 p-5 text-left">
@@ -187,10 +187,11 @@ export function JourneyBooking({ slug, journeyName, prepay: prepayPerPerson = 0 
         <p className="eyebrow-line">Бүртгүүлэх</p>
         <h3 className="mt-3 font-display text-2xl font-semibold text-ink">{journeyName}</h3>
         {prepayPerPerson > 0 && (
-          <p className="mt-3 rounded-xl bg-primary-50 px-4 py-2.5 text-sm leading-relaxed text-ink/85">
-            💳 Хүн тутамд <b className="text-primary-700">{money(prepayPerPerson)}</b> урьдчилгаа шаардана (нийт {money(prepayTotal)}).
-            Захиалга илгээсний дараа дансны мэдээлэл харагдана.
-          </p>
+          <div className="mt-3 rounded-xl bg-primary-50 px-4 py-2.5 text-sm leading-relaxed text-ink/85">
+            <p>💳 Урьдчилгаа <b className="text-primary-700">{money(prepayPerPerson)}</b> / хүн</p>
+            <p>Нийт дүн: <b className="text-primary-700">{money(prepayTotal)}</b></p>
+            <p>Захиалга илгээсний дараа дансны мэдээлэл харагдана.</p>
+          </div>
         )}
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">

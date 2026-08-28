@@ -170,10 +170,10 @@ export function ServiceBooking({
         <b className="text-ink">{pad(startHour)}:00–{pad(endHour)}:00</b> цагийн хооронд хүлээн авна.
       </p>
       {prepay > 0 && (
-        <p className="mt-3 rounded-xl bg-primary-50 px-4 py-2.5 text-sm leading-relaxed text-ink/85">
-          💳 Цаг баталгаажуулахад <b className="text-primary-700">{money(prepay)}</b> урьдчилгаа шаардана.
-          Захиалга илгээсний дараа дансны мэдээлэл харагдана.
-        </p>
+        <div className="mt-3 rounded-xl bg-primary-50 px-4 py-2.5 text-sm leading-relaxed text-ink/85">
+          <p>💳 Урьдчилгаа <b className="text-primary-700">{money(prepay)}</b></p>
+          <p>Захиалга илгээсний дараа дансны мэдээлэл харагдана.</p>
+        </div>
       )}
 
       {/* Хуанли */}

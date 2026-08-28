@@ -103,7 +103,7 @@ export function Header() {
                     onClick={() => { setAccountOpen(false); logout().then(() => router.push("/")); }}
                     className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm text-rose-600 transition hover:bg-rose-50"
                   >
-                    ⏻ {t("account.logout")}
+                    {t("account.logout")}
                   </button>
                 </div>
               )}
@@ -135,7 +135,7 @@ export function Header() {
             {user?.isAdmin && <Link href="/admin" className="btn btn-outline btn-md w-full">⚙ {t("admin.title")}</Link>}
             {user && (
               <button onClick={() => logout().then(() => router.push("/"))} className="btn btn-outline btn-md w-full text-rose-600">
-                ⏻ {t("account.logout")}
+                {t("account.logout")}
               </button>
             )}
           </div>
