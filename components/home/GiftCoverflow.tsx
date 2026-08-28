@@ -86,6 +86,7 @@ export function GiftCoverflow({ items }: { items: CmsItem[] }) {
         getKey={(r) => r.id}
         renderItem={(r) => <GiftCard reel={r} />}
         cardWidthClassName="w-[19rem] sm:w-[21rem]"
+        flat
       />
       <div className="mt-2 text-center">
         <Link href="/gift" className="btn btn-outline btn-sm">{tr(MORE)} →</Link>

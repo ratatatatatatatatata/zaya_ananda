@@ -21,12 +21,15 @@ export function Coverflow3D<T>({
   renderItem,
   cardWidthClassName = "w-[19rem] sm:w-[21rem]",
   autoPlay = true,
+  flat = false,
 }: {
   items: T[];
   getKey: (item: T, index: number) => string;
   renderItem: (item: T, index: number) => React.ReactNode;
   cardWidthClassName?: string;
   autoPlay?: boolean;
+  /** true бол 3D хазайлтгүй, эгц урдаас (flat) харагдана — гулсах, автоплэй хэвээр ажиллана */
+  flat?: boolean;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -41,8 +44,9 @@ export function Coverflow3D<T>({
 
     // Жижиг дэлгэц дээр (утас) нэг карт бараг бүтэн өргөнийг эзэлдэг тул
     // 3D хазайлт хэвийн бус, "хазгай" харагдана — тэнд яг урдаас, шулуун харуулна.
-    const flat = typeof window !== "undefined" && window.innerWidth < 640;
-    if (flat) {
+    // `flat` prop өгөгдсөн бол дэлгэцийн хэмжээ үл хамааран үргэлж шулуун харуулна.
+    const isMobileFlat = typeof window !== "undefined" && window.innerWidth < 640;
+    if (flat || isMobileFlat) {
       cardRefs.current.forEach((card) => {
         if (!card) return;
         card.style.transform = "none";
@@ -72,7 +76,7 @@ export function Coverflow3D<T>({
       card.style.zIndex = String(Math.round((1 - unit) * 10));
     });
     rafId.current = null;
-  }, []);
+  }, [flat]);
 
   const requestTilt = useCallback(() => {
     if (rafId.current != null) return;

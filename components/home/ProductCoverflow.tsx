@@ -15,6 +15,7 @@ export function ProductCoverflow({ items }: { items: CmsItem[] }) {
       getKey={(it) => it.id}
       renderItem={(it) => <CmsCard item={it} />}
       cardWidthClassName="w-[16rem] sm:w-[18rem]"
+      flat
     />
   );
 }
