@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JOURNEY_FAQ, JOURNEY_PREP } from "@/data/journeys";
-import { getJourneyBySlugCached } from "@/lib/journeys-db";
+import { getJourneyBySlugCached, getJourneyBySlug } from "@/lib/journeys-db";
 import { JourneyImage } from "@/components/journey/SceneArt";
 import { LeadCard, CrewRow } from "@/components/journey/PersonCard";
 import { JourneyBooking } from "@/components/journey/JourneyBooking";
@@ -12,14 +12,23 @@ import { ContactSection } from "@/components/ContactSection";
 // статик param урьдчилан үүсгэхийг больж, хүсэлт болгонд шинэчлэн уншина (доод давхаргад unstable_cache 5 минут кэшилнэ).
 export const dynamic = "force-dynamic";
 
+// Кэшлэгдсэн уншилт "олдсонгүй" гэж буцаавал (шинэ аялал саяхан нэмэгдсэн ч кэш
+// хараахан шинэчлэгдээгүй байх магадлалтай тул) шууд DB-ээс дахин нэг шалгана —
+// ингэснээр саяхан нэмсэн аялал дэлгэрэнгүй хуудсан дээрээ 404 үзүүлэхгүй.
+async function findJourney(slug: string) {
+  const cached = await getJourneyBySlugCached(slug).catch(() => null);
+  if (cached) return cached;
+  return getJourneyBySlug(slug).catch(() => null);
+}
+
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const j = await getJourneyBySlugCached(params.slug).catch(() => null);
+  const j = await findJourney(params.slug);
   if (!j) return { title: "Аялал олдсонгүй" };
   return { title: `${j.name} — Сүнслэг аялал`, description: j.summary };
 }
 
 export default async function JourneyPage({ params }: { params: { slug: string } }) {
-  const j = await getJourneyBySlugCached(params.slug).catch(() => null);
+  const j = await findJourney(params.slug);
   if (!j) notFound();
 
   return (

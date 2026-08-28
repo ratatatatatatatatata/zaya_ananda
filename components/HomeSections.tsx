@@ -3,6 +3,7 @@ import { listCmsCached, getSettingsCached } from "@/lib/repo";
 import { heroMediaFor } from "@/lib/hero-video";
 import { GiftCoverflow } from "./home/GiftCoverflow";
 import { JourneyCoverflow } from "./home/JourneyCoverflow";
+import { ProductCoverflow } from "./home/ProductCoverflow";
 import { StoneReading } from "./StoneReading";
 import { T, Tr } from "./T";
 import { PathsHighlight } from "./home/PathsHighlight";
@@ -56,9 +57,10 @@ const D = {
 
 /** Нүүр хуудас — хэсэг бүр товч мэдээлэл, шууд орох товчтой. */
 export async function HomeSections() {
-  const [services, courses, free, settings, bandMedia, JOURNEYS] = await Promise.all([
+  const [services, courses, free, products, settings, bandMedia, JOURNEYS] = await Promise.all([
     listCmsCached("service"), listCmsCached("course"),
-    listCmsCached("free"), getSettingsCached(), heroMediaFor("band"),
+    listCmsCached("free"), listCmsCached("product"),
+    getSettingsCached(), heroMediaFor("band"),
     listJourneysCached().catch(() => []),
   ]);
 
@@ -111,10 +113,13 @@ export async function HomeSections() {
         <JourneyCoverflow items={JOURNEYS} />
       </div></section>
 
-      {/* Энергийн хамгаалалт */}
+      {/* Энергийн хамгаалалт — эхлээд бүтээгдэхүүн (Энергийн засалтай адилхан гулддаг), доор нь төрсөн огноогоор чулуу тааруулах хэсэг */}
       <section id="shop" className="section scroll-mt-36 bg-surface-2"><div className="container-px">
         <SectionZoom eyebrow="🛡" title={<T k="nav.shop" />} desc={<Tr v={D.shop} />} href="/shop">
-          <StoneReading />
+          <ProductCoverflow items={products} />
+          <div className="mt-12">
+            <StoneReading />
+          </div>
         </SectionZoom>
       </div></section>
 
