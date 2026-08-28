@@ -108,11 +108,22 @@ export function Coverflow3D<T>({
     return best;
   }, []);
 
+  // Зөвхөн carousel-ийн дотоод хэвтээ гүйлтийг (track.scrollLeft) хөдөлгөнө —
+  // scrollIntoView ашигладаггүй нь чухал: тэр функц заримдаа "хамгийн ойрхон" гэсэн
+  // тохиргоотой байсан ч хуудасны босоо гүйлтийг бас хөдөлгөж, "дээшээ доошоо
+  // гүйгээд байгаа" мэт харагдах шалтгаан болдог байсан.
   const goTo = useCallback((index: number) => {
+    const el = trackRef.current;
     const n = items.length;
-    if (n === 0) return;
+    if (!el || n === 0) return;
     const wrapped = ((index % n) + n) % n;
-    cardRefs.current[wrapped]?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    const card = cardRefs.current[wrapped];
+    if (!card) return;
+    const elRect = el.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const cardLeftInScroll = cardRect.left - elRect.left + el.scrollLeft;
+    const target = cardLeftInScroll - (el.clientWidth - card.clientWidth) / 2;
+    el.scrollTo({ left: target, behavior: "smooth" });
   }, [items.length]);
 
   const next = useCallback(() => goTo(nearestIndex() + 1), [goTo, nearestIndex]);
