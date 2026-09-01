@@ -266,7 +266,7 @@ export function ServiceBooking({
         </div>
         <div>
           <label className="field-label" htmlFor="sb-phone">Утас *</label>
-          <input id="sb-phone" required className={inputCls} value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="9900 0000" />
+          <input id="sb-phone" required inputMode="tel" autoComplete="tel" pattern="[0-9+() -]{8,}" className={inputCls} value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="9900 0000" />
         </div>
         <div>
           <label className="field-label" htmlFor="sb-email">Имэйл</label>

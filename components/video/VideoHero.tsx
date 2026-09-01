@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
+import { Atmosphere } from "@/components/motion/Atmosphere";
 
 export type Clip = "meditation" | "stream" | "temple" | "stones";
 
@@ -110,6 +111,15 @@ export function VideoHero({
       <div aria-hidden className="absolute inset-0 -z-10" style={{ background: "linear-gradient(to top, rgba(8,20,17,0.92) 0%, rgba(8,20,17,0.45) 34%, rgba(8,20,17,0.12) 62%, rgba(8,20,17,0.35) 100%)" }} />
       <div aria-hidden className="absolute inset-0 -z-10" style={{ background: "radial-gradient(80% 60% at 78% 12%, rgba(232,183,95,0.16), transparent 62%)" }} />
 
+      {/* Lightweight 3D light sculpture: CSS-only so it stays smooth on phones. */}
+      <div aria-hidden className="hero-orbit-scene absolute right-[-7rem] top-[12%] -z-[5] hidden h-[34rem] w-[34rem] md:block">
+        <div className="hero-orbit hero-orbit-one" />
+        <div className="hero-orbit hero-orbit-two" />
+        <div className="hero-orbit hero-orbit-three" />
+        <div className="hero-orb-core" />
+      </div>
+      <Atmosphere className="pointer-events-none absolute inset-0 -z-[4] h-full w-full opacity-70" density={0.7} color="235,210,153" />
+
       {/* Агуулга */}
       <div className={`container-px w-full pb-16 pt-32 sm:pb-24 ${align === "center" ? "text-center" : ""}`}>
         <div ref={copy} className={align === "center" ? "mx-auto max-w-3xl" : "max-w-3xl"} style={{ willChange: "transform, opacity" }}>
@@ -132,6 +142,18 @@ export function VideoHero({
               ))}
             </div>
           )}
+          <div className={`animate-fade-rise-delay-2 mt-8 grid max-w-[34rem] grid-cols-3 overflow-hidden rounded-2xl border border-white/15 bg-white/[0.07] text-left shadow-2xl backdrop-blur-md ${align === "center" ? "mx-auto" : ""}`}>
+            {[
+              ["01", "Тайван орон зай"],
+              ["02", "Хувийн зөвлөмж"],
+              ["03", "Хялбар захиалга"],
+            ].map(([n, label]) => (
+              <div key={n} className="border-r border-white/10 px-3 py-3 last:border-r-0 sm:px-4">
+                <span className="block text-[0.62rem] font-bold tracking-[0.2em] text-accent-300">{n}</span>
+                <span className="mt-1 block text-[0.72rem] font-semibold leading-tight text-white/80 sm:text-xs">{label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

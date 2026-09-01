@@ -111,12 +111,12 @@ export function Header() {
           ) : (
             <Link href="/login" className="grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-primary-50 hover:text-primary-700" aria-label="Account">👤</Link>
           )}
-          <button onClick={() => setMenuOpen((o) => !o)} className="grid h-11 w-11 place-items-center rounded-full text-2xl text-ink/80 xl:hidden" aria-label="Menu">{menuOpen ? "✕" : "☰"}</button>
+          <button onClick={() => setMenuOpen((o) => !o)} className="grid h-11 w-11 place-items-center rounded-full text-2xl text-ink/80 transition hover:bg-primary-50 xl:hidden" aria-label={menuOpen ? "Цэс хаах" : "Цэс нээх"} aria-expanded={menuOpen} aria-controls="mobile-navigation">{menuOpen ? "✕" : "☰"}</button>
         </div>
       </div>
 
       {/* mobile / tablet menu */}
-      <div className={cx("border-t border-line bg-ivory/95 backdrop-blur xl:hidden", menuOpen ? "max-h-[calc(100dvh-4.5rem)] overflow-y-auto" : "max-h-0 overflow-hidden")} style={{ transition: "max-height 0.3s ease" }}>
+      <div id="mobile-navigation" className={cx("border-t border-line bg-ivory/95 backdrop-blur xl:hidden", menuOpen ? "visible max-h-[calc(100dvh-4.5rem)] overflow-y-auto opacity-100" : "invisible max-h-0 overflow-hidden opacity-0")} style={{ transition: "max-height 0.3s ease, opacity 0.2s ease, visibility 0.3s" }}>
         <nav className="container-px flex flex-col gap-1 py-4">
           {links.map((l) => (
             <Link key={l.href} href={l.href}

@@ -231,6 +231,31 @@ select option:checked { background-color: #16AFA4; color: #ffffff; }
 @keyframes zaStageIn { from { opacity: 0; transform: translateZ(-60px) scale(1.06); } to { opacity: 1; transform: translateZ(0) scale(1); } }
 @keyframes zaStageOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.94) translateY(8px); } }
 
+/* Hero 3D light sculpture — no WebGL payload, GPU-composited transforms only. */
+.hero-orbit-scene { perspective: 900px; transform-style: preserve-3d; filter: drop-shadow(0 30px 55px rgba(0,0,0,.28)); }
+.hero-orbit {
+  position: absolute; inset: 12%; border-radius: 999px; border: 1px solid rgba(238,211,148,.4);
+  box-shadow: inset 0 0 30px rgba(238,211,148,.08), 0 0 36px rgba(51,188,169,.09);
+  transform-style: preserve-3d; will-change: transform;
+}
+.hero-orbit-one { animation: orbitOne 18s linear infinite; }
+.hero-orbit-two { inset: 22%; border-color: rgba(91,218,200,.34); animation: orbitTwo 14s linear infinite reverse; }
+.hero-orbit-three { inset: 32%; border-style: dashed; animation: orbitThree 22s linear infinite; }
+.hero-orb-core {
+  position: absolute; left: 42%; top: 42%; width: 16%; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff8dc 0 7%, #dec37e 18%, #379f92 58%, rgba(12,72,66,.2) 75%);
+  box-shadow: 0 0 55px rgba(222,195,126,.42), 0 0 120px rgba(55,159,146,.28);
+  animation: orbBreathe 6s ease-in-out infinite;
+}
+@keyframes orbitOne { to { transform: rotateZ(360deg) rotateX(68deg) rotateY(18deg); } }
+@keyframes orbitTwo { to { transform: rotateZ(360deg) rotateY(72deg) rotateX(22deg); } }
+@keyframes orbitThree { to { transform: rotateZ(-360deg) rotateX(55deg) rotateY(55deg); } }
+@keyframes orbBreathe { 0%,100% { transform: translateZ(28px) scale(.94); } 50% { transform: translateZ(58px) scale(1.08); } }
+
+@media (max-width: 640px) {
+  .btn-lg { min-height: 50px; padding-left: 1.25rem; padding-right: 1.25rem; font-size: .96rem; }
+}
+
 
 /* ============================================================
    «ҮҮРИЙН ГЭГЭЭ» — шинэ дүрслэлийн хэл

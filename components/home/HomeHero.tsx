@@ -18,6 +18,10 @@ export function HomeHero({ media }: { media?: { kind: "video" | "image"; url: st
         </>
       }
       desc={t("home.heroDescription")}
+      cta={[
+        { href: "/services", label: "Засал сонгох" },
+        { href: "/courses", label: "Сургалт үзэх", variant: "gold" },
+      ]}
     />
   );
 }

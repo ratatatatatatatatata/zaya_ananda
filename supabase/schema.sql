@@ -67,4 +67,18 @@ create table if not exists site_settings (
   updated_at timestamptz default now()
 );
 
+-- Existing projects may have been created from an older schema. Keep every
+-- settings field additive so the admin screen never fails with PGRST204.
+alter table site_settings add column if not exists about_video text;
+alter table site_settings add column if not exists hero_videos jsonb;
+alter table site_settings add column if not exists hero_media jsonb;
+alter table site_settings add column if not exists zurhai_cards jsonb;
+alter table site_settings add column if not exists custom_moods jsonb;
+alter table site_settings add column if not exists zurhai_rules jsonb;
+alter table site_settings add column if not exists contact jsonb;
+alter table site_settings add column if not exists service_prepay numeric default 0;
+alter table site_settings add column if not exists team jsonb;
+alter table site_settings add column if not exists teachers jsonb;
+alter table site_settings add column if not exists bank jsonb;
+
 alter table cms_items add column if not exists link text;

@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { unstable_cache } from "next/cache";
 import { hashPassword, verifyPassword } from "./auth";
-import { sbSelect, sbInsert, sbUpdate, sbDelete, enc } from "./supabase";
+import { sbSelect, sbInsert, sbUpdate, sbDelete, enc, supabaseReady } from "./supabase";
 import { services, courses, products } from "@/data/content";
 import type { User, PublicUser, Order, OrderItem, ContactMessage, CmsItem, SiteSettings, SitePage, TeacherPreset, CmsTranslations } from "./types";
 
@@ -207,14 +207,19 @@ export async function updateSettings(patch: Partial<SiteSettings>): Promise<Site
 
 // ---------- CMS ----------
 export async function listCms(kind: CmsItem["kind"]): Promise<CmsItem[]> {
+  // Preview/CI builds do not receive production secrets. Render a usable empty
+  // catalogue instead of failing the whole Next.js export at build time.
+  if (!supabaseReady) return [];
   return sbSelect<CmsItem>("cms_items", `kind=eq.${enc(kind)}&order=created_at.desc`);
 }
 export async function allCms(): Promise<CmsItem[]> {
+  if (!supabaseReady) return [];
   return sbSelect<CmsItem>("cms_items", "order=created_at.desc");
 }
 const numOrNull = (v: unknown) => (typeof v === "number" && !Number.isNaN(v) ? v : null);
 
 export async function getCmsById(id: string): Promise<CmsItem | null> {
+  if (!supabaseReady) return null;
   const rows = await sbSelect<CmsItem>("cms_items", `id=eq.${enc(id)}&limit=1`);
   return rows[0] || null;
 }
