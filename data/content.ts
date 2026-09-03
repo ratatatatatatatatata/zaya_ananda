@@ -28,7 +28,7 @@ export const siteConfig = {
     "ウランバートル ハンウール区15区、マハトマ・ガンジー通り、17010",
     "乌兰巴托 汗乌拉区15区 甘地大街 17010"
   ),
-  mapQuery: "WW49+4X3 Mahatma Gandhi St, HUD - 15 khoroo, Ulaanbaatar 17010, Mongolia",
+  mapQuery: "Mahatma Gandhi St, HUD - 15 khoroo, Ulaanbaatar 17010, Mongolia",
   workingHours: l(
     "Даваа–Бямба, 09:00–19:00",
     "Mon–Sat, 09:00–19:00",
