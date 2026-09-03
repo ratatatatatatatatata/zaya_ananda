@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import { TiltCard } from "@/components/motion/TiltCard";
 import type { Locale } from "@/lib/types";
@@ -39,13 +38,13 @@ const TONES = [
 const AUTOPLAY_MS = 2000;
 
 /** Нүүр хуудасны зурхайн төрлүүд — хуучин байдлаараа (нэг бүтэн баннер, цэгүүд), 2 секунд тутам өөрөө солигдоно. Дарахад доор нь алхмууд нээгдэнэ. */
-export function ZurhaiSlider({ cards, daily }: {
+export function ZurhaiSlider({ cards, daily, matrix }: {
   cards?: ZurhaiCard[];
-  /** «Өдрийн зурхай» карт сонгогдоход задаргаанд гарах тайлал */
+  /** Сонгосон картын доор нээгдэх тайллууд */
   daily?: ReactNode;
+  matrix?: ReactNode;
 }) {
   const { tr } = useI18n();
-  const router = useRouter();
   const list = cards && cards.length ? cards : DEFAULT_ZURHAI;
   const [i, setI] = useState(0);
   const [open, setOpen] = useState(false);
@@ -130,14 +129,7 @@ export function ZurhaiSlider({ cards, daily }: {
                       <p className="mt-3 leading-relaxed text-white/85">{card.desc}</p>
                       <button
                         type="button"
-                        onClick={() => {
-                          const isMatrix = card.href === "/matrix" || card.title.toLocaleLowerCase().includes("матри");
-                          if (isMatrix) {
-                            router.push("/matrix");
-                            return;
-                          }
-                          setOpen((v) => (k === i ? !v : true));
-                        }}
+                        onClick={() => setOpen((v) => (k === i ? !v : true))}
                         aria-expanded={k === i && open}
                         className="btn btn-gold btn-md mt-6"
                       >
@@ -175,8 +167,9 @@ export function ZurhaiSlider({ cards, daily }: {
         className="overflow-hidden transition-[max-height,opacity] duration-500 ease-out"
         style={{ maxHeight: open ? "500rem" : 0, opacity: open ? 1 : 0 }}
       >
-        {/* Төрсөн он, сар, өдрөө оруулах хэсэг — үргэлж эндээ гарна */}
-        {daily && <div className="mt-2">{daily}</div>}
+        <div className="mt-2">
+          {(list[i]?.href === "/matrix" || list[i]?.title.toLocaleLowerCase().includes("матри")) ? matrix : daily}
+        </div>
       </div>
     </div>
   );
