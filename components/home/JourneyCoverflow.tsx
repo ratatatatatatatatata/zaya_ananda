@@ -12,7 +12,7 @@ export function JourneyCard({ j }: { j: Journey }) {
     <TiltCard max={6} className="h-full">
       {/* prefetch={false}: урьдчилан татсан хуучин RSC өгөгдөл slug-той таарахгүй үед
           "дэлгэрэнгүй" рүү орохад 404 үзүүлэх эрсдэлийг арилгана — дарахад л шинээр татна. */}
-      <Link href={`/ayalal/${j.slug}`} prefetch={false} className="glass-lux group flex h-full w-full flex-col text-left">
+      <Link href={`/ayalal/${encodeURIComponent(j.slug)}`} prefetch={false} className="glass-lux group flex h-full w-full flex-col text-left">
         <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-[1.75rem] bg-surface-3">
           <JourneyImage src={j.image} scene={j.scene} alt={j.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
           <span className="absolute left-4 top-4 rounded-full bg-[#0B1714]/75 px-3 py-1 text-xs font-semibold text-accent-300 backdrop-blur">

@@ -5,6 +5,22 @@ import type { Journey } from "@/data/journeys";
 
 const enc = (s: string) => encodeURIComponent(s);
 
+/** Route-оос ирсэн кирилл slug percent-encoded хэвээр байх тохиолдлыг
+ * тайлж, Unicode-ийн ижил утгатай representation-уудыг нэг хэлбэрт оруулна. */
+export function normalizeJourneySlug(value: string): string {
+  let normalized = String(value || "").trim().replace(/^\/+|\/+$/g, "");
+  for (let i = 0; i < 2; i++) {
+    try {
+      const decoded = decodeURIComponent(normalized);
+      if (decoded === normalized) break;
+      normalized = decoded;
+    } catch {
+      break;
+    }
+  }
+  return normalized.normalize("NFC").toLowerCase();
+}
+
 /* ---------- Захиалга ---------- */
 
 export async function createBooking(input: {
@@ -201,8 +217,15 @@ export async function listJourneys(): Promise<Journey[]> {
 }
 
 export async function getJourneyBySlug(slug: string): Promise<Journey | null> {
-  const rows = await sbSelect<Journey>("journeys", `slug=eq.${enc(slug)}&limit=1`);
-  return rows[0] || null;
+  const normalized = normalizeJourneySlug(slug);
+  if (!normalized) return null;
+
+  const rows = await sbSelect<Journey>("journeys", `slug=eq.${enc(normalized)}&limit=1`);
+  if (rows[0]) return rows[0];
+
+  // Route болон PostgREST-ийн encoding ялгаатай үед ч зөв мөрөө олно.
+  const all = await listJourneys();
+  return all.find((journey) => normalizeJourneySlug(journey.slug) === normalized) || null;
 }
 
 export async function getJourneyById(id: string): Promise<Journey | null> {
