@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth";
 import { getUserById } from "@/lib/repo";
-import { createReview, listReviews } from "@/lib/journeys-db";
+import { createReview, listFeaturedReviews } from "@/lib/journeys-db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,12 +10,13 @@ export const dynamic = "force-dynamic";
 // (шинэ хүснэгт үүсгэх шаардлагагүй) — аяллын сэтгэгдэлтэй андуурахгүй.
 const key = (itemId: string) => "item-" + itemId;
 
-/** Хичээлийн бүх сэтгэгдэл — админы зөвшөөрөл хэрэггүй, шууд харагдана */
+/** Нийтэд харагдах хичээлийн сэтгэгдэл — аяллын/нүүр хуудасны сэтгэгдэлтэй адил, админ
+ *  "Аяллын сэтгэгдэл" табаас тухайн хичээлд дээд тал нь 3-ыг сонгосны дараа нийтэд харагдана. */
 export async function GET(req: Request) {
   const itemId = new URL(req.url).searchParams.get("itemId") || "";
   if (!itemId) return NextResponse.json({ items: [] });
   try {
-    return NextResponse.json({ items: await listReviews(key(itemId)) });
+    return NextResponse.json({ items: await listFeaturedReviews(key(itemId)) });
   } catch {
     return NextResponse.json({ items: [] });
   }

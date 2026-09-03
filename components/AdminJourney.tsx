@@ -29,6 +29,7 @@ export function AdminJourney({ courseOrders = [], productOrders = [], onOrderSta
   const [reviews, setReviews] = useState<JourneyReview[]>([]);
   const [services, setServices] = useState<ServiceBooking[]>([]);
   const [tab, setTab] = useState<"bookings" | "services" | "courses" | "products" | "reviews">("bookings");
+  const [reviewFilter, setReviewFilter] = useState<"all" | "journey" | "home" | "course">("all");
   const [err, setErr] = useState("");
   const [serviceItems, setServiceItems] = useState<CmsItem[]>([]);
   const [manual, setManual] = useState({ itemId: "", date: "", time: "", name: "", phone: "", note: "" });
@@ -73,6 +74,9 @@ export function AdminJourney({ courseOrders = [], productOrders = [], onOrderSta
   }
 
   const featuredCount = (slug: string) => reviews.filter((r) => r.slug === slug && r.featured).length;
+  const kindOf = (slug: string): "home" | "course" | "journey" =>
+    slug === "home" ? "home" : slug.startsWith("item-") ? "course" : "journey";
+  const filteredReviews = reviews.filter((r) => reviewFilter === "all" || kindOf(r.slug) === reviewFilter);
 
   return (
     <div className="space-y-5">
@@ -270,16 +274,30 @@ export function AdminJourney({ courseOrders = [], productOrders = [], onOrderSta
       {tab === "reviews" && (
         <div className="space-y-3">
           <p className="rounded-xl bg-aqua px-4 py-2.5 text-sm text-muted">
-            ℹ️ Аялал тус бүрд <b>дээд тал нь 3</b> сэтгэгдлийг сонгож нийтэд харуулна. Сонгосон сэтгэгдэл аяллын хуудсанд, хариуцах багийн доор гарна.
+            ℹ️ Төрөл (аялал / нүүр хуудас / хичээл) тус бүрд <b>дээд тал нь 3</b> сэтгэгдлийг сонгож нийтэд харуулна — Аяллын
+            хуудсанд, нүүр хуудсанд, эсвэл тухайн хичээлийн хуудсанд харагдана. Доор шүүлтүүрээр төрлөөр нь ялгаж үзээрэй.
           </p>
-          {reviews.map((r) => (
+          <div className="flex flex-wrap gap-2">
+            {([
+              ["all", "Бүгд"],
+              ["journey", "🧭 Аяллын сэтгэгдэл"],
+              ["home", "🏠 Нүүр хуудас"],
+              ["course", "💬 Хичээлийн сэтгэгдэл"],
+            ] as const).map(([k, l]) => (
+              <button key={k} onClick={() => setReviewFilter(k)}
+                className={"rounded-full px-4 py-1.5 text-xs font-semibold transition " + (reviewFilter === k ? "bg-primary-grad text-white shadow-soft" : "border border-line bg-surface-1 text-ink/70 hover:border-primary-300")}>
+                {l} ({k === "all" ? reviews.length : reviews.filter((r) => kindOf(r.slug) === k).length})
+              </button>
+            ))}
+          </div>
+          {filteredReviews.map((r) => (
             <div key={r.id} className="card flex flex-wrap items-start justify-between gap-4 p-5">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="font-display font-semibold text-ink">{r.name}</span>
                   <span className="text-accent-300">{"★".repeat(r.rating)}</span>
                   <span className="rounded-full bg-surface-2 px-2.5 py-0.5 text-xs font-semibold text-muted">
-                    {r.slug === "home" ? "🏠 Нүүр хуудас" : r.slug.startsWith("item-") ? "💬 Хичээлийн сэтгэгдэл" : r.slug}
+                    {r.slug === "home" ? "🏠 Нүүр хуудас" : r.slug.startsWith("item-") ? "💬 Хичээлийн сэтгэгдэл" : "🧭 " + r.slug}
                   </span>
                   <span className="text-xs text-muted">{r.createdAt.slice(0, 10)}</span>
                 </div>
@@ -297,7 +315,7 @@ export function AdminJourney({ courseOrders = [], productOrders = [], onOrderSta
               </div>
             </div>
           ))}
-          {reviews.length === 0 && <p className="card p-6 text-sm text-muted">Сэтгэгдэл алга.</p>}
+          {filteredReviews.length === 0 && <p className="card p-6 text-sm text-muted">Энэ төрлөөр сэтгэгдэл алга.</p>}
         </div>
       )}
     </div>

@@ -5,12 +5,14 @@ import { useAuth } from "@/lib/auth-context";
 
 type Comment = { id: string; name: string; text: string; createdAt: string };
 
-/** Хичээлийн сэтгэгдэл — нэвтэрсэн хэрэглэгч бичнэ, бүх хүн шууд харна. */
+/** Хичээлийн сэтгэгдэл — нэвтэрсэн хэрэглэгч бичнэ; админ сонгосны дараа (дээд тал нь 3)
+ *  нийтэд харагдана — аяллын болон нүүр хуудасны сэтгэгдэлтэй ижил зарчим. */
 export function CourseComments({ itemId }: { itemId: string }) {
   const { user } = useAuth();
   const [items, setItems] = useState<Comment[]>([]);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
   const [err, setErr] = useState("");
 
   function load() {
@@ -31,7 +33,7 @@ export function CourseComments({ itemId }: { itemId: string }) {
         body: JSON.stringify({ itemId, text: text.trim() }),
       });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
-      setText(""); load();
+      setText(""); setDone(true);
     } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Алдаа гарлаа."); } finally { setBusy(false); }
   }
 
@@ -39,7 +41,13 @@ export function CourseComments({ itemId }: { itemId: string }) {
     <div>
       <p className="font-display text-lg font-semibold text-ink">Сэтгэгдэл ({items.length})</p>
 
-      {user ? (
+      {done && (
+        <p className="mt-4 rounded-2xl bg-jade-400/12 px-5 py-4 text-sm text-jade-600">
+          Сэтгэгдэл илгээгдлээ. Баярлалаа! Админ сонгосны дараа нийтэд харагдана.
+        </p>
+      )}
+
+      {user && !done ? (
         <form onSubmit={submit} className="mt-4 flex items-start gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-magic-grad text-sm font-bold text-white">
             {(user.name || "?").charAt(0).toUpperCase()}
@@ -52,11 +60,11 @@ export function CourseComments({ itemId }: { itemId: string }) {
             </button>
           </div>
         </form>
-      ) : (
+      ) : !user ? (
         <p className="mt-4 rounded-2xl border border-dashed border-line bg-surface-2/60 px-5 py-4 text-sm text-muted">
           Сэтгэгдэл бичихийн тулд эхлээд <a href="/login" className="font-semibold text-primary-700 hover:underline">нэвтэрнэ үү</a>.
         </p>
-      )}
+      ) : null}
 
       <div className="mt-6 space-y-4">
         {items.map((c) => (
@@ -74,7 +82,7 @@ export function CourseComments({ itemId }: { itemId: string }) {
           </div>
         ))}
         {items.length === 0 && (
-          <p className="text-sm italic text-muted">Одоогоор сэтгэгдэл алга, эхлүүлээрэй...</p>
+          <p className="text-sm italic text-muted">Одоогоор нийтэд харагдах сэтгэгдэл алга — эхлүүлээрэй...</p>
         )}
       </div>
     </div>
