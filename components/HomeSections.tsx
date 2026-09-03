@@ -12,6 +12,7 @@ import { VideoBand } from "./video/VideoBand";
 import { SectionZoom } from "./home/SectionZoom";
 import { ZurhaiSlider } from "./home/ZurhaiSlider";
 import { ServiceCoverflow } from "./home/ServiceCoverflow";
+import { InlineDestinyMatrix } from "./matrix/InlineDestinyMatrix";
 import { HomeAbout } from "./home/HomeAbout";
 import { listJourneysCached } from "@/lib/journeys-db";
 import type { Locale } from "@/lib/types";
@@ -80,7 +81,7 @@ export async function HomeSections() {
 
       {/* Зурхай — слайдер. Сонгож дарахад доор нь тухайн тайлал нээгдэнэ. */}
       <section id="zurhai" className="section scroll-mt-36"><div className="container-px">
-        <ZurhaiSlider cards={settings.zurhaiCards} daily={<MergeToorog />} />
+        <ZurhaiSlider cards={settings.zurhaiCards} daily={<MergeToorog />} matrix={<InlineDestinyMatrix />} />
       </div></section>
 
       {/* Энергийн засал */}
