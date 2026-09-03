@@ -271,7 +271,7 @@ export const listCmsCached = (kind: CmsItem["kind"]) =>
 export const getCmsByIdCached = (id: string) =>
   unstable_cache(() => getCmsById(id), ["cms-item", id], { tags: ["cms"], revalidate: 300 })();
 export const getSettingsCached = () =>
-  unstable_cache(() => getSettings(), ["site-settings"], { tags: ["settings"], revalidate: 300 })();
+  unstable_cache(() => getSettings(), ["site-settings-v2"], { tags: ["settings"], revalidate: 300 })();
 export const listPagesCached = () =>
   unstable_cache(() => listPages(), ["site-pages"], { tags: ["pages"], revalidate: 300 })();
 export const getPageByIdCached = (id: string) =>
