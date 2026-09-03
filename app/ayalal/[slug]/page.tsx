@@ -21,6 +21,53 @@ async function findJourney(slug: string) {
   return getJourneyBySlug(slug).catch(() => null);
 }
 
+function splitJourneyDetails(value?: string | null) {
+  const text = (value || "").trim();
+  if (!text) return [];
+
+  const numbered = text
+    .split(/\s+(?=\d+[.)]\s*)/g)
+    .map((item) => item.replace(/^\d+[.)]\s*/, "").trim())
+    .filter(Boolean);
+
+  if (numbered.length > 1) return numbered;
+
+  return text
+    .split(/\r?\n|[•·]\s*/g)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function DetailList({ value, tone = "jade" }: { value?: string | null; tone?: "jade" | "rose" }) {
+  const items = splitJourneyDetails(value);
+
+  if (!items.length) return <p className="mt-5 text-sm text-muted">Мэдээлэл оруулаагүй байна.</p>;
+
+  return (
+    <ul className="mt-5 space-y-3">
+      {items.map((item, index) => (
+        <li key={`${item}-${index}`} className="flex gap-3 text-[0.95rem] leading-6 text-ink/80">
+          <span
+            aria-hidden
+            className={`mt-1.5 grid size-5 shrink-0 place-items-center rounded-full text-[0.68rem] font-bold ${
+              tone === "rose" ? "bg-rose-50 text-rose-700" : "bg-primary-50 text-primary-700"
+            }`}
+          >
+            {tone === "rose" ? "–" : "✓"}
+          </span>
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function formatJourneyPrice(value?: string | null) {
+  const text = (value || "").trim();
+  const numeric = Number(text.replace(/[^0-9]/g, ""));
+  return numeric ? `${new Intl.NumberFormat("mn-MN").format(numeric)} ₮` : text || "Үнэ тохирно";
+}
+
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const j = await findJourney(params.slug);
   if (!j) return { title: "Аялал олдсонгүй" };
@@ -68,23 +115,50 @@ export default async function JourneyPage({ params }: { params: { slug: string }
 
       {/* Товч мэдээлэл */}
       <section className="section"><div className="container-px">
-        <div className="grid gap-5 lg:grid-cols-4">
-          <div className="panel p-6">
-            <p className="text-xs font-bold uppercase tracking-wide text-muted">Хэнд тохирох вэ</p>
-            <p className="mt-2 leading-relaxed text-ink/85">{j.audience}</p>
-          </div>
-          <div className="panel p-6">
-            <p className="text-xs font-bold uppercase tracking-wide text-jade-600">Багтсан</p>
-            <p className="mt-2 leading-relaxed text-ink/85">{j.included}</p>
-          </div>
-          <div className="panel p-6">
-            <p className="text-xs font-bold uppercase tracking-wide text-rose-700">Багтаагүй</p>
-            <p className="mt-2 leading-relaxed text-ink/85">{j.excluded}</p>
-          </div>
-          <div className="panel p-6">
-            <p className="text-xs font-bold uppercase tracking-wide text-accent-300">Үнэ</p>
-            <p className="mt-2 leading-relaxed text-ink/85">{j.price}</p>
-          </div>
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,.65fr)]">
+          <article className="panel relative overflow-hidden p-6 sm:p-8">
+            <div aria-hidden className="absolute -right-16 -top-20 size-48 rounded-full bg-primary-100/60 blur-3xl" />
+            <div className="relative">
+              <span className="grid size-11 place-items-center rounded-2xl bg-primary-50 text-xl text-primary-700">✦</span>
+              <p className="mt-5 text-xs font-bold uppercase tracking-[0.14em] text-primary-700">Хэнд тохирох вэ</p>
+              <p className="mt-3 max-w-3xl text-[1.02rem] leading-8 text-ink/80">{j.audience}</p>
+            </div>
+          </article>
+
+          <aside className="panel flex flex-col justify-between overflow-hidden bg-[#0b3d35] p-6 text-white sm:p-8">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/60">Аяллын үнэ</p>
+              <p className="mt-3 font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+                {formatJourneyPrice(j.price)}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-white/65">Нэг хүний багц үнэ</p>
+            </div>
+            <a href="#zahialga" className="mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-primary-800 transition hover:-translate-y-0.5 hover:shadow-lg">
+              Өдрөө сонгох <span aria-hidden>→</span>
+            </a>
+          </aside>
+
+          <article className="panel p-6 sm:p-8">
+            <div className="flex items-center gap-3 border-b border-line pb-5">
+              <span className="grid size-10 place-items-center rounded-xl bg-primary-50 font-bold text-primary-700">✓</span>
+              <div>
+                <p className="font-display text-xl font-semibold text-ink">Үнэд багтсан</p>
+                <p className="mt-0.5 text-sm text-muted">Аяллын багцад багтах үйлчилгээ</p>
+              </div>
+            </div>
+            <DetailList value={j.included} />
+          </article>
+
+          <article className="panel p-6 sm:p-8">
+            <div className="flex items-center gap-3 border-b border-line pb-5">
+              <span className="grid size-10 place-items-center rounded-xl bg-rose-50 font-bold text-rose-700">–</span>
+              <div>
+                <p className="font-display text-xl font-semibold text-ink">Үнэд багтаагүй</p>
+                <p className="mt-0.5 text-sm text-muted">Тусад нь тооцогдох зардал</p>
+              </div>
+            </div>
+            <DetailList value={j.excluded} tone="rose" />
+          </article>
         </div>
       </div></section>
 
