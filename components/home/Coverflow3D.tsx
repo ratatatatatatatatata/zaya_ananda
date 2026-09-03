@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const MAX_TILT_DEG = 26;
 const MAX_SCALE_DROP = 0.13;
@@ -22,6 +22,7 @@ export function Coverflow3D<T>({
   cardWidthClassName = "w-[19rem] sm:w-[21rem]",
   autoPlay = true,
   flat = false,
+  cinematic = false,
 }: {
   items: T[];
   getKey: (item: T, index: number) => string;
@@ -30,13 +31,32 @@ export function Coverflow3D<T>({
   autoPlay?: boolean;
   /** true бол 3D хазайлтгүй, эгц урдаас (flat) харагдана — гулсах, автоплэй хэвээр ажиллана */
   flat?: boolean;
+  /** Төвийн картыг өргөж, хоёр талын картыг ард давхарласан кино мэт 3D харагдац. */
+  cinematic?: boolean;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const rafId = useRef<number | null>(null);
   const hoveringRef = useRef(false);
   const lastUserInteractRef = useRef(0);
+  const [activeIndex, setActiveIndex] = useState(0);
   const markInteraction = useCallback(() => { lastUserInteractRef.current = Date.now(); }, []);
+
+  const nearestIndex = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return 0;
+    const rect = el.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    let best = 0;
+    let bestDist = Infinity;
+    cardRefs.current.forEach((card, i) => {
+      if (!card) return;
+      const cr = card.getBoundingClientRect();
+      const d = Math.abs(cr.left + cr.width / 2 - centerX);
+      if (d < bestDist) { bestDist = d; best = i; }
+    });
+    return best;
+  }, []);
 
   const tilt = useCallback(() => {
     const el = trackRef.current;
@@ -46,13 +66,15 @@ export function Coverflow3D<T>({
     // 3D хазайлт хэвийн бус, "хазгай" харагдана — тэнд яг урдаас, шулуун харуулна.
     // `flat` prop өгөгдсөн бол дэлгэцийн хэмжээ үл хамааран үргэлж шулуун харуулна.
     const isMobileFlat = typeof window !== "undefined" && window.innerWidth < 640;
-    if (flat || isMobileFlat) {
+    if (flat || (isMobileFlat && !cinematic)) {
       cardRefs.current.forEach((card) => {
         if (!card) return;
         card.style.transform = "none";
         card.style.opacity = "1";
+        card.style.filter = "none";
         card.style.zIndex = "1";
       });
+      setActiveIndex(nearestIndex());
       rafId.current = null;
       return;
     }
@@ -68,15 +90,18 @@ export function Coverflow3D<T>({
       const raw = (cardCenter - centerX) / half;
       const clamped = Math.max(-1.4, Math.min(1.4, raw));
       const unit = Math.min(Math.abs(clamped), 1);
-      const deg = -clamped * MAX_TILT_DEG;
-      const scale = 1 - unit * MAX_SCALE_DROP;
-      const depth = -unit * 70;
-      card.style.transform = `perspective(1400px) rotateY(${deg}deg) scale(${scale}) translateZ(${depth}px)`;
-      card.style.opacity = String(1 - unit * MAX_OPACITY_DROP);
+      const deg = -clamped * (cinematic ? 9 : MAX_TILT_DEG);
+      const scale = 1 - unit * (cinematic ? 0.2 : MAX_SCALE_DROP);
+      const depth = -unit * (cinematic ? 180 : 70);
+      const overlap = cinematic ? -clamped * 52 : 0;
+      card.style.transform = `perspective(1400px) translateX(${overlap}px) rotateY(${deg}deg) scale(${scale}) translateZ(${depth}px)`;
+      card.style.opacity = String(1 - unit * (cinematic ? 0.48 : MAX_OPACITY_DROP));
+      card.style.filter = cinematic ? `blur(${(unit * 1.2).toFixed(1)}px)` : "none";
       card.style.zIndex = String(Math.round((1 - unit) * 10));
     });
+    setActiveIndex(nearestIndex());
     rafId.current = null;
-  }, [flat]);
+  }, [cinematic, flat, nearestIndex]);
 
   const requestTilt = useCallback(() => {
     if (rafId.current != null) return;
@@ -95,22 +120,6 @@ export function Coverflow3D<T>({
       if (rafId.current != null) cancelAnimationFrame(rafId.current);
     };
   }, [tilt, requestTilt, items.length]);
-
-  const nearestIndex = useCallback(() => {
-    const el = trackRef.current;
-    if (!el) return 0;
-    const rect = el.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    let best = 0;
-    let bestDist = Infinity;
-    cardRefs.current.forEach((card, i) => {
-      if (!card) return;
-      const cr = card.getBoundingClientRect();
-      const d = Math.abs(cr.left + cr.width / 2 - centerX);
-      if (d < bestDist) { bestDist = d; best = i; }
-    });
-    return best;
-  }, []);
 
   // Зөвхөн carousel-ийн дотоод хэвтээ гүйлтийг (track.scrollLeft) хөдөлгөнө —
   // scrollIntoView ашигладаггүй нь чухал: тэр функц заримдаа "хамгийн ойрхон" гэсэн
@@ -156,7 +165,7 @@ export function Coverflow3D<T>({
       onWheel={markInteraction}
       onTouchMove={markInteraction}
     >
-      {items.length > 1 && (
+      {items.length > 1 && !cinematic && (
         <>
           <button
             type="button"
@@ -179,19 +188,30 @@ export function Coverflow3D<T>({
 
       <div
         ref={trackRef}
-        className="flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-6 pt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-10"
-        style={{ scrollPaddingLeft: "40%", scrollPaddingRight: "40%" }}
+        className={`flex snap-x snap-mandatory overflow-x-auto pb-8 pt-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${cinematic ? "gap-0" : "gap-6 px-4 sm:px-10"}`}
+        style={cinematic ? { paddingInline: "max(1rem, calc(50% - 10.5rem))", scrollPaddingInline: "50%" } : { scrollPaddingLeft: "40%", scrollPaddingRight: "40%" }}
       >
         {items.map((it, i) => (
           <div
             key={getKey(it, i)}
             ref={(el) => { cardRefs.current[i] = el; }}
-            className={"shrink-0 snap-center transition-transform duration-150 ease-out will-change-transform " + cardWidthClassName}
+            className={"shrink-0 snap-center transition-[transform,opacity,filter] duration-300 ease-out will-change-transform " + cardWidthClassName}
           >
             {renderItem(it, i)}
           </div>
         ))}
       </div>
+      {items.length > 1 && cinematic && (
+        <div className="mt-1 flex items-center justify-center gap-4">
+          <button type="button" onClick={() => { markInteraction(); prev(); }} aria-label="Өмнөх"
+            className="focus-ring grid h-12 w-12 place-items-center rounded-full border border-line bg-surface-1 text-xl text-primary-700 shadow-sm transition hover:-translate-y-0.5 hover:border-primary-400">‹</button>
+          <div className="flex items-center gap-2" aria-label={`${activeIndex + 1} / ${items.length}`}>
+            {items.map((_, index) => <span key={index} className={`h-2 rounded-full transition-all ${index === activeIndex ? "w-7 bg-primary-500" : "w-2 bg-primary-200"}`} />)}
+          </div>
+          <button type="button" onClick={() => { markInteraction(); next(); }} aria-label="Дараах"
+            className="focus-ring grid h-12 w-12 place-items-center rounded-full border border-line bg-surface-1 text-xl text-primary-700 shadow-sm transition hover:-translate-y-0.5 hover:border-primary-400">›</button>
+        </div>
+      )}
     </div>
   );
 }

@@ -111,23 +111,7 @@ export function VideoHero({
       <div aria-hidden className="absolute inset-0 -z-10" style={{ background: "linear-gradient(to top, rgba(8,20,17,0.92) 0%, rgba(8,20,17,0.45) 34%, rgba(8,20,17,0.12) 62%, rgba(8,20,17,0.35) 100%)" }} />
       <div aria-hidden className="absolute inset-0 -z-10" style={{ background: "radial-gradient(80% 60% at 78% 12%, rgba(232,183,95,0.16), transparent 62%)" }} />
 
-<<<<<<< Updated upstream
-      {/* Lightweight 3D light sculpture: CSS-only so it stays smooth on phones. */}
-      <div aria-hidden className="hero-orbit-scene absolute right-[-7rem] top-[12%] -z-[5] hidden h-[34rem] w-[34rem] md:block">
-        <div className="hero-orbit hero-orbit-one" />
-        <div className="hero-orbit hero-orbit-two" />
-        <div className="hero-orbit hero-orbit-three" />
-        <div className="hero-orb-core" />
-      </div>
       <Atmosphere className="pointer-events-none absolute inset-0 -z-[4] h-full w-full opacity-70" density={0.7} color="235,210,153" />
-=======
-      {/* Хөвөгч гэрлийн бөмбөлгүүд — гүн мэдрэмж, 3D параллакс */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="float-token float-token--slow absolute right-[10%] top-[18%] h-24 w-24 rounded-full opacity-60 blur-2xl" style={{ background: "radial-gradient(circle, rgba(232,183,95,0.55), transparent 70%)" }} />
-        <div className="float-token absolute left-[8%] top-[62%] h-16 w-16 rounded-full opacity-50 blur-xl" style={{ background: "radial-gradient(circle, rgba(124,220,210,0.5), transparent 70%)", animationDelay: "1.2s" }} />
-        <div className="float-token float-token--rev absolute right-[22%] bottom-[14%] h-12 w-12 rounded-full opacity-45 blur-lg" style={{ background: "radial-gradient(circle, rgba(155,110,240,0.45), transparent 70%)", animationDelay: "2.4s" }} />
-      </div>
->>>>>>> Stashed changes
 
       {/* Агуулга */}
       <div className={`container-px w-full pb-16 pt-32 sm:pb-24 ${align === "center" ? "text-center" : ""}`}>
