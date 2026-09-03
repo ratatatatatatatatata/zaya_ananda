@@ -4,12 +4,9 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { ARCANA, SOUL_LEVELS, ZON, ZON_TITLES, AGE_DUTIES } from "@/data/matrix-data";
+import { DestinyMatrixDiagram } from "@/components/matrix/DestinyMatrixDiagram";
+import { calculateDestinyMatrix } from "@/lib/matrix-calculation";
 
-/** 22-оос их тоог цифрүүдийн нийлбэрээр бууруулна (Хувь тавилангийн матриксын дүрэм). */
-function reduce22(n: number): number {
-  while (n > 22) n = String(n).split("").reduce((s, d) => s + Number(d), 0);
-  return n;
-}
 function reduce9(n: number): number {
   while (n > 9) n = String(n).split("").reduce((s, d) => s + Number(d), 0);
   return n;
@@ -26,24 +23,20 @@ export default function MatrixPage() {
     const d = new Date(date + "T00:00:00");
     if (isNaN(d.getTime())) return null;
     const day = d.getDate(), month = d.getMonth() + 1, year = d.getFullYear();
-    const A = reduce22(day);
-    const B = month;
-    const C = reduce22(digitSum(String(year)));
-    const D = reduce22(A + B + C);
-    const E = reduce22(A + B + C + D);
+    const matrix = calculateDestinyMatrix(day, month, year);
     const total = digitSum(String(day).padStart(2, "0") + String(month).padStart(2, "0") + String(year));
     const soul = SOUL_LEVELS.find((l) => total >= l.from && total <= l.to) || null;
     const zon = reduce9(total);
-    return { day, month, year, A, B, C, D, E, total, soul, zon };
+    return { matrix, total, soul, zon };
   }, [date]);
 
   const points = r
     ? [
-        { k: "A", n: r.A, label: "Таны үндсэн эрчим (төрсөн өдөр)", hint: "Таны зан чанар, энэ насны гол хөдөлгөгч хүч" },
-        { k: "B", n: r.B, label: "Сэтгэлийн эрчим (төрсөн сар)", hint: "Сэтгэл хөдлөл, авьяас билгийн урсгал" },
-        { k: "C", n: r.C, label: "Удам угсааны эрчим (төрсөн он)", hint: "Өвөг дээдсээс уламжилсан хүч, өв" },
-        { k: "D", n: r.D, label: "Хувь тавилангийн эрчим", hint: "Энэ насандаа гүйцэлдүүлэх үүрэг даалгавар" },
-        { k: "E", n: r.E, label: "Төв — сүнсний тайвшралын бүс", hint: "Таны дотоод тэнцвэрийн гол эх үүсвэр" },
+        { k: "A", n: r.matrix.points.a, label: "Хувь хүний үндсэн эрчим", hint: "Төрсөн өдрийн тоо — зан чанар, ертөнцөд өөрийгөө илэрхийлэх байдал" },
+        { k: "B", n: r.matrix.points.b, label: "Сүнслэг авьяасын эрчим", hint: "Төрсөн сарын тоо — дээд авьяас, зөн совингийн урсгал" },
+        { k: "C", n: r.matrix.points.c, label: "Нийгэм, удам угсааны эрчим", hint: "Төрсөн оны цифрийн нийлбэр — нийгэм болон удмын орон зай дахь илрэл" },
+        { k: "D", n: r.matrix.points.d, label: "Үйлийн үрийн үндсэн эрчим", hint: "Энэ насандаа ухамсарлаж, тэнцвэржүүлэх гол даалгавар" },
+        { k: "E", n: r.matrix.points.e, label: "Матрицын төв эрчим", hint: "Дотоод тав тух, хүчээ сэргээх болон шийдвэр гаргах суурь төлөв" },
       ]
     : [];
 
@@ -63,9 +56,43 @@ export default function MatrixPage() {
 
         {r && (
           <>
+            <div className="mt-12 grid items-start gap-7 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,.65fr)]">
+              <DestinyMatrixDiagram matrix={r.matrix} />
+              <div className="space-y-4">
+                <div className="card p-6">
+                  <p className="text-xs font-bold uppercase tracking-wide text-primary-400">Үйлийн үрийн сүүл</p>
+                  <p className="mt-2 font-display text-3xl font-semibold text-ink">{r.matrix.karmicTail.join(" – ")}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">Өнгөрсөн туршлагаас авч ирсэн давтагдах сургамж, энэ насанд хөгжүүлэх чиглэлийг илэрхийлнэ.</p>
+                </div>
+                <div className="card p-6">
+                  <p className="text-xs font-bold uppercase tracking-wide text-grape-400">Зорилгын шугам</p>
+                  <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                    {[
+                      ["Хувийн", r.matrix.purposes.personal],
+                      ["Нийгмийн", r.matrix.purposes.social],
+                      ["Сүнслэг", r.matrix.purposes.spiritual],
+                    ].map(([label, value]) => (
+                      <div key={String(label)} className="rounded-2xl bg-surface-4 px-2 py-3">
+                        <strong className="block font-display text-2xl text-ink">{value}</strong>
+                        <span className="text-[11px] text-muted">{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="card p-6">
+                  <p className="text-xs font-bold uppercase tracking-wide text-accent-500">Авьяасын гурвал</p>
+                  <dl className="mt-3 space-y-2 text-sm">
+                    <div className="flex justify-between gap-3"><dt className="text-muted">Дээд авьяас</dt><dd className="font-semibold text-ink">{r.matrix.talents.spiritual.join(" · ")}</dd></div>
+                    <div className="flex justify-between gap-3"><dt className="text-muted">Эхийн удмын авьяас</dt><dd className="font-semibold text-ink">{r.matrix.talents.maternal.join(" · ")}</dd></div>
+                    <div className="flex justify-between gap-3"><dt className="text-muted">Эцгийн удмын авьяас</dt><dd className="font-semibold text-ink">{r.matrix.talents.paternal.join(" · ")}</dd></div>
+                  </dl>
+                </div>
+              </div>
+            </div>
+
             {/* Матриксын гол цэгүүд */}
             <h2 className="mt-12 font-display text-2xl font-semibold text-ink sm:text-3xl">Таны матриксын гол эрчмүүд</h2>
-            <div className="mt-6 space-y-5">
+            <div className="mt-6 grid gap-5 md:grid-cols-2">
               {points.map((p) => {
                 const a = ARCANA[p.n];
                 return (
@@ -127,6 +154,7 @@ export default function MatrixPage() {
                 <Link href="/about#contact" className="btn btn-outline btn-md">Цаг захиалах</Link>
               </div>
             </div>
+            <p className="mt-5 text-center text-xs leading-relaxed text-muted">Энэхүү матриц нь 22 арканын бэлгэдэлт өөрийгөө танин мэдэх аргачлал бөгөөд шинжлэх ухааны онош, баталгаатай таамаглал биш юм.</p>
           </>
         )}
       </div></section>
