@@ -111,6 +111,7 @@ export function VideoHero({
       <div aria-hidden className="absolute inset-0 -z-10" style={{ background: "linear-gradient(to top, rgba(8,20,17,0.92) 0%, rgba(8,20,17,0.45) 34%, rgba(8,20,17,0.12) 62%, rgba(8,20,17,0.35) 100%)" }} />
       <div aria-hidden className="absolute inset-0 -z-10" style={{ background: "radial-gradient(80% 60% at 78% 12%, rgba(232,183,95,0.16), transparent 62%)" }} />
 
+<<<<<<< Updated upstream
       {/* Lightweight 3D light sculpture: CSS-only so it stays smooth on phones. */}
       <div aria-hidden className="hero-orbit-scene absolute right-[-7rem] top-[12%] -z-[5] hidden h-[34rem] w-[34rem] md:block">
         <div className="hero-orbit hero-orbit-one" />
@@ -119,14 +120,24 @@ export function VideoHero({
         <div className="hero-orb-core" />
       </div>
       <Atmosphere className="pointer-events-none absolute inset-0 -z-[4] h-full w-full opacity-70" density={0.7} color="235,210,153" />
+=======
+      {/* Хөвөгч гэрлийн бөмбөлгүүд — гүн мэдрэмж, 3D параллакс */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="float-token float-token--slow absolute right-[10%] top-[18%] h-24 w-24 rounded-full opacity-60 blur-2xl" style={{ background: "radial-gradient(circle, rgba(232,183,95,0.55), transparent 70%)" }} />
+        <div className="float-token absolute left-[8%] top-[62%] h-16 w-16 rounded-full opacity-50 blur-xl" style={{ background: "radial-gradient(circle, rgba(124,220,210,0.5), transparent 70%)", animationDelay: "1.2s" }} />
+        <div className="float-token float-token--rev absolute right-[22%] bottom-[14%] h-12 w-12 rounded-full opacity-45 blur-lg" style={{ background: "radial-gradient(circle, rgba(155,110,240,0.45), transparent 70%)", animationDelay: "2.4s" }} />
+      </div>
+>>>>>>> Stashed changes
 
       {/* Агуулга */}
       <div className={`container-px w-full pb-16 pt-32 sm:pb-24 ${align === "center" ? "text-center" : ""}`}>
         <div ref={copy} className={align === "center" ? "mx-auto max-w-3xl" : "max-w-3xl"} style={{ willChange: "transform, opacity" }}>
           {eyebrow && (
-            <p className={`animate-fade-rise flex items-center gap-3 text-[0.72rem] font-bold uppercase tracking-[0.34em] text-accent-300 ${align === "center" ? "justify-center" : ""}`}>
-              <span aria-hidden className="h-px w-8 bg-accent-300/60" />
-              {eyebrow}
+            <p className={`animate-fade-rise flex items-center gap-3 ${align === "center" ? "justify-center" : ""}`}>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-[0.72rem] font-bold uppercase tracking-[0.34em] text-accent-300 backdrop-blur-md">
+                <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-accent-300 shadow-[0_0_10px_2px_rgba(232,183,95,0.7)]" />
+                {eyebrow}
+              </span>
             </p>
           )}
           <h1 className="animate-fade-rise-delay mt-5 text-balance font-display text-[2.6rem] font-semibold leading-[1.06] text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.55)] sm:text-6xl lg:text-7xl">

@@ -2,6 +2,7 @@ import { Reveal } from "../Reveal";
 import { Tr } from "../T";
 import type { Locale } from "@/lib/types";
 import { LevelCourses, type LevelCourse } from "./LevelCourses";
+import { FloatingGlyphs } from "./FloatingGlyphs";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
 
@@ -21,7 +22,14 @@ const C = {
 /** Нүүрний гол онцлол — Ариусахуйн үйлийн 4 түвшин ба сүнслэг аяллын товч танилцуулга. */
 export function PathsHighlight({ courses }: { courses: LevelCourse[] }) {
   return (
-    <section className="section"><div className="container-px">
+    <section className="section relative"><div className="container-px relative">
+      <FloatingGlyphs
+        tokens={[
+          { glyph: "lotus", from: "#2BC8BB", to: "#7CDCD2", top: "4%", left: "3%", size: 64, delay: 0 },
+          { glyph: "mountain", from: "#F0B27A", to: "#5FCFC4", top: "10%", right: "5%", size: 56, delay: 1.4, slow: true },
+          { glyph: "scroll", from: "#E3BE62", to: "#9BC7F0", top: "68%", left: "8%", size: 48, delay: 0.8, rev: true },
+        ]}
+      />
       <Reveal>
         <div className="mx-auto max-w-3xl text-center">
           <p className="eyebrow-line justify-center"><Tr v={C.eyebrow} /></p>

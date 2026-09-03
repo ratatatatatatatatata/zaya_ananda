@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Coverflow3D } from "./Coverflow3D";
+import { TiltCard } from "../motion/TiltCard";
 import { embedSrc, youtubeThumb } from "@/lib/video-embed";
 import { useI18n } from "@/lib/i18n";
 import type { CmsItem, Locale } from "@/lib/types";
@@ -38,8 +39,8 @@ function GiftCard({ reel }: { reel: Reel }) {
   const [open, setOpen] = useState(false);
   const e = embedSrc(reel.url, true);
   return (
-    <div className="card group flex h-full w-full flex-col overflow-hidden text-left">
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-3">
+    <div className="glass-lux group flex h-full w-full flex-col text-left">
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-[1.75rem] bg-surface-3">
         {open ? (
           <iframe
             src={e.src}
@@ -84,7 +85,7 @@ export function GiftCoverflow({ items }: { items: CmsItem[] }) {
       <Coverflow3D
         items={reels}
         getKey={(r) => r.id}
-        renderItem={(r) => <GiftCard reel={r} />}
+        renderItem={(r) => <TiltCard max={6} className="h-full"><GiftCard reel={r} /></TiltCard>}
         cardWidthClassName="w-[19rem] sm:w-[21rem]"
         flat
       />

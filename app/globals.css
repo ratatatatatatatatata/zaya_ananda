@@ -314,3 +314,95 @@ select option:checked { background-color: #16AFA4; color: #ffffff; }
     background-position: center;
   }
 }
+
+/* ============================================================
+   3D DEPTH SYSTEM — 台灣現代 refined glass, layered elevation,
+   real perspective tilt. Applied on top of the "Үүрийн гэгээ" system.
+   ============================================================ */
+@layer components {
+  /* Perspective stage — wrap a TiltCard (or any hover-tilt element) in this
+     so its rotateX/rotateY reads as genuine 3D, not a flat skew. */
+  .stage-3d { perspective: 1400px; }
+
+  /* Refined glass surface — brighter top-edge highlight, doubled shadow
+     (contact shadow + ambient) reads as real elevation instead of a flat drop-shadow.
+     NB: no backdrop-filter here on purpose — combined with a perspective/3D-tilt
+     ancestor (TiltCard), Chromium fails to paint backdrop-filter at all and the
+     whole card silently disappears. Solid layered gradient reads as glass instead. */
+  .glass-lux {
+    @apply relative overflow-hidden rounded-[1.75rem] border;
+    border-color: rgb(var(--c-line) / 0.9);
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.65) 0%, rgb(255 255 255 / 0) 40%),
+      rgb(var(--c-s1) / 0.98);
+    box-shadow:
+      0 1px 0 0 rgb(255 255 255 / 0.65) inset,
+      0 18px 40px -22px rgb(var(--shadow-tint) / 0.35),
+      0 44px 80px -40px rgb(var(--shadow-tint) / 0.30);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+  }
+  .glass-lux:hover {
+    border-color: rgb(var(--c-p400) / 0.5);
+    box-shadow:
+      0 1px 0 0 rgb(255 255 255 / 0.7) inset,
+      0 26px 54px -22px rgb(var(--shadow-tint) / 0.4),
+      0 60px 100px -36px rgb(var(--c-p600) / 0.28);
+  }
+  .night .glass-lux {
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.07) 0%, rgb(255 255 255 / 0) 40%), rgb(var(--c-s1) / 0.98);
+    box-shadow:
+      0 1px 0 0 rgb(255 255 255 / 0.08) inset,
+      0 18px 40px -22px rgb(0 0 0 / 0.55),
+      0 44px 80px -40px rgb(0 0 0 / 0.5);
+  }
+  .night .glass-lux:hover {
+    box-shadow:
+      0 1px 0 0 rgb(255 255 255 / 0.12) inset,
+      0 26px 54px -22px rgb(0 0 0 / 0.6),
+      0 60px 100px -36px rgb(43 200 187 / 0.35);
+  }
+
+  /* Floating decorative token — gently orbits + bobs, sits behind content (z <0)
+     to give sections real depth without any 3D library. */
+  .float-token {
+    position: absolute;
+    pointer-events: none;
+    filter: blur(0.4px);
+    animation: zaTokenFloat 11s ease-in-out infinite;
+  }
+  .float-token--slow { animation-duration: 16s; }
+  .float-token--rev { animation-direction: reverse; }
+
+  /* Chip that reads as a raised glass pebble — used for eyebrow icons / stat tiles */
+  .pebble {
+    @apply relative grid place-items-center rounded-3xl border;
+    border-color: rgb(var(--c-line));
+    background: linear-gradient(160deg, rgb(255 255 255 / 0.9), rgb(var(--c-s2)) 60%);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 14px 30px -16px rgb(var(--shadow-tint) / 0.4);
+  }
+  .night .pebble {
+    background: linear-gradient(160deg, rgb(255 255 255 / 0.1), rgb(var(--c-s2)) 60%);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.1) inset, 0 14px 30px -16px rgb(0 0 0 / 0.5);
+  }
+}
+
+@layer utilities {
+  .preserve-3d { transform-style: preserve-3d; }
+  .backface-hidden { backface-visibility: hidden; }
+}
+
+@keyframes zaTokenFloat {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  33% { transform: translate3d(6px, -14px, 0) rotate(4deg); }
+  66% { transform: translate3d(-8px, -6px, 0) rotate(-3deg); }
+}
+
+@keyframes zaOrbitSlow {
+  from { transform: rotate(0deg) translateX(var(--orbit-r, 120px)) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(var(--orbit-r, 120px)) rotate(-360deg); }
+}
+.orbit-slow { animation: zaOrbitSlow 26s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .float-token, .orbit-slow { animation: none !important; }
+}

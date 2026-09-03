@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ServiceBooking } from "@/components/ServiceBooking";
+import { TiltCard } from "@/components/motion/TiltCard";
 import type { CmsItem } from "@/lib/types";
 
 function initials(name: string) {
@@ -26,55 +27,60 @@ export function ServiceCard({ item }: { item: CmsItem }) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-haspopup="dialog"
-        className="card group flex h-full w-full flex-col overflow-hidden text-left transition hover:-translate-y-1 hover:shadow-glow"
-      >
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-3">
-          {cover ? (
-            <img src={cover} alt={item.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-          ) : (
-            <div className="h-full w-full" style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }} />
-          )}
-          {item.category && (
-            <span className="absolute left-4 top-4 rounded-full bg-[#0B1714]/75 px-3 py-1 text-xs font-semibold text-accent-300 backdrop-blur">
-              {item.category}
-            </span>
-          )}
-        </div>
+      <div className="h-full">
+        <TiltCard max={7} className="h-full">
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            aria-haspopup="dialog"
+            className="glass-lux group flex h-full w-full flex-col text-left"
+          >
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-[1.75rem] bg-surface-3">
+              {cover ? (
+                <img src={cover} alt={item.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+              ) : (
+                <div className="h-full w-full" style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }} />
+              )}
+              <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              {item.category && (
+                <span className="absolute left-4 top-4 rounded-full bg-[#0B1714]/75 px-3 py-1 text-xs font-semibold text-accent-300 backdrop-blur">
+                  {item.category}
+                </span>
+              )}
+            </div>
 
-        <div className="flex flex-1 flex-col p-5">
-          <h3 className="font-display text-lg font-semibold text-ink">{item.title}</h3>
-          {item.summary && <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{item.summary}</p>}
+            <div className="flex flex-1 flex-col p-5">
+              <h3 className="font-display text-lg font-semibold text-ink">{item.title}</h3>
+              {item.summary && <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{item.summary}</p>}
 
-          {hasTeacher && (
-            <div className="mt-5 flex items-center gap-3 border-t border-line pt-4">
-              <span className="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-surface-3">
-                {item.teacherImage ? (
-                  <img src={item.teacherImage} alt={item.teacherName} className="h-full w-full object-cover" />
-                ) : (
-                  <span
-                    className="grid h-full w-full place-items-center font-display text-sm font-semibold text-[#14231F]"
-                    style={{ backgroundImage: "linear-gradient(150deg,#FFE7A8,#E8B75F 55%,#B98A3C)" }}
-                  >
-                    {initials(item.teacherName || "")}
+              {hasTeacher && (
+                <div className="mt-5 flex items-center gap-3 border-t border-line pt-4">
+                  <span className="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-surface-3">
+                    {item.teacherImage ? (
+                      <img src={item.teacherImage} alt={item.teacherName} className="h-full w-full object-cover" />
+                    ) : (
+                      <span
+                        className="grid h-full w-full place-items-center font-display text-sm font-semibold text-[#14231F]"
+                        style={{ backgroundImage: "linear-gradient(150deg,#FFE7A8,#E8B75F 55%,#B98A3C)" }}
+                      >
+                        {initials(item.teacherName || "")}
+                      </span>
+                    )}
                   </span>
-                )}
-              </span>
-              <span className="min-w-0">
-                <span className="block truncate font-display text-sm font-semibold text-ink">{item.teacherName}</span>
-                {item.teacherInfo && <span className="block truncate text-xs text-muted">{item.teacherInfo.split("\n")[0]}</span>}
+                  <span className="min-w-0">
+                    <span className="block truncate font-display text-sm font-semibold text-ink">{item.teacherName}</span>
+                    {item.teacherInfo && <span className="block truncate text-xs text-muted">{item.teacherInfo.split("\n")[0]}</span>}
+                  </span>
+                </div>
+              )}
+
+              <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-primary-700">
+                Цаг захиалах <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">→</span>
               </span>
             </div>
-          )}
-
-          <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-primary-700">
-            Цаг захиалах <span aria-hidden>→</span>
-          </span>
-        </div>
-      </button>
+          </button>
+        </TiltCard>
+      </div>
 
       {/* Дэлгэрэнгүй ба цаг захиалга — хуудас солихгүйгээр энд нээгдэнэ */}
       {open && (

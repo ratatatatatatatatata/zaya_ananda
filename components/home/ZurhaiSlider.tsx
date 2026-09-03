@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useI18n } from "@/lib/i18n";
+import { TiltCard } from "@/components/motion/TiltCard";
 import type { Locale } from "@/lib/types";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
@@ -95,7 +96,7 @@ export function ZurhaiSlider({ cards, daily }: {
         </button>
 
         {/* Гулсах зурвас */}
-        <div className="overflow-hidden rounded-[1.75rem] shadow-card">
+        <TiltCard max={3} className="block overflow-hidden rounded-[1.75rem] shadow-lift">
           <div
             className="flex transition-transform duration-500 ease-out"
             style={{ transform: `translateX(-${i * 100}%)` }}
@@ -140,7 +141,7 @@ export function ZurhaiSlider({ cards, daily }: {
               );
             })}
           </div>
-        </div>
+        </TiltCard>
 
         {/* Цэгүүд */}
         <div className="mt-5 flex justify-center gap-2.5">

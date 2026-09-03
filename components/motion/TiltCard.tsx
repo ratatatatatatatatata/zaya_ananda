@@ -29,7 +29,6 @@ export function TiltCard({ children, className, max = 6 }: { children: ReactNode
       onPointerMove={move}
       onPointerLeave={leave}
       className={cx("transition-transform duration-300 ease-out will-change-transform", className)}
-      style={{ transformStyle: "preserve-3d" }}
     >
       {children}
     </div>
