@@ -14,6 +14,10 @@ const MORE = Lx("Дэлгэрэнгүй", "Details", "자세히", "詳細", "详
 type Vid = { title: string; url: string };
 
 function firstVideo(item: CmsItem): Vid | null {
+  if (item.link) {
+    const direct = embedSrc(item.link);
+    if (direct.youtubeId) return { title: item.title, url: item.link };
+  }
   const l = (item.lessons || []).find((x) => x.url && /youtu|vimeo/.test(x.url));
   return l?.url ? { title: l.title || item.title, url: l.url } : null;
 }
@@ -37,7 +41,7 @@ export function GiftGrid({ items, emptyText }: { items: CmsItem[]; emptyText: st
 
         return (
           <article key={item.id} className="card overflow-hidden">
-            <div className="relative aspect-video w-full overflow-hidden bg-black">
+            <div className="relative mx-auto aspect-[9/16] w-full max-w-[24rem] overflow-hidden bg-black">
               {open && e ? (
                 <iframe
                   src={e.src}

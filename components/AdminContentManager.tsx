@@ -400,6 +400,36 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
               : <input className="input" placeholder={form.title} value={i18n[langTab]?.title || ""} onChange={(e) => setTr(langTab, "title", e.target.value)} />}
           </div>
 
+          {isFree && (
+            <div className="rounded-2xl border border-primary-500/30 bg-primary-50/60 p-4">
+              <label className="field-label">YouTube Reel холбоос</label>
+              <input
+                className="input"
+                type="url"
+                value={form.link}
+                onChange={(e) => set("link", e.target.value)}
+                placeholder="https://youtube.com/shorts/..."
+              />
+              <p className="mt-2 text-xs leading-relaxed text-muted">
+                YouTube Shorts, youtube.com/watch эсвэл youtu.be холбоос оруулна. Бичлэг сайт дээрээ 9:16 босоо хэмжээгээр тоглоно.
+              </p>
+              {form.link.trim() && (() => {
+                const preview = embedSrc(form.link.trim());
+                return preview.youtubeId ? (
+                  <div className="mt-3 w-40 overflow-hidden rounded-2xl border border-line bg-black shadow-card">
+                    <iframe
+                      src={preview.src}
+                      title="YouTube Reel preview"
+                      className="aspect-[9/16] w-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                ) : <p className="mt-2 text-xs font-semibold text-rose-500">YouTube холбоос танигдсангүй.</p>;
+              })()}
+            </div>
+          )}
+
           {isPromo ? (
             <div className="rounded-2xl border border-primary-500/30 bg-primary-50/60 p-4">
               <label className="field-label">Очих холбоос *</label>

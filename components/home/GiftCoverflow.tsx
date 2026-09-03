@@ -19,6 +19,12 @@ type Reel = { id: string; title: string; url: string; poster: string };
 function collect(items: CmsItem[]): Reel[] {
   const out: Reel[] = [];
   for (const it of items) {
+    if (it.link) {
+      const direct = embedSrc(it.link);
+      if (direct.youtubeId) {
+        out.push({ id: it.id + "-direct", title: it.title, url: it.link, poster: youtubeThumb(direct.youtubeId) });
+      }
+    }
     for (const l of it.lessons || []) {
       if (!l.url) continue;
       const e = embedSrc(l.url);
@@ -40,7 +46,7 @@ function GiftCard({ reel }: { reel: Reel }) {
   const e = embedSrc(reel.url, true);
   return (
     <div className="glass-lux group flex h-full w-full flex-col text-left">
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-[1.75rem] bg-surface-3">
+      <div className="relative mx-auto aspect-[9/16] w-full max-w-[22rem] overflow-hidden rounded-t-[1.75rem] bg-surface-3">
         {open ? (
           <iframe
             src={e.src}

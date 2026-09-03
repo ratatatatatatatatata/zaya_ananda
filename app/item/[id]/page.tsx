@@ -66,7 +66,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
   const isFree = item.kind === "free";
   const nextItem = item.nextItemId ? await getCmsByIdCached(item.nextItemId).catch(() => null) : null;
   const gallery = item.images && item.images.length ? item.images : item.image ? [item.image] : [];
-  const publicVideos = !isCourse && item.lessons?.length
+  const lessonVideos = !isCourse && item.lessons?.length
     ? await Promise.all(item.lessons.map(async (l) => {
         let url = "";
         if (l.path) { try { url = await signedDownloadUrl("lesson-videos", l.path); } catch { url = ""; } }
@@ -74,6 +74,9 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
         return { title: l.title, url, quality: l.quality || "", subtitles: l.subtitles || "" };
       }))
     : [];
+  const publicVideos = item.link && isFree
+    ? [{ title: item.title, url: item.link, quality: "", subtitles: "" }, ...lessonVideos]
+    : lessonVideos;
   const related = isProduct
     ? (await listCmsCached("product")).filter((p) => p.id !== item.id).slice(0, 4)
     : [];
