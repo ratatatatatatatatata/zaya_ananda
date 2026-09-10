@@ -30,7 +30,7 @@ export function LeadCard({ person }: { person: Person }) {
       <div className="p-6">
         <p className="text-xs font-bold uppercase tracking-wide text-primary-700">{person.role}</p>
         <h3 className="mt-1.5 font-display text-2xl font-semibold text-ink">{person.name}</h3>
-        <p className="mt-3 leading-relaxed text-muted">{person.info}</p>
+        <p className="mt-3 whitespace-pre-line leading-relaxed text-muted">{person.info}</p>
       </div>
     </article>
   );
@@ -46,7 +46,7 @@ export function CrewRow({ person }: { person: Person }) {
       <div className="min-w-0">
         <p className="font-display text-base font-semibold text-ink">{person.name}</p>
         <p className="text-xs font-bold uppercase tracking-wide text-primary-700">{person.role}</p>
-        <p className="mt-1.5 text-sm leading-relaxed text-muted">{person.info}</p>
+        <p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-muted">{person.info}</p>
       </div>
     </div>
   );

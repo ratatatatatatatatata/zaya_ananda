@@ -91,7 +91,7 @@ export default async function JourneyPage({ params }: { params: { slug: string }
           <Link href="/ayalal" className="text-sm font-semibold text-accent-300 hover:underline">← Бүх аялал</Link>
           <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-accent-300">{j.tagline}</p>
           <h1 className="mt-3 max-w-3xl text-balance font-display text-4xl font-semibold leading-tight text-white sm:text-5xl">{j.name}</h1>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/85">{j.summary}</p>
+          <p className="mt-5 max-w-2xl whitespace-pre-line text-lg leading-relaxed text-white/85">{j.summary}</p>
           <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/75">
             <span>🗓 {j.days}</span><span>👥 {j.groupSize}</span><span>🚌 {j.transport}</span><span>⛺ {j.stay}</span>
           </div>
@@ -122,7 +122,7 @@ export default async function JourneyPage({ params }: { params: { slug: string }
             <div className="relative">
               <span className="grid size-11 place-items-center rounded-2xl bg-primary-50 text-xl text-primary-700">✦</span>
               <p className="mt-5 text-xs font-bold uppercase tracking-[0.14em] text-primary-700">Хэнд тохирох вэ</p>
-              <p className="mt-3 max-w-3xl text-[1.02rem] leading-8 text-ink/80">{j.audience}</p>
+              <p className="mt-3 max-w-3xl whitespace-pre-line text-[1.02rem] leading-8 text-ink/80">{j.audience}</p>
             </div>
           </article>
 
@@ -135,19 +135,19 @@ export default async function JourneyPage({ params }: { params: { slug: string }
               <p className="mt-1.5 text-sm leading-6 text-white/65">Нэг хүний багц үнэ</p>
 
               {j.lead?.name && (
-                <div className="mt-5 flex items-center gap-3 border-t border-white/15 pt-5">
-                  <span className="h-11 w-11 shrink-0 overflow-hidden rounded-full bg-white/10">
-                    <Avatar person={j.lead} size="sm" />
+                <div className="mt-5 flex items-center gap-3.5 border-t border-white/15 pt-5">
+                  <span className="h-20 w-20 shrink-0 overflow-hidden rounded-full bg-white/10">
+                    <Avatar person={j.lead} size="lg" />
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold text-white">{j.lead.name}</span>
+                    <span className="block truncate text-base font-semibold text-white">{j.lead.name}</span>
                     {j.lead.role && <span className="block truncate text-xs text-white/60">{j.lead.role}</span>}
                   </span>
                 </div>
               )}
             </div>
             <a href="#zahialga" className="mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-primary-800 transition hover:-translate-y-0.5 hover:shadow-lg">
-              Өдрөө сонгох <span aria-hidden>→</span>
+              Бүртгүүлэх <span aria-hidden>→</span>
             </a>
           </aside>
 
@@ -194,7 +194,7 @@ export default async function JourneyPage({ params }: { params: { slug: string }
               {/* Ард тал — товч гарчиг, мэдээлэл, үзэх зүйлс */}
               <div className="p-6 sm:p-8">
                 <h3 className="font-display text-2xl font-semibold text-ink">{d.title}</h3>
-                <p className="mt-3 leading-relaxed text-muted">{d.text}</p>
+                <p className="mt-3 whitespace-pre-line leading-relaxed text-muted">{d.text}</p>
                 {d.bullets && d.bullets.length > 0 && (
                   <>
                     <p className="mt-6 text-xs font-bold uppercase tracking-wide text-primary-700">Үзэх, хийх зүйлс</p>
@@ -228,7 +228,7 @@ export default async function JourneyPage({ params }: { params: { slug: string }
                 <div className="p-6 sm:p-8">
                   <p className="eyebrow-line">📍 Очих газар</p>
                   {dest.title && <h3 className="mt-3 font-display text-2xl font-semibold text-ink">{dest.title}</h3>}
-                  {dest.desc && <p className="mt-3 leading-relaxed text-muted">{dest.desc}</p>}
+                  {dest.desc && <p className="mt-3 whitespace-pre-line leading-relaxed text-muted">{dest.desc}</p>}
                 </div>
               </div>
             ))}
