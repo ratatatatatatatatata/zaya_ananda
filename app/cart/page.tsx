@@ -69,7 +69,7 @@ export default function CartPage() {
                 <span className="font-display text-xl font-semibold text-ink">{formatMNT(total)}</span>
               </div>
               <Link href="/checkout" className="btn btn-primary btn-lg mt-6 w-full">{t("cart.checkout")}</Link>
-              <Link href="/services" className="btn btn-ghost btn-sm mt-2 w-full">{t("common.continue")}</Link>
+              <Link href="/shop" className="btn btn-ghost btn-sm mt-2 w-full">{t("common.continue")}</Link>
             </div>
           </aside>
         </div>

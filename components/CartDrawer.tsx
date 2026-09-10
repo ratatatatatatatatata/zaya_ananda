@@ -62,7 +62,7 @@ export function CartDrawer() {
                 <span className="text-xl font-semibold text-ink">{formatMNT(total)}</span>
               </div>
               <Link href="/checkout" onClick={close} className="btn btn-primary btn-lg w-full">{t("cart.go")}</Link>
-              <button onClick={close} className="btn btn-ghost btn-sm mt-2 w-full">{t("common.continue")}</button>
+              <Link href="/shop" onClick={close} className="btn btn-ghost btn-sm mt-2 w-full">{t("common.continue")}</Link>
             </footer>
           </>
         )}
