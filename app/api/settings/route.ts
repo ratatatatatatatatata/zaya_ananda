@@ -93,6 +93,23 @@ export async function PATCH(req: Request) {
       bank: body.bank && typeof body.bank === "object"
         ? { bankName: str(body.bank.bankName), account: str(body.bank.account), holder: str(body.bank.holder) }
         : undefined,
+      aboutMission: str(body.aboutMission),
+      aboutStory: str(body.aboutStory),
+      aboutStats: Array.isArray(body.aboutStats)
+        ? body.aboutStats
+            .map((s: Record<string, unknown>) => ({ value: String(s?.value || "").trim(), label: String(s?.label || "").trim() }))
+            .filter((s: { value: string; label: string }) => s.value && s.label)
+        : undefined,
+      aboutValues: Array.isArray(body.aboutValues)
+        ? body.aboutValues
+            .map((v: Record<string, unknown>) => ({ glyph: String(v?.glyph || "✶").trim(), title: String(v?.title || "").trim(), text: String(v?.text || "").trim() }))
+            .filter((v: { title: string; text: string }) => v.title && v.text)
+        : undefined,
+      aboutFaqs: Array.isArray(body.aboutFaqs)
+        ? body.aboutFaqs
+            .map((f: Record<string, unknown>) => ({ q: String(f?.q || "").trim(), a: String(f?.a || "").trim() }))
+            .filter((f: { q: string; a: string }) => f.q && f.a)
+        : undefined,
     });
     revalidateTag("settings");
     revalidatePath("/", "layout");

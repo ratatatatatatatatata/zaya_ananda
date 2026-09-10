@@ -241,6 +241,13 @@ export interface SiteSettings {
   aboutTitle?: string;
   aboutBody?: string;
   aboutVideo?: string;
+  /** "Бидний тухай" хэсгийн нэмэлт, засварлаж болдог агуулга — хоосон бол data/content.ts-ийн
+   *  өгөгдмөл (олон хэлтэй) агуулга харагдана. */
+  aboutMission?: string;
+  aboutStory?: string;
+  aboutStats?: { value: string; label: string }[];
+  aboutValues?: { glyph: string; title: string; text: string }[];
+  aboutFaqs?: { q: string; a: string }[];
   /** Хуудас бүрийн толгойн богино бичлэг — түлхүүр: home/services/courses/ayalal/shop/about/resources/item */
   heroVideos?: Record<string, string>;
   /** Толгойн дэвсгэр — бичлэг эсвэл зураг. Түлхүүр: hero slot */

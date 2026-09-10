@@ -181,6 +181,10 @@ export async function getSettings(): Promise<SiteSettings> {
       team: Array.isArray(r.team) ? r.team : [],
       teachers: Array.isArray(r.teachers) ? r.teachers : [],
       bank: r.bank && typeof r.bank === "object" ? r.bank : {},
+      aboutMission: r.aboutMission, aboutStory: r.aboutStory,
+      aboutStats: Array.isArray(r.aboutStats) ? r.aboutStats : [],
+      aboutValues: Array.isArray(r.aboutValues) ? r.aboutValues : [],
+      aboutFaqs: Array.isArray(r.aboutFaqs) ? r.aboutFaqs : [],
     };
   } catch { return {}; }
 }
