@@ -252,6 +252,10 @@ export interface SiteSettings {
   aboutGallery?: { image: string; caption?: string }[];
   /** Тэмдэглэлт он жилүүд — он тус бүрээр товч түүх, доор нь зургийн галерей гүйж харагдана. */
   aboutMilestones?: { year: string; text: string }[];
+  /** Хөтөлбөрийн зорилтууд — дугаарлагдсан (01, 02...) блок бүрд glyph, гарчиг, тайлбар. */
+  aboutProgramMilestones?: { glyph: string; title: string; text: string }[];
+  /** Хамтрагч байгууллагууд — Дэмжлэг ба хүлээн зөвшөөрөл хэсэгт лого + нэр. */
+  aboutPartners?: { logo: string; name: string }[];
   /** Хуудас бүрийн толгойн богино бичлэг — түлхүүр: home/services/courses/ayalal/shop/about/resources/item */
   heroVideos?: Record<string, string>;
   /** Толгойн дэвсгэр — бичлэг эсвэл зураг. Түлхүүр: hero slot */

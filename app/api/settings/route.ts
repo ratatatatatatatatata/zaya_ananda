@@ -120,6 +120,20 @@ export async function PATCH(req: Request) {
             .map((m: Record<string, unknown>) => ({ year: String(m?.year || "").trim(), text: String(m?.text || "").trim() }))
             .filter((m: { year: string; text: string }) => m.year && m.text)
         : undefined,
+      aboutProgramMilestones: Array.isArray(body.aboutProgramMilestones)
+        ? body.aboutProgramMilestones
+            .map((m: Record<string, unknown>) => ({
+              glyph: String(m?.glyph || "").trim(),
+              title: String(m?.title || "").trim(),
+              text: String(m?.text || "").trim(),
+            }))
+            .filter((m: { title: string }) => m.title)
+        : undefined,
+      aboutPartners: Array.isArray(body.aboutPartners)
+        ? body.aboutPartners
+            .map((p: Record<string, unknown>) => ({ logo: String(p?.logo || "").trim(), name: String(p?.name || "").trim() }))
+            .filter((p: { logo: string; name: string }) => p.logo || p.name)
+        : undefined,
     });
     revalidateTag("settings");
     revalidatePath("/", "layout");

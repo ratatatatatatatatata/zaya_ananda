@@ -57,8 +57,11 @@ export function AdminAbout() {
   const [values, setValues] = useState<{ glyph: string; title: string; text: string }[]>([]);
   const [faqs, setFaqs] = useState<{ q: string; a: string }[]>([]);
   const [milestones, setMilestones] = useState<{ year: string; text: string }[]>([]);
+  const [programMilestones, setProgramMilestones] = useState<{ glyph: string; title: string; text: string }[]>([]);
+  const [partners, setPartners] = useState<{ logo: string; name: string }[]>([]);
   const [gallery, setGallery] = useState<{ image: string; caption: string }[]>([]);
   const [galleryBusy, setGalleryBusy] = useState(false);
+  const [partnerBusy, setPartnerBusy] = useState<number | null>(null);
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
@@ -76,6 +79,8 @@ export function AdminAbout() {
         if (Array.isArray(s.aboutValues)) setValues(s.aboutValues);
         if (Array.isArray(s.aboutFaqs)) setFaqs(s.aboutFaqs);
         if (Array.isArray(s.aboutMilestones)) setMilestones(s.aboutMilestones);
+        if (Array.isArray(s.aboutProgramMilestones)) setProgramMilestones(s.aboutProgramMilestones);
+        if (Array.isArray(s.aboutPartners)) setPartners(s.aboutPartners);
         if (Array.isArray(s.aboutGallery)) setGallery(s.aboutGallery.map((g: { image: string; caption?: string }) => ({ image: g.image, caption: g.caption || "" })));
       })
       .catch(() => {});
@@ -89,6 +94,16 @@ export function AdminAbout() {
       setGallery((g) => [...g, ...added]);
     } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг оруулахад алдаа."); }
     finally { setGalleryBusy(false); e.target.value = ""; }
+  }
+
+  async function pickPartnerLogo(i: number, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]; if (!file) return;
+    setErr(""); setPartnerBusy(i);
+    try {
+      const img = await compressImage(file, 600, 0.9);
+      setPartners((a) => a.map((x, k) => (k === i ? { ...x, logo: img } : x)));
+    } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Лого оруулахад алдаа."); }
+    finally { setPartnerBusy(null); e.target.value = ""; }
   }
 
   async function pickVideo(e: React.ChangeEvent<HTMLInputElement>) {
@@ -107,6 +122,7 @@ export function AdminAbout() {
         aboutTitle: title, aboutBody: body, aboutVideo: video,
         aboutMission: mission, aboutStory: story, aboutStats: stats, aboutValues: values, aboutFaqs: faqs,
         aboutMilestones: milestones, aboutGallery: gallery,
+        aboutProgramMilestones: programMilestones, aboutPartners: partners,
       };
       const res = await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
@@ -220,6 +236,30 @@ export function AdminAbout() {
 
       <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="font-display font-semibold text-ink">Хөтөлбөрийн зорилтууд</p>
+          <button type="button" onClick={() => setProgramMilestones((a) => [...a, { glyph: "◈", title: "", text: "" }])} className="btn btn-outline btn-sm">+ Нэмэх</button>
+        </div>
+        <p className="mt-1 text-xs leading-relaxed text-muted">
+          Хоосон орхивол өгөгдмөл 4 зорилт (01, 02, 03, 04 дугаартай) харагдана. «Хамт олон»-ы дор,
+          гүн дэвсгэртэй хэсэгт дугаарлагдсан блок болж харагдана.
+        </p>
+        <div className="mt-3 space-y-2.5">
+          {programMilestones.map((m, i) => (
+            <div key={i} className="space-y-2 rounded-xl border border-line bg-surface-1 px-3 py-2.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <input className="input w-16 text-center" maxLength={4} value={m.glyph} onChange={(e) => setProgramMilestones((a) => a.map((x, k) => (k === i ? { ...x, glyph: e.target.value } : x)))} />
+                <input className="input min-w-[10rem] flex-1" placeholder="Гарчиг — ж: Дотоод тэнцвэр" value={m.title} onChange={(e) => setProgramMilestones((a) => a.map((x, k) => (k === i ? { ...x, title: e.target.value } : x)))} />
+                <button type="button" onClick={() => setProgramMilestones((a) => a.filter((_, k) => k !== i))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
+              </div>
+              <textarea className="textarea" rows={2} placeholder="Тайлбар" value={m.text} onChange={(e) => setProgramMilestones((a) => a.map((x, k) => (k === i ? { ...x, text: e.target.value } : x)))} />
+            </div>
+          ))}
+          {programMilestones.length === 0 && <p className="text-sm text-muted">Одоогоор нэмээгүй — өгөгдмөл 4 зорилт ажиллаж байна.</p>}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="font-display font-semibold text-ink">Зургийн галерей</p>
             <p className="mt-1 text-xs leading-relaxed text-muted">
@@ -246,6 +286,33 @@ export function AdminAbout() {
           ))}
         </div>
         {gallery.length === 0 && <p className="mt-3 text-sm text-muted">Одоогоор зураг нэмээгүй.</p>}
+      </div>
+
+      <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="font-display font-semibold text-ink">Хамтрагч байгууллагууд</p>
+          <button type="button" onClick={() => setPartners((a) => [...a, { logo: "", name: "" }])} className="btn btn-outline btn-sm">+ Нэмэх</button>
+        </div>
+        <p className="mt-1 text-xs leading-relaxed text-muted">
+          «Дэмжлэг ба хүлээн зөвшөөрөл» хэсэгт лого+нэрээр харагдана. Юу ч нэмээгүй үед бодит
+          хамтрагч байгаа мэт харагдахгүйн тулд «удахгүй нэмэгдэнэ» гэсэн орлуулагч блок харагдана.
+        </p>
+        <div className="mt-3 space-y-2.5">
+          {partners.map((p, i) => (
+            <div key={i} className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface-1 px-3 py-2.5">
+              {p.logo
+                ? <img src={p.logo} alt="" className="h-12 w-12 shrink-0 rounded-lg bg-white object-contain p-1" />
+                : <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-surface-2 text-[10px] text-muted">Лого</div>}
+              <label className="btn btn-outline btn-sm shrink-0 cursor-pointer">
+                {partnerBusy === i ? "…" : "Лого сонгох"}
+                <input type="file" accept="image/*" onChange={(e) => pickPartnerLogo(i, e)} disabled={partnerBusy === i} className="hidden" />
+              </label>
+              <input className="input min-w-[10rem] flex-1" placeholder="Байгууллагын нэр" value={p.name} onChange={(e) => setPartners((a) => a.map((x, k) => (k === i ? { ...x, name: e.target.value } : x)))} />
+              <button type="button" onClick={() => setPartners((a) => a.filter((_, k) => k !== i))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
+            </div>
+          ))}
+          {partners.length === 0 && <p className="text-sm text-muted">Одоогоор нэмээгүй.</p>}
+        </div>
       </div>
 
       <p className="rounded-xl bg-aqua px-4 py-2.5 text-sm text-muted">ℹ️ «Хамт олон» (багш нар)-ыг зүүн цэсний <b>«Хамт олон»</b> таб дээр удирдана.</p>

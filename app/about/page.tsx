@@ -1,7 +1,4 @@
-import { VideoHero } from "@/components/video/VideoHero";
-import { heroMediaFor } from "@/lib/hero-video";
 import { SectionHeading } from "@/components/ui";
-import { GlyphTile } from "@/components/GlyphTile";
 import { Reveal } from "@/components/Reveal";
 import { T, Tr } from "@/components/T";
 import { aboutContent, team, faqs, siteConfig } from "@/data/content";
@@ -10,6 +7,10 @@ import { signedDownloadUrl } from "@/lib/supabase";
 import { ContactSection } from "@/components/ContactSection";
 import { AboutGallery } from "@/components/home/AboutGallery";
 import { AboutMilestones } from "@/components/home/AboutMilestones";
+import { AboutHero } from "@/components/about/AboutHero";
+import { AboutTeamRow } from "@/components/about/AboutTeamRow";
+import { ProgramMilestones } from "@/components/about/ProgramMilestones";
+import { PartnersGrid } from "@/components/about/PartnersGrid";
 import type { L } from "@/lib/types";
 
 // Админ энгийн (нэг хэлтэй) текст оруулсан бол шууд, эсрэг тохиолдолд өгөгдмөл олон хэлтэй
@@ -21,7 +22,6 @@ export const metadata = { title: "Бидний тухай" };
 export const dynamic = "force-dynamic";
 
 export default async function AboutPage() {
-  const heroMedia = await heroMediaFor("about");
   const settings = await getSettings();
   let aboutVideoUrl = "";
   if (settings.aboutVideo) {
@@ -33,21 +33,23 @@ export default async function AboutPage() {
     ...(settings.team || []).filter((m) => !(settings.teachers || []).some((t) => t.name === m.name)),
   ];
   const dynamicTeam = mergedTeam.length > 0 ? mergedTeam : null;
+  // Хамт олны хэсэгт нэгдсэн бүтэц дамжуулна — admin өгөгдөл байхгүй бол өгөгдмөл багийг ашиглана.
+  const teamForRow = dynamicTeam
+    ? dynamicTeam.map((m) => ({ name: m.name, image: m.image, role: m.role, info: m.info, focus: m.focus }))
+    : team.map((m) => ({ name: m.name, role: <Tr v={m.role} />, info: <Tr v={m.bio} /> }));
+
   return (
     <>
-      {/* «Нэг гэрлээс Ananda» — харанхуйгаас гэрлийн үр ургаж, туяа дэлгэрнэ */}
-      <VideoHero
-        media={heroMedia}
-        clip="temple"
+      {/* Бараг бүтэн дэлгэцийн цайвар hero — гарчиг/танилцуулга зүүн тал, R3F бөмбөлгийн бүлэг баруун тал */}
+      <AboutHero
         eyebrow="Нэг гэрлээс Ananda"
         title={<T k="about.title" />}
-        desc={<Tr v={siteConfig.tagline} />}
+        intro={settings.aboutBody ? settings.aboutBody : <T k="about.heroIntro" />}
       />
 
-      {(settings.aboutTitle || settings.aboutBody || aboutVideoUrl) && (
-        <section className="section"><div className="container-px max-w-3xl">
+      {(settings.aboutTitle || aboutVideoUrl) && (
+        <section className="section pb-0"><div className="container-px max-w-3xl">
           {settings.aboutTitle && <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl">{settings.aboutTitle}</h2>}
-          {settings.aboutBody && <div className="mt-4 whitespace-pre-line leading-relaxed text-muted">{settings.aboutBody}</div>}
           {aboutVideoUrl && <video controls playsInline className="mt-6 w-full rounded-3xl bg-black" src={aboutVideoUrl} />}
         </div></section>
       )}
@@ -72,7 +74,7 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <section className="section pb-0">
+      <section id="our-story" className="section scroll-mt-24 pb-0">
         <div className="container-px max-w-3xl">
           <SectionHeading center eyebrow={<T k="about.milestonesEyebrow" />} title={<T k="about.milestonesTitle" />} />
         </div>
@@ -103,36 +105,29 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <section className="section">
-        <div className="container-px">
-          <SectionHeading center eyebrow={<T k="about.teamEyebrow" />} title={<T k="about.teamTitle" />} />
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {dynamicTeam
-              ? dynamicTeam.map((m, i) => (
-                  <Reveal key={m.name + i} delay={i * 80}>
-                    <div className="card flex h-full flex-col items-center p-8 text-center">
-                      {m.image
-                        ? <img src={m.image} alt="" className="h-28 w-28 rounded-full object-cover shadow-card" style={{ objectPosition: "50% " + (m.focus ?? 50) + "%" }} />
-                        : <div className="grid h-28 w-28 place-items-center rounded-full bg-primary-50 text-3xl">👤</div>}
-                      <h3 className="mt-5 font-display text-xl font-semibold text-ink">{m.name}</h3>
-                      {m.role && <p className="mt-1 text-sm font-medium text-primary-600">{m.role}</p>}
-                      {m.info && <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted">{m.info}</p>}
-                    </div>
-                  </Reveal>
-                ))
-              : team.map((m, i) => (
-                  <Reveal key={m.id} delay={i * 80}>
-                    <div className="card flex h-full flex-col items-center p-8 text-center">
-                      <GlyphTile glyph={m.glyph} tone={m.tone} size="lg" />
-                      <h3 className="mt-5 font-display text-xl font-semibold text-ink">{m.name}</h3>
-                      <p className="mt-1 text-sm font-medium text-primary-600"><Tr v={m.role} /></p>
-                      <p className="mt-3 text-sm leading-relaxed text-muted"><Tr v={m.bio} /></p>
-                    </div>
-                  </Reveal>
-                ))}
-          </div>
-        </div>
-      </section>
+      {/* Хамт олон — гүн дэвсгэртэй, хэвтээ гүйдэг зургийн эгнээ, дарахад биографи modal */}
+      <AboutTeamRow
+        eyebrow={<T k="about.teamEyebrow" />}
+        statement={<T k="about.teamTitle" />}
+        members={teamForRow}
+      />
+
+      {/* Хөтөлбөрийн зорилтууд — том дэлгэц дээр pinned хэвтээ шилжилт */}
+      <ProgramMilestones
+        eyebrow={<T k="about.programEyebrow" />}
+        title={<T k="about.programTitle" />}
+        milestones={(settings.aboutProgramMilestones && settings.aboutProgramMilestones.length > 0
+          ? settings.aboutProgramMilestones
+          : aboutContent.programMilestones
+        ).map((m) => ({ glyph: m.glyph, title: localeText(m.title), text: localeText(m.text) }))}
+      />
+
+      {/* Дэмжлэг ба хүлээн зөвшөөрөл — хамтрагч байгууллагын лого */}
+      <PartnersGrid
+        eyebrow={<T k="about.partnersEyebrow" />}
+        title={<T k="about.partnersTitle" />}
+        partners={settings.aboutPartners || []}
+      />
 
       <section className="section bg-surface-2">
         <div className="container-px max-w-3xl">

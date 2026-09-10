@@ -187,6 +187,8 @@ export async function getSettings(): Promise<SiteSettings> {
       aboutFaqs: Array.isArray(r.aboutFaqs) ? r.aboutFaqs : [],
       aboutGallery: Array.isArray(r.aboutGallery) ? r.aboutGallery : [],
       aboutMilestones: Array.isArray(r.aboutMilestones) ? r.aboutMilestones : [],
+      aboutProgramMilestones: Array.isArray(r.aboutProgramMilestones) ? r.aboutProgramMilestones : [],
+      aboutPartners: Array.isArray(r.aboutPartners) ? r.aboutPartners : [],
     };
   } catch { return {}; }
 }
