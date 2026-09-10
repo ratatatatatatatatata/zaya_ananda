@@ -1,19 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import type { L } from "@/lib/types";
 
-type Milestone = { year: string; text: L | string };
+type Milestone = { year: string; text: ReactNode };
 
 const STEP = 108; // жилийн мөр бүрийн өндөр (px)
 
 /** Он жилийн шилжилт — гүйлгэхэд "наалдаж" зогсоод, том оны тоонууд аажим шилжиж, баруун
  *  талын текст оноор солигддог interaction (лавлагаа: PROSION About Us). Сэдэлт багасгах
- *  тохиргоотой үед (prefers-reduced-motion) энгийн, эхний оноор л зогсонги харагдана. */
-export function AboutMilestones({ milestones, localeText }: {
-  milestones: Milestone[];
-  localeText: (v: string | L) => ReactNode;
-}) {
+ *  тохиргоотой үед (prefers-reduced-motion) энгийн, эхний оноор л зогсонги харагдана.
+ *  Тайлбар: энэ бол client компонент бөгөөд эцэг нь (about/page.tsx, HomeAbout.tsx) async server
+ *  компонент тул localeText функцийг өөрийг нь prop-оор дамжуулж болохгүй (server→client хилээр
+ *  зөвхөн сериализацлагдах утга/JSX дамжина, функц дамжихгүй — "Application error" гарах шалтгаан
+ *  яг энэ байсан). Тиймээс text талбарыг server талд аль хэдийн resolve хийж, ReactNode болгож
+ *  дамжуулдаг. */
+export function AboutMilestones({ milestones }: { milestones: Milestone[] }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
 
@@ -78,7 +79,7 @@ export function AboutMilestones({ milestones, localeText }: {
           {/* Баруун талын тайлбар текст — он солигдох бүрд шинэчлэгдэнэ */}
           <div key={activeIndex} className="animate-fade-rise">
             <p className="eyebrow-line">Манай түүх</p>
-            <p className="mt-4 text-lg leading-relaxed text-muted">{localeText(milestones[activeIndex]?.text ?? "")}</p>
+            <p className="mt-4 text-lg leading-relaxed text-muted">{milestones[activeIndex]?.text}</p>
           </div>
         </div>
       </div>

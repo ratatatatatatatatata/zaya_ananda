@@ -77,8 +77,7 @@ export default async function AboutPage() {
           <SectionHeading center eyebrow={<T k="about.milestonesEyebrow" />} title={<T k="about.milestonesTitle" />} />
         </div>
         <AboutMilestones
-          milestones={settings.aboutMilestones && settings.aboutMilestones.length > 0 ? settings.aboutMilestones : aboutContent.milestones}
-          localeText={localeText}
+          milestones={(settings.aboutMilestones && settings.aboutMilestones.length > 0 ? settings.aboutMilestones : aboutContent.milestones).map((m) => ({ year: m.year, text: localeText(m.text) }))}
         />
         {settings.aboutGallery && settings.aboutGallery.length > 0 && (
           <div className="container-px pb-20 pt-4">

@@ -77,8 +77,7 @@ export async function HomeAbout() {
           <h3 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl"><T k="about.milestonesTitle" /></h3>
         </div>
         <AboutMilestones
-          milestones={settings.aboutMilestones && settings.aboutMilestones.length > 0 ? settings.aboutMilestones : aboutContent.milestones}
-          localeText={localeText}
+          milestones={(settings.aboutMilestones && settings.aboutMilestones.length > 0 ? settings.aboutMilestones : aboutContent.milestones).map((m) => ({ year: m.year, text: localeText(m.text) }))}
         />
         {settings.aboutGallery && settings.aboutGallery.length > 0 && (
           <div className="mt-4">
