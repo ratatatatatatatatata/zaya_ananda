@@ -153,6 +153,13 @@ export const aboutContent = {
     { value: "20+", label: l("сургалт, хөтөлбөр", "courses & programs", "강좌·프로그램", "講座・プログラム", "课程与计划") },
     { value: "4.9", label: l("дундаж үнэлгээ", "average rating", "평균 평점", "平均評価", "平均评分") },
   ],
+  /** Тэмдэглэлт он жилүүд — "Бидний тухай" хуудсанд он тус бүрээр товч түүхийг харуулна. */
+  milestones: [
+    { year: "2016", text: l("Анхны биечлэн зөвлөгөө, медитацийн бүлгээр эхэлсэн.", "Started with our first in-person consultations and meditation circles.", "첫 대면 상담과 명상 모임으로 시작했습니다.", "最初の対面カウンセリングと瞑想サークルから始まりました。", "从首批线下咨询与冥想小组起步。") },
+    { year: "2019", text: l("Онлайн сургалтын анхны хөтөлбөрөө нээсэн.", "Launched our first online course program.", "첫 온라인 강좌 프로그램을 열었습니다.", "初のオンライン講座プログラムを開講しました。", "推出首个在线课程项目。") },
+    { year: "2022", text: l("Сүнслэг аяллын хөтөлбөрүүдээ өргөжүүлсэн.", "Expanded our spiritual journey programs.", "영적 여행 프로그램을 확장했습니다.", "スピリチュアルジャーニーのプログラムを拡大しました。", "扩展了我们的心灵之旅项目。") },
+    { year: "2025", text: l("2,400 гаруй үйлчлүүлэгчид хүрч, багаа өргөжүүлсэн.", "Reached over 2,400 clients and grew our team.", "2,400명 이상의 고객에게 다가가고 팀을 확장했습니다.", "2,400名を超えるお客様に届き、チームを拡大しました。", "服务超过2,400名客户，团队规模不断壮大。") },
+  ],
 };
 
 export const homeFeatures: { glyph: string; tone: Tone; title: L; text: L }[] = [

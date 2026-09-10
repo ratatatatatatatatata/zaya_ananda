@@ -43,12 +43,6 @@ export default async function AboutPage() {
         desc={<Tr v={siteConfig.tagline} />}
       />
 
-      {settings.aboutGallery && settings.aboutGallery.length > 0 && (
-        <section className="section pb-0"><div className="container-px">
-          <AboutGallery images={settings.aboutGallery} />
-        </div></section>
-      )}
-
       {(settings.aboutTitle || settings.aboutBody || aboutVideoUrl) && (
         <section className="section"><div className="container-px max-w-3xl">
           {settings.aboutTitle && <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl">{settings.aboutTitle}</h2>}
@@ -75,6 +69,28 @@ export default async function AboutPage() {
             </div>
           </Reveal>
         </div>
+      </section>
+
+      <section className="section">
+        <div className="container-px max-w-3xl">
+          <SectionHeading center eyebrow={<T k="about.milestonesEyebrow" />} title={<T k="about.milestonesTitle" />} />
+          <div className="mt-12 space-y-8 border-l border-line pl-8">
+            {(settings.aboutMilestones && settings.aboutMilestones.length > 0 ? settings.aboutMilestones : aboutContent.milestones).map((m, i) => (
+              <Reveal key={i} delay={i * 70}>
+                <div className="relative">
+                  <span aria-hidden className="absolute -left-[2.6rem] top-1.5 h-3 w-3 rounded-full bg-primary-500 ring-4 ring-cream" />
+                  <p className="font-display text-2xl font-semibold text-primary-700">{m.year}</p>
+                  <p className="mt-1.5 leading-relaxed text-muted">{localeText(m.text)}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+        {settings.aboutGallery && settings.aboutGallery.length > 0 && (
+          <div className="container-px mt-12">
+            <AboutGallery images={settings.aboutGallery} />
+          </div>
+        )}
       </section>
 
       <section className="section bg-surface-2">

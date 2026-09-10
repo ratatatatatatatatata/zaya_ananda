@@ -115,6 +115,11 @@ export async function PATCH(req: Request) {
             .map((g: Record<string, unknown>) => ({ image: String(g?.image || "").trim(), caption: g?.caption ? String(g.caption).trim() : "" }))
             .filter((g: { image: string }) => g.image)
         : undefined,
+      aboutMilestones: Array.isArray(body.aboutMilestones)
+        ? body.aboutMilestones
+            .map((m: Record<string, unknown>) => ({ year: String(m?.year || "").trim(), text: String(m?.text || "").trim() }))
+            .filter((m: { year: string; text: string }) => m.year && m.text)
+        : undefined,
     });
     revalidateTag("settings");
     revalidatePath("/", "layout");

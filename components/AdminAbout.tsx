@@ -56,6 +56,7 @@ export function AdminAbout() {
   const [stats, setStats] = useState<{ value: string; label: string }[]>([]);
   const [values, setValues] = useState<{ glyph: string; title: string; text: string }[]>([]);
   const [faqs, setFaqs] = useState<{ q: string; a: string }[]>([]);
+  const [milestones, setMilestones] = useState<{ year: string; text: string }[]>([]);
   const [gallery, setGallery] = useState<{ image: string; caption: string }[]>([]);
   const [galleryBusy, setGalleryBusy] = useState(false);
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
@@ -74,6 +75,7 @@ export function AdminAbout() {
         if (Array.isArray(s.aboutStats)) setStats(s.aboutStats);
         if (Array.isArray(s.aboutValues)) setValues(s.aboutValues);
         if (Array.isArray(s.aboutFaqs)) setFaqs(s.aboutFaqs);
+        if (Array.isArray(s.aboutMilestones)) setMilestones(s.aboutMilestones);
         if (Array.isArray(s.aboutGallery)) setGallery(s.aboutGallery.map((g: { image: string; caption?: string }) => ({ image: g.image, caption: g.caption || "" })));
       })
       .catch(() => {});
@@ -104,7 +106,7 @@ export function AdminAbout() {
       const payload = {
         aboutTitle: title, aboutBody: body, aboutVideo: video,
         aboutMission: mission, aboutStory: story, aboutStats: stats, aboutValues: values, aboutFaqs: faqs,
-        aboutGallery: gallery,
+        aboutMilestones: milestones, aboutGallery: gallery,
       };
       const res = await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
@@ -195,6 +197,24 @@ export function AdminAbout() {
             </div>
           ))}
           {faqs.length === 0 && <p className="text-sm text-muted">Одоогоор нэмээгүй — өгөгдмөл асуулт-хариултууд ажиллаж байна.</p>}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="font-display font-semibold text-ink">Тэмдэглэлт он жилүүд</p>
+          <button type="button" onClick={() => setMilestones((a) => [...a, { year: "", text: "" }])} className="btn btn-outline btn-sm">+ Нэмэх</button>
+        </div>
+        <p className="mt-1 text-xs leading-relaxed text-muted">Хоосон орхивол өгөгдмөл түүх харагдана. Доор нь зургийн галерей гүйж харагдана.</p>
+        <div className="mt-3 space-y-2.5">
+          {milestones.map((m, i) => (
+            <div key={i} className="flex flex-wrap items-center gap-2 rounded-xl border border-line bg-surface-1 px-3 py-2.5">
+              <input className="input w-24" placeholder="2024" value={m.year} onChange={(e) => setMilestones((a) => a.map((x, k) => (k === i ? { ...x, year: e.target.value } : x)))} />
+              <input className="input min-w-[12rem] flex-1" placeholder="Энэ онд юу болсон бэ?" value={m.text} onChange={(e) => setMilestones((a) => a.map((x, k) => (k === i ? { ...x, text: e.target.value } : x)))} />
+              <button type="button" onClick={() => setMilestones((a) => a.filter((_, k) => k !== i))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
+            </div>
+          ))}
+          {milestones.length === 0 && <p className="text-sm text-muted">Одоогоор нэмээгүй — өгөгдмөл түүх ажиллаж байна.</p>}
         </div>
       </div>
 

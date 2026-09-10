@@ -34,9 +34,6 @@ export async function HomeAbout() {
       {/* Тоо, баримт */}
       <AboutFacts />
 
-      {/* Олон зургийн галерей */}
-      {settings.aboutGallery && settings.aboutGallery.length > 0 && <AboutGallery images={settings.aboutGallery} />}
-
       {/* Админаас оруулсан танилцуулга */}
       {(settings.aboutTitle || settings.aboutBody || aboutVideoUrl) && (
         <Reveal>
@@ -70,6 +67,30 @@ export async function HomeAbout() {
             ))}
           </div>
         </Reveal>
+      </div>
+
+      {/* Тэмдэглэлт он жилүүд + доор нь зургийн галерей */}
+      <div>
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="eyebrow-line justify-center"><T k="about.milestonesEyebrow" /></p>
+          <h3 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl"><T k="about.milestonesTitle" /></h3>
+        </div>
+        <div className="mx-auto mt-10 max-w-2xl space-y-8 border-l border-line pl-8">
+          {(settings.aboutMilestones && settings.aboutMilestones.length > 0 ? settings.aboutMilestones : aboutContent.milestones).map((m, i) => (
+            <Reveal key={i} delay={i * 70}>
+              <div className="relative">
+                <span aria-hidden className="absolute -left-[2.6rem] top-1.5 h-3 w-3 rounded-full bg-primary-500 ring-4 ring-surface-1" />
+                <p className="font-display text-2xl font-semibold text-primary-700">{m.year}</p>
+                <p className="mt-1.5 leading-relaxed text-muted">{localeText(m.text)}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        {settings.aboutGallery && settings.aboutGallery.length > 0 && (
+          <div className="mt-12">
+            <AboutGallery images={settings.aboutGallery} />
+          </div>
+        )}
       </div>
 
       {/* Үнэт зүйлс */}

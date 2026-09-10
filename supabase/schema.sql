@@ -86,6 +86,7 @@ alter table site_settings add column if not exists about_stats jsonb;
 alter table site_settings add column if not exists about_values jsonb;
 alter table site_settings add column if not exists about_faqs jsonb;
 alter table site_settings add column if not exists about_gallery jsonb;
+alter table site_settings add column if not exists about_milestones jsonb;
 
 -- journeys/journey_bookings/journey_reviews тухайн Supabase төсөлд шууд (энэ файлаас гадуур)
 -- үүсгэгдсэн тул CREATE TABLE энд байхгүй — зөвхөн шинэ баганыг л additive байдлаар нэмнэ.

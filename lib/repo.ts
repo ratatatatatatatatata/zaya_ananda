@@ -186,6 +186,7 @@ export async function getSettings(): Promise<SiteSettings> {
       aboutValues: Array.isArray(r.aboutValues) ? r.aboutValues : [],
       aboutFaqs: Array.isArray(r.aboutFaqs) ? r.aboutFaqs : [],
       aboutGallery: Array.isArray(r.aboutGallery) ? r.aboutGallery : [],
+      aboutMilestones: Array.isArray(r.aboutMilestones) ? r.aboutMilestones : [],
     };
   } catch { return {}; }
 }
