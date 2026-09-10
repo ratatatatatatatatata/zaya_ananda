@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { ServiceBooking } from "@/components/ServiceBooking";
 import type { CmsItem } from "@/lib/types";
 
@@ -90,7 +91,7 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
       </div>
     </article>
 
-      {booking && (
+      {booking && typeof document !== "undefined" && createPortal(
         <div role="dialog" aria-modal="true" aria-label={item.title}
           className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-[#0B1714]/70 p-4 backdrop-blur-sm sm:p-8">
           <div aria-hidden className="fixed inset-0" onClick={() => setBooking(false)} />
@@ -146,7 +147,8 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

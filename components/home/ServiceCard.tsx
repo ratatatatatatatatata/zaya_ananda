@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { ServiceBooking } from "@/components/ServiceBooking";
 import { TiltCard } from "@/components/motion/TiltCard";
 import type { CmsItem } from "@/lib/types";
@@ -82,8 +83,12 @@ export function ServiceCard({ item }: { item: CmsItem }) {
         </TiltCard>
       </div>
 
-      {/* Дэлгэрэнгүй ба цаг захиалга — хуудас солихгүйгээр энд нээгдэнэ */}
-      {open && (
+      {/* Дэлгэрэнгүй ба цаг захиалга — хуудас солихгүйгээр энд нээгдэнэ.
+          document.body руу portal хийж байгаа шалтгаан: coverflow-ийн 3D transform
+          (will-change/transform) бүхий эцэг элемент дотор "fixed" байрлал viewport биш
+          харин тэр эцэг элементийн хэмжээгээр хязгаарлагддаг тул цонх жижигрээд гажиг
+          (хажуугийн картууд харагдаж, цонх нарийсаж) гарч байсан. */}
+      {open && typeof document !== "undefined" && createPortal(
         <div role="dialog" aria-modal="true" aria-label={item.title}
           className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-[#0B1714]/70 p-4 backdrop-blur-sm sm:p-8">
           <div aria-hidden className="fixed inset-0" onClick={() => setOpen(false)} />
@@ -139,7 +144,8 @@ export function ServiceCard({ item }: { item: CmsItem }) {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
