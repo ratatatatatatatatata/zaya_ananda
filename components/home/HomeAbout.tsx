@@ -6,6 +6,7 @@ import { aboutContent, team, faqs } from "@/data/content";
 import { getSettingsCached } from "@/lib/repo";
 import { ContactSection } from "@/components/ContactSection";
 import { signedDownloadUrl } from "@/lib/supabase";
+import { AboutGallery } from "./AboutGallery";
 import type { L } from "@/lib/types";
 
 // Админ энгийн (нэг хэлтэй) текст оруулсан бол шууд, эсрэг тохиолдолд өгөгдмөл олон хэлтэй
@@ -32,6 +33,9 @@ export async function HomeAbout() {
     <div className="space-y-16">
       {/* Тоо, баримт */}
       <AboutFacts />
+
+      {/* Олон зургийн галерей */}
+      {settings.aboutGallery && settings.aboutGallery.length > 0 && <AboutGallery images={settings.aboutGallery} />}
 
       {/* Админаас оруулсан танилцуулга */}
       {(settings.aboutTitle || settings.aboutBody || aboutVideoUrl) && (

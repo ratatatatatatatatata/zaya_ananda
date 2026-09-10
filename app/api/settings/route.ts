@@ -110,6 +110,11 @@ export async function PATCH(req: Request) {
             .map((f: Record<string, unknown>) => ({ q: String(f?.q || "").trim(), a: String(f?.a || "").trim() }))
             .filter((f: { q: string; a: string }) => f.q && f.a)
         : undefined,
+      aboutGallery: Array.isArray(body.aboutGallery)
+        ? body.aboutGallery
+            .map((g: Record<string, unknown>) => ({ image: String(g?.image || "").trim(), caption: g?.caption ? String(g.caption).trim() : "" }))
+            .filter((g: { image: string }) => g.image)
+        : undefined,
     });
     revalidateTag("settings");
     revalidatePath("/", "layout");

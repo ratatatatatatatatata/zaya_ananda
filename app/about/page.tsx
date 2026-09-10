@@ -8,6 +8,7 @@ import { aboutContent, team, faqs, siteConfig } from "@/data/content";
 import { getSettings } from "@/lib/repo";
 import { signedDownloadUrl } from "@/lib/supabase";
 import { ContactSection } from "@/components/ContactSection";
+import { AboutGallery } from "@/components/home/AboutGallery";
 import type { L } from "@/lib/types";
 
 // Админ энгийн (нэг хэлтэй) текст оруулсан бол шууд, эсрэг тохиолдолд өгөгдмөл олон хэлтэй
@@ -41,6 +42,12 @@ export default async function AboutPage() {
         title={<T k="about.title" />}
         desc={<Tr v={siteConfig.tagline} />}
       />
+
+      {settings.aboutGallery && settings.aboutGallery.length > 0 && (
+        <section className="section pb-0"><div className="container-px">
+          <AboutGallery images={settings.aboutGallery} />
+        </div></section>
+      )}
 
       {(settings.aboutTitle || settings.aboutBody || aboutVideoUrl) && (
         <section className="section"><div className="container-px max-w-3xl">

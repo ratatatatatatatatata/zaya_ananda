@@ -248,6 +248,8 @@ export interface SiteSettings {
   aboutStats?: { value: string; label: string }[];
   aboutValues?: { glyph: string; title: string; text: string }[];
   aboutFaqs?: { q: string; a: string }[];
+  /** Олон зургийн масоник (жижиг/том, шатлан байрлах) галерей — OPPO Community хэлбэрийн үзэмж. */
+  aboutGallery?: { image: string; caption?: string }[];
   /** Хуудас бүрийн толгойн богино бичлэг — түлхүүр: home/services/courses/ayalal/shop/about/resources/item */
   heroVideos?: Record<string, string>;
   /** Толгойн дэвсгэр — бичлэг эсвэл зураг. Түлхүүр: hero slot */

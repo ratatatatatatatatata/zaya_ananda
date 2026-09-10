@@ -2,6 +2,29 @@
 
 import { useEffect, useState } from "react";
 
+function compressImage(file: File, maxW = 1000, quality = 0.85): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Зураг уншиж чадсангүй."));
+    reader.onload = () => {
+      const img = new window.Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxW / img.width);
+        const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("canvas алдаа"));
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = () => reject(new Error("Зураг буруу байна."));
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 const SB_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 async function uploadVideo(file: File, onProgress: (p: number) => void): Promise<string> {
   const r = await fetch("/api/admin/video-upload-url", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: file.name }) });
@@ -33,6 +56,8 @@ export function AdminAbout() {
   const [stats, setStats] = useState<{ value: string; label: string }[]>([]);
   const [values, setValues] = useState<{ glyph: string; title: string; text: string }[]>([]);
   const [faqs, setFaqs] = useState<{ q: string; a: string }[]>([]);
+  const [gallery, setGallery] = useState<{ image: string; caption: string }[]>([]);
+  const [galleryBusy, setGalleryBusy] = useState(false);
   const [videoProgress, setVideoProgress] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
@@ -49,9 +74,20 @@ export function AdminAbout() {
         if (Array.isArray(s.aboutStats)) setStats(s.aboutStats);
         if (Array.isArray(s.aboutValues)) setValues(s.aboutValues);
         if (Array.isArray(s.aboutFaqs)) setFaqs(s.aboutFaqs);
+        if (Array.isArray(s.aboutGallery)) setGallery(s.aboutGallery.map((g: { image: string; caption?: string }) => ({ image: g.image, caption: g.caption || "" })));
       })
       .catch(() => {});
   }, []);
+
+  async function pickGalleryImages(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []); if (files.length === 0) return;
+    setErr(""); setGalleryBusy(true);
+    try {
+      const added = await Promise.all(files.map(async (f) => ({ image: await compressImage(f), caption: "" })));
+      setGallery((g) => [...g, ...added]);
+    } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг оруулахад алдаа."); }
+    finally { setGalleryBusy(false); e.target.value = ""; }
+  }
 
   async function pickVideo(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]; if (!file) return;
@@ -68,6 +104,7 @@ export function AdminAbout() {
       const payload = {
         aboutTitle: title, aboutBody: body, aboutVideo: video,
         aboutMission: mission, aboutStory: story, aboutStats: stats, aboutValues: values, aboutFaqs: faqs,
+        aboutGallery: gallery,
       };
       const res = await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
@@ -159,6 +196,36 @@ export function AdminAbout() {
           ))}
           {faqs.length === 0 && <p className="text-sm text-muted">Одоогоор нэмээгүй — өгөгдмөл асуулт-хариултууд ажиллаж байна.</p>}
         </div>
+      </div>
+
+      <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="font-display font-semibold text-ink">Зургийн галерей</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted">
+              Олон зураг нэг дор сонгож оруулна — «Бидний тухай» хуудас болон нүүр хуудсанд шатлан
+              (том/жижиг холилдсон) харагдацтай, хажуу тийш аяндаа гулсдаг галерей болно. Зураг бүрд
+              доор нь тайлбар текст оруулж болно (заавал биш).
+            </p>
+          </div>
+          <label className="btn btn-outline btn-sm cursor-pointer">
+            {galleryBusy ? "Оруулж байна…" : "+ Зураг нэмэх"}
+            <input type="file" accept="image/*" multiple onChange={pickGalleryImages} disabled={galleryBusy} className="hidden" />
+          </label>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {gallery.map((g, i) => (
+            <div key={i} className="flex gap-3 rounded-xl border border-line bg-surface-1 p-3">
+              <img src={g.image} alt="" className="h-20 w-20 shrink-0 rounded-lg object-cover" />
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <input className="input !py-1.5 text-sm" placeholder="Тайлбар (заавал биш)" value={g.caption}
+                  onChange={(e) => setGallery((a) => a.map((x, k) => (k === i ? { ...x, caption: e.target.value } : x)))} />
+                <button type="button" onClick={() => setGallery((a) => a.filter((_, k) => k !== i))} className="text-xs font-semibold text-rose-500 hover:underline">Устгах</button>
+              </div>
+            </div>
+          ))}
+        </div>
+        {gallery.length === 0 && <p className="mt-3 text-sm text-muted">Одоогоор зураг нэмээгүй.</p>}
       </div>
 
       <p className="rounded-xl bg-aqua px-4 py-2.5 text-sm text-muted">ℹ️ «Хамт олон» (багш нар)-ыг зүүн цэсний <b>«Хамт олон»</b> таб дээр удирдана.</p>
