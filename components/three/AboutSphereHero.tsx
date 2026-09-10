@@ -1,96 +1,51 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import dynamic from "next/dynamic";
-import { Canvas } from "@react-three/fiber";
+/** Бидний тухай hero-гийн баруун талын бөмбөлгийн бүлэг — хөнгөн, найдвартай, цэвэр CSS
+ *  дүрслэл (radial-gradient + box-shadow). Анх Three.js/React Three Fiber Canvas-аар
+ *  хийсэн ч тестийн явцад зарим орчинд (програмчлагдсан viewport, WebGL software
+ *  rendering) canvas огт зурагдахгүй хоосон гарах нь ажиглагдсан тул илүү найдвартай,
+ *  бүх төхөөрөмж дээр баталгаатай харагддаг CSS хувилбар руу шилжүүлсэн. Бүлэг бүхэлдээ
+ *  маш аажим эргэлдэж (animate-spinSlow, tailwind.config.ts), бөмбөлөг тус бүр өөр
+ *  saatал/хугацаатай зөөлөн хөвнө (anim-float, globals.css) — хоёул
+ *  prefers-reduced-motion үед globals.css-ийн ерөнхий дүрмээр автоматаар зогсоно. */
 
-/** Journey3D.tsx-тэй адил дэлгэцэд ойртох хүртэл Canvas огт ачаалагдахгүй (lazy),
- *  WebGL дэмжихгүй / сэдэлт багасгасан / жижиг дэлгэц дээр хөнгөн CSS orb-аар сольно.
- *  next/dynamic(import(...)) ашигласнаар Three.js/R3F код зөвхөн энэ Canvas бодитоор
- *  render хийгдэх мөчид тусдаа chunk-аар ачаалагдана — эхний хуудасны бандлд ордоггүй. */
-const Scene = dynamic(() => import("./AboutSphereScene").then((m) => m.AboutSphereScene), { ssr: false });
+type Orb = { top: string; left: string; size: number; tone: string; delay: number; duration: number };
 
-function supportsWebGL(): boolean {
-  try {
-    const c = document.createElement("canvas");
-    return !!(c.getContext("webgl2") || c.getContext("webgl"));
-  } catch {
-    return false;
-  }
-}
+const ORBS: Orb[] = [
+  { top: "6%", left: "46%", size: 60, tone: "#f0d9a0", delay: 0.2, duration: 8 },
+  { top: "14%", left: "62%", size: 84, tone: "#dff0ea", delay: 1.4, duration: 9.5 },
+  { top: "24%", left: "30%", size: 46, tone: "#f0d9a0", delay: 0.8, duration: 7.5 },
+  { top: "30%", left: "50%", size: 150, tone: "#8fd6c4", delay: 0, duration: 10 },
+  { top: "26%", left: "72%", size: 68, tone: "#dff0ea", delay: 2.2, duration: 8.6 },
+  { top: "48%", left: "20%", size: 58, tone: "#8fd6c4", delay: 1.1, duration: 9 },
+  { top: "50%", left: "40%", size: 118, tone: "#8fd6c4", delay: 0.5, duration: 11 },
+  { top: "46%", left: "64%", size: 92, tone: "#dff0ea", delay: 1.8, duration: 8.2 },
+  { top: "64%", left: "76%", size: 54, tone: "#f0d9a0", delay: 0.3, duration: 7.8 },
+  { top: "70%", left: "54%", size: 72, tone: "#8fd6c4", delay: 2.6, duration: 9.2 },
+  { top: "78%", left: "34%", size: 40, tone: "#dff0ea", delay: 1.6, duration: 8.8 },
+];
 
-/** WebGL байхгүй үед ашиглах хөнгөн, статик CSS орлуулагч — зөөлөн бүдгэрсэн бөмбөлгүүд. */
-function StaticOrbs() {
+export function AboutSphereHero() {
   return (
     <div aria-hidden className="relative h-full w-full">
-      {[
-        { top: "18%", left: "38%", size: 132, tone: "#8fd6c4", op: 0.9 },
-        { top: "8%", left: "58%", size: 72, tone: "#dff0ea", op: 0.85 },
-        { top: "40%", left: "58%", size: 168, tone: "#8fd6c4", op: 0.95 },
-        { top: "58%", left: "30%", size: 60, tone: "#f0d9a0", op: 0.8 },
-        { top: "68%", left: "62%", size: 96, tone: "#dff0ea", op: 0.85 },
-        { top: "30%", left: "20%", size: 44, tone: "#f0d9a0", op: 0.75 },
-        { top: "78%", left: "44%", size: 54, tone: "#8fd6c4", op: 0.7 },
-      ].map((o, i) => (
-        <span
-          key={i}
-          className="anim-float absolute rounded-full"
-          style={{
-            top: o.top, left: o.left, width: o.size, height: o.size,
-            background: `radial-gradient(circle at 32% 28%, rgba(255,255,255,0.9), ${o.tone} 55%, ${o.tone}55 100%)`,
-            opacity: o.op,
-            boxShadow: `0 18px 40px -14px ${o.tone}99`,
-            animationDelay: `${i * 0.6}s`,
-            animationDuration: `${7 + i}s`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-/** Бидний тухай hero-гийн баруун талын 3D бөмбөлгийн бүлэг — дэлгэцэд ойртсон үед л
- *  ачаалагдана (IntersectionObserver), WebGL-гүй/reduced-motion/жижиг дэлгэц дээр хөнгөн
- *  статик CSS orb-аар автоматаар сольж харуулна. */
-export function AboutSphereHero() {
-  const wrap = useRef<HTMLDivElement>(null);
-  const [mode, setMode] = useState<"pending" | "webgl" | "fallback">("pending");
-  const [near, setNear] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setReducedMotion(reduced);
-    setMode(supportsWebGL() ? "webgl" : "fallback");
-  }, []);
-
-  useEffect(() => {
-    const el = wrap.current;
-    if (!el) return;
-    const ob = new IntersectionObserver(
-      (es) => es.forEach((e) => { if (e.isIntersecting) { setNear(true); ob.disconnect(); } }),
-      { rootMargin: "300px" }
-    );
-    ob.observe(el);
-    return () => ob.disconnect();
-  }, []);
-
-  const isWebgl = mode === "webgl";
-
-  return (
-    <div ref={wrap} className="relative h-full w-full">
-      {isWebgl && near ? (
-        <Canvas
-          dpr={[1, 1.75]}
-          camera={{ position: [0, 0, 7.2], fov: 40 }}
-          gl={{ alpha: true, antialias: true }}
-          style={{ background: "transparent" }}
-        >
-          <Scene reducedMotion={reducedMotion} />
-        </Canvas>
-      ) : (
-        <StaticOrbs />
-      )}
+      <div className="animate-spinSlow absolute inset-[6%]" style={{ transformOrigin: "50% 50%" }}>
+        {ORBS.map((o, i) => (
+          <span
+            key={i}
+            className="anim-float absolute rounded-full"
+            style={{
+              top: o.top,
+              left: o.left,
+              width: o.size,
+              height: o.size,
+              background: `radial-gradient(circle at 32% 26%, rgba(255,255,255,0.95), ${o.tone} 55%, ${o.tone}66 100%)`,
+              boxShadow: `0 ${Math.round(o.size / 4)}px ${Math.round(o.size / 1.4)}px -${Math.round(o.size / 5)}px ${o.tone}aa`,
+              animationDelay: `${o.delay}s`,
+              animationDuration: `${o.duration}s`,
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }

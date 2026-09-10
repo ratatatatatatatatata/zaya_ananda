@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { JOURNEY_FAQ, JOURNEY_PREP } from "@/data/journeys";
 import { getJourneyBySlugCached, getJourneyBySlug } from "@/lib/journeys-db";
 import { JourneyImage } from "@/components/journey/SceneArt";
-import { LeadCard, CrewRow } from "@/components/journey/PersonCard";
+import { LeadCard, CrewRow, Avatar } from "@/components/journey/PersonCard";
 import { JourneyBooking } from "@/components/journey/JourneyBooking";
 import { JourneyReviews } from "@/components/journey/JourneyReviews";
 import { ContactSection } from "@/components/ContactSection";
@@ -103,6 +103,7 @@ export default async function JourneyPage({ params }: { params: { slug: string }
         <div className="container-px flex gap-x-7 gap-y-2 overflow-x-auto py-3.5 sm:flex-wrap sm:justify-center sm:overflow-visible">
           {[
             { id: "hutulbur", label: "Өдөр өдрийн хөтөлбөр" },
+            ...(j.destination && j.destination.length > 0 ? [{ id: "gazar", label: "Очих газрууд" }] : []),
             { id: "baga", label: "Хариуцах баг" },
             { id: "zahialga", label: "Цаг захиалах" },
             { id: "zuvlumj", label: "Аялагчдын зөвлөмж" },
@@ -128,10 +129,22 @@ export default async function JourneyPage({ params }: { params: { slug: string }
           <aside className="panel flex flex-col justify-between overflow-hidden bg-[#0b3d35] p-6 text-white sm:p-8">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/60">Аяллын үнэ</p>
-              <p className="mt-3 font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+              <p className="mt-2 font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
                 {formatJourneyPrice(j.price)}
               </p>
-              <p className="mt-2 text-sm leading-6 text-white/65">Нэг хүний багц үнэ</p>
+              <p className="mt-1.5 text-sm leading-6 text-white/65">Нэг хүний багц үнэ</p>
+
+              {j.lead?.name && (
+                <div className="mt-5 flex items-center gap-3 border-t border-white/15 pt-5">
+                  <span className="h-11 w-11 shrink-0 overflow-hidden rounded-full bg-white/10">
+                    <Avatar person={j.lead} size="sm" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-semibold text-white">{j.lead.name}</span>
+                    {j.lead.role && <span className="block truncate text-xs text-white/60">{j.lead.role}</span>}
+                  </span>
+                </div>
+              )}
             </div>
             <a href="#zahialga" className="mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-primary-800 transition hover:-translate-y-0.5 hover:shadow-lg">
               Өдрөө сонгох <span aria-hidden>→</span>
@@ -199,10 +212,14 @@ export default async function JourneyPage({ params }: { params: { slug: string }
             </article>
           ))}
         </div>
+      </div></section>
 
-        {/* Очих газрын тухай мэдээлэл — хөтөлбөрийн доод талд, олон газар байж болно */}
-        {j.destination && j.destination.length > 0 && (
-          <div className="mt-8 space-y-6">
+      {/* Очих газрын тухай мэдээлэл — тусдаа том гарчигтай хэсэг, олон газар байж болно */}
+      {j.destination && j.destination.length > 0 && (
+        <section id="gazar" className="section scroll-mt-32"><div className="container-px">
+          <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Очих газрууд</h2>
+          <p className="mt-2 max-w-2xl text-muted">Энэ аяллаар очих гол газрууд, тэдгээрийн тухай мэдээлэл.</p>
+          <div className="mt-10 space-y-6">
             {j.destination.map((dest, i) => (
               <div key={i} className="card grid gap-0 overflow-hidden lg:grid-cols-[minmax(0,22rem)_1fr]">
                 <div className="relative aspect-[4/3] w-full overflow-hidden lg:aspect-auto lg:h-full">
@@ -216,8 +233,8 @@ export default async function JourneyPage({ params }: { params: { slug: string }
               </div>
             ))}
           </div>
-        )}
-      </div></section>
+        </div></section>
+      )}
 
       {/* Хариуцах хүн ба баг */}
       <section id="baga" className="section scroll-mt-32"><div className="container-px">

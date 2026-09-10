@@ -241,7 +241,7 @@ export function AdminJourneys() {
             {/* Очих газрын тухай мэдээлэл — өдрийн хөтөлбөрийн доод талд, олон газар нэмж болно */}
             <div className="mt-4 rounded-xl border border-line bg-surface-3 p-3">
               <div className="mb-2 flex items-center justify-between">
-                <p className="text-sm font-semibold text-ink">Очих газрын тухай мэдээлэл <span className="font-normal text-muted">({destinations.length}) — өдрийн хөтөлбөрийн доод талд харагдана</span></p>
+                <p className="text-sm font-semibold text-ink">Очих газрын тухай мэдээлэл <span className="font-normal text-muted">({destinations.length}) — өдрийн хөтөлбөрийн дараа, тусдаа том гарчигтай («Очих газрууд») хэсэг болж харагдана</span></p>
                 <button type="button" onClick={addDestination} className="btn btn-outline btn-sm">+ Газар нэмэх</button>
               </div>
               <div className="space-y-3">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 type Member = { name: string; image?: string; role?: ReactNode; info?: ReactNode; focus?: number };
@@ -15,7 +15,7 @@ function TeamCard({ m, onOpen }: { m: Member; onOpen: () => void }) {
     <button
       type="button"
       onClick={onOpen}
-      className="group w-[13.5rem] shrink-0 snap-center text-left focus-ring sm:w-[15.5rem]"
+      className="group w-[13.5rem] shrink-0 text-left focus-ring sm:w-[15.5rem]"
       aria-haspopup="dialog"
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden rounded-3xl border border-white/12 bg-white/5">
@@ -84,16 +84,38 @@ function BioModal({ m, onClose }: { m: Member; onClose: () => void }) {
   );
 }
 
-/** Хамт олон — гүн дэвсгэртэй (.night), хэвтээ гүйдэг зургийн эгнээ (утсан дээр swipe),
- *  дарахад биографийн modal нээгдэнэ. */
+/** Хамт олон — гүн дэвсгэртэй (.night), хажуу тийш аяндаа аажим гулсдаг зургийн эгнээ
+ *  (AboutGallery-тэй адил rAF/scrollLeft техник), hover дээр зогсоно, гар/хуруугаар
+ *  чирж болно, дарахад биографийн modal нээгдэнэ. */
 export function AboutTeamRow({ eyebrow, statement, members }: {
   eyebrow?: ReactNode;
   statement?: ReactNode;
   members: Member[];
 }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const hoveringRef = useRef(false);
+
+  useEffect(() => {
+    if (members.length === 0) return;
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    const step = () => {
+      const track = trackRef.current;
+      if (track && !hoveringRef.current) {
+        if (track.scrollLeft >= track.scrollWidth - track.clientWidth - 1) track.scrollLeft = 0;
+        else track.scrollLeft += 0.35;
+      }
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [members.length]);
 
   if (members.length === 0) return null;
+  // Гурав дахин давхарлаж эгнээг сунгана — хажуу тийш үргэлжлүүлж гүйхэд төгсгөлд
+  // хүрэлгүй, эргүүлж эхнээс нь аяндаа үргэлжилдэг мэт харагдана.
+  const loop = [...members, ...members, ...members];
 
   return (
     <section className="night relative overflow-hidden py-24 sm:py-28" style={{ background: "radial-gradient(120% 90% at 15% 0%, #163a32 0%, #0B1714 55%, #060f0d 100%)" }}>
@@ -110,10 +132,14 @@ export function AboutTeamRow({ eyebrow, statement, members }: {
         )}
       </div>
 
-      <div className="container-px relative mt-14">
-        <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {members.map((m, i) => (
-            <TeamCard key={m.name + i} m={m} onOpen={() => setOpenIndex(i)} />
+      <div
+        className="container-px relative mt-14"
+        onMouseEnter={() => { hoveringRef.current = true; }}
+        onMouseLeave={() => { hoveringRef.current = false; }}
+      >
+        <div ref={trackRef} className="flex gap-6 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {loop.map((m, i) => (
+            <TeamCard key={m.name + i} m={m} onOpen={() => setOpenIndex(i % members.length)} />
           ))}
         </div>
       </div>
