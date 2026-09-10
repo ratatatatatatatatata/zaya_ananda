@@ -26,6 +26,42 @@ function compressImage(file: File, maxW = 1200, quality = 0.82): Promise<string>
   });
 }
 
+/** Өдөр өдрийн хөтөлбөр болон очих газрын зургуудад ашиглана — ямар хэмжээ/харьцаатай
+ *  зураг оруулсан ч төвөөс нь тайрч, ЯГ ИЖИЛ (4:3) харьцаа, хэмжээтэй болгож хадгална.
+ *  Ингэснээр карт бүрийн зураг харагдах үедээ үргэлж нэг стандарт хэмжээтэй байна. */
+function compressImageCropped(file: File, targetW = 1200, targetH = 900, quality = 0.82): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Зураг уншиж чадсангүй."));
+    reader.onload = () => {
+      const img = new window.Image();
+      img.onload = () => {
+        const targetRatio = targetW / targetH;
+        const srcRatio = img.width / img.height;
+        let sx = 0, sy = 0, sw = img.width, sh = img.height;
+        if (srcRatio > targetRatio) {
+          // Эх зураг илүү өргөн — хажуу талыг нь тайрна (төвөөс)
+          sw = Math.round(img.height * targetRatio);
+          sx = Math.round((img.width - sw) / 2);
+        } else {
+          // Эх зураг илүү өндөр (нарийн) — дээд/доод талыг нь тайрна (төвөөс)
+          sh = Math.round(img.width / targetRatio);
+          sy = Math.round((img.height - sh) / 2);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = targetW; canvas.height = targetH;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("canvas алдаа"));
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetW, targetH);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = () => reject(new Error("Зураг буруу байна."));
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 const SCENES: { key: Scene; label: string }[] = [
   { key: "gobi", label: "Говь" },
   { key: "mountain", label: "Уул" },
@@ -96,6 +132,13 @@ export function AdminJourneys() {
   async function pickImage(e: React.ChangeEvent<HTMLInputElement>, onDone: (data: string) => void) {
     const file = e.target.files?.[0]; if (!file) return;
     try { onDone(await compressImage(file)); } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
+    e.target.value = "";
+  }
+
+  // Хөтөлбөрийн өдөр болон очих газрын зурагт — төвөөс тайрч, үргэлж ижил (4:3) хэмжээтэй болгоно.
+  async function pickImageCropped(e: React.ChangeEvent<HTMLInputElement>, onDone: (data: string) => void) {
+    const file = e.target.files?.[0]; if (!file) return;
+    try { onDone(await compressImageCropped(file)); } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
     e.target.value = "";
   }
 
@@ -228,10 +271,10 @@ export function AdminJourneys() {
                       {SCENES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
                     </select>
                     {d.image
-                      ? <div className="relative"><img src={d.image} alt="" className="h-14 w-20 rounded-lg object-cover" />
+                      ? <div className="relative"><img src={d.image} alt="" className="aspect-[4/3] h-14 w-auto rounded-lg object-cover" />
                           <button type="button" onClick={() => updDay(i, { image: "" })} className="absolute -right-2 -top-2 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-bold text-white">✕</button>
                         </div>
-                      : <input type="file" accept="image/*" className="text-sm" onChange={(e) => pickImage(e, (dd) => updDay(i, { image: dd }))} />}
+                      : <input type="file" accept="image/*" className="text-sm" onChange={(e) => pickImageCropped(e, (dd) => updDay(i, { image: dd }))} />}
                   </div>
                 </div>
               ))}
@@ -253,10 +296,10 @@ export function AdminJourneys() {
                     </div>
                     <div className="mt-2 flex flex-wrap items-center gap-3">
                       {d.image
-                        ? <div className="relative"><img src={d.image} alt="" className="h-16 w-24 rounded-lg object-cover" />
+                        ? <div className="relative"><img src={d.image} alt="" className="aspect-[4/3] h-16 w-auto rounded-lg object-cover" />
                             <button type="button" onClick={() => updDestination(i, { image: "" })} className="absolute -right-2 -top-2 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-bold text-white">✕</button>
                           </div>
-                        : <input type="file" accept="image/*" className="text-sm" onChange={(e) => pickImage(e, (dd) => updDestination(i, { image: dd }))} />}
+                        : <input type="file" accept="image/*" className="text-sm" onChange={(e) => pickImageCropped(e, (dd) => updDestination(i, { image: dd }))} />}
                     </div>
                     <input className="input mt-2" placeholder="Газрын нэр — жишээ: Хөвсгөл нуур" value={d.title}
                       onChange={(e) => updDestination(i, { title: e.target.value })} />
