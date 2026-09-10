@@ -9,6 +9,7 @@ import { getSettings } from "@/lib/repo";
 import { signedDownloadUrl } from "@/lib/supabase";
 import { ContactSection } from "@/components/ContactSection";
 import { AboutGallery } from "@/components/home/AboutGallery";
+import { AboutMilestones } from "@/components/home/AboutMilestones";
 import type { L } from "@/lib/types";
 
 // Админ энгийн (нэг хэлтэй) текст оруулсан бол шууд, эсрэг тохиолдолд өгөгдмөл олон хэлтэй
@@ -71,23 +72,16 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section pb-0">
         <div className="container-px max-w-3xl">
           <SectionHeading center eyebrow={<T k="about.milestonesEyebrow" />} title={<T k="about.milestonesTitle" />} />
-          <div className="mt-12 space-y-8 border-l border-line pl-8">
-            {(settings.aboutMilestones && settings.aboutMilestones.length > 0 ? settings.aboutMilestones : aboutContent.milestones).map((m, i) => (
-              <Reveal key={i} delay={i * 70}>
-                <div className="relative">
-                  <span aria-hidden className="absolute -left-[2.6rem] top-1.5 h-3 w-3 rounded-full bg-primary-500 ring-4 ring-cream" />
-                  <p className="font-display text-2xl font-semibold text-primary-700">{m.year}</p>
-                  <p className="mt-1.5 leading-relaxed text-muted">{localeText(m.text)}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
         </div>
+        <AboutMilestones
+          milestones={settings.aboutMilestones && settings.aboutMilestones.length > 0 ? settings.aboutMilestones : aboutContent.milestones}
+          localeText={localeText}
+        />
         {settings.aboutGallery && settings.aboutGallery.length > 0 && (
-          <div className="container-px mt-12">
+          <div className="container-px pb-20 pt-4">
             <AboutGallery images={settings.aboutGallery} />
           </div>
         )}

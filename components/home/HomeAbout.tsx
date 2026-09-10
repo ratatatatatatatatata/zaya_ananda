@@ -7,6 +7,7 @@ import { getSettingsCached } from "@/lib/repo";
 import { ContactSection } from "@/components/ContactSection";
 import { signedDownloadUrl } from "@/lib/supabase";
 import { AboutGallery } from "./AboutGallery";
+import { AboutMilestones } from "./AboutMilestones";
 import type { L } from "@/lib/types";
 
 // Админ энгийн (нэг хэлтэй) текст оруулсан бол шууд, эсрэг тохиолдолд өгөгдмөл олон хэлтэй
@@ -75,19 +76,12 @@ export async function HomeAbout() {
           <p className="eyebrow-line justify-center"><T k="about.milestonesEyebrow" /></p>
           <h3 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl"><T k="about.milestonesTitle" /></h3>
         </div>
-        <div className="mx-auto mt-10 max-w-2xl space-y-8 border-l border-line pl-8">
-          {(settings.aboutMilestones && settings.aboutMilestones.length > 0 ? settings.aboutMilestones : aboutContent.milestones).map((m, i) => (
-            <Reveal key={i} delay={i * 70}>
-              <div className="relative">
-                <span aria-hidden className="absolute -left-[2.6rem] top-1.5 h-3 w-3 rounded-full bg-primary-500 ring-4 ring-surface-1" />
-                <p className="font-display text-2xl font-semibold text-primary-700">{m.year}</p>
-                <p className="mt-1.5 leading-relaxed text-muted">{localeText(m.text)}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        <AboutMilestones
+          milestones={settings.aboutMilestones && settings.aboutMilestones.length > 0 ? settings.aboutMilestones : aboutContent.milestones}
+          localeText={localeText}
+        />
         {settings.aboutGallery && settings.aboutGallery.length > 0 && (
-          <div className="mt-12">
+          <div className="mt-4">
             <AboutGallery images={settings.aboutGallery} />
           </div>
         )}
