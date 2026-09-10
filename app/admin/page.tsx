@@ -8,6 +8,7 @@ import { useI18n } from "@/lib/i18n";
 import { formatMNT, cx } from "@/lib/format";
 import { Icon } from "@/components/Icon";
 import { AdminContentManager } from "@/components/AdminContentManager";
+import { AdminAbout } from "@/components/AdminAbout";
 import { AdminSettings } from "@/components/AdminSettings";
 import { AdminPages } from "@/components/AdminPages";
 import { AdminTeachers } from "@/components/AdminTeachers";
@@ -27,6 +28,7 @@ const nav: { id: string; k: string; label?: string; icon: string }[] = [
   { id: "stones", k: "admin.productsM", label: "Чулуунууд", icon: "star" },
   { id: "zurhai", k: "admin.zurhaiM", label: "Зурхай", icon: "star" },
   { id: "teachers", k: "admin.teachersM", label: "Хамт олон", icon: "user" },
+  { id: "about", k: "admin.aboutM", label: "Бидний тухай", icon: "sparkles" },
   { id: "gift", k: "admin.giftM", label: "Гэгээн бэлэг", icon: "award" },
   { id: "promos", k: "admin.promosM", label: "Сурталчилгаа", icon: "star" },
   { id: "reviews", k: "admin.reviews", icon: "star" },
@@ -223,6 +225,7 @@ export default function AdminPage() {
             {tab === "promos" && <AdminContentManager kind="promo" />}
             {tab === "zurhai" && <AdminZurhai />}
             {tab === "teachers" && <AdminTeachers />}
+            {tab === "about" && <AdminAbout />}
             {tab === "gift" && <AdminContentManager kind="free" />}
             {tab === "pages" && <AdminPages />}
             {tab === "settings" && <AdminSettings />}

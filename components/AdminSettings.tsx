@@ -26,26 +26,7 @@ function compressImage(file: File, maxW = 800, quality = 0.85): Promise<string> 
   });
 }
 
-const SB_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-async function uploadVideo(file: File, onProgress: (p: number) => void): Promise<string> {
-  const r = await fetch("/api/admin/video-upload-url", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: file.name }) });
-  if (!r.ok) throw new Error(((await r.json().catch(() => ({}))) as { error?: string }).error || "Байршуулах URL авахад алдаа гарлаа.");
-  const { uploadUrl, path } = (await r.json()) as { uploadUrl: string; path: string };
-  await new Promise<void>((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("PUT", uploadUrl);
-    if (SB_ANON) { xhr.setRequestHeader("apikey", SB_ANON); xhr.setRequestHeader("authorization", "Bearer " + SB_ANON); }
-    xhr.setRequestHeader("x-upsert", "true");
-    if (file.type) xhr.setRequestHeader("content-type", file.type);
-    xhr.upload.onprogress = (e) => { if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100)); };
-    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error("Байршуулалт амжилтгүй (" + xhr.status + ")")));
-    xhr.onerror = () => reject(new Error("Сүлжээний алдаа. Дахин оролдоно уу."));
-    xhr.send(file);
-  });
-  return path;
-}
-
-const EMPTY = { logo: "", aboutTitle: "", aboutBody: "", aboutVideo: "", facebook: "", instagram: "", youtube: "" };
+const EMPTY = { logo: "", facebook: "", instagram: "", youtube: "" };
 const EMPTY_BANK: BankInfo = { bankName: "", account: "", holder: "" };
 
 type ContactInfo = { phone: string; email: string; address: string; hours: string; mapQuery: string };
@@ -57,12 +38,6 @@ export function AdminSettings() {
   const [contact, setContact] = useState<ContactInfo>(EMPTY_CONTACT);
   const [prepay, setPrepay] = useState("");
   const [moods, setMoods] = useState<{ key: string; emoji: string; label: string }[]>([]);
-  const [aboutMission, setAboutMission] = useState("");
-  const [aboutStory, setAboutStory] = useState("");
-  const [aboutStats, setAboutStats] = useState<{ value: string; label: string }[]>([]);
-  const [aboutValues, setAboutValues] = useState<{ glyph: string; title: string; text: string }[]>([]);
-  const [aboutFaqs, setAboutFaqs] = useState<{ q: string; a: string }[]>([]);
-  const [videoProgress, setVideoProgress] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
@@ -75,17 +50,13 @@ export function AdminSettings() {
         if (!d?.settings) return;
         const s = d.settings;
         setForm({
-          logo: s.logo || "", aboutTitle: s.aboutTitle || "", aboutBody: s.aboutBody || "", aboutVideo: s.aboutVideo || "",
+          logo: s.logo || "",
           facebook: s.facebook || "", instagram: s.instagram || "", youtube: s.youtube || "",
         });
         if (s.bank) setBank({ ...EMPTY_BANK, ...s.bank });
         if (s.contact) setContact({ ...EMPTY_CONTACT, ...s.contact });
         if (s.servicePrepay) setPrepay(String(s.servicePrepay));
         if (Array.isArray(s.customMoods)) setMoods(s.customMoods);
-        setAboutMission(s.aboutMission || ""); setAboutStory(s.aboutStory || "");
-        if (Array.isArray(s.aboutStats)) setAboutStats(s.aboutStats);
-        if (Array.isArray(s.aboutValues)) setAboutValues(s.aboutValues);
-        if (Array.isArray(s.aboutFaqs)) setAboutFaqs(s.aboutFaqs);
       })
       .catch(() => {});
   }, []);
@@ -94,21 +65,11 @@ export function AdminSettings() {
     const file = e.target.files?.[0]; if (!file) return;
     try { set("logo", await compressImage(file, 400)); } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
   }
-  async function pickAboutVideo(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]; if (!file) return;
-    setErr(""); setVideoProgress(0);
-    try { const path = await uploadVideo(file, setVideoProgress); set("aboutVideo", path); }
-    catch (e2) { setErr(e2 instanceof Error ? e2.message : "Видео байршуулахад алдаа."); }
-    finally { setVideoProgress(null); }
-  }
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true); setErr(""); setMsg("");
     try {
-      const payload = {
-        ...form, bank, contact, servicePrepay: Number(prepay) || 0, customMoods: moods,
-        aboutMission, aboutStory, aboutStats, aboutValues, aboutFaqs,
-      };
+      const payload = { ...form, bank, contact, servicePrepay: Number(prepay) || 0, customMoods: moods };
       const res = await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
       setMsg("Хадгаллаа. Шинэ мэдээлэл сайтад тусгагдана.");
@@ -132,87 +93,7 @@ export function AdminSettings() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
-        <p className="mb-3 font-display font-semibold text-ink">Бидний тухай</p>
-        <div><label className="field-label">Гарчиг</label><input className="input" value={form.aboutTitle} onChange={(e) => set("aboutTitle", e.target.value)} placeholder="Жишээ: Бидний тухай" /></div>
-        <div className="mt-3"><label className="field-label">Дэлгэрэнгүй</label><textarea className="textarea" rows={6} value={form.aboutBody} onChange={(e) => set("aboutBody", e.target.value)} placeholder="Төвийн тухай мэдээлэл…" /></div>
-        <div className="mt-3">
-          <label className="field-label">Эрхэм зорилго (Бидний тухай хуудасны "Эрхэм зорилго" хэсэгт)</label>
-          <textarea className="textarea" rows={3} value={aboutMission} onChange={(e) => setAboutMission(e.target.value)} placeholder="Хоосон орхивол өгөгдмөл (олон хэлтэй) текст харагдана." />
-        </div>
-        <div className="mt-3">
-          <label className="field-label">Түүх / танилцуулга</label>
-          <textarea className="textarea" rows={3} value={aboutStory} onChange={(e) => setAboutStory(e.target.value)} placeholder="Хоосон орхивол өгөгдмөл (олон хэлтэй) текст харагдана." />
-        </div>
-        <div className="mt-3">
-          <label className="field-label">Танилцуулга видео</label>
-          {form.aboutVideo
-            ? <div className="flex items-center gap-3"><span className="text-sm font-medium text-jade-600">✓ Видео орсон</span><button type="button" onClick={() => set("aboutVideo", "")} className="text-xs font-semibold text-rose-500 hover:underline">Устгах</button></div>
-            : videoProgress !== null
-            ? <div className="flex items-center gap-3"><span className="text-sm font-medium text-primary-700">Байршуулж байна… {videoProgress}%</span><div className="h-1.5 flex-1 overflow-hidden rounded-full bg-line"><div className="h-full bg-primary-500 transition-all" style={{ width: videoProgress + "%" }} /></div></div>
-            : <input type="file" accept="video/*" onChange={pickAboutVideo} className="text-sm" />}
-          <p className="mt-1 text-xs text-muted">Видео нь “Бидний тухай” хуудсанд харагдана.</p>
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="font-display font-semibold text-ink">Тоо, баримт (Бидний тухай хуудсанд)</p>
-          <button type="button" onClick={() => setAboutStats((a) => [...a, { value: "", label: "" }])} className="btn btn-outline btn-sm">+ Нэмэх</button>
-        </div>
-        <p className="mt-1 text-xs leading-relaxed text-muted">Хоосон орхивол өгөгдмөл 4 тоо (жилийн туршлага, үйлчлүүлэгч гэх мэт) харагдана.</p>
-        <div className="mt-3 space-y-2.5">
-          {aboutStats.map((s, i) => (
-            <div key={i} className="flex flex-wrap items-center gap-2 rounded-xl border border-line bg-surface-1 px-3 py-2.5">
-              <input className="input w-28" placeholder="10+" value={s.value} onChange={(e) => setAboutStats((a) => a.map((x, k) => (k === i ? { ...x, value: e.target.value } : x)))} />
-              <input className="input min-w-[12rem] flex-1" placeholder="жилийн туршлага" value={s.label} onChange={(e) => setAboutStats((a) => a.map((x, k) => (k === i ? { ...x, label: e.target.value } : x)))} />
-              <button type="button" onClick={() => setAboutStats((a) => a.filter((_, k) => k !== i))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
-            </div>
-          ))}
-          {aboutStats.length === 0 && <p className="text-sm text-muted">Одоогоор нэмээгүй — өгөгдмөл 4 тоо ажиллаж байна.</p>}
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="font-display font-semibold text-ink">Үнэт зүйлс (Бидний тухай хуудсанд)</p>
-          <button type="button" onClick={() => setAboutValues((a) => [...a, { glyph: "✶", title: "", text: "" }])} className="btn btn-outline btn-sm">+ Нэмэх</button>
-        </div>
-        <p className="mt-1 text-xs leading-relaxed text-muted">Хоосон орхивол өгөгдмөл 4 үнэт зүйл (хүндлэл, аюулгүй байдал гэх мэт) харагдана.</p>
-        <div className="mt-3 space-y-2.5">
-          {aboutValues.map((v, i) => (
-            <div key={i} className="space-y-2 rounded-xl border border-line bg-surface-1 px-3 py-2.5">
-              <div className="flex flex-wrap items-center gap-2">
-                <input className="input w-16 text-center" maxLength={4} value={v.glyph} onChange={(e) => setAboutValues((a) => a.map((x, k) => (k === i ? { ...x, glyph: e.target.value } : x)))} />
-                <input className="input min-w-[10rem] flex-1" placeholder="Гарчиг — ж: Хүндлэл" value={v.title} onChange={(e) => setAboutValues((a) => a.map((x, k) => (k === i ? { ...x, title: e.target.value } : x)))} />
-                <button type="button" onClick={() => setAboutValues((a) => a.filter((_, k) => k !== i))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
-              </div>
-              <textarea className="textarea" rows={2} placeholder="Тайлбар" value={v.text} onChange={(e) => setAboutValues((a) => a.map((x, k) => (k === i ? { ...x, text: e.target.value } : x)))} />
-            </div>
-          ))}
-          {aboutValues.length === 0 && <p className="text-sm text-muted">Одоогоор нэмээгүй — өгөгдмөл 4 үнэт зүйл ажиллаж байна.</p>}
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="font-display font-semibold text-ink">Түгээмэл асуултууд (Бидний тухай хуудсанд)</p>
-          <button type="button" onClick={() => setAboutFaqs((a) => [...a, { q: "", a: "" }])} className="btn btn-outline btn-sm">+ Нэмэх</button>
-        </div>
-        <p className="mt-1 text-xs leading-relaxed text-muted">Хоосон орхивол өгөгдмөл асуулт-хариултууд харагдана.</p>
-        <div className="mt-3 space-y-2.5">
-          {aboutFaqs.map((f, i) => (
-            <div key={i} className="space-y-2 rounded-xl border border-line bg-surface-1 px-3 py-2.5">
-              <div className="flex items-center gap-2">
-                <input className="input flex-1" placeholder="Асуулт" value={f.q} onChange={(e) => setAboutFaqs((a) => a.map((x, k) => (k === i ? { ...x, q: e.target.value } : x)))} />
-                <button type="button" onClick={() => setAboutFaqs((a) => a.filter((_, k) => k !== i))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
-              </div>
-              <textarea className="textarea" rows={2} placeholder="Хариулт" value={f.a} onChange={(e) => setAboutFaqs((a) => a.map((x, k) => (k === i ? { ...x, a: e.target.value } : x)))} />
-            </div>
-          ))}
-          {aboutFaqs.length === 0 && <p className="text-sm text-muted">Одоогоор нэмээгүй — өгөгдмөл асуулт-хариултууд ажиллаж байна.</p>}
-        </div>
-      </div>
+      <p className="rounded-xl bg-aqua px-4 py-2.5 text-sm text-muted">ℹ️ <b>«Бидний тухай»</b> хуудасны агуулгыг зүүн цэсний <b>«Бидний тухай»</b> таб дээр удирдана.</p>
 
       <p className="rounded-xl bg-aqua px-4 py-2.5 text-sm text-muted">ℹ️ Нүүр хуудасны <b>зурхайн төрөл</b> болон <b>тайллын алгоритмыг</b> зүүн цэсний <b>«Зурхай»</b> таб дээр удирдана.</p>
 
