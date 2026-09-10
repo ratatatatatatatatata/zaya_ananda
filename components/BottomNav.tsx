@@ -18,6 +18,7 @@ export function BottomNav() {
   const pathname = usePathname();
   const { t } = useI18n();
   const active = (h: string) => (h === "/" ? pathname === "/" : pathname.startsWith(h));
+  if (pathname === "/about") return null;
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ivory/95 backdrop-blur-xl lg:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
       <div className="mx-auto grid max-w-md grid-cols-5">

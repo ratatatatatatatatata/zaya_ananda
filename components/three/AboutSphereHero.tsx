@@ -1,96 +1,35 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Component, useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import { Canvas } from "@react-three/fiber";
 
-/** Journey3D.tsx-тэй адил дэлгэцэд ойртох хүртэл Canvas огт ачаалагдахгүй (lazy),
- *  WebGL дэмжихгүй / сэдэлт багасгасан / жижиг дэлгэц дээр хөнгөн CSS orb-аар сольно.
- *  next/dynamic(import(...)) ашигласнаар Three.js/R3F код зөвхөн энэ Canvas бодитоор
- *  render хийгдэх мөчид тусдаа chunk-аар ачаалагдана — эхний хуудасны бандлд ордоггүй. */
-const Scene = dynamic(() => import("./AboutSphereScene").then((m) => m.AboutSphereScene), { ssr: false });
-
-function supportsWebGL(): boolean {
-  try {
-    const c = document.createElement("canvas");
-    return !!(c.getContext("webgl2") || c.getContext("webgl"));
-  } catch {
-    return false;
-  }
+// Canvas itself lives in the lazy module, outside the initial bundle.
+const CanvasScene = dynamic(() => import("./AboutSphereCanvas"), { ssr:false, loading:()=><StaticOrbs/> });
+const orbs = [[27,17,11],[38,25,20],[60,23,11],[52,38,25],[28,47,17],[66,49,16],[40,63,24],[65,72,13],[20,70,8],[77,16,5],[15,35,7],[78,85,6],[53,86,8]];
+export function StaticOrbs() {
+  return <div aria-hidden="true" style={{position:"relative",width:"100%",height:"100%"}}>{orbs.map(([x,y,size],i)=><span key={i} style={{position:"absolute",left:x+"%",top:y+"%",width:size+"%",aspectRatio:"1",borderRadius:"50%",transform:"translate(-50%,-50%)",background:"radial-gradient(circle at 32% 26%,#ffffff 0%,#dbeef8 32%,#acc9df 67%,#769ab9 93%,#6688a5)",boxShadow:"inset -6px -8px 18px #56779528, 15px 24px 28px -14px #22426735",zIndex:i%3}}/>)}</div>;
 }
-
-/** WebGL байхгүй үед ашиглах хөнгөн, статик CSS орлуулагч — зөөлөн бүдгэрсэн бөмбөлгүүд. */
-function StaticOrbs() {
-  return (
-    <div aria-hidden className="relative h-full w-full">
-      {[
-        { top: "18%", left: "38%", size: 132, tone: "#8fd6c4", op: 0.9 },
-        { top: "8%", left: "58%", size: 72, tone: "#dff0ea", op: 0.85 },
-        { top: "40%", left: "58%", size: 168, tone: "#8fd6c4", op: 0.95 },
-        { top: "58%", left: "30%", size: 60, tone: "#f0d9a0", op: 0.8 },
-        { top: "68%", left: "62%", size: 96, tone: "#dff0ea", op: 0.85 },
-        { top: "30%", left: "20%", size: 44, tone: "#f0d9a0", op: 0.75 },
-        { top: "78%", left: "44%", size: 54, tone: "#8fd6c4", op: 0.7 },
-      ].map((o, i) => (
-        <span
-          key={i}
-          className="anim-float absolute rounded-full"
-          style={{
-            top: o.top, left: o.left, width: o.size, height: o.size,
-            background: `radial-gradient(circle at 32% 28%, rgba(255,255,255,0.9), ${o.tone} 55%, ${o.tone}55 100%)`,
-            opacity: o.op,
-            boxShadow: `0 18px 40px -14px ${o.tone}99`,
-            animationDelay: `${i * 0.6}s`,
-            animationDuration: `${7 + i}s`,
-          }}
-        />
-      ))}
-    </div>
-  );
+class SceneBoundary extends Component<{ children:ReactNode },{ failed:boolean }> {
+  state={failed:false};
+  static getDerivedStateFromError() { return {failed:true}; }
+  render() { return this.state.failed ? <StaticOrbs/> : this.props.children; }
 }
-
-/** Бидний тухай hero-гийн баруун талын 3D бөмбөлгийн бүлэг — дэлгэцэд ойртсон үед л
- *  ачаалагдана (IntersectionObserver), WebGL-гүй/reduced-motion/жижиг дэлгэц дээр хөнгөн
- *  статик CSS orb-аар автоматаар сольж харуулна. */
 export function AboutSphereHero() {
-  const wrap = useRef<HTMLDivElement>(null);
-  const [mode, setMode] = useState<"pending" | "webgl" | "fallback">("pending");
-  const [near, setNear] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setReducedMotion(reduced);
-    setMode(supportsWebGL() ? "webgl" : "fallback");
-  }, []);
-
-  useEffect(() => {
-    const el = wrap.current;
-    if (!el) return;
-    const ob = new IntersectionObserver(
-      (es) => es.forEach((e) => { if (e.isIntersecting) { setNear(true); ob.disconnect(); } }),
-      { rootMargin: "300px" }
-    );
-    ob.observe(el);
-    return () => ob.disconnect();
-  }, []);
-
-  const isWebgl = mode === "webgl";
-
-  return (
-    <div ref={wrap} className="relative h-full w-full">
-      {isWebgl && near ? (
-        <Canvas
-          dpr={[1, 1.75]}
-          camera={{ position: [0, 0, 7.2], fov: 40 }}
-          gl={{ alpha: true, antialias: true }}
-          style={{ background: "transparent" }}
-        >
-          <Scene reducedMotion={reducedMotion} />
-        </Canvas>
-      ) : (
-        <StaticOrbs />
-      )}
-    </div>
-  );
+  const ref = useRef<HTMLDivElement>(null);
+  const [enabled,setEnabled]=useState(false);
+  const [visible,setVisible]=useState(false);
+  useEffect(()=>{
+    const reduced=matchMedia("(prefers-reduced-motion: reduce)");
+    const mobile=matchMedia("(max-width: 767px)");
+    let supported=false;
+    try { const canvas=document.createElement("canvas"); const gl=canvas.getContext("webgl2") || canvas.getContext("webgl"); supported=!!gl; gl?.getExtension("WEBGL_lose_context")?.loseContext(); } catch { /* static fallback */ }
+    const update=()=>setEnabled(supported && !reduced.matches && !mobile.matches && (navigator.hardwareConcurrency || 8)>4);
+    update(); reduced.addEventListener("change",update); mobile.addEventListener("change",update);
+    const observer=new IntersectionObserver(entries=>setVisible(entries[0].isIntersecting),{rootMargin:"100px"});
+    if(ref.current)observer.observe(ref.current);
+    const onVisibility=()=>{ if(document.hidden)setVisible(false); else if(ref.current){const r=ref.current.getBoundingClientRect();setVisible(r.bottom>0&&r.top<innerHeight);} };
+    document.addEventListener("visibilitychange",onVisibility);
+    return ()=>{observer.disconnect();reduced.removeEventListener("change",update);mobile.removeEventListener("change",update);document.removeEventListener("visibilitychange",onVisibility);};
+  },[]);
+  return <div ref={ref} aria-hidden="true" style={{height:"100%",width:"100%"}}>{enabled && visible ? <SceneBoundary><CanvasScene/></SceneBoundary> : <StaticOrbs/>}</div>;
 }

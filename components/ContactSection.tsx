@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 type ContactInfo = { phone?: string; email?: string; address?: string; hours?: string; mapQuery?: string };
 
 /** Холбоо барих хэсэг — "Бидний тухай" хуудсанд нэгтгэгдсэн. */
-export function ContactSection() {
+export function ContactSection({ id = "contact" }: { id?: string }) {
   const { t, tr } = useI18n();
   const { user } = useAuth();
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
@@ -94,7 +94,7 @@ export function ContactSection() {
   ];
 
   return (
-    <section id="contact" className="section bg-surface-2">
+    <section id={id} className="section bg-surface-2">
       <div className="container-px">
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <h2 className="font-display text-3xl font-semibold text-ink">{t("contact.title")}</h2>
