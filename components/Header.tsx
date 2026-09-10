@@ -11,6 +11,7 @@ import { NotificationBell } from "./NotificationBell";
 import { Logo } from "./Logo";
 import { cx } from "@/lib/format";
 import { NAV_LINKS as links } from "@/lib/nav-links";
+import { AboutNavigation } from "./about/AboutNavigation";
 
 
 export function Header() {
@@ -46,6 +47,8 @@ export function Header() {
   useEffect(() => { fetch("/api/pages", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((d) => { if (Array.isArray(d?.pages)) setCustomPages(d.pages); }).catch(() => {}); }, []);
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
+  if (pathname === "/about") return <AboutNavigation logo={logo} />;
 
   return (
     <header className={cx("sticky top-0 z-40 transition-all duration-300", scrolled ? "glass border-b border-line shadow-sm" : "border-b border-transparent bg-ivory/80 backdrop-blur-sm")}>

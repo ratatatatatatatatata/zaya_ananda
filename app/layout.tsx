@@ -79,7 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Header />
             <main className="flex-1">{children}</main>
             <FooterGate />
-            <div className="h-20 lg:hidden" aria-hidden />
+            <div className="about-layout-spacer h-20 lg:hidden" aria-hidden />
           </div>
           <PromoModal />
           <Interactions />
