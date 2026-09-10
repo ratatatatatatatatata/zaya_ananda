@@ -135,14 +135,12 @@ export default async function JourneyPage({ params }: { params: { slug: string }
               <p className="mt-1.5 text-sm leading-6 text-white/65">Нэг хүний багц үнэ</p>
 
               {j.lead?.name && (
-                <div className="mt-5 flex items-center gap-3.5 border-t border-white/15 pt-5">
-                  <span className="h-20 w-20 shrink-0 overflow-hidden rounded-full bg-white/10">
+                <div className="mt-6">
+                  <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-white/10">
                     <Avatar person={j.lead} size="lg" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-base font-semibold text-white">{j.lead.name}</span>
-                    {j.lead.role && <span className="block truncate text-xs text-white/60">{j.lead.role}</span>}
-                  </span>
+                  </div>
+                  <p className="mt-4 truncate text-base font-semibold text-white">{j.lead.name}</p>
+                  {j.lead.role && <p className="truncate text-xs text-white/60">{j.lead.role}</p>}
                 </div>
               )}
             </div>
