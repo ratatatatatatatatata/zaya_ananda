@@ -56,7 +56,7 @@ export function AdminJourneys() {
 
   const [form, setForm] = useState(EMPTY);
   const [itinerary, setItinerary] = useState<JourneyDay[]>([]);
-  const [destination, setDestination] = useState<Destination>(EMPTY_DESTINATION);
+  const [destinations, setDestinations] = useState<Destination[]>([]);
   const [lead, setLead] = useState<Person>(EMPTY_PERSON);
   const [crew, setCrew] = useState<Person[]>([]);
 
@@ -71,11 +71,11 @@ export function AdminJourneys() {
   useEffect(() => { load(); }, [load]);
 
   function resetForm() {
-    setForm(EMPTY); setItinerary([]); setDestination(EMPTY_DESTINATION); setLead(EMPTY_PERSON); setCrew([]);
+    setForm(EMPTY); setItinerary([]); setDestinations([]); setLead(EMPTY_PERSON); setCrew([]);
     setEditingId(null); setErr(""); setOpen(false);
   }
   function startNew() {
-    setForm(EMPTY); setItinerary([]); setDestination(EMPTY_DESTINATION); setLead(EMPTY_PERSON); setCrew([]);
+    setForm(EMPTY); setItinerary([]); setDestinations([]); setLead(EMPTY_PERSON); setCrew([]);
     setEditingId(null); setErr(""); setOpen(true);
   }
   function startEdit(j: Journey) {
@@ -86,7 +86,7 @@ export function AdminJourneys() {
       prepay: j.prepay ? String(j.prepay) : "",
     });
     setItinerary(j.itinerary && j.itinerary.length ? j.itinerary : []);
-    setDestination(j.destination || EMPTY_DESTINATION);
+    setDestinations(j.destination && j.destination.length ? j.destination : []);
     setLead(j.lead || EMPTY_PERSON);
     setCrew(j.crew || []);
     setEditingId(j.id); setErr(""); setOpen(true);
@@ -103,6 +103,10 @@ export function AdminJourneys() {
   const updDay = (i: number, patch: Partial<JourneyDay>) => setItinerary((ds) => ds.map((d, k) => (k === i ? { ...d, ...patch } : d)));
   const delDay = (i: number) => setItinerary((ds) => ds.filter((_, k) => k !== i));
 
+  const addDestination = () => setDestinations((ds) => [...ds, { ...EMPTY_DESTINATION }]);
+  const updDestination = (i: number, patch: Partial<Destination>) => setDestinations((ds) => ds.map((d, k) => (k === i ? { ...d, ...patch } : d)));
+  const delDestination = (i: number) => setDestinations((ds) => ds.filter((_, k) => k !== i));
+
   const addCrew = () => setCrew((cs) => [...cs, { ...EMPTY_PERSON }]);
   const updCrew = (i: number, patch: Partial<Person>) => setCrew((cs) => cs.map((c, k) => (k === i ? { ...c, ...patch } : c)));
   const delCrew = (i: number) => setCrew((cs) => cs.filter((_, k) => k !== i));
@@ -115,7 +119,7 @@ export function AdminJourneys() {
       ...form,
       prepay: Number(form.prepay) || 0,
       itinerary,
-      destination,
+      destination: destinations,
       lead,
       crew,
     };
@@ -234,21 +238,34 @@ export function AdminJourneys() {
               {itinerary.length === 0 && <p className="text-sm text-muted">Одоогоор өдөр алга. “+ Өдөр нэмэх” дарж эхлүүлнэ үү.</p>}
             </div>
 
-            {/* Очих газрын тухай мэдээлэл — өдрийн хөтөлбөрийн доод талд харагдана */}
+            {/* Очих газрын тухай мэдээлэл — өдрийн хөтөлбөрийн доод талд, олон газар нэмж болно */}
             <div className="mt-4 rounded-xl border border-line bg-surface-3 p-3">
-              <p className="mb-2 text-sm font-semibold text-ink">Очих газрын тухай мэдээлэл <span className="font-normal text-muted">(өдрийн хөтөлбөрийн доод талд харагдана)</span></p>
-              <div className="flex flex-wrap items-center gap-3">
-                {destination.image
-                  ? <div className="relative"><img src={destination.image} alt="" className="h-16 w-24 rounded-lg object-cover" />
-                      <button type="button" onClick={() => setDestination((d) => ({ ...d, image: "" }))} className="absolute -right-2 -top-2 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-bold text-white">✕</button>
-                    </div>
-                  : <input type="file" accept="image/*" className="text-sm" onChange={(e) => pickImage(e, (dd) => setDestination((d) => ({ ...d, image: dd })))} />}
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-sm font-semibold text-ink">Очих газрын тухай мэдээлэл <span className="font-normal text-muted">({destinations.length}) — өдрийн хөтөлбөрийн доод талд харагдана</span></p>
+                <button type="button" onClick={addDestination} className="btn btn-outline btn-sm">+ Газар нэмэх</button>
               </div>
-              <input className="input mt-2" placeholder="Газрын нэр — жишээ: Хөвсгөл нуур" value={destination.title}
-                onChange={(e) => setDestination((d) => ({ ...d, title: e.target.value }))} />
-              <textarea className="textarea mt-2" rows={3} placeholder="Газрын тухай дэлгэрэнгүй тайлбар" value={destination.desc}
-                onChange={(e) => setDestination((d) => ({ ...d, desc: e.target.value }))} />
-              <p className="mt-1 text-xs text-muted">Хоосон орхивол энэ хэсэг аяллын хуудсанд харагдахгүй.</p>
+              <div className="space-y-3">
+                {destinations.map((d, i) => (
+                  <div key={i} className="rounded-xl border border-line bg-surface-1 p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-100 text-xs font-bold text-primary-700">{i + 1}</span>
+                      <button type="button" onClick={() => delDestination(i)} className="text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-3">
+                      {d.image
+                        ? <div className="relative"><img src={d.image} alt="" className="h-16 w-24 rounded-lg object-cover" />
+                            <button type="button" onClick={() => updDestination(i, { image: "" })} className="absolute -right-2 -top-2 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-bold text-white">✕</button>
+                          </div>
+                        : <input type="file" accept="image/*" className="text-sm" onChange={(e) => pickImage(e, (dd) => updDestination(i, { image: dd }))} />}
+                    </div>
+                    <input className="input mt-2" placeholder="Газрын нэр — жишээ: Хөвсгөл нуур" value={d.title}
+                      onChange={(e) => updDestination(i, { title: e.target.value })} />
+                    <textarea className="textarea mt-2" rows={3} placeholder="Газрын тухай дэлгэрэнгүй тайлбар" value={d.desc}
+                      onChange={(e) => updDestination(i, { desc: e.target.value })} />
+                  </div>
+                ))}
+                {destinations.length === 0 && <p className="text-sm text-muted">Одоогоор газар алга. “+ Газар нэмэх” дарж эхлүүлнэ үү.</p>}
+              </div>
             </div>
           </div>
 
