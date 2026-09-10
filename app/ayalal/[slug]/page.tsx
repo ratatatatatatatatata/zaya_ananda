@@ -199,6 +199,20 @@ export default async function JourneyPage({ params }: { params: { slug: string }
             </article>
           ))}
         </div>
+
+        {/* Очих газрын тухай мэдээлэл — хөтөлбөрийн доод талд */}
+        {j.destination && (j.destination.title || j.destination.desc) && (
+          <div className="card mt-8 grid gap-0 overflow-hidden lg:grid-cols-[minmax(0,22rem)_1fr]">
+            <div className="relative aspect-[4/3] w-full overflow-hidden lg:aspect-auto lg:h-full">
+              <JourneyImage src={j.destination.image} scene={j.scene} alt={j.destination.title} className="h-full w-full object-cover" />
+            </div>
+            <div className="p-6 sm:p-8">
+              <p className="eyebrow-line">📍 Очих газар</p>
+              {j.destination.title && <h3 className="mt-3 font-display text-2xl font-semibold text-ink">{j.destination.title}</h3>}
+              {j.destination.desc && <p className="mt-3 leading-relaxed text-muted">{j.destination.desc}</p>}
+            </div>
+          </div>
+        )}
       </div></section>
 
       {/* Хариуцах хүн ба баг */}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { Journey, JourneyDay, Person, Scene } from "@/data/journeys";
+import type { Destination, Journey, JourneyDay, Person, Scene } from "@/data/journeys";
 
 function compressImage(file: File, maxW = 1200, quality = 0.82): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -37,6 +37,7 @@ const SCENES: { key: Scene; label: string }[] = [
 
 const EMPTY_PERSON: Person = { name: "", role: "", info: "", image: "" };
 const EMPTY_DAY: JourneyDay = { label: "", title: "", text: "", bullets: [], image: "", scene: "steppe" };
+const EMPTY_DESTINATION: Destination = { title: "", desc: "", image: "" };
 
 const EMPTY = {
   slug: "", name: "", tagline: "", scene: "steppe" as Scene, image: "",
@@ -55,6 +56,7 @@ export function AdminJourneys() {
 
   const [form, setForm] = useState(EMPTY);
   const [itinerary, setItinerary] = useState<JourneyDay[]>([]);
+  const [destination, setDestination] = useState<Destination>(EMPTY_DESTINATION);
   const [lead, setLead] = useState<Person>(EMPTY_PERSON);
   const [crew, setCrew] = useState<Person[]>([]);
 
@@ -69,11 +71,11 @@ export function AdminJourneys() {
   useEffect(() => { load(); }, [load]);
 
   function resetForm() {
-    setForm(EMPTY); setItinerary([]); setLead(EMPTY_PERSON); setCrew([]);
+    setForm(EMPTY); setItinerary([]); setDestination(EMPTY_DESTINATION); setLead(EMPTY_PERSON); setCrew([]);
     setEditingId(null); setErr(""); setOpen(false);
   }
   function startNew() {
-    setForm(EMPTY); setItinerary([]); setLead(EMPTY_PERSON); setCrew([]);
+    setForm(EMPTY); setItinerary([]); setDestination(EMPTY_DESTINATION); setLead(EMPTY_PERSON); setCrew([]);
     setEditingId(null); setErr(""); setOpen(true);
   }
   function startEdit(j: Journey) {
@@ -84,6 +86,7 @@ export function AdminJourneys() {
       prepay: j.prepay ? String(j.prepay) : "",
     });
     setItinerary(j.itinerary && j.itinerary.length ? j.itinerary : []);
+    setDestination(j.destination || EMPTY_DESTINATION);
     setLead(j.lead || EMPTY_PERSON);
     setCrew(j.crew || []);
     setEditingId(j.id); setErr(""); setOpen(true);
@@ -112,6 +115,7 @@ export function AdminJourneys() {
       ...form,
       prepay: Number(form.prepay) || 0,
       itinerary,
+      destination,
       lead,
       crew,
     };
@@ -228,6 +232,23 @@ export function AdminJourneys() {
                 </div>
               ))}
               {itinerary.length === 0 && <p className="text-sm text-muted">Одоогоор өдөр алга. “+ Өдөр нэмэх” дарж эхлүүлнэ үү.</p>}
+            </div>
+
+            {/* Очих газрын тухай мэдээлэл — өдрийн хөтөлбөрийн доод талд харагдана */}
+            <div className="mt-4 rounded-xl border border-line bg-surface-3 p-3">
+              <p className="mb-2 text-sm font-semibold text-ink">Очих газрын тухай мэдээлэл <span className="font-normal text-muted">(өдрийн хөтөлбөрийн доод талд харагдана)</span></p>
+              <div className="flex flex-wrap items-center gap-3">
+                {destination.image
+                  ? <div className="relative"><img src={destination.image} alt="" className="h-16 w-24 rounded-lg object-cover" />
+                      <button type="button" onClick={() => setDestination((d) => ({ ...d, image: "" }))} className="absolute -right-2 -top-2 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-bold text-white">✕</button>
+                    </div>
+                  : <input type="file" accept="image/*" className="text-sm" onChange={(e) => pickImage(e, (dd) => setDestination((d) => ({ ...d, image: dd })))} />}
+              </div>
+              <input className="input mt-2" placeholder="Газрын нэр — жишээ: Хөвсгөл нуур" value={destination.title}
+                onChange={(e) => setDestination((d) => ({ ...d, title: e.target.value }))} />
+              <textarea className="textarea mt-2" rows={3} placeholder="Газрын тухай дэлгэрэнгүй тайлбар" value={destination.desc}
+                onChange={(e) => setDestination((d) => ({ ...d, desc: e.target.value }))} />
+              <p className="mt-1 text-xs text-muted">Хоосон орхивол энэ хэсэг аяллын хуудсанд харагдахгүй.</p>
             </div>
           </div>
 

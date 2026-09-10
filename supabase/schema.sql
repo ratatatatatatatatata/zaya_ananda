@@ -80,5 +80,15 @@ alter table site_settings add column if not exists service_prepay numeric defaul
 alter table site_settings add column if not exists team jsonb;
 alter table site_settings add column if not exists teachers jsonb;
 alter table site_settings add column if not exists bank jsonb;
+alter table site_settings add column if not exists about_mission text;
+alter table site_settings add column if not exists about_story text;
+alter table site_settings add column if not exists about_stats jsonb;
+alter table site_settings add column if not exists about_values jsonb;
+alter table site_settings add column if not exists about_faqs jsonb;
+alter table site_settings add column if not exists about_gallery jsonb;
+
+-- journeys/journey_bookings/journey_reviews тухайн Supabase төсөлд шууд (энэ файлаас гадуур)
+-- үүсгэгдсэн тул CREATE TABLE энд байхгүй — зөвхөн шинэ баганыг л additive байдлаар нэмнэ.
+alter table journeys add column if not exists destination jsonb;
 
 alter table cms_items add column if not exists link text;

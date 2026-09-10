@@ -33,6 +33,11 @@ function parsePerson(v: any) {
   return { name: str(v?.name), role: str(v?.role), info: str(v?.info), image: v?.image ? String(v.image) : "" };
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseDestination(v: any) {
+  const d = { title: str(v?.title), desc: str(v?.desc), image: v?.image ? String(v.image) : "" };
+  return d.title || d.desc || d.image ? d : undefined;
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseItinerary(raw: any) {
   if (!Array.isArray(raw)) return [];
   return raw
@@ -66,6 +71,7 @@ function parseInput(body: any) {
     price: str(body.price),
     prepay: Number(body.prepay) || 0,
     itinerary: parseItinerary(body.itinerary),
+    destination: parseDestination(body.destination),
     lead: parsePerson(body.lead || {}),
     crew: Array.isArray(body.crew) ? body.crew.map(parsePerson).filter((c: { name: string }) => c.name) : [],
   };

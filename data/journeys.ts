@@ -22,6 +22,13 @@ export type Person = {
   image?: string;
 };
 
+/** Очих газрын тухай мэдээлэл — өдрийн хөтөлбөрийн доод талд харагдана. */
+export type Destination = {
+  title: string;
+  desc: string;
+  image?: string;
+};
+
 export type Journey = {
   id: string;
   slug: string;
@@ -42,6 +49,8 @@ export type Journey = {
   /** Урьдчилгаа төлбөр (₮). 0 бол урьдчилгаа авахгүй. */
   prepay?: number;
   itinerary: JourneyDay[];
+  /** Очих газрын тухай мэдээлэл — өдрийн хөтөлбөрийн доод талд харагдана */
+  destination?: Destination;
   /** Аяллыг хариуцан удирдах хүн */
   lead: Person;
   /** Хамт явах баг */

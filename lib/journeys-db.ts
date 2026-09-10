@@ -207,6 +207,7 @@ function journeyRow(input: Omit<Journey, "id" | "createdAt">): Record<string, un
     price: input.price?.trim() || "",
     prepay: typeof input.prepay === "number" && input.prepay > 0 ? input.prepay : 0,
     itinerary: input.itinerary || [],
+    destination: input.destination || null,
     lead: input.lead || { name: "", role: "", info: "" },
     crew: input.crew || [],
   };
