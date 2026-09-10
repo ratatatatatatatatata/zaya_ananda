@@ -89,3 +89,7 @@ export async function signedDownloadUrl(bucket: string, path: string, expiresIn 
   const data = (await storageReq(`object/sign/${bucket}/${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expiresIn }) })) as { signedURL?: string };
   return fullStorageUrl(data?.signedURL || "");
 }
+
+export async function deleteObjects(bucket: string, paths: string[]): Promise<void> {
+  await storageReq(`object/${bucket}`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prefixes: paths }) });
+}

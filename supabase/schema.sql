@@ -95,3 +95,15 @@ alter table site_settings add column if not exists about_partners jsonb;
 alter table journeys add column if not exists destination jsonb;
 
 alter table cms_items add column if not exists link text;
+
+-- Админы "Зураг, бичлэг" сан — Supabase Storage (lesson-videos bucket) дахь файлуудын жагсаалт
+create table if not exists media_library (
+  id         uuid primary key default gen_random_uuid(),
+  filename   text not null,
+  path       text not null,
+  kind       text not null default 'other',
+  mime       text,
+  size       bigint,
+  created_at timestamptz not null default now()
+);
+create index if not exists media_library_created_idx on media_library(created_at);

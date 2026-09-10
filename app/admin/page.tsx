@@ -15,6 +15,7 @@ import { AdminTeachers } from "@/components/AdminTeachers";
 import { AdminJourney } from "@/components/AdminJourney";
 import { AdminJourneys } from "@/components/AdminJourneys";
 import { AdminZurhai } from "@/components/AdminZurhai";
+import { AdminMedia } from "@/components/AdminMedia";
 import type { Order, PublicUser, ContactMessage } from "@/lib/types";
 
 const nav: { id: string; k: string; label?: string; icon: string }[] = [
@@ -34,6 +35,7 @@ const nav: { id: string; k: string; label?: string; icon: string }[] = [
   { id: "reviews", k: "admin.reviews", icon: "star" },
   { id: "messages", k: "nav.contact", label: "Зурвасууд", icon: "user" },
   { id: "pages", k: "admin.pagesM", label: "Цэс / Шинэ хуудас", icon: "laptop" },
+  { id: "media", k: "admin.mediaM", label: "Зураг, бичлэг", icon: "laptop" },
   { id: "settings", k: "admin.settingsM", label: "Тохиргоо", icon: "sparkles" },
 ];
 
@@ -228,6 +230,7 @@ export default function AdminPage() {
             {tab === "about" && <AdminAbout />}
             {tab === "gift" && <AdminContentManager kind="free" />}
             {tab === "pages" && <AdminPages />}
+            {tab === "media" && <AdminMedia />}
             {tab === "settings" && <AdminSettings />}
             {tab === "messages" && (
               <div className="card overflow-x-auto"><table className="w-full min-w-[680px]">
