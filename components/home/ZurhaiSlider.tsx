@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useI18n } from "@/lib/i18n";
 import { TiltCard } from "@/components/motion/TiltCard";
 import type { Locale } from "@/lib/types";
@@ -49,6 +49,29 @@ export function ZurhaiSlider({ cards, daily, matrix }: {
   const [i, setI] = useState(0);
   const [open, setOpen] = useState(false);
   const hoveringRef = useRef(false);
+  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
+  // Идэвхтэй картын өөрийн өндөр — цонхны бусад (нуугдмал) картын урттай хамааралгүй,
+  // зөвхөн одоо харагдаж буй карт тааруулна. Жагсаалтад орсны дараа тэр даруй хэмжинэ
+  // (useLayoutEffect) — анхны рендерт өндөр "үсрэхээс" сэргийлнэ.
+  const [trackH, setTrackH] = useState<number>();
+
+  useLayoutEffect(() => {
+    const el = slideRefs.current[i];
+    if (el) setTrackH(el.offsetHeight);
+  }, [i, list]);
+
+  useEffect(() => {
+    const el = slideRefs.current[i];
+    if (!el) return;
+    const measure = () => setTrackH(el.offsetHeight);
+    if (typeof ResizeObserver !== "undefined") {
+      const ro = new ResizeObserver(measure);
+      ro.observe(el);
+      return () => ro.disconnect();
+    }
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [i, list]);
 
   const go = (dir: 1 | -1) => {
     setOpen(false);
@@ -96,8 +119,13 @@ export function ZurhaiSlider({ cards, daily, matrix }: {
           ›
         </button>
 
-        {/* Гулсах зурвас */}
+        {/* Гулсах зурвас — өндөр нь зөвхөн идэвхтэй картын агуулгаар тодорхойлогдоно,
+            бусад (нуугдмал) картуудын урттай хамааралгүй, зөөлөн шилжинэ. */}
         <TiltCard max={3} className="block overflow-hidden rounded-[1.75rem] shadow-lift">
+          <div
+            className="overflow-hidden transition-[height] duration-500 ease-out"
+            style={{ height: trackH }}
+          >
           <div
             className="flex transition-transform duration-500 ease-out"
             style={{ transform: `translateX(-${i * 100}%)` }}
@@ -105,8 +133,9 @@ export function ZurhaiSlider({ cards, daily, matrix }: {
             {list.map((card, k) => {
               const t = TONES[k % TONES.length];
               return (
-                <div key={card.title + k} className="w-full shrink-0">
+                <div key={card.title + k} className="w-full shrink-0 self-start">
                   <div
+                    ref={(el) => { slideRefs.current[k] = el; }}
                     className="night relative flex min-h-[16rem] flex-col justify-center overflow-hidden p-8 sm:min-h-[18rem] sm:p-12"
                     style={
                       card.image
@@ -141,6 +170,7 @@ export function ZurhaiSlider({ cards, daily, matrix }: {
                 </div>
               );
             })}
+          </div>
           </div>
         </TiltCard>
 
