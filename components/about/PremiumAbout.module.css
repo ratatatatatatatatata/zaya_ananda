@@ -1,4 +1,5 @@
-.page { --paper:#f5f7fa; --navy:#102735; --ink:#101d26; background:var(--paper); color:var(--ink); font-family:var(--font-sans); }
+.page { --paper:#f5f7fa; --navy:#102735; --ink:#101d26; background:var(--paper); color:var(--ink); font-family:var(--font-sans); overflow-wrap:anywhere; }
+.page :where(article,article>*,.mission>div,.contactForm div) { min-width:0; }
 .page *, .navigation *, .menuDialog *, .bioDialog * { box-sizing:border-box; }
 .page h1,.page h2,.page h3,.bioDialog h2 { font-family:var(--font-sans); color:inherit; font-weight:500; letter-spacing:-.055em; }
 .page h2 { font-size:clamp(32px,4.6vw,72px); line-height:1.15; }
