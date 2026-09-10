@@ -224,7 +224,12 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
       bookingDays: kind === "service" ? bookingDays : undefined,
       bookingStartHour: kind === "service" ? Number(bookingStart) : undefined,
       bookingEndHour: kind === "service" ? Number(bookingEnd) : undefined,
-      lessons: lessons.filter((l) => l.title.trim() && (l.path || (l.url || "").trim())).map((l) => ({ title: l.title.trim(), path: l.path, url: (l.url || "").trim(), quality: l.quality, subtitles: l.subtitles || "" })),
+      // Гарчиггүй ч URL/видео оруулсан мөрийг устгахгүй — гарчиг хоосон бол автоматаар нэрлэнэ
+      // (өмнө нь гарчиггүй бол мөрийг чимээгүй устгадаг байсан тул зөвхөн линк нэмэхэд алга болдог байсан).
+      lessons: lessons.filter((l) => l.path || (l.url || "").trim()).map((l, i) => ({
+        title: l.title.trim() || `Бичлэг ${i + 1}`,
+        path: l.path, url: (l.url || "").trim(), quality: l.quality, subtitles: l.subtitles || "",
+      })),
     };
     try {
       const res = await fetch("/api/admin/content", {

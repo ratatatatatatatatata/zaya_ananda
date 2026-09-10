@@ -32,9 +32,14 @@ const num = (v: unknown) => (v !== undefined && v !== null && v !== "" ? Number(
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseInput(body: any) {
+  // Гарчиггүй ч линк/видео байвал мөрийг хадгална — гарчиг хоосон бол автоматаар нэрлэнэ
+  // (клиент талд ижил зарчмаар аль хэдийн нэр өгдөг тул энд зөвхөн бататгаж байна).
   const lessons = Array.isArray(body.lessons)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ? body.lessons.map((l: any) => ({ title: String(l?.title || "").trim(), path: l?.path ? String(l.path) : "", url: l?.url ? String(l.url) : "", quality: l?.quality ? String(l.quality) : "", subtitles: l?.subtitles ? String(l.subtitles) : "" })).filter((l: { title: string; path: string; url: string }) => l.title && (l.path || l.url))
+    ? body.lessons
+        .map((l: any) => ({ title: String(l?.title || "").trim(), path: l?.path ? String(l.path) : "", url: l?.url ? String(l.url) : "", quality: l?.quality ? String(l.quality) : "", subtitles: l?.subtitles ? String(l.subtitles) : "" }))
+        .filter((l: { title: string; path: string; url: string }) => l.path || l.url)
+        .map((l: { title: string; path: string; url: string; quality: string; subtitles: string }, i: number) => ({ ...l, title: l.title || `Бичлэг ${i + 1}` }))
     : undefined;
   return {
     kind: body.kind,
