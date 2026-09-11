@@ -16,6 +16,7 @@ import { InlineDestinyMatrix } from "./matrix/InlineDestinyMatrix";
 import { HomeAbout } from "./home/HomeAbout";
 import { listJourneysCached } from "@/lib/journeys-db";
 import type { Locale } from "@/lib/types";
+import { SectionBackdrop } from "./home/SectionBackdrop";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
 
@@ -66,8 +67,11 @@ export async function HomeSections() {
   ]);
 
 
+  const serviceArtwork = services.find((item) => /лаа|candle/i.test(item.title) && (item.image || item.images?.[0]));
+  const productArtwork = products.find((item) => item.image || item.images?.[0]);
+
   return (
-    <>
+    <div className="home-catalog">
       {/* Хоёр гол зам — сургалт ба сүнслэг аялал */}
       <PathsHighlight
         courses={courses.map((c) => ({
@@ -80,19 +84,23 @@ export async function HomeSections() {
       />
 
       {/* Зурхай — слайдер. Сонгож дарахад доор нь тухайн тайлал нээгдэнэ. */}
-      <section id="zurhai" className="section scroll-mt-36"><div className="container-px">
+      <section id="zurhai" className="section activity-section scroll-mt-36">
+        <SectionBackdrop src="/poster_night.jpg" centered position="center 35%" />
+        <div className="container-px">
         <ZurhaiSlider cards={settings.zurhaiCards} daily={<MergeToorog />} matrix={<InlineDestinyMatrix />} />
       </div></section>
 
       {/* Энергийн засал */}
-      <section id="services" className="section scroll-mt-36"><div className="container-px">
+      <section id="services" className="section activity-section scroll-mt-36">
+        <SectionBackdrop src={serviceArtwork?.image || serviceArtwork?.images?.[0] || "/video/stream.jpg"} />
+        <div className="container-px">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-2xl">
-            <p className="eyebrow-line"><span>✨</span></p>
+            <p className="eyebrow-line"><span>01 / ҮЙЛЧИЛГЭЭ</span></p>
             <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><T k="nav.services" /></h2>
             <p className="mt-3 leading-relaxed text-muted"><Tr v={D.services} /></p>
           </div>
-          <Link href="/services" className="btn btn-primary btn-md shrink-0">Бүтэн хуудас →</Link>
+          <Link href="/services" className="btn btn-primary btn-md shrink-0">Бүх үйлчилгээ →</Link>
         </div>
         <div aria-hidden className="khas-rule mt-6 opacity-70" />
 
@@ -101,10 +109,12 @@ export async function HomeSections() {
       </div></section>
 
       {/* Сүнслэг аялал — бүртгэлтэй аяллууд */}
-      <section id="ayalal" className="section scroll-mt-36"><div className="container-px">
+      <section id="ayalal" className="section activity-section scroll-mt-36">
+        <SectionBackdrop src={JOURNEYS.find((journey) => journey.image)?.image || "/video/temple.jpg"} />
+        <div className="container-px">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-2xl">
-            <p className="eyebrow-line"><span>🕊</span></p>
+            <p className="eyebrow-line"><span>02 / АЯЛАЛ</span></p>
             <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl"><Tr v={JOURNEY_EYEBROW} /></h2>
             <p className="mt-3 leading-relaxed text-muted"><Tr v={JOURNEY_DESC} /></p>
           </div>
@@ -115,8 +125,10 @@ export async function HomeSections() {
       </div></section>
 
       {/* Энергийн хамгаалалт — эхлээд бүтээгдэхүүн (Энергийн засалтай адилхан гулддаг), доор нь төрсөн огноогоор чулуу тааруулах хэсэг */}
-      <section id="shop" className="section scroll-mt-36 bg-surface-2"><div className="container-px">
-        <SectionZoom eyebrow="🛡" title={<T k="nav.shop" />} desc={<Tr v={D.shop} />} href="/shop">
+      <section id="shop" className="section activity-section scroll-mt-36 bg-surface-2">
+        <SectionBackdrop src={productArtwork?.image || productArtwork?.images?.[0] || "/video/stones.jpg"} />
+        <div className="container-px">
+        <SectionZoom eyebrow="03 / БҮТЭЭГДЭХҮҮН" title={<T k="nav.shop" />} desc={<Tr v={D.shop} />} href="/shop">
           <ProductCoverflow items={products} />
           <div className="mt-12">
             <StoneReading />
@@ -125,8 +137,10 @@ export async function HomeSections() {
       </div></section>
 
       {/* Гэгээн бэлэг */}
-      <section id="gift" className="section scroll-mt-36"><div className="container-px">
-        <SectionZoom eyebrow="🎁" title={<T k="nav.gift" />} desc={<Tr v={D.gift} />} href="/gift">
+      <section id="gift" className="section activity-section scroll-mt-36">
+        <SectionBackdrop src="/video/meditation.jpg" position="center 60%" />
+        <div className="container-px">
+        <SectionZoom eyebrow="04 / НЭЭЛТТЭЙ ХИЧЭЭЛ" title={<T k="nav.gift" />} desc={<Tr v={D.gift} />} href="/gift">
           <GiftCoverflow items={free} />
         </SectionZoom>
       </div></section>
@@ -144,6 +158,6 @@ export async function HomeSections() {
         <HomeAbout />
       </div></section>
 
-    </>
+    </div>
   );
 }

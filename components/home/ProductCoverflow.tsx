@@ -4,7 +4,7 @@ import { Coverflow3D } from "./Coverflow3D";
 import { CmsCard } from "../CmsCard";
 import type { CmsItem } from "@/lib/types";
 
-/** Энергийн хамгаалалтын бүтээгдэхүүн — Энергийн заслын карттай адилхан 3D coverflow систем ашиглана. */
+/** Энергийн хамгаалалтын бүтээгдэхүүн — Энергийн заслын карттай адилхан тэгш байрлалтай гүйлгэх жагсаалт ашиглана. */
 export function ProductCoverflow({ items }: { items: CmsItem[] }) {
   // "Чулуунууд" ангилал доор нь тусдаа (StoneReading) харагддаг тул энд давхардуулахгүй.
   const shown = items.filter((i) => i.category !== "Чулуунууд");
@@ -15,8 +15,8 @@ export function ProductCoverflow({ items }: { items: CmsItem[] }) {
       getKey={(it) => it.id}
       renderItem={(it) => <CmsCard item={it} />}
       cardWidthClassName="w-[18rem] sm:w-[21rem]"
-      cinematic
-      autoPlay
+      flat
+      autoPlay={false}
     />
   );
 }
