@@ -15,7 +15,7 @@ function PathIcon({ kind }: { kind: string }) {
 }
 function BlurHeading({ text }: { text: string }) {
   const reduced = useReducedMotion();
-  return <h1 className="cinema-title" aria-label={text}>{text.split(/\s+/).map((word, i) => <m.span key={`${word}-${i}`} aria-hidden="true" initial={false} whileInView={reduced ? undefined : { filter: ["blur(10px)", "blur(5px)", "blur(0px)"], opacity: [0, .5, 1], y: [30, -5, 0] }} viewport={{ once: true, amount: .1 }} transition={{ duration: .7, times: [0, .5, 1], delay: i * .1, ease: "easeOut" }}>{word}</m.span>)}</h1>;
+  return <h1 id="cinema-home-heading" className="cinema-title" aria-label={text}>{text.split(/\s+/).map((word, i) => <m.span key={`${word}-${i}`} aria-hidden="true" initial={false} whileInView={reduced ? undefined : { filter: ["blur(10px)", "blur(5px)", "blur(0px)"], opacity: [0, .5, 1], y: [30, -5, 0] }} viewport={{ once: true, amount: .1 }} transition={{ duration: .7, times: [0, .5, 1], delay: i * .1, ease: "easeOut" }}>{word}</m.span>)}</h1>;
 }
 
 export function CinematicLanding({ media }: { media?: HeroMedia }) {
@@ -26,14 +26,14 @@ export function CinematicLanding({ media }: { media?: HeroMedia }) {
   return <LazyMotion features={domAnimation}>
     <section className="cinema-hero" aria-labelledby="cinema-home-heading">
       <FadingVideo {...cinematicMedia.hero} src={media?.kind === "video" ? media.url : cinematicMedia.hero.src} image={media?.kind === "image" ? media.url : undefined} hero />
-      <div className="cinema-hero-content" id="cinema-home-heading">
+      <div className="cinema-hero-content">
         <m.a href="/gift" className="cinema-badge liquid-glass" {...entrance(.2)}><span>{english ? "Explore" : "Нээлттэй"}</span>{english ? "A gift for your inner journey" : "Өөрийгөө таних аяллын эхний алхам"}<ArrowUpRight /></m.a>
         <BlurHeading text={`${t("home.heroTitleLine1")} ${t("home.heroTitleLine2")}`} />
         <m.p className="cinema-description" {...entrance(.5)}>{t("home.heroDescription")}</m.p>
         <m.div className="cinema-ctas" {...entrance(.7)}><Link href="/services" className="liquid-glass liquid-glass-strong cinema-primary">{english ? "Explore services" : "Засал сонгох"}<ArrowUpRight /></Link><Link href="/courses" className="cinema-secondary"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m7 4 14 8L7 20Z"/></svg>{t("home.heroStart")}</Link></m.div>
         <m.div className="cinema-highlights" {...entrance(.9)}>
           <Link href="/courses" className="liquid-glass"><PathIcon kind="learn"/><strong>04</strong><span>{english ? "Levels of learning" : "Суралцах дөрвөн түвшин"}<ArrowUpRight /></span></Link>
-          <Link href="/gift" className="liquid-glass"><PathIcon kind="orbit"/><strong>{english ? "Open" : "Нээлттэй"}</strong><span>{english ? "Free lessons to begin" : "Үнэгүй хичээлээр эхлээрэй"}<ArrowUpRight /></span></Link>
+          <Link href="/gift" className="liquid-glass"><PathIcon kind="orbit"/><strong>{english ? "Free" : "Үнэгүй"}</strong><span>{english ? "Free lessons to begin" : "Үнэгүй хичээлээр эхлээрэй"}<ArrowUpRight /></span></Link>
         </m.div>
       </div>
       <m.div className="cinema-explore" {...entrance(1)}><span className="liquid-glass">{english ? "Discover your own path" : "Өөрийн замаа нээгээрэй"}</span><div>{[["/courses","nav.courses"],["/ayalal","nav.journey"],["/shop","nav.shop"],["/gift","nav.gift"]].map(([href,key])=><Link key={href} href={href}>{t(key)}</Link>)}</div><a href="#capabilities" className="cinema-scroll" aria-label="Дараагийн хэсэг">↓</a></m.div>

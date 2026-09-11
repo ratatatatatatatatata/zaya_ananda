@@ -101,7 +101,10 @@ body:has([data-cinematic-theme]) .mobile-dock { margin:0 10px 10px; border:1px s
 .cinema-highlights { display:flex; gap:16px; margin-top:34px; width:min(100%,456px); }
 .cinema-highlights>a { flex:1; min-width:0; padding:21px; border-radius:20px; color:#fff; text-align:left; background-color:#08090c30; }
 .cinema-highlights>a>svg { width:26px; height:26px; display:block; margin-bottom:25px; }
-.cinema-highlights strong { display:block; font-family:var(--cinema-serif); font-weight:400; font-style:italic; font-size:40px; line-height:1.15; letter-spacing:-.035em; }
+.cinema-highlights strong { display:block; white-space:nowrap; font-family:var(--cinema-serif); font-weight:400; font-style:italic; font-size:40px; line-height:1.15; letter-spacing:-.035em; }
+body:has([data-cinematic-theme]) .coverflow-controls { padding-inline:12px; }
+body:has([data-cinematic-theme]) .coverflow-controls>button { flex-shrink:0; }
+body:has([data-cinematic-theme]) .coverflow-controls>div { flex-wrap:wrap; justify-content:center; min-width:0; max-width:260px; }
 .cinema-highlights span { display:flex; align-items:center; justify-content:space-between; gap:6px; font-size:11px; margin-top:8px; color:#fff; }
 .cinema-highlights span svg { width:15px; height:15px; flex-shrink:0; }
 .cinema-explore { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:20px; padding:0 65px 26px; text-align:center; }

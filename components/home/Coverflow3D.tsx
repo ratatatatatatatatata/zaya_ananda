@@ -202,7 +202,7 @@ export function Coverflow3D<T>({
         ))}
       </div>
       {items.length > 1 && cinematic && (
-        <div className="mt-1 flex items-center justify-center gap-4">
+        <div className="coverflow-controls mt-1 flex items-center justify-center gap-4">
           <button type="button" onClick={() => { markInteraction(); prev(); }} aria-label="Өмнөх"
             className="focus-ring grid h-12 w-12 place-items-center rounded-full border border-line bg-surface-1 text-xl text-primary-700 shadow-sm transition hover:-translate-y-0.5 hover:border-primary-400">‹</button>
           <div className="flex items-center gap-2" aria-label={`${activeIndex + 1} / ${items.length}`}>

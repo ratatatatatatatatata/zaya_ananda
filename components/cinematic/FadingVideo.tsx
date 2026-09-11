@@ -13,6 +13,7 @@ export function FadingVideo({ src, poster, image, hero = false }: { src: string;
   const [allowed, setAllowed] = useState(false);
   const [paused, setPaused] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
@@ -46,7 +47,7 @@ export function FadingVideo({ src, poster, image, hero = false }: { src: string;
       if (document.hidden || disposed) return;
       v.play().then(() => { if (!disposed) fadeTo(1); }).catch(() => { if (!disposed) setFailed(true); });
     };
-    const loaded = () => { v.style.opacity = "0"; play(); };
+    const loaded = () => { setReady(true); v.style.opacity = "0"; play(); };
     const timeupdate = () => {
       const remaining = v.duration - v.currentTime;
       if (!fadingOut && remaining > 0 && remaining <= FADE_OUT_LEAD) { fadingOut = true; fadeTo(0); }
@@ -72,7 +73,7 @@ export function FadingVideo({ src, poster, image, hero = false }: { src: string;
   return <div ref={wrap} className={`cinema-backdrop ${hero ? "cinema-backdrop-hero" : ""}`}>
     {/* The supplied frame remains visible while loading, offline or in reduced motion. */}
     <div className="cinema-media" aria-hidden="true">
-      <img src={image || poster} alt="" fetchPriority={hero ? "high" : "auto"} loading={hero ? "eager" : "lazy"} />
+      <img src={image || poster} alt="" fetchPriority={hero ? "high" : "auto"} loading={hero ? "eager" : "lazy"} style={{ opacity: !image && allowed && near && ready && !failed ? 0 : 1 }} />
       {!image && allowed && near && !failed && <video ref={video} src={src} muted playsInline autoPlay={!paused} preload="auto" aria-hidden="true" style={{ opacity: 0 }} onError={() => setFailed(true)} />}
     </div>
     {!image && allowed && !failed && <button type="button" className="cinema-video-toggle liquid-glass" aria-label={paused ? "Дэвсгэр видео тоглуулах" : "Дэвсгэр видео түр зогсоох"} aria-pressed={paused} onClick={() => setPaused(p => !p)}>{paused ? "▷" : "Ⅱ"}</button>}
