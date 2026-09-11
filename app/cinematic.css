@@ -25,6 +25,8 @@ body:has([data-cinematic-theme]) .eyebrow-line { color:rgb(var(--c-muted)); lett
 body:has([data-cinematic-theme]) :is(.khas-rule,.eyebrow-line::before,.eyebrow-line::after) { background:rgb(var(--c-line)); mask-image:none; height:1px; }
 body:has([data-cinematic-theme]) main>.section { border-top:1px solid #dbe4da70; }
 body:has([data-cinematic-theme]) main .section { background-color:#f7f8f4; }
+body:has([data-cinematic-theme]) .section .grid>* { min-width:0; }
+body:has([data-cinematic-theme]) a[href^="mailto:"] { overflow-wrap:anywhere; }
 body:has([data-cinematic-theme]) :is(.input,.textarea) { background:rgb(var(--c-s1)); border-width:1px; color:rgb(var(--c-ink)); }
 body:has([data-cinematic-theme]) .input:focus { border-color:#779f83; box-shadow:0 0 0 3px #477a5a16; }
 body:has([data-cinematic-theme]) [data-cinema-surface] { background:#315e46!important; }
