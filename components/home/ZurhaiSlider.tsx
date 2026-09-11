@@ -136,6 +136,7 @@ export function ZurhaiSlider({ cards, daily, matrix }: {
                 <div key={card.title + k} className="w-full shrink-0 self-start">
                   <div
                     ref={(el) => { slideRefs.current[k] = el; }}
+                    data-cinema-surface={!card.image || undefined}
                     className="night relative flex min-h-[16rem] flex-col justify-center overflow-hidden p-8 sm:min-h-[18rem] sm:p-12"
                     style={
                       card.image

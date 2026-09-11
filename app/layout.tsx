@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./cinematic.css";
+import { VisualTheme } from "@/components/VisualTheme";
 import { Providers } from "@/components/Providers";
 import { Header } from "@/components/Header";
 import { FooterGate } from "@/components/FooterGate";
@@ -74,6 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen">
         <Providers>
+          <VisualTheme />
           <CosmicBackdrop />
           <div className="relative z-10 flex min-h-screen flex-col">
             <Header />
