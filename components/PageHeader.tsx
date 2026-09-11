@@ -8,7 +8,7 @@ import { Atmosphere } from "./motion/Atmosphere";
  *  Гэрлийн тоос, ариун геометрийн цагираг, гэрлийн урсгал, зөөлөн орох хөдөлгөөн. */
 export function PageHeader({ title, desc, crumb }: { title: ReactNode; desc?: ReactNode; crumb?: ReactNode }) {
   return (
-    <section className="night edge-wave relative isolate overflow-hidden bg-[#0C1A17]">
+    <section className="page-header night edge-wave relative isolate overflow-hidden bg-[#0C1A17]">
       {/* Аура туяанууд — ногоон, ягаан, цэнхэр */}
       <div
         aria-hidden

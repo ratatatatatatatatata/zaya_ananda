@@ -18,7 +18,7 @@ export function AuthShell({
   footer?: ReactNode;
 }) {
   return (
-    <section className="night relative isolate overflow-hidden">
+    <section className="cinema-auth night relative isolate overflow-hidden">
       <ShambhalaBg />
 
       <div className="relative z-10 container-px flex min-h-[86vh] items-center justify-center py-16 sm:py-20">
@@ -38,7 +38,7 @@ export function AuthShell({
 
           {/* Шилэн самбар */}
           <div
-            className="rounded-3xl border border-white/15 p-6 shadow-[0_36px_90px_-32px_rgba(0,0,0,0.75)] backdrop-blur-xl sm:p-8"
+            className="cinema-auth-panel rounded-3xl border border-white/15 p-6 shadow-[0_36px_90px_-32px_rgba(0,0,0,0.75)] backdrop-blur-xl sm:p-8"
             style={{ background: "linear-gradient(155deg, rgba(18,32,58,0.78), rgba(24,22,52,0.72))" }}
           >
             {children}

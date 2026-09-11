@@ -7,7 +7,7 @@ import { MouseParallax } from "./MouseParallax";
    жинхэнэ гүн мэдрэмж, 3D сан ашиглалгүйгээр). */
 export function CosmicBackdrop() {
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+    <div aria-hidden className="cosmic-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden">
       {/* soft moving gradient wash */}
       <div className="absolute inset-0 bg-aurora opacity-80" style={{ backgroundSize: "180% 180%" }} />
 

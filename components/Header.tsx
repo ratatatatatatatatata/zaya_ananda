@@ -11,7 +11,6 @@ import { NotificationBell } from "./NotificationBell";
 import { Logo } from "./Logo";
 import { cx } from "@/lib/format";
 import { NAV_LINKS as links } from "@/lib/nav-links";
-import { AboutNavigation } from "./about/AboutNavigation";
 
 
 export function Header() {
@@ -48,14 +47,12 @@ export function Header() {
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
-  if (pathname === "/about") return <AboutNavigation logo={logo} />;
-
   return (
-    <header className={cx("sticky top-0 z-40 transition-all duration-300", scrolled ? "glass border-b border-line shadow-sm" : "border-b border-transparent bg-ivory/80 backdrop-blur-sm")}>
-      <div className="flex h-16 w-full items-center justify-between gap-3 px-4 lg:h-[72px] lg:px-6">
-        <Link href="/" aria-label="Zaya's Ananda" className="shrink-0"><Logo logoSrc={logo} /></Link>
+    <header className={cx("site-header sticky top-0 z-40 transition-all duration-300", scrolled ? "glass border-b border-line shadow-sm" : "border-b border-transparent bg-ivory/80 backdrop-blur-sm")}>
+      <div className="site-header-row flex h-16 w-full items-center justify-between gap-3 px-4 lg:h-[72px] lg:px-6">
+        <Link href="/" aria-label="Zaya's Ananda" className="site-brand shrink-0"><Logo logoSrc={logo} /></Link>
 
-        <nav className="hidden min-w-0 items-center gap-2.5 xl:flex 2xl:gap-4">
+        <nav aria-label="Үндсэн цэс" className="site-nav hidden min-w-0 items-center gap-2.5 xl:flex 2xl:gap-4">
           {links.map((l) => (
             <Link key={l.href} href={l.href}
               className={cx("nav-link relative whitespace-nowrap py-1 text-[13px] 2xl:text-[14.5px]", isActive(l.href) && "text-primary-700 after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:rounded-full after:bg-primary-grad")}>
@@ -70,10 +67,10 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+        <div className="site-actions flex shrink-0 items-center gap-1.5 sm:gap-2">
           <div className="hidden sm:block"><LanguageSwitcher /></div>
           <button onClick={open} className="relative grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-primary-50 hover:text-primary-700" aria-label="Cart">
-            🛒
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M6 7h14l-2 9H8L5 3H2M9 20h.01M17 20h.01" strokeLinecap="round"/></svg>
             {count > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-[20px] place-items-center rounded-full bg-primary px-1 text-[11px] font-bold text-white">{count}</span>}
           </button>
           <NotificationBell />
@@ -112,7 +109,7 @@ export function Header() {
               )}
             </div>
           ) : (
-            <Link href="/login" className="grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-primary-50 hover:text-primary-700" aria-label="Account">👤</Link>
+            <Link href="/login" className="grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-primary-50 hover:text-primary-700" aria-label="Account"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg></Link>
           )}
           <button onClick={() => setMenuOpen((o) => !o)} className="grid h-11 w-11 place-items-center rounded-full text-2xl text-ink/80 transition hover:bg-primary-50 xl:hidden" aria-label={menuOpen ? "Цэс хаах" : "Цэс нээх"} aria-expanded={menuOpen} aria-controls="mobile-navigation">{menuOpen ? "✕" : "☰"}</button>
         </div>
