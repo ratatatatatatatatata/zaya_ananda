@@ -2,6 +2,7 @@ import { Reveal } from "../Reveal";
 import { Tr } from "../T";
 import type { Locale } from "@/lib/types";
 import { LevelCourses, type LevelCourse } from "./LevelCourses";
+import { SectionBackdrop } from "./SectionBackdrop";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
 
@@ -21,7 +22,9 @@ const C = {
 /** Нүүрний гол онцлол — Ариусахуйн үйлийн 4 түвшин ба сүнслэг аяллын товч танилцуулга. */
 export function PathsHighlight({ courses }: { courses: LevelCourse[] }) {
   return (
-    <section className="section relative"><div className="container-px relative">
+    <section className="section activity-section relative">
+      <SectionBackdrop src="/video/meditation.jpg" centered position="center 60%" />
+      <div className="container-px relative">
       <Reveal>
         <div className="mx-auto max-w-3xl text-center">
           <p className="eyebrow-line justify-center"><Tr v={C.eyebrow} /></p>

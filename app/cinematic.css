@@ -185,6 +185,26 @@ body:has([data-cinematic-theme]) .home-catalog .course-level { background:transp
  .discovery-stage { padding:64px 24px; }.discovery-heading h2 { font-size:2rem; line-height:1.2; }.discovery-photo { height:300px; }.discovery-copy h3 { font-size:2.25rem; }.discovery-copy>p:not(.discovery-kicker) { font-size:1rem; }.discovery-link { margin-top:24px; }
  body:has([data-cinematic-theme]) .home-catalog .section { padding-block:64px; }.home-catalog .container-px { padding-inline:24px; }.home-catalog .section h2 { font-size:2rem; }
 }
+/* Activity photographs sit behind existing sections without intercepting controls. */
+.home-catalog .activity-section { position:relative; isolation:isolate; }
+.home-catalog .activity-section>.container-px { position:relative; z-index:1; }
+.activity-backdrop { position:absolute; inset:0 0 auto; height:560px; max-height:100%; overflow:hidden; pointer-events:none; z-index:0; }
+.activity-backdrop img { object-fit:cover; opacity:.65; }
+.activity-backdrop::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg,var(--activity-surface) 0%,transparent 55%),linear-gradient(90deg,var(--activity-surface) 8%,var(--activity-surface) 25%,transparent 100%); }
+.home-catalog .activity-section { --activity-surface:#fff; }
+.home-catalog .activity-section:nth-child(even) { --activity-surface:#f5f8f6; }
+.activity-backdrop-centered::after { background:linear-gradient(0deg,var(--activity-surface) 0%,transparent 85%),linear-gradient(90deg,#fff5,#fffffff0 26%,#fffffff0 74%,#fff5); }
+.home-catalog .activity-section .eyebrow-line { letter-spacing:.16em; font-weight:600; }
+body:has([data-cinematic-theme]) .home-catalog .activity-section .course-level { background:#fffffff0; border-color:#d5e1d9; box-shadow:0 8px 24px #14382c05; transition:border-color .2s,box-shadow .2s; }
+body:has([data-cinematic-theme]) .home-catalog .activity-section .course-level:hover,
+body:has([data-cinematic-theme]) .home-catalog .activity-section .course-level[aria-expanded=true] { background:#fff; border-color:#7e9e8e; box-shadow:0 12px 32px #14382c0d; }
+.home-catalog .activity-section .khas-rule { background:linear-gradient(90deg,#b9cbc0,transparent); }
+@media(max-width:767px) {
+ .activity-backdrop { height:460px; }
+ .activity-backdrop img { opacity:.45; object-position:65% center!important; }
+ .activity-backdrop::after { background:linear-gradient(0deg,var(--activity-surface),transparent 90%),linear-gradient(90deg,#ffffffed 5%,#ffffffb3 65%,#ffffff66); }
+ .activity-backdrop-centered::after { background:linear-gradient(0deg,var(--activity-surface),#ffffffc9 100%); }
+}
 @media(prefers-reduced-motion:reduce) {
  html:has([data-cinematic-theme]) { scroll-behavior:auto; }
  .discovery-panel,.discovery-card img,.discovery-link svg { animation:none!important; transition:none!important; }.discovery-hero-parallax,.discovery-hero-copy { transform:none!important; }
