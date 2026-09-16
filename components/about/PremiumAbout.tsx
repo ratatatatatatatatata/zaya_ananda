@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Logo } from "@/components/Logo";
 import { useEffect, useRef, useState, type ReactNode, type CSSProperties } from "react";
 import { Pentagon } from "./AboutNavigation";
 import styles from "./PremiumAbout.module.css";
@@ -8,6 +9,7 @@ import styles from "./PremiumAbout.module.css";
 type Member = { name: string; image?: string; role?: ReactNode; info?: ReactNode; focus?: number };
 type Props = {
   intro: ReactNode; mission: ReactNode; storyIntro: ReactNode;
+  logo?: string;
   story: { year: string; text: ReactNode }[]; sample: boolean;
   members: Member[]; sampleMembers: boolean;
   programs: { title: ReactNode; text: ReactNode }[];
@@ -110,6 +112,7 @@ export function PremiumAbout(p: Props) {
   return <div className={styles.page} data-premium-about>
     <section className={styles.hero} aria-labelledby="about-title"><div className={`${styles.container} ${styles.heroGrid}`}>
       <div className={styles.heroCopy}><p className={styles.label}><span className={styles.smallDot}/> A SPACE TO RECONNECT</p><h1 id="about-title">Бидний<br/>тухай<span className={styles.titleDot}>.</span></h1><div className={styles.heroIntro}>{p.intro}</div><a className={styles.scrollLink} href="#our-story" aria-label="Манай түүх рүү гүйлгэх"><Pentagon arrow/><span>БИДНИЙГ ТАНИАРАЙ</span></a></div>
+      <div className={styles.heroLogo}><Logo withText={false} logoSrc={p.logo} /></div>
     </div><div className={`${styles.container} ${styles.heroFoot}`}><span>ZAYA’S ANANDA</span><span>УХАМСАР / ТЭНЦВЭР / ХӨГЖИЛ</span><span>ULAANBAATAR, MN</span></div></section>
     <section className={`${styles.container} ${styles.mission}`}><p className={styles.label}>БИДНИЙ ЗОРИЛГО</p><div><h2>Дотоод ертөнцтэйгөө<br/><span>дахин холбогдох орон зай.</span></h2><p>{p.mission}</p><p>{p.storyIntro}</p>{p.media}</div></section>
     <Story items={p.story} sample={p.sample}/>
