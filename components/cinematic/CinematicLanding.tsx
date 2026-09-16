@@ -25,6 +25,5 @@ export function CinematicLanding({ media }: { media?: HeroMedia }) {
         <m.div className="discovery-hero-visual"><m.div className="discovery-hero-parallax" style={reduced ? undefined : { y: imageY }}><FadingVideo src={media?.kind === "video" ? media.url : "/video/meditation.mp4"} poster="/video/meditation.jpg" image={media?.kind === "image" ? media.url : undefined} hero/></m.div><div className="discovery-hero-wash" aria-hidden="true"/><div className="discovery-hero-foot"><span>{lang === "mn" ? "Өөртэйгөө ойртох нэг алхам." : "A little closer to yourself."}</span><a href="#discover" aria-label={lang === "mn" ? "Доош гүйлгэж танилцах" : "Scroll to explore"}>↓</a><span>INNER BALANCE</span></div></m.div>
       </div>
     </section>
-    <div className="home-highlights"><div><strong>04</strong><span>{lang === "mn" ? "Суралцах дөрвөн түвшин" : "Four levels of learning"}</span></div><div><strong>{lang === "mn" ? "Үнэгүй" : "Free"}</strong><Link href="/gift">{lang === "mn" ? "Үнэгүй хичээлээр эхлээрэй" : "Begin with free lessons"} ↗</Link></div></div>
   </LazyMotion>;
 }
