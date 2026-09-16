@@ -28,7 +28,7 @@ export default async function AboutPage() {
   const programs = settings.aboutProgramMilestones?.length ? settings.aboutProgramMilestones : programSteps;
   const contact = settings.contact;
   return <PremiumAbout
-    logo={settings.logo}
+    logo="/brand/zaya-ananda-logo-clean.png"
     intro={settings.aboutBody || <Tr v={siteConfig.description} />}
     mission={settings.aboutMission || <Tr v={aboutContent.mission} />}
     storyIntro={settings.aboutStory || <Tr v={aboutContent.story} />}
