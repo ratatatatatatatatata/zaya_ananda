@@ -17,6 +17,16 @@ const localeText = (v: string | L) => (typeof v === "string" ? v : <Tr v={v} />)
 /** Нүүр хуудасны «Бидний тухай» — Бидний тухай цэсний бүх мэдээллийг нэг дор харуулна. */
 export async function HomeAbout() {
   const settings = await getSettingsCached();
+  // Suppress only observed draft/test copy; retain real future admin edits.
+  const drafts = new Set(["rw45524iuop'", "ewrtuerotipow", "wertjelkl;'", "eruhjl;dl;'", "ewra", "afdasd", "adfasdfas", "asdfasdfasdf"]);
+  const published = (text?: string) => !!text?.trim() && !drafts.has(text.trim()) && !/lorem ipsum/i.test(text);
+  const aboutTitle = published(settings.aboutTitle) ? settings.aboutTitle : "";
+  const aboutBody = published(settings.aboutBody) ? settings.aboutBody : "";
+  const mission = published(settings.aboutMission) ? settings.aboutMission : "";
+  const story = published(settings.aboutStory) ? settings.aboutStory : "";
+  const values = (settings.aboutValues || []).filter(v => published(v.title) && published(v.text));
+  const questions = (settings.aboutFaqs || []).filter(f => published(f.q) && published(f.a));
+  const milestones = (settings.aboutMilestones || []).filter(m => published(m.text) && !/^(3janjfkakldfkavskmm|avhdbfasjdnfvasnlvasnvksdn)/.test(m.text));
 
   // Танилцуулга видео — хадгалалтын замыг гарын үсэгтэй хаяг руу хөрвүүлнэ
   let aboutVideoUrl = "";
@@ -36,55 +46,23 @@ export async function HomeAbout() {
       <AboutFacts />
 
       {/* Админаас оруулсан танилцуулга */}
-      {(settings.aboutTitle || settings.aboutBody || aboutVideoUrl) && (
+      {(aboutTitle || aboutBody || aboutVideoUrl) && (
         <Reveal>
           <div className="panel mx-auto max-w-3xl p-8 sm:p-10">
-            {settings.aboutTitle && (
-              <h3 className="font-display text-2xl font-semibold text-ink sm:text-3xl">{settings.aboutTitle}</h3>
+            {aboutTitle && (
+              <h3 className="font-display text-2xl font-semibold text-ink sm:text-3xl">{aboutTitle}</h3>
             )}
-            {settings.aboutBody && (
-              <div className="mt-4 whitespace-pre-line leading-relaxed text-muted">{settings.aboutBody}</div>
+            {aboutBody && (
+              <div className="mt-4 whitespace-pre-line leading-relaxed text-muted">{aboutBody}</div>
             )}
             {aboutVideoUrl && <video controls playsInline className="mt-6 w-full rounded-2xl bg-black" src={aboutVideoUrl} />}
           </div>
         </Reveal>
       )}
 
-      {/* Эрхэм зорилго ба түүх */}
-      <div className="grid items-center gap-12 lg:grid-cols-2">
-        <Reveal>
-          <p className="eyebrow-line"><T k="about.missionEyebrow" /></p>
-          <h3 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl"><T k="about.missionTitle" /></h3>
-          <p className="mt-4 leading-relaxed text-muted">{settings.aboutMission ? settings.aboutMission : <Tr v={aboutContent.mission} />}</p>
-          <p className="mt-4 leading-relaxed text-muted">{settings.aboutStory ? settings.aboutStory : <Tr v={aboutContent.story} />}</p>
-        </Reveal>
-        <Reveal delay={120}>
-          <div className="grid grid-cols-2 gap-4">
-            {(settings.aboutStats && settings.aboutStats.length > 0 ? settings.aboutStats : aboutContent.stats).map((s, i) => (
-              <div key={i} className="rounded-3xl bg-gradient-to-br from-primary-50 to-accent-50 p-6 text-center">
-                <div className="font-display text-3xl font-semibold text-primary-700">{s.value}</div>
-                <div className="mt-1 text-sm text-muted">{localeText(s.label)}</div>
-              </div>
-            ))}
-          </div>
-        </Reveal>
-      </div>
-
-      {/* Тэмдэглэлт он жилүүд + доор нь зургийн галерей */}
-      <div>
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="eyebrow-line justify-center"><T k="about.milestonesEyebrow" /></p>
-          <h3 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl"><T k="about.milestonesTitle" /></h3>
-        </div>
-        <AboutMilestones
-          milestones={(settings.aboutMilestones && settings.aboutMilestones.length > 0 ? settings.aboutMilestones : aboutContent.milestones).map((m) => ({ year: m.year, text: localeText(m.text) }))}
-        />
-        {settings.aboutGallery && settings.aboutGallery.length > 0 && (
-          <div className="mt-4">
-            <AboutGallery images={settings.aboutGallery} />
-          </div>
-        )}
-      </div>
+      {(mission || story) && <div className="mx-auto max-w-3xl space-y-4 leading-relaxed text-muted">{mission && <p>{mission}</p>}{story && <p className="whitespace-pre-line">{story}</p>}</div>}
+      {milestones.length > 0 && <AboutMilestones milestones={milestones.map(m => ({year:m.year,text:m.text}))}/>}
+      {settings.aboutGallery && settings.aboutGallery.length > 0 && <AboutGallery images={settings.aboutGallery} />}
 
       {/* Үнэт зүйлс */}
       <div>
@@ -93,7 +71,7 @@ export async function HomeAbout() {
           <h3 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl"><T k="about.valuesTitle" /></h3>
         </div>
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {(settings.aboutValues && settings.aboutValues.length > 0 ? settings.aboutValues : aboutContent.values).map((v, i) => (
+          {(values.length ? values : aboutContent.values).map((v, i) => (
             <Reveal key={i} delay={i * 70}>
               <div className="card h-full p-6">
                 <div className="text-3xl">{v.glyph}</div>
@@ -145,7 +123,7 @@ export async function HomeAbout() {
           <h3 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl"><T k="about.faqTitle" /></h3>
         </div>
         <div className="mt-8 space-y-3">
-          {(settings.aboutFaqs && settings.aboutFaqs.length > 0 ? settings.aboutFaqs : faqs).map((f, i) => (
+          {(questions.length ? questions : faqs).map((f, i) => (
             <details key={i} className="group rounded-2xl border border-line bg-surface-1 p-5 [&_summary]:cursor-pointer">
               <summary className="flex items-center justify-between gap-4 font-semibold text-ink marker:content-['']">
                 {localeText(f.q)}

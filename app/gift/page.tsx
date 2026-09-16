@@ -1,7 +1,7 @@
 import { listCmsCached } from "@/lib/repo";
 import { VideoHero } from "@/components/video/VideoHero";
 import { heroMediaFor } from "@/lib/hero-video";
-import { GiftGrid } from "@/components/GiftGrid";
+import { MediaLibrary } from "@/components/home/MediaLibrary";
 import { T } from "@/components/T";
 
 export const revalidate = 300;
@@ -22,7 +22,7 @@ export default async function GiftPage() {
         desc="Үнэгүй нээлттэй хичээлүүд — эхлэхэд тань зориулсан бидний бэлэг. Бүртгэлгүйгээр үзнэ."
       />
       <section className="section"><div className="container-px">
-        <GiftGrid items={items} emptyText="Бэлэг болгон өргөх хичээлүүд удахгүй нэмэгдэнэ. 🎁" />
+        <MediaLibrary items={items} />
       </div></section>
     </>
   );

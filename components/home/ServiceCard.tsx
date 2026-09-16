@@ -11,10 +11,12 @@ function initials(name: string) {
 }
 
 /** Энергийн заслын карт — дэлгэрэнгүй хуудас руу шилжихгүй, энд дээрээ дэлгэгдэж цаг захиална. */
-export function ServiceCard({ item }: { item: CmsItem }) {
+export function ServiceCard({ item, onOpenChange }: { item: CmsItem; onOpenChange?: (open: boolean) => void }) {
   const cover = item.image || item.images?.[0];
   const hasTeacher = Boolean(item.teacherName);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => { onOpenChange?.(open); return () => { if(open) onOpenChange?.(false); }; }, [open, onOpenChange]);
 
   // Нээлттэй үед арын хуудас гүйхийг зогсооно
   useEffect(() => {
