@@ -24,31 +24,24 @@ type Slide = { id: string; title: string; desc: string; image: string; tags: str
 
 export function CategoryExperience({ services, courses, products, journeys }: { services: CmsItem[]; courses: CmsItem[]; products: CmsItem[]; journeys: Journey[] }) {
   const { t } = useI18n();
-  const [selected, setSelected] = useState(0);
-  const tabs = useRef<(HTMLButtonElement | null)[]>([]);
-  useEffect(() => {
-    const fromHash = () => {
-      const hash = location.hash.slice(1);
-      const index = categories.findIndex(c => c.id === hash || (c.id === "courses" && hash === "capabilities"));
-      if (index >= 0) setSelected(index);
-    };
-    fromHash(); window.addEventListener("hashchange", fromHash);
-    return () => window.removeEventListener("hashchange", fromHash);
-  }, []);
-  const category = categories[selected];
   const lists = [services, courses, [], products.filter(p => p.category !== "Чулуунууд")];
-  const slides: Slide[] = selected === 2 ? journeys.map(j => ({ id:j.id, title:j.name, desc:j.summary, image:j.image || category.image, tags:[j.days,j.groupSize,j.tagline].filter(Boolean), href:`/ayalal/${encodeURIComponent(j.slug)}`, journey:j })) : lists[selected].map(item => ({ id:item.id, title:item.title, desc:item.summary || category.desc, image:item.image || item.images?.[0] || category.image, tags:[item.category,item.teacherName,typeof item.price === "number" ? formatMNT(item.price) : ""].filter((v): v is string => !!v), href:`/item/${item.id}`, item }));
-  return <section id="discover" className="experience-section" aria-labelledby="experience-title">
-    {categories.map(c => <span key={c.id} id={c.id} className="experience-anchor" aria-hidden="true"/>)}<span id="capabilities" className="experience-anchor" aria-hidden="true"/>
-    <div className="experience-heading"><p className="discovery-kicker">ӨӨРТӨӨ ЗОРИУЛАХ ЦАГ</p><h2 id="experience-title">Таны аялал. Таны хэмнэл.</h2></div>
-    <div className="experience-tabs" role="tablist" aria-label="Үйл ажиллагааны ангилал">
-      {categories.map((c,i) => <button key={c.id} id={`tab-${c.id}`} ref={el => { tabs.current[i] = el; }} role="tab" aria-selected={i===selected} aria-controls={`panel-${c.id}`} tabIndex={i===selected ? 0 : -1} onClick={() => setSelected(i)} onKeyDown={e => { let next = i; if(e.key === "ArrowRight") next=(i+1)%4; else if(e.key === "ArrowLeft") next=(i+3)%4; else if(e.key === "Home") next=0; else if(e.key === "End") next=3; else return; e.preventDefault(); setSelected(next); tabs.current[next]?.focus(); }}>{t(c.key)}</button>)}
-    </div>
-    <div id={`panel-${category.id}`} role="tabpanel" aria-labelledby={`tab-${category.id}`}>
-      <CategoryCarousel key={category.id} slides={slides} category={category} title={t(category.key)} />
-      {selected === 3 && <div className="experience-stones"><StoneReading /></div>}
-    </div>
-  </section>;
+  return <div id="discover" className="experience-collection">
+    {categories.map((category, categoryIndex) => {
+      const slides: Slide[] = category.id === "ayalal"
+        ? journeys.map(j => ({ id:j.id, title:j.name, desc:j.summary, image:j.image || category.image, tags:[j.days,j.groupSize,j.tagline].filter(Boolean), href:`/ayalal/${encodeURIComponent(j.slug)}`, journey:j }))
+        : lists[categoryIndex].map(item => ({ id:item.id, title:item.title, desc:item.summary || category.desc, image:item.image || item.images?.[0] || category.image, tags:[item.category,item.teacherName,typeof item.price === "number" ? formatMNT(item.price) : ""].filter((v): v is string => !!v), href:`/item/${item.id}`, item }));
+      return <section key={category.id} id={category.id} className="experience-section" aria-labelledby={`experience-${category.id}`}>
+        {category.id === "courses" && <span id="capabilities" className="experience-anchor" aria-hidden="true"/>}
+        <div className="experience-heading">
+          <p className="discovery-kicker">ZAYA’S ANANDA · {String(categoryIndex+1).padStart(2,"0")}</p>
+          <h2 id={`experience-${category.id}`}>{t(category.key)}</h2>
+          <p className="experience-intro">{category.desc}</p>
+        </div>
+        <CategoryCarousel slides={slides} category={category} title={t(category.key)} />
+        {category.id === "shop" && <div className="experience-stones"><StoneReading /></div>}
+      </section>;
+    })}
+  </div>;
 }
 
 function CategoryCarousel({ slides, category, title }: { slides: Slide[]; category: typeof categories[number]; title:string }) {
