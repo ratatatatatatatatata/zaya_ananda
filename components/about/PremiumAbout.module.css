@@ -189,3 +189,9 @@
 @media (prefers-reduced-motion:no-preference) { .heroCopy { animation:entrance .9s both; } .storyText { animation:entrance .5s both; } }
 @keyframes entrance { from {opacity:0; transform:translateY(18px);} to {opacity:1;transform:none;} }
 @media (prefers-reduced-motion:reduce) { .yearTrack,.portrait img,.menuTrigger svg { transition:none; } }
+
+/* “Бидний тухай” hero-ийн баруун талд одоогийн брэндийн логог тогтвортой харуулна. */
+.heroLogo { position:absolute; inset:0; z-index:2; display:grid; place-items:center; pointer-events:none; }
+.heroLogo>span { transform:scale(1.55); padding:18px 24px; border:1px solid #ffffff26; border-radius:28px; background:#102735b8; box-shadow:0 30px 80px #07151f55; backdrop-filter:blur(16px); }
+.heroLogo :global(img),.heroLogo :global(svg) { width:88px!important; height:88px!important; }
+@media (max-width:600px) { .heroLogo>span { transform:scale(1.05); } .heroLogo :global(img),.heroLogo :global(svg) { width:70px!important; height:70px!important; } }
