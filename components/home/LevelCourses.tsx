@@ -70,14 +70,14 @@ export function LevelCourses({ courses }: { courses: LevelCourse[] }) {
           const active = open === l.key;
           const n = byLevel[l.key]?.length ?? 0;
           return (
-            <TiltCard key={l.key} max={8} className="h-full">
+            <TiltCard key={l.key} max={0} className="h-full">
             <button
               type="button"
               onClick={() => setOpen(active ? null : l.key)}
               aria-expanded={active}
               style={{ transitionDelay: active ? "0ms" : idx * 40 + "ms" }}
               className={
-                "glass-lux group relative flex h-full w-full flex-col p-7 text-left transition-transform duration-500 " +
+                "course-level glass-lux group relative flex h-full w-full flex-col p-7 text-left transition-transform duration-500 " +
                 (active ? "ring-2 ring-primary-500 -translate-y-1.5" : "hover:-translate-y-1.5")
               }
             >
@@ -85,8 +85,7 @@ export function LevelCourses({ courses }: { courses: LevelCourse[] }) {
                 style={{ background: "radial-gradient(circle, rgb(var(--c-p400) / 0.2), transparent 70%)", filter: "blur(6px)" }} />
               <div className="relative z-10 flex flex-1 flex-col">
                 <div className="flex items-center gap-3">
-                  <span className="pebble h-12 w-12 rounded-2xl text-2xl">{l.icon}</span>
-                  <span className="font-display text-sm font-bold tracking-[0.2em] text-primary-700">{l.step}</span>
+                  <span className="course-level-number">0{idx + 1}</span>
                   {n > 0 && <span className="ml-auto rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-bold text-primary-700">{n}</span>}
                 </div>
                 <h3 className="mt-4 font-display text-xl font-semibold text-ink">{l.label[lang]}</h3>
@@ -112,7 +111,7 @@ export function LevelCourses({ courses }: { courses: LevelCourse[] }) {
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {open && byLevel[open].map((c) => (
-                <TiltCard key={c.id} max={6} className="h-full">
+                <TiltCard key={c.id} max={0} className="h-full">
                 <Link href={"/item/" + c.id} className="glass-lux group flex h-full flex-col">
                   <div className="aspect-[4/3] w-full overflow-hidden rounded-t-[1.75rem] bg-surface-3">
                     {c.image

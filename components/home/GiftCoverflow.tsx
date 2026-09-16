@@ -79,7 +79,7 @@ function GiftCard({ reel }: { reel: Reel }) {
   );
 }
 
-/** Гэгээн бэлгийн жагсаалт — Энергийн заслын карттай адилхан 3D coverflow систем ашиглана. */
+/** Гэгээн бэлгийн жагсаалт — Энергийн заслын карттай адилхан тэгш байрлалтай гүйлгэх жагсаалт ашиглана. */
 export function GiftCoverflow({ items }: { items: CmsItem[] }) {
   const { tr } = useI18n();
   const reels = collect(items);
@@ -91,10 +91,10 @@ export function GiftCoverflow({ items }: { items: CmsItem[] }) {
       <Coverflow3D
         items={reels}
         getKey={(r) => r.id}
-        renderItem={(r) => <TiltCard max={6} className="h-full"><GiftCard reel={r} /></TiltCard>}
+        renderItem={(r) => <TiltCard max={0} className="h-full"><GiftCard reel={r} /></TiltCard>}
         cardWidthClassName="w-[18rem] sm:w-[21rem]"
-        cinematic
-        autoPlay
+        flat
+        autoPlay={false}
       />
       <div className="mt-2 text-center">
         <Link href="/gift" className="btn btn-outline btn-sm">{tr(MORE)} →</Link>

@@ -1,16 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState, type ReactNode, type CSSProperties } from "react";
-import { PremiumSphereHero } from "@/components/three/PremiumSphereHero";
 import { Logo } from "@/components/Logo";
+import { useEffect, useRef, useState, type ReactNode, type CSSProperties } from "react";
 import { Pentagon } from "./AboutNavigation";
 import styles from "./PremiumAbout.module.css";
 
 type Member = { name: string; image?: string; role?: ReactNode; info?: ReactNode; focus?: number };
 type Props = {
-  logo?: string;
   intro: ReactNode; mission: ReactNode; storyIntro: ReactNode;
+  logo?: string;
   story: { year: string; text: ReactNode }[]; sample: boolean;
   members: Member[]; sampleMembers: boolean;
   programs: { title: ReactNode; text: ReactNode }[];
@@ -77,19 +76,25 @@ function Story({ items, sample }: { items: Props["story"]; sample: boolean }) {
 }
 
 function Team({ members, sample }: { members: Member[]; sample: boolean }) {
-  const [selected, setSelected] = useState<Member | null>(null);
-  const dialog = useRef<HTMLDialogElement>(null);
-  const trigger = useRef<HTMLButtonElement | null>(null);
   return <section id="our-team" className={styles.team}>
-    <div className={styles.container}><p className={styles.label}>02 / OUR PEOPLE</p><h2 className={styles.statement}>Хүн бүрийн дотор<br/>нээх ертөнц бий.<br/><span>Хамтдаа нээцгээе.</span></h2><p className={styles.sectionIntro}>Таны өөрийгөө таних, суралцах аялалд хамт байх хүмүүс.</p>{sample && <p className={styles.sample}>Жишиг багийн картууд · Бодит гишүүдийг админаас нэмнэ</p>}
-      <div className={styles.teamTrack} aria-label="Хамт олон">{members.map((m,i)=><button key={`${m.name}-${i}`} className={styles.teamCard} aria-haspopup="dialog" onClick={e => { trigger.current = e.currentTarget; setSelected(m); dialog.current?.showModal(); }}>
-        <div className={styles.portrait} style={{ "--portrait-hue": `${190+i*28}` } as CSSProperties}>{m.image ? <Image src={m.image} unoptimized fill sizes="(max-width: 768px) 76vw, 300px" alt={m.name} style={{objectFit:"cover",objectPosition:`50% ${m.focus ?? 50}%`}}/> : <><svg viewBox="0 0 300 400" aria-hidden="true"><circle cx={150+(i%2?10:-10)} cy="145" r="52"/><path d="M40 400v-48c0-87 42-139 110-139s110 52 110 139v48"/></svg><span>ЗУРАГ НЭМЭГДЭНЭ</span></>}<span className={styles.cardArrow}>↗</span></div><h3>{m.name}</h3><p>{m.role}</p>
-      </button>)}</div>
+    <div className={styles.container}>
+      <p className={styles.label}>02 / OUR PEOPLE</p>
+      <h2 className={styles.teamTitle}>Багш, хамт олон</h2>
+      <p className={styles.sectionIntro}>Таны өөрийгөө таних, суралцах аялалд хамт байх хүмүүс.</p>
+      {sample && <p className={styles.sample}>Жишиг багийн картууд · Бодит гишүүдийг админаас нэмнэ</p>}
+      <div className={styles.teamGrid} aria-label="Багш, хамт олны танилцуулга">
+        {members.map((member, i) => <article key={`${member.name}-${i}`} className={styles.memberCard}>
+          <div className={styles.memberHeading}>
+            <div className={styles.memberAvatar}>
+              {member.image ? <Image src={member.image} unoptimized fill sizes="80px" alt={member.name} style={{objectFit:"cover", objectPosition:`50% ${member.focus ?? 50}%`}} />
+                : <span aria-hidden="true">{member.name.trim().split(/\s+/).map(part => part[0]).slice(0,2).join("")}</span>}
+            </div>
+            <div><h3>{member.name}</h3>{member.role && <p className={styles.memberRole}>{member.role}</p>}</div>
+          </div>
+          {member.info && <div className={styles.memberInfo}>{member.info}</div>}
+        </article>)}
+      </div>
     </div>
-    <dialog ref={dialog} className={styles.bioDialog} aria-labelledby="about-bio-name" onClose={() => trigger.current?.focus()} onClick={e=>{if(e.target===e.currentTarget)dialog.current?.close();}}>
-      <button autoFocus className={styles.close} aria-label="Намтар хаах" onClick={()=>dialog.current?.close()}>✕</button>
-      {selected && <div className={styles.bioBody}><p className={styles.label}>OUR PEOPLE / ХАМТ ОЛОН</p><h2 id="about-bio-name">{selected.name}</h2><p className={styles.bioRole}>{selected.role}</p><div className={styles.bioInfo}>{selected.info || "Дэлгэрэнгүй танилцуулга удахгүй нэмэгдэнэ."}</div></div>}
-    </dialog>
   </section>;
 }
 
@@ -107,7 +112,7 @@ export function PremiumAbout(p: Props) {
   return <div className={styles.page} data-premium-about>
     <section className={styles.hero} aria-labelledby="about-title"><div className={`${styles.container} ${styles.heroGrid}`}>
       <div className={styles.heroCopy}><p className={styles.label}><span className={styles.smallDot}/> A SPACE TO RECONNECT</p><h1 id="about-title">Бидний<br/>тухай<span className={styles.titleDot}>.</span></h1><div className={styles.heroIntro}>{p.intro}</div><a className={styles.scrollLink} href="#our-story" aria-label="Манай түүх рүү гүйлгэх"><Pentagon arrow/><span>БИДНИЙГ ТАНИАРАЙ</span></a></div>
-      <div className={styles.sculpture}><div aria-hidden="true"><PremiumSphereHero/></div><div className={styles.heroLogo}><Logo logoSrc={p.logo} /></div><span className={styles.sculptureNote}>BALANCE, FROM WITHIN.</span></div>
+      <div className={styles.heroLogo}><Logo withText={false} logoSrc={p.logo} /></div>
     </div><div className={`${styles.container} ${styles.heroFoot}`}><span>ZAYA’S ANANDA</span><span>УХАМСАР / ТЭНЦВЭР / ХӨГЖИЛ</span><span>ULAANBAATAR, MN</span></div></section>
     <section className={`${styles.container} ${styles.mission}`}><p className={styles.label}>БИДНИЙ ЗОРИЛГО</p><div><h2>Дотоод ертөнцтэйгөө<br/><span>дахин холбогдох орон зай.</span></h2><p>{p.mission}</p><p>{p.storyIntro}</p>{p.media}</div></section>
     <Story items={p.story} sample={p.sample}/>

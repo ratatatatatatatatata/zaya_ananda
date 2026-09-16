@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
 
@@ -8,20 +7,12 @@ const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<
 
 const EYEBROW = Lx("Бидний тухай", "About us", "우리 소개", "私たちについて", "关于我们");
 const TITLE = Lx(
-  "Тоо, баримтаар",
-  "In numbers and facts",
+  "Дотоод тэнцвэрийг хүн бүрт хүртээмжтэй болгох",
+  "Making inner balance accessible to everyone",
   "숫자와 사실로",
   "数字とファクトで",
   "用数字与事实说话",
 );
-
-/** Анхаарал татах жижиг баримтууд */
-const FACTS: { value: number; suffix: string; label: Record<Locale, string>; icon: string }[] = [
-  { value: 15, suffix: "+", icon: "🧘", label: Lx("жилийн бясалгалын туршлага", "years of meditation practice", "년의 명상 경험", "年の瞑想経験", "年冥想经验") },
-  { value: 40, suffix: "+", icon: "🕊", label: Lx("удаа ариун газарт бүлэг удирдсан", "group journeys to sacred sites", "회의 성지 순례 인솔", "回の聖地への引率", "次圣地带团") },
-  { value: 108, suffix: "", icon: "🛕", label: Lx("суваргыг нар зөв тойрдог зан үйл", "stupas in the circumambulation ritual", "개의 탑을 도는 의식", "基の仏塔を巡る儀式", "座佛塔的绕行仪式") },
-  { value: 5, suffix: "", icon: "🌍", label: Lx("хэлээр үйлчилгээ авах боломж", "languages you can be served in", "개 언어로 이용 가능", "言語で利用可能", "种语言可选") },
-];
 
 /** Богино сонирхолтой мэдээллүүд */
 const NOTES: { icon: string; text: Record<Locale, string> }[] = [
@@ -67,38 +58,6 @@ const NOTES: { icon: string; text: Record<Locale, string> }[] = [
   },
 ];
 
-/** Тоо 0-оос эхлэн өсөх */
-function Counter({ to, suffix }: { to: number; suffix: string }) {
-  const [n, setN] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const started = useRef(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setN(to); return; }
-
-    const ob = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (!e.isIntersecting || started.current) continue;
-        started.current = true;
-        const t0 = performance.now();
-        const dur = 1100;
-        const tick = (now: number) => {
-          const p = Math.min(1, (now - t0) / dur);
-          setN(Math.round(to * (1 - Math.pow(1 - p, 3))));
-          if (p < 1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-      }
-    }, { threshold: 0.4 });
-    ob.observe(el);
-    return () => ob.disconnect();
-  }, [to]);
-
-  return <span ref={ref}>{n}{suffix}</span>;
-}
-
 /** Нүүр хуудасны «Бидний тухай» — анхаарал татах жижиг баримтууд. */
 export function AboutFacts() {
   const { tr, lang } = useI18n();
@@ -108,19 +67,6 @@ export function AboutFacts() {
       <div className="mx-auto max-w-2xl text-center">
         <p className="eyebrow-line justify-center">{tr(EYEBROW)}</p>
         <h2 className="mt-4 font-display text-3xl font-semibold text-ink sm:text-4xl">{tr(TITLE)}</h2>
-      </div>
-
-      {/* Тоон баримтууд */}
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {FACTS.map((f) => (
-          <div key={f.icon} className="panel p-6 text-center">
-            <span className="text-3xl">{f.icon}</span>
-            <p className="mt-3 font-display text-4xl font-semibold text-primary-700">
-              <Counter to={f.value} suffix={f.suffix} />
-            </p>
-            <p className="mt-2 text-[0.95rem] leading-relaxed text-muted">{f.label[lang]}</p>
-          </div>
-        ))}
       </div>
 
       {/* Сонирхолтой тэмдэглэлүүд */}
