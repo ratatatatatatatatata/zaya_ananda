@@ -257,3 +257,5 @@ html:has([data-cinematic-theme]) { scroll-padding-top:88px; }
 .experience-copy h3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
 .experience-slide { min-height:560px; }.experience-related .glass-lux h3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }.experience-related .glass-lux p { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
 @media(max-width:767px) { .experience-slide { min-height:0; }.experience-copy { min-height:420px; } }
+.experience-copy .btn,.episode-feature-copy .btn { padding:13px 24px; }
+body:has([data-cinematic-theme]) .episode-feature-copy h4 { color:#f4f5ec; }
