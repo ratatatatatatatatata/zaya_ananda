@@ -260,3 +260,45 @@ html:has([data-cinematic-theme]) { scroll-padding-top:88px; }
 @media(max-width:767px) { .experience-slide { min-height:0; }.experience-copy { min-height:420px; } }
 .experience-copy .btn,.episode-feature-copy .btn { padding:13px 24px; }
 body:has([data-cinematic-theme]) .episode-feature-copy h4 { color:#f4f5ec; }
+
+/* Independent scroll stories: native page scrolling controls each category. */
+.category-scroll-story .experience-slide { animation:none; }
+.experience-image-motion { position:absolute; inset:0; }
+.category-scroll-story[data-scroll-mode=false] .experience-window { display:grid; gap:24px; overflow:visible; background:transparent; }
+.category-scroll-story[data-scroll-mode=false] .experience-slide { overflow:hidden; border-radius:24px; background:#fafbf6; }
+.category-scroll-story[data-scroll-mode=true] .experience-scroll-track { height:calc(min(650px, 100svh - 190px) + 100px + var(--experience-steps) * 72svh); position:relative; }
+.category-scroll-story[data-scroll-mode=true] .experience-scroll-stage { position:sticky; top:88px; }
+.category-scroll-story[data-scroll-mode=true] .experience-window { height:min(650px, calc(100svh - 190px)); position:relative; }
+.category-scroll-story[data-scroll-mode=true] .experience-slide { position:absolute; inset:0; height:100%; min-height:0; }
+.category-scroll-story[data-scroll-mode=true] .experience-image { min-height:0; }
+.experience-scroll-meta { display:flex; align-items:center; justify-content:space-between; gap:16px; height:40px; color:#49654e; font-size:.85rem; }
+.experience-scroll-meta>span:first-child { font-weight:600; }
+.experience-scroll-controls { display:flex; align-items:center; gap:24px; height:60px; color:#476149; font-size:.85rem; }
+.experience-scroll-count { font-variant-numeric:tabular-nums; flex-shrink:0; }
+.experience-scroll-progress { height:2px; background:#cbd7c4; flex:1; overflow:hidden; }
+.experience-scroll-progress>div { height:100%; width:100%; background:#315e46; transform-origin:left; }
+.experience-scroll-controls>a { flex-shrink:0; }
+.category-scroll-story .experience-related { scroll-margin-top:100px; margin-top:32px; }
+@media(min-width:768px) and (max-height:850px) {
+ .category-scroll-story[data-scroll-mode=true] .experience-copy { padding:28px; }
+ .category-scroll-story[data-scroll-mode=true] .experience-copy h3 { font-size:2rem; margin:14px 0; }
+ .category-scroll-story[data-scroll-mode=true] .experience-description { -webkit-line-clamp:3; }
+ .category-scroll-story[data-scroll-mode=true] .experience-tags { margin:14px 0; }
+}
+@media(max-width:767px) {
+ .category-scroll-story[data-scroll-mode=true] .experience-scroll-stage { top:76px; }
+ .category-scroll-story[data-scroll-mode=true] .experience-scroll-track { height:calc(100svh - 160px + var(--experience-steps) * 72svh); }
+ .category-scroll-story[data-scroll-mode=true] .experience-window { height:calc(100svh - 250px); }
+ .category-scroll-story[data-scroll-mode=true] .experience-slide { grid-template-rows:34% 66%; }
+ .category-scroll-story[data-scroll-mode=true] .experience-image { height:100%; }
+ .category-scroll-story[data-scroll-mode=true] .experience-image>span { left:16px; bottom:12px; padding:6px 12px; font-size:.75rem; }
+ .category-scroll-story[data-scroll-mode=true] .experience-copy { min-height:0; padding:16px 20px; }
+ .category-scroll-story[data-scroll-mode=true] .experience-copy h3 { font-size:1.4rem; margin:8px 0; -webkit-line-clamp:2; }
+ .category-scroll-story[data-scroll-mode=true] .experience-copy .discovery-kicker { font-size:.6rem; }
+ .category-scroll-story[data-scroll-mode=true] .experience-description { font-size:.875rem; line-height:1.5; -webkit-line-clamp:2; }
+ .category-scroll-story[data-scroll-mode=true] .experience-tags { margin:8px 0; gap:4px; max-height:30px; overflow:hidden; }
+ .category-scroll-story[data-scroll-mode=true] .experience-tags span { font-size:.75rem; padding:4px 8px; }
+ .category-scroll-story[data-scroll-mode=true] .experience-copy .btn { min-height:40px; padding:9px 16px; font-size:.875rem; }
+ .experience-scroll-meta { height:36px; font-size:.7rem; gap:8px; }
+ .experience-scroll-controls { height:54px; gap:16px; font-size:.75rem; }
+}
