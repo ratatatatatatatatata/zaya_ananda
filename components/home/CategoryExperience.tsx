@@ -4,9 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { motion, useMotionValue, useReducedMotion } from "framer-motion";
-import { ServiceCard } from "./ServiceCard";
-import { CmsCard } from "../CmsCard";
-import { JourneyCard } from "./JourneyCoverflow";
 import { StoneReading } from "../StoneReading";
 import { useI18n } from "@/lib/i18n";
 import { formatMNT } from "@/lib/format";
@@ -118,11 +115,10 @@ function CategoryScrollStory({ slides, category, title }: { slides: Slide[]; cat
         {scrollMode && <div className="experience-scroll-controls">
           <span className="experience-scroll-count">{String(index+1).padStart(2,"0")} / {String(list.length).padStart(2,"0")}</span>
           <div className="experience-scroll-progress" aria-hidden="true"><motion.div style={{scaleX:progress}} /></div>
-          <Link href={`#${category.id}-browse`}>Бүгдийг үзэх ↗</Link>
+          <Link href={category.href}>Бүгдийг үзэх ↗</Link>
         </div>}
       </div>
     </div>
-    {slides.length>0 && <div id={`${category.id}-browse`} className="experience-related">{slides.slice(0,3).map(slide => <div key={slide.id}>{slide.journey ? <JourneyCard j={slide.journey}/> : slide.item?.kind === "service" ? <ServiceCard item={slide.item}/> : slide.item ? <CmsCard item={slide.item}/> : null}</div>)}</div>}
     <div className="experience-browse"><Link href={category.href}>Бүгдийг үзэх <span aria-hidden>→</span></Link></div>
   </div>;
 }
