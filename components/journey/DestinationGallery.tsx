@@ -29,13 +29,14 @@ export function DestinationGallery({ places, scene }: { places: Destination[]; s
     const element = dialog.current;
     if (!place || !element) return;
     const overflow = document.body.style.overflow;
+    const ownsScrollLock = overflow !== "hidden";
     const scroll = { left: window.scrollX, top: window.scrollY, behavior: "instant" as ScrollBehavior };
     element.showModal();
-    document.body.style.overflow = "hidden";
+    if (ownsScrollLock) document.body.style.overflow = "hidden";
     window.scrollTo(scroll);
     return () => {
       element.close();
-      document.body.style.overflow = overflow;
+      if (ownsScrollLock) document.body.style.overflow = overflow;
       trigger.current?.focus({ preventScroll: true });
       window.scrollTo(scroll);
     };
@@ -61,7 +62,7 @@ export function DestinationGallery({ places, scene }: { places: Destination[]; s
       </button>)}
     </div>
     <dialog id={dialogId} ref={dialog} className={styles.dialog} aria-labelledby={titleId}
-      onCancel={event => { event.preventDefault(); close(); }}
+      onCancel={event => { event.preventDefault(); event.stopPropagation(); close(); }}
       onClick={event => { if (event.target === event.currentTarget) close(); }}>
       {place && <div className={styles.detail}>
         <button type="button" className={styles.close} autoFocus onClick={close} aria-label={tl("Дэлгэрэнгүйг хаах")}>✕</button>
