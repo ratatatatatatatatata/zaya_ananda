@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Reveal } from "../Reveal";
 import { T, Tr } from "../T";
 import { AboutFacts } from "./AboutFacts";
@@ -132,9 +131,6 @@ export async function HomeAbout() {
               <p className="mt-3 leading-relaxed text-muted">{localeText(f.a)}</p>
             </details>
           ))}
-        </div>
-        <div className="mt-8 text-center">
-          <Link href="/about" className="btn btn-outline btn-md">Бидний тухай бүтэн хуудас →</Link>
         </div>
       </div>
 

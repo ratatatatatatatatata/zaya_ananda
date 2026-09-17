@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { HomeDetailLink as Link } from "@/components/home/HomeDetails";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { motion, useMotionValue, useReducedMotion } from "framer-motion";
 import { StoneReading } from "../StoneReading";

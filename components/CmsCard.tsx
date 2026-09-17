@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { HomeDetailLink as Link } from "@/components/home/HomeDetails";
 import { formatMNT } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 import { locText } from "@/lib/cms-i18n";

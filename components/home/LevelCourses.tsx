@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
+import { HomeDetailLink as Link } from "@/components/home/HomeDetails";
 import { useI18n } from "@/lib/i18n";
 import { COURSE_LEVELS } from "@/data/cms-taxonomy";
 import { TiltCard } from "@/components/motion/TiltCard";

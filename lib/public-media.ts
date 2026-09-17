@@ -1,7 +1,15 @@
 import { embedSrc, youtubeThumb } from "./video-embed";
 import type { CmsItem } from "./types";
 
-export type PublicEpisode = { id:string; title:string; url:string; poster:string; kind:"reel"|"podcast" };
+export type GiftCategory = "podcast" | "meditation" | "advice";
+export function giftCategory(item: Pick<CmsItem, "title" | "category">): GiftCategory {
+  const text = `${item.category || ""} ${item.title}`;
+  if (/podcast|подкаст|season\s*\d|episode\s*\d/i.test(text)) return "podcast";
+  if (/бясалгал|дасгал|meditation|exercise|practice/i.test(item.category || item.title)) return "meditation";
+  return "advice";
+}
+
+export type PublicEpisode = { id:string; title:string; url:string; poster:string; kind:"reel"|"podcast"; category:GiftCategory };
 /** Only public media records are passed here; paid course lessons are never included. */
 export function collectPublicMedia(items:CmsItem[]):PublicEpisode[] {
   const seen = new Set<string>();
@@ -18,7 +26,7 @@ export function collectPublicMedia(items:CmsItem[]):PublicEpisode[] {
       seen.add(key);
       const title=source.title || item.title;
       const podcast=/podcast|подкаст|season\s*\d|episode\s*\d/i.test(`${title} ${item.title} ${item.category || ""}`);
-      videos.push({id:`${item.id}-${videos.length}`,title,url:source.url,poster:item.image || item.images?.[0] || (embed.youtubeId ? youtubeThumb(embed.youtubeId) : "/video/meditation.jpg"),kind:podcast?"podcast":"reel"});
+      videos.push({id:`${item.id}-${videos.length}`,title,url:source.url,poster:item.image || item.images?.[0] || (embed.youtubeId ? youtubeThumb(embed.youtubeId) : "/video/meditation.jpg"),kind:podcast?"podcast":"reel",category:podcast ? "podcast" : giftCategory(item)});
     }
   }
   return videos;

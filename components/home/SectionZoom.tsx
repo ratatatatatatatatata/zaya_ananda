@@ -12,7 +12,7 @@ export function SectionZoom({
   eyebrow: string;
   title: ReactNode;
   desc: ReactNode;
-  href: string;
+  href?: string;
   children: ReactNode;
 }) {
   return (
@@ -23,7 +23,7 @@ export function SectionZoom({
           <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl">{title}</h2>
           <p className="mt-3 leading-relaxed text-muted">{desc}</p>
         </div>
-        <Link href={href} className="btn btn-primary btn-md shrink-0">Бүтэн хуудас →</Link>
+        {href && <Link href={href} className="btn btn-primary btn-md shrink-0">Бүтэн хуудас →</Link>}
       </div>
 
       <div aria-hidden className="khas-rule mt-6 opacity-70" />

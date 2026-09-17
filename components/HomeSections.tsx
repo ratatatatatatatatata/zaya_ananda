@@ -1,6 +1,7 @@
 import { listCmsCached, getSettingsCached } from "@/lib/repo";
 import { heroMediaFor } from "@/lib/hero-video";
 import { GiftOverview } from "./home/GiftOverview";
+import { HomeDetails } from "./home/HomeDetails";
 import { CategoryExperience } from "./home/CategoryExperience";
 import { T, Tr } from "./T";
 import { PathsHighlight } from "./home/PathsHighlight";
@@ -28,16 +29,17 @@ const D = {
 
 /** Нүүр хуудас — хэсэг бүр товч мэдээлэл, шууд орох товчтой. */
 export async function HomeSections() {
-  const [services, courses, products, settings, bandMedia, JOURNEYS] = await Promise.all([
+  const [services, courses, products, settings, bandMedia, JOURNEYS, free, resources] = await Promise.all([
     listCmsCached("service"), listCmsCached("course"),
     listCmsCached("product"),
     getSettingsCached(), heroMediaFor("band"),
     listJourneysCached().catch(() => []),
+    listCmsCached("free"), listCmsCached("resource"),
   ]);
 
 
   return (
-    <div className="home-catalog">
+    <HomeDetails items={[...services, ...courses, ...products]} journeys={JOURNEYS}><div className="home-catalog">
       {/* Хоёр гол зам — сургалт ба сүнслэг аялал */}
       <PathsHighlight
         courses={courses.map((c) => ({
@@ -62,8 +64,8 @@ export async function HomeSections() {
       <section id="gift" className="section activity-section scroll-mt-36">
         <SectionBackdrop src="/video/meditation.jpg" position="center 60%" />
         <div className="container-px">
-        <SectionZoom eyebrow="04 / НЭЭЛТТЭЙ ХИЧЭЭЛ" title={<T k="nav.gift" />} desc={<Tr v={D.gift} />} href="/gift">
-          <GiftOverview />
+        <SectionZoom eyebrow="04 / НЭЭЛТТЭЙ ХИЧЭЭЛ" title={<T k="nav.gift" />} desc={<Tr v={D.gift} />}>
+          <GiftOverview items={[...free, ...resources]} />
         </SectionZoom>
       </div></section>
 
@@ -72,7 +74,7 @@ export async function HomeSections() {
         media={bandMedia}
         quote="Ойн гүн дэх сүм шиг — дотоод ертөнц тань чимээгүй байдал, хүндэтгэлээр нээгддэг."
         author="Zaya's Ananda"
-        cta={{ href: "/about", label: "Бидний тухай" }}
+        cta={{ href: "#about", label: "Бидний тухай" }}
       />
 
       {/* Бидний тухай — ишлэлийн зурвасын дараа, бүх мэдээллээрээ */}
@@ -80,6 +82,6 @@ export async function HomeSections() {
         <HomeAbout />
       </div></section>
 
-    </div>
+    </div></HomeDetails>
   );
 }
