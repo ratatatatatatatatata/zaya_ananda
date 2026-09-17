@@ -216,7 +216,7 @@ export default async function JourneyPage({ params }: { params: { slug: string }
       {j.destination && j.destination.length > 0 && (
         <section id="gazar" className="section scroll-mt-32"><div className="container-px">
           <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Очих газрууд</h2>
-          <p className="mt-2 max-w-2xl text-muted">Зураг дээр дарж тухайн газрын дэлгэрэнгүй мэдээллийг үзээрэй.</p>
+          <p className="mt-2 max-w-2xl text-muted">Зураг дээр курсороо аваачих эсвэл дарж дэлгэрэнгүй мэдээллийг томоор үзээрэй.</p>
           <DestinationGallery places={j.destination} scene={j.scene} />
         </div></section>
       )}
