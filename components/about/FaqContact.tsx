@@ -19,12 +19,17 @@ export function FaqContact({ questions, mapQuery }: { questions: { q: string | L
       </div>
     </section>
     <section className={styles.contact} aria-label="Зурвас илгээх">
-      <iframe title="Zaya’s Ananda — байршил" src={mapUrl + "&z=17&output=embed"} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
       <div className={styles.form}>
         <h3 className={styles.heading}>Зурвас илгээх</h3>
         <ContactForm />
       </div>
-      <a className={styles.mapLink} href={mapUrl} target="_blank" rel="noreferrer">Газрын зураг дээр нээх ↗</a>
+    </section>
+    <section className={styles.map} aria-label="Байршил">
+      <div className={styles.mapHeading}>
+        <h3>Байршил</h3>
+        <a className={styles.mapLink} href={mapUrl} target="_blank" rel="noreferrer">Газрын зураг дээр нээх ↗</a>
+      </div>
+      <iframe title="Zaya’s Ananda — байршил" src={mapUrl + "&z=17&output=embed"} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
     </section>
   </div>;
 }
