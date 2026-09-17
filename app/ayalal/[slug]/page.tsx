@@ -284,9 +284,9 @@ export default async function JourneyPage({ params }: { params: { slug: string }
       </div></section>
 
       {/* Түгээмэл асуултууд */}
-      <section id="faq" className="section scroll-mt-32 bg-surface-2"><div className="container-px max-w-3xl">
+      <section id="faq" className="section scroll-mt-32 bg-surface-2"><div className="container-px">
         <h2 className="text-center font-display text-3xl font-semibold text-ink sm:text-4xl">Түгээмэл асуултууд</h2>
-        <div className="mt-8 space-y-3">
+        <div className="mt-8 grid items-start gap-4 lg:grid-cols-2">
           {JOURNEY_FAQ.map((f) => (
             <details key={f.q} className="group rounded-2xl border border-line bg-surface-1 p-5 [&_summary]:cursor-pointer">
               <summary className="flex items-center justify-between gap-4 font-semibold text-ink marker:content-['']">

@@ -109,7 +109,7 @@ export function LevelCourses({ courses }: { courses: LevelCourse[] }) {
           {open && (byLevel[open]?.length ?? 0) === 0 ? (
             <p className="rounded-2xl border border-dashed border-line bg-surface-1 px-5 py-10 text-center text-muted">{tr(EMPTY)}</p>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="adaptive-cards">
               {open && byLevel[open].map((c) => (
                 <TiltCard key={c.id} max={0} className="h-full">
                 <Link href={"/item/" + c.id} className="glass-lux group flex h-full flex-col">

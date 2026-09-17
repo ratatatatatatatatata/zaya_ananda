@@ -302,3 +302,11 @@ body:has([data-cinematic-theme]) .episode-feature-copy h4 { color:#f4f5ec; }
  .experience-scroll-meta { height:36px; font-size:.7rem; gap:8px; }
  .experience-scroll-controls { height:54px; gap:16px; font-size:.75rem; }
 }
+
+/* Use the available viewport consistently across the homepage sections. */
+body:has([data-cinematic-theme]) .site-header-row { max-width:none; padding-inline:var(--page-gutter); }
+.discovery-hero-copy { max-width:none; padding-inline:var(--page-gutter); }
+.discovery-overview,.experience-section { padding-inline:var(--page-gutter); }
+.discovery-stage { max-width:none; padding-inline:var(--page-gutter); }
+.home-catalog .container-px { max-width:none; padding-inline:var(--page-gutter); }
+.category-carousel,.experience-stones { max-width:none; width:100%; }

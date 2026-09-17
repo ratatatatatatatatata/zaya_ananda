@@ -79,7 +79,7 @@ export function GiftGrid({ items, emptyText }: { items: CmsItem[]; emptyText: st
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="adaptive-cards">
       {items.map((item) => {
         const videos = allVideos(item);
         return (

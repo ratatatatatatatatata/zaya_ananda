@@ -33,7 +33,7 @@ export default async function ShopPage() {
           products={
             items.length === 0
               ? <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-14 text-center text-muted">Одоохондоо бүтээгдэхүүн нэмэгдээгүй байна.</p>
-              : <Stagger className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{items.map((i) => <TiltCard key={i.id} className="h-full"><CmsCard item={i} /></TiltCard>)}</Stagger>
+              : <Stagger className="adaptive-cards">{items.map((i) => <TiltCard key={i.id} className="h-full"><CmsCard item={i} /></TiltCard>)}</Stagger>
           }
           stones={<StoneReading />}
         />

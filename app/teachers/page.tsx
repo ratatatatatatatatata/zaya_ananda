@@ -25,7 +25,7 @@ export default async function TeachersPage() {
             Багш нарын мэдээлэл удахгүй нэмэгдэнэ.
           </p>
         ) : (
-          <Stagger className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" step={110}>
+          <Stagger className="adaptive-cards" step={110}>
             {teachers.map((t) => (
               <TiltCard key={t.name} className="h-full" max={4}><Link href={"/teachers/" + slugOf(t.name)}
                 className="panel group relative flex flex-col">

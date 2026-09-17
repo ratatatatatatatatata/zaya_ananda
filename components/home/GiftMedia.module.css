@@ -7,7 +7,7 @@
 .sections { display:grid; grid-template-columns:minmax(0,1fr); gap:72px; }.sections > section { min-width:0; }.sections > section + section { padding-top:48px; border-top:1px solid #d5dfcc; }
 
 /* Compact layout for the Gift menu's stacked categories. */
-.sections { max-width:1040px; margin-inline:auto; gap:48px; }
+.sections { width:100%; max-width:none; margin-inline:auto; gap:48px; }
 .sections > section + section { padding-top:32px; }
 .sections .heading { margin-bottom:18px; }
 .sections .heading h3 { font-size:clamp(1.35rem,2.4vw,1.8rem); }

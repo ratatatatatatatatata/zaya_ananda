@@ -24,7 +24,7 @@ export default async function CustomPage({ params }: { params: { id: string } })
         crumb={<CmsText mn={page.navLabel || page.title} i18n={page.i18n} field="navLabel" />}
       />
       <section className="section">
-        <div className="container-px max-w-4xl">
+        <div className="container-px">
           {page.image && <img src={page.image} alt="" className="mb-8 max-h-[520px] w-full rounded-3xl object-cover" />}
           {videoUrl && (
             <video controls playsInline className="mb-8 w-full rounded-3xl bg-black" src={videoUrl} />

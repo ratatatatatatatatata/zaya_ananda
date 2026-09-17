@@ -6,6 +6,7 @@
 @tailwind utilities;
 
 :root {
+  --page-gutter: clamp(16px, 2.5vw, 48px);
   --font-sans: "Manrope", "Noto Sans KR", "Noto Sans JP", "Noto Sans SC", system-ui, -apple-system, sans-serif;
   /* Lora — кирилл дэмждэг цорын ганц display фонт. Instrument Serif кирилл үсэггүй
      тул монгол текстэд ашиглахгүй (латин гарчигт л зөвшөөрнө). */
@@ -85,7 +86,9 @@ select option:checked { background-color: #16AFA4; color: #ffffff; }
 }
 
 @layer components {
-  .container-px { @apply mx-auto w-full max-w-[1240px] px-5 lg:px-8; }
+  .container-px { @apply mx-auto w-full; max-width:none; padding-inline:var(--page-gutter); }
+  .adaptive-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); gap:clamp(16px,1.5vw,28px); }
+  .adaptive-cards > * { min-width:0; }
 
   .btn {
     @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-semibold transition-all duration-200
@@ -385,3 +388,7 @@ select option:checked { background-color: #16AFA4; color: #ffffff; }
 @media (prefers-reduced-motion: reduce) {
   .float-token, .orbit-slow { animation: none !important; }
 }
+
+/* Shared page gutters track the viewport without a fixed desktop width. */
+.site-header-row { max-width:none; padding-inline:var(--page-gutter); }
+main { min-width:0; }

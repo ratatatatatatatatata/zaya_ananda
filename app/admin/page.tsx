@@ -142,7 +142,7 @@ export default function AdminPage() {
           <Link href="/" className="btn btn-outline btn-sm">{t("admin.backSite")}</Link>
         </div>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-[230px_1fr]">
+        <div className="mt-8 grid gap-6 lg:grid-cols-[230px_minmax(0,1fr)]">
           <aside className="h-fit rounded-3xl border border-line bg-surface-1 p-2 lg:sticky lg:top-24">
             {nav.map((n) => (
               <button key={n.id} onClick={() => setTab(n.id)}

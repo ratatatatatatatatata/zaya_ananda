@@ -66,7 +66,7 @@ export async function HomeAbout() {
           <p className="eyebrow-line justify-center"><T k="about.valuesEyebrow" /></p>
           <h3 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl"><T k="about.valuesTitle" /></h3>
         </div>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 adaptive-cards">
           {(values.length ? values : aboutContent.values).map((v, i) => (
             <Reveal key={i} delay={i * 70}>
               <div className="card h-full p-6">
@@ -85,7 +85,7 @@ export async function HomeAbout() {
           <p className="eyebrow-line justify-center"><T k="about.teamEyebrow" /></p>
           <h3 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl"><T k="about.teamTitle" /></h3>
         </div>
-        <div className="mt-10 grid auto-rows-fr gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 adaptive-cards auto-rows-fr">
           {mergedTeam.length > 0
             ? mergedTeam.map((m, i) => (
                 <Reveal key={m.name + i} delay={i * 80}>

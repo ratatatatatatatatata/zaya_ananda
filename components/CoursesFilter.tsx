@@ -27,7 +27,7 @@ export function CoursesFilter({ courses }: { courses: Course[] }) {
           </button>
         ))}
       </div>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="adaptive-cards">
         {shown.map((c) => <CourseCard key={c.id} c={c} />)}
       </div>
     </div>

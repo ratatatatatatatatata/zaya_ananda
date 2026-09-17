@@ -147,9 +147,9 @@ export default async function AyalalPage() {
       </div></section>
 
       {/* FAQ */}
-      <section id="faq" className="section bg-surface-2 scroll-mt-32"><div className="container-px max-w-3xl">
+      <section id="faq" className="section bg-surface-2 scroll-mt-32"><div className="container-px">
         <h2 className="text-center font-display text-3xl font-semibold text-ink">Түгээмэл асуултууд</h2>
-        <div className="mt-8 space-y-3">
+        <div className="mt-8 grid items-start gap-4 lg:grid-cols-2">
           {JOURNEY_FAQ.map((f) => (
             <details key={f.q} className="group rounded-2xl border border-line bg-surface-1 p-5 [&_summary]:cursor-pointer">
               <summary className="flex items-center justify-between font-semibold text-ink marker:content-['']">

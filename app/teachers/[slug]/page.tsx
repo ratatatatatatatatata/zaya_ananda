@@ -53,7 +53,7 @@ export default async function TeacherDetailPage({ params }: { params: { slug: st
       </section>
 
       {/* Багшийн заадаг хичээл, үйлчилгээ */}
-      <section className="section"><div className="container-px max-w-4xl">
+      <section className="section"><div className="container-px">
         <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl">{teacher.name} багшийн хөтөлдөг хичээл, үйлчилгээ</h2>
         <p className="mt-2 text-muted">Гарчиг дээр дарж дэлгэрэнгүй мэдээллийг нь харна уу.</p>
         <TeacherClasses classes={classes} />

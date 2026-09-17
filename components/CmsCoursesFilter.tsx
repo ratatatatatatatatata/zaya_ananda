@@ -52,7 +52,7 @@ export function CmsCoursesFilter({ items }: { items: CmsItem[] }) {
       {shown.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-12 text-center text-muted">{tr(EMPTY)}</p>
       ) : (
-        <Stagger className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <Stagger className="adaptive-cards">
           {shown.map((i) => <TiltCard key={i.id} className="h-full"><CmsCard item={i} /></TiltCard>)}
         </Stagger>
       )}

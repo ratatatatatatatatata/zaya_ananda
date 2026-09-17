@@ -26,7 +26,7 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
 
   return (
     <>
-    <article id={"service-" + item.id} className="card grid gap-0 overflow-hidden scroll-mt-32 lg:grid-cols-[minmax(0,24rem)_1fr]">
+    <article id={"service-" + item.id} className="card grid gap-0 overflow-hidden scroll-mt-32 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
       {/* Зураг */}
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-3 lg:aspect-auto lg:h-full">
         {cover ? (
@@ -40,7 +40,7 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
       </div>
 
       {/* Бүх мэдээлэл — нуухгүй, шууд харагдана */}
-      <div className="p-6 sm:p-8">
+      <div className="min-w-0 p-6 sm:p-8">
         <h3 className="font-display text-2xl font-semibold text-ink">{item.title}</h3>
         {item.summary && <p className="mt-3 leading-relaxed text-muted">{item.summary}</p>}
 
@@ -91,7 +91,7 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
               </div>
             )}
 
-            <div className="p-6 sm:p-8">
+            <div className="min-w-0 p-6 sm:p-8">
               {!cover && <h3 className="font-display text-2xl font-semibold text-ink">{item.title}</h3>}
               {item.summary && <p className="mt-2 leading-relaxed text-muted">{item.summary}</p>}
               {paragraphs.length > 0 && (

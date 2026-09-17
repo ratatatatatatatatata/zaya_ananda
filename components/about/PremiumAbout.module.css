@@ -8,7 +8,7 @@
 .page a,.page button,.navigation a,.navigation button,.menuDialog a,.menuDialog button,.bioDialog button { -webkit-tap-highlight-color:transparent; }
 .page :focus-visible,.navigation :focus-visible,.menuDialog :focus-visible,.bioDialog :focus-visible { outline:2px solid #477a5a; outline-offset:6px; }
 .page section,.page footer { scroll-margin-top:100px; }
-.container { width:min(100% - 112px,1280px); margin-inline:auto; }
+.container { width:calc(100% - 2 * var(--page-gutter)); margin-inline:auto; }
 .label { display:flex; align-items:center; gap:12px; font-size:10px; letter-spacing:.22em; font-weight:600; text-transform:uppercase; }
 .smallDot { width:5px; height:5px; border-radius:50%; background:#477a5a; }
 .navigation { height:92px; position:sticky; top:0; z-index:50; display:flex; justify-content:space-between; align-items:center; padding:0 56px; color:#1b2b23; background:#fffffff0; backdrop-filter:blur(20px); border-bottom:1px solid #233a2510; }
@@ -46,7 +46,7 @@
 .mission h2 { font-size:clamp(28px,3.2vw,50px); }
 .mission p:not(.label) { max-width:750px; color:#61716c; margin-top:24px; font-size:15px; }
 .story { padding:80px 0 110px; }
-.storyStage { width:min(100% - 112px,1280px); margin:auto; }
+.storyStage { width:calc(100% - 2 * var(--page-gutter)); margin:auto; }
 .storyHeading { margin-bottom:55px; }
 .storyHeading h2 { margin-top:18px; }
 .sample { font-size:11px; opacity:.66; margin-top:15px; letter-spacing:.01em; }
@@ -72,7 +72,7 @@
 .statement span { color:#668378!important; }
 .sectionIntro { margin-top:24px; max-width:580px; color:#61716c; font-size:15px; }
 .teamTitle { margin-top:24px; font-size:clamp(30px,3.2vw,48px)!important; }
-.teamGrid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; margin-top:40px; align-items:stretch; grid-auto-rows:1fr; }
+.teamGrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); gap:24px; margin-top:40px; align-items:stretch; grid-auto-rows:1fr; }
 .memberCard { display:flex; flex-direction:column; height:100%; min-width:0; padding:24px; border:1px solid #dbe4da; border-radius:24px; background:#ffffff; box-shadow:0 6px 35px #33553706; }
 .memberHeading { display:flex; align-items:center; gap:16px; min-width:0; }
 .memberHeading>div:last-child { min-width:0; }
@@ -89,7 +89,7 @@
 .bioInfo { white-space:pre-line; margin-top:28px; line-height:1.9; color:#61716c; }
 .program { padding:70px 0 100px; background:#f8faf9; }
 .program h2 { margin-top:28px; }
-.programViewport { width:min(100% - 112px,1280px); margin:60px auto 0; overflow:hidden; }
+.programViewport { width:calc(100% - 2 * var(--page-gutter)); margin:60px auto 0; overflow:hidden; }
 .programTrack { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:60px; }
 .programCard { min-width:0; }
 .programNumber { display:block; font-weight:200; font-size:clamp(100px,12vw,176px); line-height:1; letter-spacing:-.065em; color:#bdcdb4; }
@@ -141,7 +141,7 @@
 :global(body):has(.page) :global(.zx-dot),:global(body):has(.page) :global(.zx-ring),:global(body):has(.page) :global(.zx-spark) { display:none!important; }
 
 @media (max-width:1023px) {
-  .container,.storyStage,.programViewport { width:calc(100% - 64px); }
+  .container,.storyStage,.programViewport { width:calc(100% - 2 * var(--page-gutter)); }
   .navigation { padding-inline:32px; height:80px; }
   .heroGrid { grid-template-columns:1fr 1fr; min-height:0; gap:24px; padding-block:50px; }
   .hero h1 { font-size:clamp(52px,6.5vw,72px); }
@@ -151,7 +151,7 @@
   .storyList article { gap:30px; }
   .storyList p { font-size:16px; }
   .team { padding-block:85px; }
-  .teamGrid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+  .teamGrid { gap:20px; }
   .partners { padding-block:85px; }
   .contactGrid { grid-template-columns:1fr 1fr; gap:24px; }
   .program { padding-top:35px; }
@@ -160,7 +160,7 @@
   .partnerPanel { padding:20px 12px; }
 }
 @media (max-width:600px) {
-  .container,.storyStage,.programViewport { width:calc(100% - 40px); }
+  .container,.storyStage,.programViewport { width:calc(100% - 2 * var(--page-gutter)); }
   .navigation { height:72px; padding-inline:20px; }
   .brand { gap:6px; font-size:16px; }.brand small { font-size:5.5px; }
   .brand img,.brand svg { width:34px; height:34px; }

@@ -47,7 +47,7 @@ export default function MatrixPage() {
         crumb="Тоон зурхайн матрикс"
         desc="Төрсөн он, сар, өдрөөрөө хувь тавилангийн матриксаа тайлж, өөрийн эрчим энерги, сүнсний түвшин, далд чадамжаа нээгээрэй."
       />
-      <section className="section"><div className="container-px max-w-5xl">
+      <section className="section"><div className="container-px">
         <div className="card p-7 sm:p-9">
           <h2 className="font-display text-2xl font-semibold text-ink">Төрсөн огноогоо оруулна уу</h2>
           <p className="mt-2 text-muted">Матрикс таны төрсөн он, сар, өдрийн тоон эрчмээс бүрддэг.</p>
