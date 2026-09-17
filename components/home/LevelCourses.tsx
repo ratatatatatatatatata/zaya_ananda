@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import { HomeDetailLink as Link } from "@/components/home/HomeDetails";
 import { useI18n } from "@/lib/i18n";
 import { COURSE_LEVELS } from "@/data/cms-taxonomy";
-import { TiltCard } from "@/components/motion/TiltCard";
-import type { Locale } from "@/lib/types";
+import { locText } from "@/lib/cms-i18n";
+import { formatMNT } from "@/lib/format";
+import styles from "./LevelCourses.module.css";
+import type { CmsItem, Locale, TeacherPreset } from "@/lib/types";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
 
@@ -49,12 +51,14 @@ const DESC: Record<string, Record<Locale, string>> = {
   ),
 };
 
-export type LevelCourse = { id: string; title: string; summary: string; image: string; level: string };
+export type LevelCourse = { id: string; title: string; summary: string; image: string; level: string; price?: number; teachers?: TeacherPreset[]; i18n?: CmsItem["i18n"] };
 
 /** Дөрвөн түвшин — товч дарахад тухайн түвшний хичээлүүд байрандаа нээгдэнэ. */
 export function LevelCourses({ courses }: { courses: LevelCourse[] }) {
-  const { tr, lang } = useI18n();
+  const { tr, tl, lang } = useI18n();
   const [open, setOpen] = useState<string | null>(null);
+  const panelId = useId();
+  const buttons = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const byLevel = useMemo(() => {
     const m: Record<string, LevelCourse[]> = {};
@@ -63,73 +67,52 @@ export function LevelCourses({ courses }: { courses: LevelCourse[] }) {
     return m;
   }, [courses]);
 
-  return (
-    <div>
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {COURSE_LEVELS.map((l, idx) => {
-          const active = open === l.key;
-          const n = byLevel[l.key]?.length ?? 0;
-          return (
-            <TiltCard key={l.key} max={0} className="h-full">
-            <button
-              type="button"
-              onClick={() => setOpen(active ? null : l.key)}
-              aria-expanded={active}
-              style={{ transitionDelay: active ? "0ms" : idx * 40 + "ms" }}
-              className={
-                "course-level glass-lux group relative flex h-full w-full flex-col p-7 text-left transition-transform duration-500 " +
-                (active ? "ring-2 ring-primary-500 -translate-y-1.5" : "hover:-translate-y-1.5")
-              }
-            >
-              <div aria-hidden className="pointer-events-none absolute -right-14 -top-14 h-40 w-40 rounded-full opacity-70 transition duration-700 group-hover:scale-110"
-                style={{ background: "radial-gradient(circle, rgb(var(--c-p400) / 0.2), transparent 70%)", filter: "blur(6px)" }} />
-              <div className="relative z-10 flex flex-1 flex-col">
-                <div className="flex items-center gap-3">
-                  <span className="course-level-number">0{idx + 1}</span>
-                  {n > 0 && <span className="ml-auto rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-bold text-primary-700">{n}</span>}
-                </div>
-                <h3 className="mt-4 font-display text-xl font-semibold text-ink">{l.label[lang]}</h3>
-                <p className="mt-2.5 flex-1 text-[0.96rem] leading-relaxed text-muted">{DESC[l.key]?.[lang]}</p>
-                <span className="mt-4 text-sm font-semibold text-primary-700">
-                  {active ? "▲" : "▼"} {l.label[lang]}
-                </span>
-              </div>
-            </button>
-            </TiltCard>
-          );
-        })}
-      </div>
-
-      {/* Сонгосон түвшний хичээлүүд */}
-      <div
-        className="overflow-hidden transition-[max-height,opacity] duration-500 ease-out"
-        style={{ maxHeight: open ? "200rem" : 0, opacity: open ? 1 : 0 }}
-      >
-        <div className="origin-top pt-8 transition-transform duration-500" style={{ transform: open ? "scale(1)" : "scale(0.97)" }}>
-          {open && (byLevel[open]?.length ?? 0) === 0 ? (
-            <p className="rounded-2xl border border-dashed border-line bg-surface-1 px-5 py-10 text-center text-muted">{tr(EMPTY)}</p>
-          ) : (
-            <div className="adaptive-cards">
-              {open && byLevel[open].map((c) => (
-                <TiltCard key={c.id} max={0} className="h-full">
-                <Link href={"/item/" + c.id} className="glass-lux group flex h-full flex-col">
-                  <div className="aspect-[4/3] w-full overflow-hidden rounded-t-[1.75rem] bg-surface-3">
-                    {c.image
-                      ? <img src={c.image} alt={c.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-                      : <div className="h-full w-full" style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }} />}
-                  </div>
-                  <div className="flex flex-1 flex-col p-5">
-                    <h4 className="font-display text-lg font-semibold text-ink">{c.title}</h4>
-                    {c.summary && <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{c.summary}</p>}
-                    <span className="mt-4 text-sm font-semibold text-primary-700">{tr(OPEN)} →</span>
-                  </div>
-                </Link>
-                </TiltCard>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+  const selected = COURSE_LEVELS.find(level => level.key === open);
+  const selectedCourses = open ? byLevel[open] || [] : [];
+  return <div>
+    <div className={styles.levels}>
+      {COURSE_LEVELS.map((level, index) => <button key={level.key} type="button"
+        ref={element => { buttons.current[level.key] = element; }}
+        className={styles.level} aria-expanded={open === level.key} aria-controls={panelId}
+        onClick={() => setOpen(current => current === level.key ? null : level.key)}>
+        <span className={styles.levelTop}><span>0{index + 1}</span><span className={styles.count}>{byLevel[level.key]?.length || 0}</span></span>
+        <span className={styles.levelTitle}>{level.label[lang]}</span>
+        <span className={styles.levelDesc}>{DESC[level.key]?.[lang]}</span>
+        <span className={styles.levelAction}>{tr(OPEN)}<span aria-hidden>{open === level.key ? "−" : "+"}</span></span>
+      </button>)}
     </div>
-  );
+    <div id={panelId} hidden={!selected}>
+      {selected && <section className={styles.panel} aria-label={selected.label[lang]}>
+        <div className={styles.panelHeader}>
+          <h3>{selected.label[lang]} <span className={styles.count}>{selectedCourses.length}</span></h3>
+          <button type="button" className={styles.close} aria-label={tl("Дэлгэрэнгүйг хаах")} onClick={() => {
+            buttons.current[selected.key]?.focus({ preventScroll: true }); setOpen(null);
+          }}>✕</button>
+        </div>
+        {selectedCourses.length === 0 ? <p className={styles.empty}>{tr(EMPTY)}</p> : <div className={styles.courses}>
+          {selectedCourses.map(course => <article key={course.id} className={styles.course}>
+            <Link href={"/item/" + course.id} className={styles.courseLink}>
+              <div className={styles.photo}>
+                {course.image ? <img src={course.image} alt="" loading="lazy" /> : <span aria-hidden>✦</span>}
+              </div>
+              <div className={styles.courseInfo}>
+                <h4>{locText(lang,course.title,course.i18n,"title")}</h4>
+                {course.summary && <p className={styles.summary}>{locText(lang,course.summary,course.i18n,"summary")}</p>}
+                {!!course.teachers?.length && <ul className={styles.teachers}>
+                  {course.teachers.map(teacher => <li key={teacher.name}>
+                    {teacher.image && <img src={teacher.image} alt="" loading="lazy" />}
+                    <span>{teacher.name}</span>
+                  </li>)}
+                </ul>}
+                <div className={styles.courseFooter}>
+                  {typeof course.price === "number" && <strong>{formatMNT(course.price)}</strong>}
+                  <span>{tl("Дэлгэрэнгүй үзэх")} <span aria-hidden>↗</span></span>
+                </div>
+              </div>
+            </Link>
+          </article>)}
+        </div>}
+      </section>}
+    </div>
+  </div>;
 }

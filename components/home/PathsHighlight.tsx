@@ -22,12 +22,13 @@ const C = {
 /** Нүүрний гол онцлол — Ариусахуйн үйлийн 4 түвшин ба сүнслэг аяллын товч танилцуулга. */
 export function PathsHighlight({ courses }: { courses: LevelCourse[] }) {
   return (
-    <section className="section activity-section relative">
+    <section id="courses" className="section activity-section relative scroll-mt-36" aria-labelledby="course-level-heading">
+      <span id="capabilities" className="experience-anchor" aria-hidden="true" />
       <SectionBackdrop src="/video/meditation.jpg" centered position="center 60%" />
       <div className="container-px relative">
       <Reveal>
         <div className="mx-auto max-w-3xl text-center">
-          <p className="eyebrow-line justify-center"><Tr v={C.eyebrow} /></p>
+          <h2 id="course-level-heading" className="font-display text-3xl font-semibold text-ink sm:text-5xl"><Tr v={C.eyebrow} /></h2>
           <p className="mt-4 text-lg leading-relaxed text-ink/85 sm:text-xl"><Tr v={C.lead} /></p>
         </div>
       </Reveal>

@@ -1,3 +1,4 @@
+import { itemTeachers } from "@/lib/item-teachers";
 import { listCmsCached, getSettingsCached } from "@/lib/repo";
 import { heroMediaFor } from "@/lib/hero-video";
 import { GiftOverview } from "./home/GiftOverview";
@@ -55,10 +56,13 @@ export async function HomeSections() {
           summary: c.summary || "",
           image: c.image || c.images?.[0] || "",
           level: c.level || "anhan",
+          price: c.price,
+          teachers: itemTeachers(c),
+          i18n: c.i18n,
         }))}
       />
 
-      <CategoryExperience services={services} courses={courses} products={products} journeys={JOURNEYS} />
+      <CategoryExperience services={services} products={products} journeys={JOURNEYS} />
 
       {/* Гэгээн бэлэг */}
       <section id="gift" className="section activity-section scroll-mt-36">
