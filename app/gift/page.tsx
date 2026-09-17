@@ -9,7 +9,7 @@ export const metadata = { title: "Гэгээн бэлэг" };
 
 /** Нээлттэй, үнэгүй хичээлүүд — "Гэгээн бэлэг" */
 export default async function GiftPage() {
-  const [items, heroMedia] = await Promise.all([listCmsCached("free"), heroMediaFor("gift")]);
+  const [free, resources, heroMedia] = await Promise.all([listCmsCached("free"), listCmsCached("resource"), heroMediaFor("gift")]);
   return (
     <>
       <VideoHero
@@ -19,10 +19,10 @@ export default async function GiftPage() {
         align="center"
         eyebrow="Zaya's Ananda"
         title={<T k="nav.gift" />}
-        desc="Үнэгүй нээлттэй хичээлүүд — эхлэхэд тань зориулсан бидний бэлэг. Бүртгэлгүйгээр үзнэ."
+        desc="Podcast, бясалгал дасгал, зөвлөмж — бүх агуулгаа эндээс үзээрэй. Бүртгэлгүйгээр үзнэ."
       />
       <section className="section"><div className="container-px">
-        <MediaLibrary items={items} />
+        <MediaLibrary items={[...free, ...resources]} />
       </div></section>
     </>
   );

@@ -1,6 +1,6 @@
 import { listCmsCached, getSettingsCached } from "@/lib/repo";
 import { heroMediaFor } from "@/lib/hero-video";
-import { MediaLibrary } from "./home/MediaLibrary";
+import { GiftOverview } from "./home/GiftOverview";
 import { CategoryExperience } from "./home/CategoryExperience";
 import { T, Tr } from "./T";
 import { PathsHighlight } from "./home/PathsHighlight";
@@ -28,11 +28,11 @@ const D = {
 
 /** Нүүр хуудас — хэсэг бүр товч мэдээлэл, шууд орох товчтой. */
 export async function HomeSections() {
-  const [services, courses, free, products, settings, bandMedia, JOURNEYS, resources] = await Promise.all([
+  const [services, courses, products, settings, bandMedia, JOURNEYS] = await Promise.all([
     listCmsCached("service"), listCmsCached("course"),
-    listCmsCached("free"), listCmsCached("product"),
+    listCmsCached("product"),
     getSettingsCached(), heroMediaFor("band"),
-    listJourneysCached().catch(() => []), listCmsCached("resource"),
+    listJourneysCached().catch(() => []),
   ]);
 
 
@@ -63,7 +63,7 @@ export async function HomeSections() {
         <SectionBackdrop src="/video/meditation.jpg" position="center 60%" />
         <div className="container-px">
         <SectionZoom eyebrow="04 / НЭЭЛТТЭЙ ХИЧЭЭЛ" title={<T k="nav.gift" />} desc={<Tr v={D.gift} />} href="/gift">
-          <MediaLibrary items={[...free, ...resources]} />
+          <GiftOverview />
         </SectionZoom>
       </div></section>
 
