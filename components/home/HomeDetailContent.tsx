@@ -8,7 +8,7 @@ import { JOURNEY_FAQ, JOURNEY_PREP, type Journey } from "@/data/journeys";
 import { ItemVideos } from "@/components/ItemVideos";
 import { RichBody } from "@/components/RichBody";
 import { ServiceBooking } from "@/components/ServiceBooking";
-import { ProductBuyBox } from "@/components/ProductBuyBox";
+import { HomeProductDetail } from "./HomeProductDetail";
 import { PurchaseBox } from "@/components/PurchaseBox";
 import { CourseLessons } from "@/components/CourseLessons";
 import { JourneyRegistration } from "@/components/journey/JourneyRegistration";
@@ -16,6 +16,7 @@ import { DestinationGallery } from "@/components/journey/DestinationGallery";
 import styles from "./HomeDetails.module.css";
 
 export default function HomeDetailContent({ item, journey: j }: { item?: CmsItem; journey?: Journey }) {
+  if (item?.kind === "product") return <HomeProductDetail key={item.id} item={item} />;
   if (item) {
     const images = Array.from(new Set([item.image, ...(item.images || [])].filter((value): value is string => !!value)));
     return <div className={styles.detail}>
@@ -26,7 +27,6 @@ export default function HomeDetailContent({ item, journey: j }: { item?: CmsItem
       {item.kind !== "course" && item.link && <ItemVideos videos={[{ title: item.title, url: item.link }]} />}
       {(!(item.kind === "course" || item.kind === "service") || itemTeachers(item).length < 2) && <ItemTeachers item={item} />}
       {item.kind === "service" && <ServiceBooking teachers={itemTeachers(item)} itemId={item.id} serviceName={item.title} workDays={item.bookingDays} startHour={item.bookingStartHour} endHour={item.bookingEndHour} />}
-      {item.kind === "product" && <ProductBuyBox id={item.id} title={item.title} price={item.price} />}
       {item.kind === "course" && <><PurchaseBox teachers={itemTeachers(item)} id={item.id} title={item.title} price={item.price} /><CourseLessons id={item.id} nextNote={item.nextNote} /></>}
     </div>;
   }
