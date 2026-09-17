@@ -28,33 +28,35 @@ export function MediaLibrary({ items, categorized = false }: { items: CmsItem[];
     id: item.id, title: item.title, poster: item.image || item.images?.[0] || "/video/meditation.jpg", category: giftCategory(item), article: item,
   }))];
   const [tab, setTab] = useState(0);
+  const [playingId, setPlayingId] = useState<string | null>(null);
   const id = useId();
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const visible = categorized ? gifts.filter(gift => gift.category === TABS[tab].id) : gifts;
   return <div className={styles.library}>
     {categorized && <div className={styles.tabs} role="tablist" aria-label="Гэгээн бэлэг">
-      {TABS.map((item,index) => <button key={item.id} ref={element => { buttons.current[index] = element; }} type="button" role="tab" aria-selected={tab === index} tabIndex={tab === index ? 0 : -1} id={`${id}-tab-${index}`} aria-controls={`${id}-panel-${index}`} onClick={() => setTab(index)} onKeyDown={event => {
+      {TABS.map((item,index) => <button key={item.id} ref={element => { buttons.current[index] = element; }} type="button" role="tab" aria-selected={tab === index} tabIndex={tab === index ? 0 : -1} id={`${id}-tab-${index}`} aria-controls={`${id}-panel-${index}`} onClick={() => { setPlayingId(null); setTab(index); }} onKeyDown={event => {
         let next = index;
         if (event.key === "ArrowRight") next = (index + 1) % TABS.length;
         else if (event.key === "ArrowLeft") next = (index + TABS.length - 1) % TABS.length;
         else if (event.key === "Home") next = 0;
         else if (event.key === "End") next = TABS.length - 1;
         else return;
-        event.preventDefault(); setTab(next); buttons.current[next]?.focus();
+        event.preventDefault(); setPlayingId(null); setTab(next); buttons.current[next]?.focus();
       }}>{item.title}</button>)}
     </div>}
     {categorized ? TABS.map((item,index) => <div key={item.id} role="tabpanel" id={`${id}-panel-${index}`} aria-labelledby={`${id}-tab-${index}`} hidden={tab !== index} tabIndex={0}>
-      {tab === index && <GiftShelf key={item.id} gifts={visible} title={item.title} />}
-    </div>) : <GiftShelf gifts={visible} title="Бүх агуулга" />}
+      {tab === index && <GiftShelf key={item.id} gifts={visible} title={item.title} playingId={playingId} setPlayingId={setPlayingId} />}
+    </div>) : <div className={styles.sections}>{TABS.map(category => <GiftShelf key={category.id} gifts={gifts.filter(gift => gift.category === category.id)} title={category.title} playingId={playingId} setPlayingId={setPlayingId} />)}</div>}
   </div>;
 }
 
-function GiftShelf({ gifts, title }: { gifts: Gift[]; title: string }) {
+function GiftShelf({ gifts, title, playingId, setPlayingId }: { gifts: Gift[]; title: string; playingId: string | null; setPlayingId: (id: string | null) => void }) {
   const [selected, setSelected] = useState(0);
-  const [playing, setPlaying] = useState(false);
+
   const rail = useRef<HTMLDivElement>(null);
   const gift = gifts[selected] || gifts[0];
-  const select = (index: number) => { setSelected(index); setPlaying(false); };
+  const playing = !!gift && playingId === gift.id;
+  const select = (index: number) => { setSelected(index); setPlayingId(null); };
   const move = (step: number) => {
     const next = (selected + step + gifts.length) % gifts.length;
     select(next);
@@ -70,11 +72,11 @@ function GiftShelf({ gifts, title }: { gifts: Gift[]; title: string }) {
       <div className={styles.feature}>
         <div className={styles.player}>
           {playing && embed ? embed.type === "iframe" ? <iframe key={gift.id} src={embed.src} title={gift.title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen /> : <video key={gift.id} src={embed.src} controls autoPlay playsInline aria-label={gift.title} />
-            : gift.url ? <button type="button" className={styles.poster} aria-label={`${gift.title} — тоглуулах`} onClick={() => setPlaying(true)}><MediaArtwork key={gift.poster} src={gift.poster} large /><span className={styles.play} aria-hidden>▶</span></button>
+            : gift.url ? <button type="button" className={styles.poster} aria-label={`${gift.title} — тоглуулах`} onClick={() => setPlayingId(gift.id)}><MediaArtwork key={gift.poster} src={gift.poster} large /><span className={styles.play} aria-hidden>▶</span></button>
             : <MediaArtwork key={gift.poster} src={gift.poster} large />}
         </div>
         <div className={styles.featureCopy}><p>{gift.url ? "ОДОО ҮЗЭХ" : "УНШИХ"} · {String(selected + 1).padStart(2,"0")}</p><h4>{gift.title}</h4>
-          {gift.url ? <button type="button" onClick={() => setPlaying(value => !value)}>{playing ? "Тоглуулагчийг хаах" : "Энд үзэх ▶"}</button> : <p>{gift.article?.summary}</p>}
+          {gift.url ? <button type="button" onClick={() => setPlayingId(playing ? null : gift.id)}>{playing ? "Тоглуулагчийг хаах" : "Энд үзэх ▶"}</button> : <p>{gift.article?.summary}</p>}
         </div>
       </div>
       {gift.article?.body && <div className={styles.article}><RichBody html={gift.article.body} i18n={gift.article.i18n} /></div>}

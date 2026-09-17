@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth";
 import { getUserById, getCmsById, createOrder } from "@/lib/repo";
+import { resolveTeacherSelection, teacherBookingNote } from "@/lib/teacher-selection";
 import { MERGE_ITEMS } from "@/data/merge-toorog";
 
 export const runtime = "nodejs";
@@ -20,6 +21,8 @@ export async function POST(req: Request) {
 
     const [user, item] = await Promise.all([getUserById(uid), fixed ? null : getCmsById(itemId)]);
     if (!fixed && !item) return NextResponse.json({ error: "Бараа олдсонгүй." }, { status: 404 });
+    const teacher = item ? resolveTeacherSelection(item, body?.teacherName) : {};
+    if (teacher.error) return NextResponse.json({ error: teacher.error }, { status: 400 });
     const price = fixed ? fixed.price : typeof item!.price === "number" ? item!.price : 0;
     const kind = fixed ? "service" : item!.kind === "course" || item!.kind === "product" ? item!.kind : "service";
     const slug = fixed ? fixed.id : item!.id;
@@ -27,12 +30,12 @@ export async function POST(req: Request) {
 
     const order = await createOrder({
       userId: uid,
-      items: [{ kind, slug, title, price, qty: 1 }],
+      items: [{ kind, slug, title, price, qty: 1, teacherName: teacher.name }],
       customer: {
         name: user?.name || "",
         email: user?.email || "",
         phone: user?.phone || "",
-        note: method === "bank" ? "Банкны шилжүүлэг" : "QPay",
+        note: teacherBookingNote(teacher.name, method === "bank" ? "Банкны шилжүүлэг" : "QPay"),
       },
     });
     return NextResponse.json({ ok: true, id: order.id });

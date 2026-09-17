@@ -17,11 +17,12 @@ export async function GET(req: Request) {
     const active = mine.find((o) => o.status === "paid" && (!o.expiresAt || new Date(o.expiresAt).getTime() > now));
     if (active) {
       const daysLeft = active.expiresAt ? Math.max(0, Math.ceil((new Date(active.expiresAt).getTime() - now) / 86400000)) : null;
-      return NextResponse.json({ status: "active", expiresAt: active.expiresAt || null, daysLeft });
+      return NextResponse.json({ status: "active", expiresAt: active.expiresAt || null, daysLeft, teacherName: active.items.find(i => i.slug === itemId)?.teacherName });
     }
     if (mine.some((o) => o.status === "paid" && o.expiresAt && new Date(o.expiresAt).getTime() <= now))
       return NextResponse.json({ status: "expired" });
-    if (mine.some((o) => o.status === "pending")) return NextResponse.json({ status: "pending" });
+    const pending = mine.find(o => o.status === "pending");
+    if (pending) return NextResponse.json({ status: "pending", teacherName: pending.items.find(i => i.slug === itemId)?.teacherName });
     return NextResponse.json({ status: "none" });
   } catch {
     return NextResponse.json({ status: "none" });

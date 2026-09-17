@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { TeacherChoice } from "./TeacherChoice";
+import type { TeacherPreset } from "@/lib/types";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { DEFAULT_BOOKING_DAYS, DEFAULT_START_HOUR, DEFAULT_END_HOUR } from "@/lib/booking-slots";
@@ -14,14 +16,17 @@ const pad = (n: number) => String(n).padStart(2, "0");
 
 /** Энергийн заслын цаг захиалга — тухайн заслын админаас тохируулсан хуваарийг дагана. */
 export function ServiceBooking({
-  itemId, serviceName,
+  itemId, serviceName, teachers = [],
   workDays = DEFAULT_BOOKING_DAYS, startHour = DEFAULT_START_HOUR, endHour = DEFAULT_END_HOUR,
 }: {
-  itemId: string; serviceName: string;
+  itemId: string; serviceName: string; teachers?: TeacherPreset[];
   /** Зөвшөөрөгдсөн өдрүүд — JS Date.getDay() индекс (0=Ням..6=Бямба) */
   workDays?: number[]; startHour?: number; endHour?: number;
 }) {
   const { user } = useAuth();
+  const [teacherName, setTeacherName] = useState("");
+  const selectedTeacher = teachers.length === 1 ? teachers[0].name : teacherName;
+  const teacherChoice = <TeacherChoice teachers={teachers} value={selectedTeacher} onChange={name => { setTeacherName(name); setErr(""); }} />;
   const today = useMemo(() => new Date(), []);
   const todayKey = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
 
@@ -81,13 +86,14 @@ export function ServiceBooking({
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (teachers.length > 1 && !selectedTeacher) { setErr("Багшаа сонгоно уу."); return; }
     if (!date || !time) { setErr("Өдөр, цагаа сонгоно уу."); return; }
     setBusy(true); setErr("");
     try {
       const res = await fetch("/api/service/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, itemId, date, time }),
+        body: JSON.stringify({ ...form, itemId, date, time, teacherName: selectedTeacher }),
       });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
       setDone(true);
@@ -100,6 +106,7 @@ export function ServiceBooking({
   if (!user) {
     return (
       <div className="card p-6 text-center">
+        {teacherChoice}
         <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-primary-50 text-2xl">🔐</div>
         <p className="mt-3 font-display text-lg font-semibold text-ink">Цаг захиалахын тулд нэвтэрнэ үү</p>
         <p className="mt-1.5 text-sm leading-relaxed text-muted">Захиалгаа хадгалж, төлөв өөрчлөгдөх бүрд мэдэгдэл авахын тулд эхлээд бүртгэлдээ нэвтэрнэ үү.</p>
@@ -118,6 +125,7 @@ export function ServiceBooking({
         <p className="mt-3 font-display text-lg font-semibold text-ink">Цаг захиаллаа</p>
         <p className="mt-1.5 text-sm leading-relaxed text-muted">
           <b>{date}</b> {time} — «{serviceName}».
+          {selectedTeacher && <span className="mt-2 block">Сонгосон багш: {selectedTeacher}</span>}
         </p>
 
         {prepay > 0 ? (
@@ -162,6 +170,7 @@ export function ServiceBooking({
 
   return (
     <div className="card p-5 sm:p-6">
+      {teacherChoice}
       <p className="eyebrow-line">Цаг захиалах</p>
       <p className="mt-2 text-sm leading-relaxed text-muted">
         {WD_INDEX.filter((d) => workDays.includes(d)).length === 7

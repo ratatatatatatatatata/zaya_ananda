@@ -202,7 +202,7 @@ export function AdminJourney({ courseOrders = [], productOrders = [], onOrderSta
             <tbody>
               {courseOrders.map((o) => <tr key={o.id} className="border-b border-line last:border-0">
                 <td className="px-4 py-3 text-sm text-ink/80">{o.createdAt.slice(0, 10)}</td>
-                <td className="px-4 py-3 text-sm font-semibold text-ink">{o.items.filter((i) => i.kind === "course").map((i) => i.title).join(", ")}</td>
+                <td className="px-4 py-3 text-sm font-semibold text-ink">{o.items.filter((i) => i.kind === "course").map((i) => <div key={i.slug}>{i.title}{i.teacherName && <p className="mt-1 font-normal text-primary-700">Багш: {i.teacherName}</p>}</div>)}</td>
                 <td className="px-4 py-3 text-sm text-ink/80">{o.customer.name}</td><td className="px-4 py-3 text-sm text-ink/80">{o.customer.phone || "—"}</td>
                 <td className="px-4 py-3 text-sm font-semibold text-ink">{o.total.toLocaleString("mn-MN")}₮</td>
                 <td className="px-4 py-3"><span className="rounded-full bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-700">{o.status === "pending" ? "Хүлээгдэж буй" : o.status === "paid" ? "Баталгаажсан" : "Цуцалсан"}</span></td>

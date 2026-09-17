@@ -274,7 +274,7 @@ export default function AccountPage() {
                   return (
                     <div key={b.id} className="rounded-2xl border border-line p-4">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span className="font-semibold text-ink">🗓 {b.serviceName}</span>
+                        <span className="font-semibold text-ink">🗓 {b.serviceName}{b.note && <span className="mt-1 block whitespace-pre-line text-sm font-normal text-muted">{b.note}</span>}</span>
                         <span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">{statusLabel(b.status)}</span>
                       </div>
                       <p className="mt-2 text-sm text-muted">{b.date} · {b.time}</p>
@@ -357,7 +357,7 @@ export default function AccountPage() {
                       <div className="mt-3 space-y-1 border-t border-line pt-3">
                         {o.items.map((it) => (
                           <div key={it.kind + it.slug} className="flex justify-between text-sm">
-                            <span className="text-ink/80">{it.title} × {it.qty}</span>
+                            <span className="text-ink/80">{it.title} × {it.qty}{it.teacherName && <span className="mt-1 block font-semibold text-primary-700">Багш: {it.teacherName}</span>}</span>
                             <span className="font-medium text-ink">{formatMNT(it.price * it.qty)}</span>
                           </div>
                         ))}

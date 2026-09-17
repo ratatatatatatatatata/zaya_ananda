@@ -114,6 +114,7 @@ export interface User extends PublicUser {
 }
 
 export interface OrderItem {
+  teacherName?: string;
   kind: ItemKind;
   slug: string;
   title: string;

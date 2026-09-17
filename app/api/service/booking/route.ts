@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { resolveTeacherSelection, teacherBookingNote } from "@/lib/teacher-selection";
 import { getSessionUserId } from "@/lib/auth";
 import { getCmsByIdCached } from "@/lib/repo";
 import { createServiceBooking, takenSlots } from "@/lib/journeys-db";
@@ -40,6 +41,8 @@ export async function POST(req: Request) {
 
   const item = await getCmsByIdCached(itemId).catch(() => null);
   if (!item) return NextResponse.json({ error: "Үйлчилгээ олдсонгүй." }, { status: 404 });
+  const teacher = resolveTeacherSelection(item, b?.teacherName);
+  if (teacher.error) return NextResponse.json({ error: teacher.error }, { status: 400 });
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !isAllowedDay(item, date))
     return NextResponse.json({ error: "Энэ өдөр захиалга авахгүй байна. Өөр өдөр сонгоно уу." }, { status: 400 });
   if (!slotsOf(item).includes(time) || !dropPastSlots(slotsOf(item), date).includes(time))
@@ -53,14 +56,14 @@ export async function POST(req: Request) {
     await createServiceBooking({
       userId: uid, itemId, serviceName: item.title, date, time, name, phone,
       email: b?.email ? String(b.email) : "",
-      note: b?.note ? String(b.note) : "",
+      note: teacherBookingNote(teacher.name, b?.note),
     });
 
     // Админд мэдэгдэнэ
     await notifyAdmins({
       kind: "booking",
       title: "Шинэ цаг захиалга — " + item.title,
-      body: `${date} ${time} · ${name} · ${phone}`,
+      body: `${date} ${time} · ${name} · ${phone}${teacher.name ? " · Багш: " + teacher.name : ""}`,
       link: "/admin",
       dedupeKey: `svc:${itemId}:${date}:${time}`,
     }).catch(() => null);

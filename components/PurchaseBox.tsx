@@ -3,14 +3,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
+import { TeacherChoice } from "./TeacherChoice";
+import type { TeacherPreset } from "@/lib/types";
 import { formatMNT } from "@/lib/format";
 
 const DEFAULT_BANK = { name: "Хаан банк", account: "5304611250", holder: "Заяа Бат-Эрдэнэ" };
 const fnv = (s: string) => { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; };
-type Access = { status: "none" | "pending" | "active" | "expired"; daysLeft?: number | null; expiresAt?: string | null };
+type Access = { status: "none" | "pending" | "active" | "expired"; daysLeft?: number | null; expiresAt?: string | null; teacherName?: string };
 
-export function PurchaseBox({ id, price }: { id: string; title: string; price?: number }) {
+export function PurchaseBox({ id, price, teachers = [] }: { id: string; title: string; price?: number; teachers?: TeacherPreset[] }) {
   const { user } = useAuth();
+  const [teacherName, setTeacherName] = useState("");
+  const selectedTeacher = teachers.length === 1 ? teachers[0].name : teacherName;
   const [step, setStep] = useState<"idle" | "choose" | "qpay" | "bank" | "done">("idle");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -44,9 +48,9 @@ export function PurchaseBox({ id, price }: { id: string; title: string; price?: 
   async function notify(method: "qpay" | "bank") {
     setBusy(true); setErr("");
     try {
-      const res = await fetch("/api/pay/notify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ itemId: id, method }) });
+      const res = await fetch("/api/pay/notify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ itemId: id, method, teacherName: selectedTeacher }) });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
-      setStep("done"); setAccess({ status: "pending" });
+      setStep("done"); setAccess({ status: "pending", teacherName: selectedTeacher });
     } catch (e) { setErr(e instanceof Error ? e.message : "Алдаа гарлаа."); } finally { setBusy(false); }
   }
 
@@ -54,11 +58,14 @@ export function PurchaseBox({ id, price }: { id: string; title: string; price?: 
 
   // Аль хэдийн худалдаж авсан бол энд юу ч харуулахгүй — үнэ, идэвхтэй эрхийн мэдээлэл
   // "Миний булан" (профайл) хэсэгт захиалгын жагсаалтад үлдсэн хоногийн хамт харагдана.
-  if (!loadingAccess && st === "active" && step === "idle") return null;
+  if (!loadingAccess && st === "active" && step === "idle") return access?.teacherName ? <p className="card p-5 text-sm font-semibold text-ink">Таны сонгосон багш: {access.teacherName}</p> : null;
 
   return (
     <div className="card p-6">
       {typeof price === "number" && <p className="price mb-4 text-center text-3xl">{formatMNT(price)}</p>}
+
+      {step === "idle" && st !== "pending" && <TeacherChoice teachers={teachers} value={selectedTeacher} onChange={name => { setTeacherName(name); setErr(""); }} />}
+      {(access?.teacherName || (step !== "idle" && selectedTeacher)) && <p className="mb-4 text-sm font-semibold text-ink">Сонгосон багш: {access?.teacherName || selectedTeacher}</p>}
 
       {step === "idle" && (
         <>
@@ -77,7 +84,7 @@ export function PurchaseBox({ id, price }: { id: string; title: string; price?: 
                   <p className="mt-1 text-sm">Дахин худалдаж аваад үргэлжлүүлнэ үү.</p>
                 </div>
               )}
-              <button onClick={() => (user ? setStep("choose") : setErr("Эхлээд нэвтэрнэ үү."))} className="btn btn-primary btn-lg w-full">Худалдаж авах</button>
+              <button onClick={() => { if (teachers.length > 1 && !selectedTeacher) { setErr("Багшаа сонгоно уу."); return; } user ? setStep("choose") : setErr("Эхлээд нэвтэрнэ үү."); }} className="btn btn-primary btn-lg w-full">Худалдаж авах</button>
               {!user && <p className="mt-3 text-center text-sm text-muted">Худалдан авахын тулд <Link href="/login" className="font-semibold text-primary-700 hover:underline">нэвтэрнэ</Link> үү.</p>}
               {err && <p className="mt-3 rounded-xl bg-rose-50 px-4 py-2 text-center text-sm text-rose-600">{err}</p>}
             </>

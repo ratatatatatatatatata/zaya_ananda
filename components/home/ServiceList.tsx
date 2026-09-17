@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ServiceBooking } from "@/components/ServiceBooking";
+import { itemTeachers } from "@/lib/item-teachers";
 import { ItemTeachers } from "@/components/ItemTeachers";
 import type { CmsItem } from "@/lib/types";
 
@@ -102,7 +103,7 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
               <div className="mt-5 border-t border-line pt-4"><ItemTeachers item={item} /></div>
 
               <div className="mt-6">
-                <ServiceBooking
+                <ServiceBooking teachers={itemTeachers(item)}
                   itemId={item.id} serviceName={item.title}
                   workDays={item.bookingDays} startHour={item.bookingStartHour} endHour={item.bookingEndHour}
                 />

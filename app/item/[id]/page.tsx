@@ -1,3 +1,4 @@
+import { itemTeachers } from "@/lib/item-teachers";
 import { ItemTeachers } from "@/components/ItemTeachers";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -182,10 +183,10 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
           {isProduct
             ? <ProductBuyBox id={item.id} title={item.title} price={item.price} />
             : isService
-            ? <ServiceBooking itemId={item.id} serviceName={item.title} workDays={item.bookingDays} startHour={item.bookingStartHour} endHour={item.bookingEndHour} />
+            ? <ServiceBooking teachers={itemTeachers(item)} itemId={item.id} serviceName={item.title} workDays={item.bookingDays} startHour={item.bookingStartHour} endHour={item.bookingEndHour} />
             : isFree
             ? <div className="card p-6 text-center"><p className="text-3xl">🎁</p><p className="mt-2 font-display text-lg font-semibold text-jade-600">Нээлттэй хичээл</p><p className="mt-1 text-sm text-muted">Энэ хичээл танд бэлэг — чөлөөтэй үзээрэй.</p></div>
-            : <PurchaseBox id={item.id} title={item.title} price={item.price} />}
+            : <PurchaseBox teachers={itemTeachers(item)} id={item.id} title={item.title} price={item.price} />}
 
           {!isCourse && <ItemTeachers item={item} />}
         </aside>
