@@ -5,6 +5,7 @@ import { getJourneyBySlugCached, getJourneyBySlug } from "@/lib/journeys-db";
 import { JourneyImage } from "@/components/journey/SceneArt";
 import { LeadCard, CrewRow, Avatar } from "@/components/journey/PersonCard";
 import { JourneyBooking } from "@/components/journey/JourneyBooking";
+import { DestinationGallery } from "@/components/journey/DestinationGallery";
 import { JourneyReviews } from "@/components/journey/JourneyReviews";
 import { ContactSection } from "@/components/ContactSection";
 
@@ -216,21 +217,8 @@ export default async function JourneyPage({ params }: { params: { slug: string }
       {j.destination && j.destination.length > 0 && (
         <section id="gazar" className="section scroll-mt-32"><div className="container-px">
           <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Очих газрууд</h2>
-          <p className="mt-2 max-w-2xl text-muted">Энэ аяллаар очих гол газрууд, тэдгээрийн тухай мэдээлэл.</p>
-          <div className="mt-10 space-y-6">
-            {j.destination.map((dest, i) => (
-              <div key={i} className="card grid gap-0 overflow-hidden lg:grid-cols-[minmax(0,22rem)_1fr]">
-                <div className="relative aspect-[4/3] w-full overflow-hidden lg:aspect-auto lg:h-full">
-                  <JourneyImage src={dest.image} scene={j.scene} alt={dest.title} className="h-full w-full object-cover" />
-                </div>
-                <div className="p-6 sm:p-8">
-                  <p className="eyebrow-line">📍 Очих газар</p>
-                  {dest.title && <h3 className="mt-3 font-display text-2xl font-semibold text-ink">{dest.title}</h3>}
-                  {dest.desc && <p className="mt-3 whitespace-pre-line leading-relaxed text-muted">{dest.desc}</p>}
-                </div>
-              </div>
-            ))}
-          </div>
+          <p className="mt-2 max-w-2xl text-muted">Зураг дээр дарж тухайн газрын дэлгэрэнгүй мэдээллийг үзээрэй.</p>
+          <DestinationGallery places={j.destination} scene={j.scene} />
         </div></section>
       )}
 
