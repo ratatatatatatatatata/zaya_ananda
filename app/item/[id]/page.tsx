@@ -1,3 +1,4 @@
+import { ItemTeachers } from "@/components/ItemTeachers";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getCmsByIdCached, listCmsCached } from "@/lib/repo";
@@ -59,7 +60,6 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
   const item = await getCmsByIdCached(params.id);
   if (!item) notFound();
   const nav = kindNav[item.kind] || kindNav.service;
-  const lines = (item.teacherInfo || "").split("\n").map((s) => s.trim()).filter(Boolean);
   const isCourse = item.kind === "course";
   const isProduct = item.kind === "product";
   const isService = item.kind === "service";
@@ -119,12 +119,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
             <>
               <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
                 <div className="flex flex-wrap gap-x-8 gap-y-3 text-sm">
-                  {item.teacherName && (
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wide text-muted">Хөтлөгч</p>
-                      <p className="font-semibold text-ink">{item.teacherName}</p>
-                    </div>
-                  )}
+                  <ItemTeachers item={item} compact />
                   {item.category && (
                     <div>
                       <p className="text-xs font-bold uppercase tracking-wide text-muted">Сэдэв</p>
@@ -157,22 +152,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
                         <RichBody html={item.body} i18n={item.i18n} className="mt-3 leading-relaxed text-muted" />
                       </>
                     )}
-                    {(item.teacherName || item.teacherImage || lines.length > 0) && (
-                      <div className="mt-8 rounded-2xl border border-line bg-surface-1 p-6">
-                        <h3 className="font-display text-lg font-semibold text-ink">Хөтлөгчийн тухай</h3>
-                        <div className="mt-4 flex items-center gap-4">
-                          {item.teacherImage
-                            ? <img src={item.teacherImage} alt="" className="h-20 w-20 shrink-0 rounded-full object-cover shadow-card" />
-                            : <div className="grid h-20 w-20 shrink-0 place-items-center rounded-full bg-primary-50 text-2xl">👤</div>}
-                          {item.teacherName && <p className="font-display text-lg font-semibold text-ink">{item.teacherName}</p>}
-                        </div>
-                        {lines.length > 0 && (
-                          <ul className="mt-4 space-y-1.5">
-                            {lines.map((l, i) => <li key={i} className="flex gap-2 text-[1.02rem] leading-relaxed text-ink/80"><span className="text-primary-500">•</span><span>{l}</span></li>)}
-                          </ul>
-                        )}
-                      </div>
-                    )}
+                    <div className="mt-8"><ItemTeachers item={item} /></div>
                   </div>
                 }
                 practice={<CourseLessons id={item.id} nextNote={item.nextNote} nextItemId={item.nextItemId} nextTitle={nextItem?.title} />}
@@ -207,22 +187,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
             ? <div className="card p-6 text-center"><p className="text-3xl">🎁</p><p className="mt-2 font-display text-lg font-semibold text-jade-600">Нээлттэй хичээл</p><p className="mt-1 text-sm text-muted">Энэ хичээл танд бэлэг — чөлөөтэй үзээрэй.</p></div>
             : <PurchaseBox id={item.id} title={item.title} price={item.price} />}
 
-          {!isCourse && (item.teacherName || item.teacherImage || lines.length > 0) && (
-            <div className="card p-6">
-              <h3 className="font-display text-lg font-semibold text-ink">Заах багш</h3>
-              <div className="mt-4 flex flex-col items-center text-center">
-                {item.teacherImage
-                  ? <img src={item.teacherImage} alt="" className="h-28 w-28 rounded-full object-cover shadow-card" />
-                  : <div className="grid h-28 w-28 place-items-center rounded-full bg-primary-50 text-3xl">👤</div>}
-                {item.teacherName && <p className="mt-3 font-display text-lg font-semibold text-ink">{item.teacherName}</p>}
-              </div>
-              {lines.length > 0 && (
-                <ul className="mt-4 space-y-1.5">
-                  {lines.map((l, i) => <li key={i} className="flex gap-2 text-[1.02rem] leading-relaxed text-ink/80"><span className="text-primary-500">•</span><span>{l}</span></li>)}
-                </ul>
-              )}
-            </div>
-          )}
+          {!isCourse && <ItemTeachers item={item} />}
         </aside>
       </div>
 

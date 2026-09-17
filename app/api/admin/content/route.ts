@@ -1,7 +1,8 @@
+import { normalizeTeachers } from "@/lib/item-teachers";
 import { NextResponse } from "next/server";
 import { revalidateTag, revalidatePath } from "next/cache";
 import { getSessionUserId } from "@/lib/auth";
-import { checkAdmin, allCms, createCmsItem, updateCmsItem, deleteCmsItem, upsertTeacherPreset } from "@/lib/repo";
+import { checkAdmin, allCms, createCmsItem, updateCmsItem, deleteCmsItem } from "@/lib/repo";
 import { autoTranslate } from "@/lib/translate";
 import type { CmsTranslations } from "@/lib/types";
 
@@ -55,6 +56,7 @@ function parseInput(body: any) {
     videoLessons: num(body.videoLessons),
     students: num(body.students),
     views: num(body.views),
+    teachers: Array.isArray(body.teachers) ? normalizeTeachers(body.teachers) : undefined,
     teacherName: body.teacherName ? String(body.teacherName) : undefined,
     teacherImage: body.teacherImage ? String(body.teacherImage) : undefined,
     teacherRole: body.teacherRole ? String(body.teacherRole) : undefined,
@@ -107,7 +109,7 @@ export async function POST(req: Request) {
     const input = parseInput(body);
     input.i18n = await autoTranslate({ title: input.title, summary: input.summary, body: input.body }, input.i18n);
     const item = await createCmsItem(input);
-    if (input.teacherName) { await upsertTeacherPreset({ name: input.teacherName, image: input.teacherImage, role: input.teacherRole, info: input.teacherInfo }); revalidateTag("settings"); }
+    revalidateTag("settings");
     refreshPublic(item.id);
     return NextResponse.json({ item });
   } catch (e) {
@@ -126,7 +128,7 @@ export async function PUT(req: Request) {
     const input = parseInput(body);
     input.i18n = await autoTranslate({ title: input.title, summary: input.summary, body: input.body }, input.i18n);
     const item = await updateCmsItem(String(body.id), input);
-    if (input.teacherName) { await upsertTeacherPreset({ name: input.teacherName, image: input.teacherImage, role: input.teacherRole, info: input.teacherInfo }); revalidateTag("settings"); }
+    revalidateTag("settings");
     refreshPublic(String(body.id));
     return NextResponse.json({ item });
   } catch (e) {

@@ -1,5 +1,6 @@
 "use client";
 
+import { ItemTeachers } from "@/components/ItemTeachers";
 import { formatMNT } from "@/lib/format";
 import type { CmsItem } from "@/lib/types";
 import { JOURNEY_FAQ, JOURNEY_PREP, type Journey } from "@/data/journeys";
@@ -21,7 +22,7 @@ export default function HomeDetailContent({ item, journey: j }: { item?: CmsItem
       {item.summary && <p>{item.summary}</p>}
       {item.body && <RichBody html={item.body} i18n={item.i18n} />}
       {item.kind !== "course" && item.link && <ItemVideos videos={[{ title: item.title, url: item.link }]} />}
-      {item.teacherName && <div className={styles.teacher}>{item.teacherImage && <img src={item.teacherImage} alt="" />}<div><h3>{item.teacherName}</h3><p>{item.teacherInfo}</p></div></div>}
+      <ItemTeachers item={item} />
       {item.kind === "service" && <ServiceBooking itemId={item.id} serviceName={item.title} workDays={item.bookingDays} startHour={item.bookingStartHour} endHour={item.bookingEndHour} />}
       {item.kind === "product" && <ProductBuyBox id={item.id} title={item.title} price={item.price} />}
       {item.kind === "course" && <><PurchaseBox id={item.id} title={item.title} price={item.price} /><CourseLessons id={item.id} nextNote={item.nextNote} /></>}

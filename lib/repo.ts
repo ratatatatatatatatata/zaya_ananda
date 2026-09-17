@@ -1,3 +1,4 @@
+import { itemTeachers, normalizeTeachers, teacherFields } from "./item-teachers";
 import { randomUUID } from "crypto";
 import { unstable_cache } from "next/cache";
 import { hashPassword, verifyPassword } from "./auth";
@@ -218,18 +219,24 @@ export async function listCms(kind: CmsItem["kind"]): Promise<CmsItem[]> {
   // Preview/CI builds do not receive production secrets. Render a usable empty
   // catalogue instead of failing the whole Next.js export at build time.
   if (!supabaseReady) return [];
-  return sbSelect<CmsItem>("cms_items", `kind=eq.${enc(kind)}&order=created_at.desc`);
+  return hydrateTeachers(await sbSelect<CmsItem>("cms_items", `kind=eq.${enc(kind)}&order=created_at.desc`));
 }
 export async function allCms(): Promise<CmsItem[]> {
   if (!supabaseReady) return [];
-  return sbSelect<CmsItem>("cms_items", "order=created_at.desc");
+  return hydrateTeachers(await sbSelect<CmsItem>("cms_items", "order=created_at.desc"));
 }
 const numOrNull = (v: unknown) => (typeof v === "number" && !Number.isNaN(v) ? v : null);
 
 export async function getCmsById(id: string): Promise<CmsItem | null> {
   if (!supabaseReady) return null;
   const rows = await sbSelect<CmsItem>("cms_items", `id=eq.${enc(id)}&limit=1`);
-  return rows[0] || null;
+  return (await hydrateTeachers(rows))[0] || null;
+}
+
+async function hydrateTeachers(items: CmsItem[]): Promise<CmsItem[]> {
+  if (!items.some(item => item.teacherName)) return items;
+  const settings = await getSettings();
+  return items.map(item => ({ ...item, teachers: itemTeachers(item, settings.teachers || []) }));
 }
 
 // ---------- Custom pages (админ өөрөө үүсгэдэг хуудсууд) ----------
@@ -275,9 +282,9 @@ export async function clearResetCode(userId: string): Promise<void> {
 
 // ---------- Cached public reads (invalidated via revalidateTag in admin API routes) ----------
 export const listCmsCached = (kind: CmsItem["kind"]) =>
-  unstable_cache(() => listCms(kind), ["cms-list", kind], { tags: ["cms"], revalidate: 300 })();
+  unstable_cache(() => listCms(kind), ["cms-list-teachers-v2", kind], { tags: ["cms", "settings"], revalidate: 300 })();
 export const getCmsByIdCached = (id: string) =>
-  unstable_cache(() => getCmsById(id), ["cms-item", id], { tags: ["cms"], revalidate: 300 })();
+  unstable_cache(() => getCmsById(id), ["cms-item-teachers-v2", id], { tags: ["cms", "settings"], revalidate: 300 })();
 export const getSettingsCached = () =>
   unstable_cache(() => getSettings(), ["site-settings-v2"], { tags: ["settings"], revalidate: 300 })();
 export const listPagesCached = () =>
@@ -288,6 +295,7 @@ export const getPageByIdCached = (id: string) =>
 type CmsInput = {
   kind: CmsItem["kind"]; title: string; summary?: string; body?: string; price?: number; category?: string; mode?: CmsItem["mode"];
   image?: string; images?: string[]; link?: string; videoLessons?: number; students?: number; views?: number; teacherName?: string; teacherImage?: string; teacherRole?: string; teacherInfo?: string; accessDays?: number; lessons?: { title: string; path?: string; url?: string; quality?: string; subtitles?: string }[];
+  teachers?: TeacherPreset[];
   moods?: string[]; i18n?: CmsTranslations;
   level?: string; nextNote?: string; nextItemId?: string;
   bookingDays?: number[]; bookingStartHour?: number; bookingEndHour?: number;
@@ -320,11 +328,33 @@ function cmsRow(input: CmsInput): Record<string, unknown> {
     i18n: input.i18n && Object.keys(input.i18n).length ? input.i18n : null,
   };
 }
+/** Teacher profiles stay separate in site_settings; cms_items stores only their name references. */
+async function prepareCmsTeachers(input: CmsInput): Promise<TeacherPreset[]> {
+  const rows = await sbSelect<SiteSettings>("site_settings", "id=eq.main&limit=1");
+  const settings = rows[0] || {};
+  const teachers = input.teachers !== undefined ? normalizeTeachers(input.teachers) : itemTeachers(input, settings.teachers || []);
+  if (teachers.some(teacher => teacher.name.includes(","))) throw new Error("Багш бүрийг тусдаа нэрээр нэмнэ үү.");
+  if (teachers.length) {
+    const presets = [...(settings.teachers || [])];
+    for (const teacher of teachers) {
+      const index = presets.findIndex(person => person.name.trim().toLowerCase() === teacher.name.toLowerCase());
+      if (index >= 0) presets[index] = { ...presets[index], ...teacher };
+      else presets.push(teacher);
+    }
+    // One write preserves all selected teachers and reports failures instead of silently losing bios.
+    await updateSettings({ teachers: presets });
+  }
+  return teachers;
+}
 export async function createCmsItem(input: CmsInput): Promise<CmsItem> {
-  return sbInsert<CmsItem>("cms_items", { id: randomUUID(), ...cmsRow(input), createdAt: new Date().toISOString() });
+  const teachers = await prepareCmsTeachers(input);
+  const item = await sbInsert<CmsItem>("cms_items", { id: randomUUID(), ...cmsRow({ ...input, ...teacherFields(teachers) }), createdAt: new Date().toISOString() });
+  return { ...item, teachers };
 }
 export async function updateCmsItem(id: string, input: CmsInput): Promise<CmsItem | null> {
-  return sbUpdate<CmsItem>("cms_items", id, cmsRow(input));
+  const teachers = await prepareCmsTeachers(input);
+  const item = await sbUpdate<CmsItem>("cms_items", id, cmsRow({ ...input, ...teacherFields(teachers) }));
+  return item ? { ...item, teachers } : null;
 }
 export async function deleteCmsItem(id: string): Promise<boolean> {
   await sbDelete("cms_items", id);

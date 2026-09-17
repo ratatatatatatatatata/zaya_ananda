@@ -1,6 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { compressImage } from "@/lib/image-compress";
+import { itemTeachers, normalizeTeachers } from "@/lib/item-teachers";
+import { TeacherPicker, teacherDraft, type TeacherDraft } from "./TeacherPicker";
 import { formatMNT } from "@/lib/format";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { SERVICE_GROUPS, COURSE_CATS, COURSE_LEVELS, PRODUCT_CATS } from "@/data/cms-taxonomy";
@@ -10,28 +13,6 @@ import { useMoods } from "@/lib/moods";
 import { embedSrc } from "@/lib/video-embed";
 import type { CmsItem, TeacherPreset, CmsTranslations } from "@/lib/types";
 
-function compressImage(file: File, maxW = 1200, quality = 0.82): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error("Зураг уншиж чадсангүй."));
-    reader.onload = () => {
-      const img = new window.Image();
-      img.onload = () => {
-        const scale = Math.min(1, maxW / img.width);
-        const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
-        const canvas = document.createElement("canvas");
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return reject(new Error("canvas алдаа"));
-        ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      };
-      img.onerror = () => reject(new Error("Зураг буруу байна."));
-      img.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  });
-}
 
 const EMPTY = { title: "", category: "", summary: "", body: "", price: "", mode: "online", link: "", videoLessons: "", students: "", views: "", teacherName: "", teacherImage: "", teacherRole: "", teacherInfo: "", accessDays: "", level: "anhan", nextNote: "", nextItemId: "" };
 
@@ -82,6 +63,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
   const [form, setForm] = useState(EMPTY);
   const [images, setImages] = useState<string[]>([]);
   const [lessons, setLessons] = useState<LessonRow[]>([]);
+  const [selectedTeachers, setSelectedTeachers] = useState<TeacherDraft[]>([]);
   const [teachers, setTeachers] = useState<TeacherPreset[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [langTab, setLangTab] = useState<"mn" | TrLang>("mn");
@@ -128,11 +110,6 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
     } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
     e.target.value = "";
   }
-  async function pickTeacherImage(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]; if (!file) return;
-    try { const data = await compressImage(file); set("teacherImage", data); }
-    catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
-  }
 
   const updLesson = (idx: number, patch: Partial<LessonRow>) =>
     setLessons((ls) => ls.map((x, i) => (i === idx ? { ...x, ...patch } : x)));
@@ -153,38 +130,20 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
     } catch { setErr("Хадмал файл уншихад алдаа."); }
   }
 
-  function selectedTeacherNames(): string[] {
-    return form.teacherName.split(",").map((s) => s.trim()).filter(Boolean);
-  }
-
-  function toggleTeacher(name: string) {
-    const cur = selectedTeacherNames();
-    const isOn = cur.includes(name);
-    const next = isOn ? cur.filter((n) => n !== name) : [...cur, name];
-    setForm((f) => {
-      // Зураг/тайлбар талбарууд ганц хэвээр — эхний сонгосон багшийнхаар автоматаар бөглөнө.
-      const first = !isOn ? teachers.find((x) => x.name === name) : undefined;
-      return {
-        ...f,
-        teacherName: next.join(", "),
-        teacherImage: first ? (first.image || f.teacherImage) : f.teacherImage,
-        teacherRole: first ? (first.role || f.teacherRole) : f.teacherRole,
-        teacherInfo: first ? (first.info || f.teacherInfo) : f.teacherInfo,
-      };
-    });
-  }
-
   function resetForm() {
+    setSelectedTeachers([]);
     setForm({ ...EMPTY, category: fixedCategory || "" }); setImages([]); setLessons([]); setI18n({}); setMoods([]);
     setBookingDays(DEFAULT_BOOKING_DAYS); setBookingStart(String(DEFAULT_START_HOUR)); setBookingEnd(String(DEFAULT_END_HOUR));
     setLangTab("mn"); setEditingId(null); setErr(""); setOpen(false);
   }
   function startNew() {
+    setSelectedTeachers([]);
     setForm({ ...EMPTY, category: fixedCategory || "" }); setImages([]); setLessons([]); setI18n({}); setMoods([]);
     setBookingDays(DEFAULT_BOOKING_DAYS); setBookingStart(String(DEFAULT_START_HOUR)); setBookingEnd(String(DEFAULT_END_HOUR));
     setLangTab("mn"); setEditingId(null); setErr(""); setOpen(true);
   }
   function startEdit(it: CmsItem) {
+    setSelectedTeachers(itemTeachers(it, teachers).map(teacherDraft));
     setForm({
       title: it.title || "", category: it.category || "", summary: it.summary || "", body: it.body || "",
       price: it.price != null ? String(it.price) : "", mode: it.mode || "online", link: it.link || "",
@@ -210,9 +169,12 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
   async function save(e: React.FormEvent) {
     e.preventDefault();
     if (!form.title.trim()) { setErr("Гарчиг оруулна уу."); return; }
+    if (selectedTeachers.some(teacher => !teacher.name.trim() || teacher.name.includes(","))) { setErr("Багш бүрийг тусдаа мөрөнд нэрээр нь нэмнэ үү."); return; }
+    if (normalizeTeachers(selectedTeachers).length !== selectedTeachers.length) { setErr("Ижил нэртэй багшийг давхар сонгосон байна."); return; }
     setSaving(true); setErr("");
     const payload = {
       kind, ...form,
+      teachers: normalizeTeachers(selectedTeachers),
       image: images[0] || "",
       images,
       i18n,
@@ -592,49 +554,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
                   : <RichTextEditor key={langTab} value={i18n[langTab]?.body || ""} onChange={(html) => setTr(langTab, "body", html)} />}
               </div>
 
-              {hasTeacher && (
-                <div className="rounded-2xl border border-line bg-primary-50/40 p-4">
-                  <p className="font-display font-semibold text-ink">Заах багшийн мэдээлэл</p>
-                  {teachers.length > 0 && (
-                    <div className="mt-3">
-                      <label className="field-label">Багш сонгох (нэгээс олноор сонгож болно)</label>
-                      <div className="mt-1.5 flex flex-wrap gap-2">
-                        {teachers.map((t) => {
-                          const on = selectedTeacherNames().includes(t.name);
-                          return (
-                            <button
-                              key={t.name}
-                              type="button"
-                              onClick={() => toggleTeacher(t.name)}
-                              className={
-                                "rounded-full border px-3.5 py-1.5 text-sm font-medium transition " +
-                                (on ? "border-primary-600 bg-primary-600 text-white" : "border-line bg-white text-ink/70 hover:border-primary-300")
-                              }
-                            >
-                              {on ? "✓ " : ""}{t.name}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                  <div className="mt-4 flex items-center gap-3">
-                    {form.teacherImage
-                      ? <img src={form.teacherImage} alt="" className="h-20 w-20 rounded-full object-cover" />
-                      : <div className="grid h-20 w-20 place-items-center rounded-full border border-dashed border-line text-xl text-muted">👤</div>}
-                    <div className="flex flex-col gap-1">
-                      <input type="file" accept="image/*" onChange={pickTeacherImage} className="text-sm" />
-                      {form.teacherImage && <button type="button" onClick={() => set("teacherImage", "")} className="text-left text-xs font-semibold text-rose-500">Устгах</button>}
-                    </div>
-                  </div>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    <div><label className="field-label">Багшийн нэр (таслалаар тусгаарлан гараар нэмж болно)</label><input className="input" value={form.teacherName} onChange={(e) => set("teacherName", e.target.value)} /></div>
-                    <div><label className="field-label">Албан тушаал / чиглэл</label><input className="input" value={form.teacherRole} onChange={(e) => set("teacherRole", e.target.value)} placeholder="Жишээ: Энерги засалч, Багш" /></div>
-                  </div>
-                  <div className="mt-3"><label className="field-label">Мэдээлэл (мөр бүрд нэг мэдээлэл)</label><textarea className="textarea" rows={4} placeholder="Үүсгэн байгуулагч, Сургагч багш&#10;Далд ухамсрын шинжээч&#10;..." value={form.teacherInfo} onChange={(e) => set("teacherInfo", e.target.value)} /></div>
-                  <p className="mt-2 text-xs text-muted">Багшийн мэдээлэл автоматаар хадгалагдаж, дараагийн удаад дээрх жагсаалтаас сонгож болно.</p>
-                </div>
-              )}
+              {hasTeacher && <TeacherPicker value={selectedTeachers} presets={teachers} onChange={setSelectedTeachers} onError={setErr} />}
             </>
           )}
 

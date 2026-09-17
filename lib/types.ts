@@ -305,6 +305,8 @@ export interface CmsItem {
   videoLessons?: number;
   students?: number;
   views?: number;
+  /** Individual profiles resolved from the selected teacher references. */
+  teachers?: TeacherPreset[];
   teacherName?: string;
   teacherImage?: string;
   teacherInfo?: string;

@@ -1,5 +1,6 @@
 "use client";
 
+import { itemTeachers } from "@/lib/item-teachers";
 import Image from "next/image";
 import { HomeDetailLink as Link } from "@/components/home/HomeDetails";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
@@ -26,7 +27,7 @@ export function CategoryExperience({ services, courses, products, journeys }: { 
     {categories.map((category, categoryIndex) => {
       const slides: Slide[] = category.id === "ayalal"
         ? journeys.map(j => ({ id:j.id, title:j.name, desc:j.summary, image:j.image || category.image, tags:[j.days,j.groupSize,j.tagline].filter(Boolean), href:`/ayalal/${encodeURIComponent(j.slug)}`, journey:j }))
-        : lists[categoryIndex].map(item => ({ id:item.id, title:item.title, desc:item.summary || category.desc, image:item.image || item.images?.[0] || category.image, tags:[item.category,item.teacherName,typeof item.price === "number" ? formatMNT(item.price) : ""].filter((v): v is string => !!v), href:`/item/${item.id}`, item }));
+        : lists[categoryIndex].map(item => ({ id:item.id, title:item.title, desc:item.summary || category.desc, image:item.image || item.images?.[0] || category.image, tags:[item.category,...itemTeachers(item).map(teacher => teacher.name),typeof item.price === "number" ? formatMNT(item.price) : ""].filter((v): v is string => !!v), href:`/item/${item.id}`, item }));
       return <section key={category.id} id={category.id} className="experience-section" aria-labelledby={`experience-${category.id}`}>
         {category.id === "courses" && <span id="capabilities" className="experience-anchor" aria-hidden="true"/>}
         <div className="experience-heading">

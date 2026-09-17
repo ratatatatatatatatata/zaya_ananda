@@ -4,16 +4,13 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ServiceBooking } from "@/components/ServiceBooking";
 import { TiltCard } from "@/components/motion/TiltCard";
+import { ItemTeachers } from "@/components/ItemTeachers";
 import type { CmsItem } from "@/lib/types";
 
-function initials(name: string) {
-  return name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
-}
 
 /** Энергийн заслын карт — дэлгэрэнгүй хуудас руу шилжихгүй, энд дээрээ дэлгэгдэж цаг захиална. */
 export function ServiceCard({ item, onOpenChange }: { item: CmsItem; onOpenChange?: (open: boolean) => void }) {
   const cover = item.image || item.images?.[0];
-  const hasTeacher = Boolean(item.teacherName);
   const [open, setOpen] = useState(false);
 
   useEffect(() => { onOpenChange?.(open); return () => { if(open) onOpenChange?.(false); }; }, [open, onOpenChange]);
@@ -56,26 +53,7 @@ export function ServiceCard({ item, onOpenChange }: { item: CmsItem; onOpenChang
               <h3 className="font-display text-lg font-semibold text-ink">{item.title}</h3>
               {item.summary && <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{item.summary}</p>}
 
-              {hasTeacher && (
-                <div className="mt-5 flex items-center gap-3 border-t border-line pt-4">
-                  <span className="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-surface-3">
-                    {item.teacherImage ? (
-                      <img src={item.teacherImage} alt={item.teacherName} className="h-full w-full object-cover" />
-                    ) : (
-                      <span
-                        className="grid h-full w-full place-items-center font-display text-sm font-semibold text-[#14231F]"
-                        style={{ backgroundImage: "linear-gradient(150deg,#FFE7A8,#E8B75F 55%,#B98A3C)" }}
-                      >
-                        {initials(item.teacherName || "")}
-                      </span>
-                    )}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate font-display text-sm font-semibold text-ink">{item.teacherName}</span>
-                    {item.teacherInfo && <span className="block truncate text-xs text-muted">{item.teacherInfo.split("\n")[0]}</span>}
-                  </span>
-                </div>
-              )}
+              <div className="mt-5 border-t border-line pt-4"><ItemTeachers item={item} /></div>
 
               <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-primary-700">
                 Цаг захиалах <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">→</span>
@@ -118,25 +96,7 @@ export function ServiceCard({ item, onOpenChange }: { item: CmsItem; onOpenChang
                 </div>
               )}
 
-              {hasTeacher && (
-                <div className="mt-6 flex items-center gap-4 rounded-3xl border border-line bg-surface-2 p-4">
-                  <span className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-surface-3">
-                    {item.teacherImage ? (
-                      <img src={item.teacherImage} alt={item.teacherName} className="h-full w-full object-cover" />
-                    ) : (
-                      <span className="grid h-full w-full place-items-center font-display font-semibold text-[#14231F]"
-                        style={{ backgroundImage: "linear-gradient(150deg,#FFE7A8,#E8B75F 55%,#B98A3C)" }}>
-                        {initials(item.teacherName || "")}
-                      </span>
-                    )}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold uppercase tracking-wide text-muted">Заах багш</p>
-                    <p className="font-display font-semibold text-ink">{item.teacherName}</p>
-                    {item.teacherInfo && <p className="text-sm text-muted">{item.teacherInfo.split("\n")[0]}</p>}
-                  </div>
-                </div>
-              )}
+              <div className="mt-5 border-t border-line pt-4"><ItemTeachers item={item} /></div>
 
               <div className="mt-6">
                 <ServiceBooking

@@ -3,11 +3,9 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ServiceBooking } from "@/components/ServiceBooking";
+import { ItemTeachers } from "@/components/ItemTeachers";
 import type { CmsItem } from "@/lib/types";
 
-function initials(name: string) {
-  return name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
-}
 
 /** Нэг үйлчилгээний мөр — зүүн талд зураг, баруун талд бүх мэдээлэл. Цаг захиалга цонхоор нээгдэнэ. */
 function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
@@ -64,25 +62,7 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
           </div>
         )}
 
-        {item.teacherName && (
-          <div className="mt-6 flex items-center gap-4 border-t border-line pt-5">
-            <span className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-surface-3">
-              {item.teacherImage ? (
-                <img src={item.teacherImage} alt={item.teacherName} className="h-full w-full object-cover" />
-              ) : (
-                <span className="grid h-full w-full place-items-center font-display font-semibold text-[#14231F]"
-                  style={{ backgroundImage: "linear-gradient(150deg,#FFE7A8,#E8B75F 55%,#B98A3C)" }}>
-                  {initials(item.teacherName)}
-                </span>
-              )}
-            </span>
-            <div className="min-w-0">
-              <p className="text-xs font-bold uppercase tracking-wide text-muted">Заах багш</p>
-              <p className="font-display font-semibold text-ink">{item.teacherName}</p>
-              {item.teacherInfo && <p className="text-sm text-muted">{item.teacherInfo.split("\n")[0]}</p>}
-            </div>
-          </div>
-        )}
+        <div className="mt-5 border-t border-line pt-4"><ItemTeachers item={item} /></div>
 
         {/* Цаг захиалга — нүүр хуудастай адил цонхоор нээгдэнэ */}
         <button type="button" onClick={() => setBooking(true)} aria-haspopup="dialog" className="btn btn-primary btn-md mt-6">
@@ -119,25 +99,7 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
                 </div>
               )}
 
-              {item.teacherName && (
-                <div className="mt-6 flex items-center gap-4 rounded-3xl border border-line bg-surface-2 p-4">
-                  <span className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-surface-3">
-                    {item.teacherImage ? (
-                      <img src={item.teacherImage} alt={item.teacherName} className="h-full w-full object-cover" />
-                    ) : (
-                      <span className="grid h-full w-full place-items-center font-display font-semibold text-[#14231F]"
-                        style={{ backgroundImage: "linear-gradient(150deg,#FFE7A8,#E8B75F 55%,#B98A3C)" }}>
-                        {initials(item.teacherName)}
-                      </span>
-                    )}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold uppercase tracking-wide text-muted">Заах багш</p>
-                    <p className="font-display font-semibold text-ink">{item.teacherName}</p>
-                    {item.teacherInfo && <p className="text-sm text-muted">{item.teacherInfo.split("\n")[0]}</p>}
-                  </div>
-                </div>
-              )}
+              <div className="mt-5 border-t border-line pt-4"><ItemTeachers item={item} /></div>
 
               <div className="mt-6">
                 <ServiceBooking
