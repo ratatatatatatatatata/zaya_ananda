@@ -70,5 +70,5 @@ test('public gallery uses additional photos only and hides empty legacy gallerie
   assert.equal(render({...body,gallery:undefined}),'');
   const html=render({...body,gallery:photos});
   assert.ok(html.includes('/one.jpg'));assert.ok(html.includes('/two.jpg'));
-  assert.ok(!html.includes('/hero.jpg'));assert.ok(!html.includes('rotate('));assert.equal((html.match(/<img /g)||[]).length,2);assert.ok(!html.includes('түр зогсоох'));
+  assert.ok(!html.includes('/hero.jpg'));assert.ok(!html.includes('rotate('));assert.equal((html.match(/<img /g)||[]).length,3);assert.ok(html.includes('Өмнөх зураг'));assert.ok(html.includes('Дараах зураг'));assert.equal((html.match(/aria-pressed="true"/g)||[]).length,1);assert.ok(!html.includes('түр зогсоох'));
 });
