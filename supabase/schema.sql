@@ -93,6 +93,9 @@ alter table site_settings add column if not exists about_partners jsonb;
 -- journeys/journey_bookings/journey_reviews тухайн Supabase төсөлд шууд (энэ файлаас гадуур)
 -- үүсгэгдсэн тул CREATE TABLE энд байхгүй — зөвхөн шинэ баганыг л additive байдлаар нэмнэ.
 alter table journeys add column if not exists destination jsonb;
+-- Аялалд бүртгүүлэхийн өмнөх хөдөлгөөнт цомгийн нэмэлт зургууд.
+alter table journeys add column if not exists gallery jsonb not null default '[]'::jsonb
+  check (jsonb_typeof(gallery) = 'array');
 
 alter table cms_items add column if not exists link text;
 

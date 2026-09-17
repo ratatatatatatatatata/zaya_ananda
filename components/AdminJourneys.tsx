@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { Destination, Journey, JourneyDay, Person, Scene } from "@/data/journeys";
+import { parseJourneyGallery } from "@/lib/journey-gallery";
+import type { Destination, Journey, JourneyDay, JourneyPhoto, Person, Scene } from "@/data/journeys";
 
 function compressImage(file: File, maxW = 1200, quality = 0.82): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -93,6 +94,9 @@ export function AdminJourneys() {
   const [form, setForm] = useState(EMPTY);
   const [itinerary, setItinerary] = useState<JourneyDay[]>([]);
   const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [gallery, setGallery] = useState<JourneyPhoto[]>([]);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const busy = saving || uploadingGallery;
   const [lead, setLead] = useState<Person>(EMPTY_PERSON);
   const [crew, setCrew] = useState<Person[]>([]);
 
@@ -107,11 +111,11 @@ export function AdminJourneys() {
   useEffect(() => { load(); }, [load]);
 
   function resetForm() {
-    setForm(EMPTY); setItinerary([]); setDestinations([]); setLead(EMPTY_PERSON); setCrew([]);
+    setGallery([]); setForm(EMPTY); setItinerary([]); setDestinations([]); setLead(EMPTY_PERSON); setCrew([]);
     setEditingId(null); setErr(""); setOpen(false);
   }
   function startNew() {
-    setForm(EMPTY); setItinerary([]); setDestinations([]); setLead(EMPTY_PERSON); setCrew([]);
+    setGallery([]); setForm(EMPTY); setItinerary([]); setDestinations([]); setLead(EMPTY_PERSON); setCrew([]);
     setEditingId(null); setErr(""); setOpen(true);
   }
   function startEdit(j: Journey) {
@@ -123,6 +127,7 @@ export function AdminJourneys() {
     });
     setItinerary(j.itinerary && j.itinerary.length ? j.itinerary : []);
     setDestinations(j.destination && j.destination.length ? j.destination : []);
+    setGallery(j.gallery || []);
     setLead(j.lead || EMPTY_PERSON);
     setCrew(j.crew || []);
     setEditingId(j.id); setErr(""); setOpen(true);
@@ -142,6 +147,29 @@ export function AdminJourneys() {
     e.target.value = "";
   }
 
+  async function pickGallery(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    e.target.value = "";
+    if (!files.length || busy) return;
+    if (gallery.length + files.length > 30) { setErr("Нэг аялалд 30 хүртэл нэмэлт зураг оруулна уу."); return; }
+    setUploadingGallery(true); setErr("");
+    try {
+      const photos: JourneyPhoto[] = [];
+      for (const file of files) photos.push({ image: await compressImage(file, 1000, 0.76), caption: "" });
+      setGallery(parseJourneyGallery([...gallery, ...photos]));
+    } catch (error) { setErr(error instanceof Error ? error.message : "Зураг оруулахад алдаа гарлаа."); }
+    finally { setUploadingGallery(false); }
+  }
+
+  function movePhoto(index: number, direction: -1 | 1) {
+    setGallery(current => {
+      const next = [...current], target = index + direction;
+      if (target < 0 || target >= next.length) return current;
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  }
+
   const addDay = () => setItinerary((ds) => [...ds, { ...EMPTY_DAY }]);
   const updDay = (i: number, patch: Partial<JourneyDay>) => setItinerary((ds) => ds.map((d, k) => (k === i ? { ...d, ...patch } : d)));
   const delDay = (i: number) => setItinerary((ds) => ds.filter((_, k) => k !== i));
@@ -156,6 +184,7 @@ export function AdminJourneys() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
     if (!form.name.trim()) { setErr("Аяллын нэрийг оруулна уу."); return; }
     setSaving(true); setErr("");
     const payload = {
@@ -163,14 +192,17 @@ export function AdminJourneys() {
       prepay: Number(form.prepay) || 0,
       itinerary,
       destination: destinations,
+      gallery,
       lead,
       crew,
     };
     try {
+      const body = JSON.stringify(editingId ? { id: editingId, ...payload } : payload);
+      if (new TextEncoder().encode(body).length > 4000000) throw new Error("Аяллын зургуудын нийт хэмжээ хэт их байна. Зарим нэмэлт зургийг хасаад дахин хадгална уу.");
       const res = await fetch("/api/admin/journeys", {
         method: editingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editingId ? { id: editingId, ...payload } : payload),
+        body,
       });
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || "Алдаа гарлаа."); }
       resetForm(); load();
@@ -186,7 +218,7 @@ export function AdminJourneys() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-lg font-semibold text-ink">Нийт: {items.length}</h2>
-        <button onClick={() => (open ? resetForm() : startNew())} className="btn btn-primary btn-sm">{open ? "Болих" : "+ Аялал нэмэх"}</button>
+        <button disabled={busy} onClick={() => (open ? resetForm() : startNew())} className="btn btn-primary btn-sm">{open ? "Болих" : "+ Аялал нэмэх"}</button>
       </div>
 
       {open && (
@@ -213,6 +245,30 @@ export function AdminJourneys() {
               </select>
             </div>
           </div>
+
+          <fieldset disabled={busy} className="rounded-2xl border border-line bg-primary-50/40 p-4">
+            <legend className="px-2 font-display font-semibold text-ink">Нэмэлт зургууд</legend>
+            <p className="text-sm text-muted">Бүртгэлийн маягтын өмнө өөр өөр өндөрт байрлан автоматаар гүйнэ. Зургийг тайрахгүйгээр харуулна.</p>
+            <label className="mt-3 block text-sm font-semibold text-ink">
+              Зураг нэмэх (олноор сонгож болно)
+              <input type="file" accept="image/*" multiple onChange={pickGallery} className="mt-2 block w-full text-sm" />
+            </label>
+            {uploadingGallery && <p role="status" className="mt-2 text-sm text-muted">Зургуудыг бэлдэж байна...</p>}
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {gallery.map((photo, i) => <div key={i} className="rounded-xl border border-line bg-white p-3">
+                <img src={photo.image} alt={photo.caption || `Нэмэлт зураг ${i + 1}`} className="h-36 w-full rounded-lg object-contain" />
+                <label className="mt-2 block text-xs text-muted">Зургийн тайлбар
+                  <input className="input mt-1" maxLength={200} value={photo.caption || ""} placeholder="Тайлбар (заавал биш)" onChange={e => setGallery(current => current.map((item, index) => index === i ? { ...item, caption: e.target.value } : item))} />
+                </label>
+                <div className="mt-3 flex items-center gap-3 text-sm">
+                  <button type="button" disabled={i === 0} aria-label={`${i + 1}-р зургийг урагшлуулах`} onClick={() => movePhoto(i, -1)} className="disabled:opacity-30">←</button>
+                  <button type="button" disabled={i === gallery.length - 1} aria-label={`${i + 1}-р зургийг хойшлуулах`} onClick={() => movePhoto(i, 1)} className="disabled:opacity-30">→</button>
+                  <button type="button" onClick={() => setGallery(current => current.filter((_, index) => index !== i))} className="ml-auto text-rose-600">Устгах</button>
+                </div>
+              </div>)}
+            </div>
+            {!gallery.length && <p className="mt-3 text-sm text-muted">Нэмэлт зураг оруулаагүй бол цомог харагдахгүй.</p>}
+          </fieldset>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div><label className="field-label">Нэр *</label><input className="input" value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Шамбалын орон — Говийн энергийн аялал" /></div>
@@ -357,8 +413,8 @@ export function AdminJourneys() {
 
           {err && <p className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-600">{err}</p>}
           <div className="flex gap-2">
-            <button type="submit" disabled={saving} className="btn btn-primary btn-md">{saving ? "Хадгалж байна..." : editingId ? "Засварыг хадгалах" : "Хадгалах"}</button>
-            <button type="button" onClick={resetForm} className="btn btn-outline btn-md">Болих</button>
+            <button type="submit" disabled={busy} className="btn btn-primary btn-md">{saving ? "Хадгалж байна..." : editingId ? "Засварыг хадгалах" : "Хадгалах"}</button>
+            <button type="button" disabled={busy} onClick={resetForm} className="btn btn-outline btn-md">Болих</button>
           </div>
         </form>
       )}
@@ -377,7 +433,7 @@ export function AdminJourneys() {
                 <td className="px-4 py-2">{j.image ? <img src={j.image} alt="" className="h-10 w-14 rounded-lg object-cover" /> : <span className="text-muted">—</span>}</td>
                 <td className="px-4 py-3 text-sm font-medium text-ink">{j.name}<span className="ml-2 text-xs text-muted">/{j.slug}</span></td>
                 <td className="px-4 py-3 text-sm text-ink/80">{j.prepay ? j.prepay.toLocaleString("mn-MN") + "₮" : "—"}</td>
-                <td className="px-4 py-3 text-right"><div className="flex justify-end gap-3"><button onClick={() => startEdit(j)} className="text-sm font-semibold text-primary-700 hover:underline">Засах</button><button onClick={() => del(j.id)} className="text-sm font-semibold text-rose-500 hover:underline">Устгах</button></div></td>
+                <td className="px-4 py-3 text-right"><div className="flex justify-end gap-3"><button disabled={busy} onClick={() => startEdit(j)} className="text-sm font-semibold text-primary-700 hover:underline">Засах</button><button disabled={busy} onClick={() => del(j.id)} className="text-sm font-semibold text-rose-500 hover:underline">Устгах</button></div></td>
               </tr>
             ))}
             {items.length === 0 && <tr><td className="px-4 py-6 text-sm text-muted" colSpan={4}>Аялал алга. “+ Аялал нэмэх” дарж эхлүүлнэ үү.</td></tr>}

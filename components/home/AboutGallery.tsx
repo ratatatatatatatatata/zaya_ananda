@@ -22,7 +22,7 @@ function buildColumns(images: GalleryImg[]) {
 /** "Бидний тухай" хуудасны олон зургийн галерей — хажуу тийш аяндаа аажим гулсдаг,
  *  зураг бүрийг бүтнээр (тайрахгүй) харуулна. */
 export function AboutGallery({ images, layout = "mosaic", label = "Манай орчны зургийн цомог" }: {
-  images: GalleryImg[]; layout?: "mosaic" | "landscape"; label?: string;
+  images: GalleryImg[]; layout?: "mosaic" | "landscape" | "scattered"; label?: string;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const cycleRef = useRef<HTMLDivElement>(null);
@@ -72,7 +72,7 @@ export function AboutGallery({ images, layout = "mosaic", label = "Манай о
   }, [canMove, paused]);
 
   if (images.length === 0) return null;
-  const columns = layout === "landscape" ? images.map(image => [image]) : buildColumns(images);
+  const columns = layout !== "mosaic" ? images.map(image => [image]) : buildColumns(images);
 
   return (
     <div className="relative min-w-0" role="region" aria-label={label}>
@@ -97,10 +97,10 @@ export function AboutGallery({ images, layout = "mosaic", label = "Манай о
       >
         {Array.from({length:canMove ? copies : 1}, (_, copy) => <div key={copy} ref={copy === 0 ? cycleRef : undefined} aria-hidden={copy > 0 ? true : undefined} className="flex shrink-0 items-start gap-4 pr-4">
           {columns.map((col, ci) => (
-            <div key={ci} className={layout === "landscape" ? "flex w-[75vw] max-w-[28rem] shrink-0 flex-col gap-4 sm:w-[28rem]" : "flex w-48 shrink-0 flex-col gap-4 sm:w-60"}>
+            <div key={ci} style={layout === "scattered" ? { paddingTop: [12, 68, 28, 92, 42][ci % 5], paddingBottom: 24 } : undefined} className={layout === "scattered" ? "flex w-52 shrink-0 flex-col gap-4 sm:w-72" : layout === "landscape" ? "flex w-[75vw] max-w-[28rem] shrink-0 flex-col gap-4 sm:w-[28rem]" : "flex w-48 shrink-0 flex-col gap-4 sm:w-60"}>
               {col.map((img, ii) => (
-                <div key={ii} className="relative overflow-hidden rounded-2xl bg-surface-3">
-                  <img src={img.image} alt={img.caption || ""} className={layout === "landscape" ? "aspect-[4/3] w-full object-cover" : "h-auto w-full"} loading="lazy" />
+                <div key={ii} className="relative overflow-hidden rounded-2xl bg-surface-3" style={layout === "scattered" ? { transform: `rotate(${[-3, 2, -1, 3, -2][ci % 5]}deg)`, marginInline: 8 } : undefined}>
+                  <img src={img.image} alt={img.caption || ""} className={layout === "landscape" ? "aspect-[4/3] w-full object-cover" : layout === "scattered" ? "h-auto max-h-80 w-full object-contain sm:max-h-96" : "h-auto w-full"} loading="lazy" />
                   {img.caption && (
                     <span className="absolute inset-x-2 bottom-2 line-clamp-2 rounded-lg bg-black/60 px-2.5 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
                       {img.caption}

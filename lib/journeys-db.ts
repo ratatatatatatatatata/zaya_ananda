@@ -208,6 +208,7 @@ function journeyRow(input: Omit<Journey, "id" | "createdAt">): Record<string, un
     prepay: typeof input.prepay === "number" && input.prepay > 0 ? input.prepay : 0,
     itinerary: input.itinerary || [],
     destination: input.destination || [],
+    ...(input.gallery !== undefined ? { gallery: input.gallery } : {}),
     lead: input.lead || { name: "", role: "", info: "" },
     crew: input.crew || [],
   };

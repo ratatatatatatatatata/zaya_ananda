@@ -29,7 +29,11 @@ export type Destination = {
   image?: string;
 };
 
+export type JourneyPhoto = { image: string; caption?: string };
+
 export type Journey = {
+  /** Additional admin-uploaded photographs shown immediately before registration. */
+  gallery?: JourneyPhoto[];
   id: string;
   slug: string;
   name: string;

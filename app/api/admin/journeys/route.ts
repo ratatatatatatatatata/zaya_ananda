@@ -3,6 +3,7 @@ import { revalidateTag, revalidatePath } from "next/cache";
 import { getSessionUserId } from "@/lib/auth";
 import { checkAdmin } from "@/lib/repo";
 import { listJourneys, getJourneyBySlug, createJourney, updateJourney, deleteJourney } from "@/lib/journeys-db";
+import { parseJourneyGallery } from "@/lib/journey-gallery";
 import type { Scene } from "@/data/journeys";
 
 export const runtime = "nodejs";
@@ -74,6 +75,7 @@ function parseInput(body: any) {
     prepay: Number(body.prepay) || 0,
     itinerary: parseItinerary(body.itinerary),
     destination: parseDestinations(body.destination),
+    ...(body.gallery !== undefined ? { gallery: parseJourneyGallery(body.gallery) } : {}),
     lead: parsePerson(body.lead || {}),
     crew: Array.isArray(body.crew) ? body.crew.map(parsePerson).filter((c: { name: string }) => c.name) : [],
   };
