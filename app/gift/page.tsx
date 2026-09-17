@@ -19,7 +19,7 @@ export default async function GiftPage() {
         align="center"
         eyebrow="Zaya's Ananda"
         title={<T k="nav.gift" />}
-        desc="Podcast, бясалгал дасгал, зөвлөмж — бүх агуулгаа эндээс үзээрэй. Бүртгэлгүйгээр үзнэ."
+        desc="Зөвлөмж, бясалгал дасгал, Podcast — бүх агуулгаа эндээс үзээрэй. Бүртгэлгүйгээр үзнэ."
       />
       <section className="section"><div className="container-px">
         <MediaLibrary items={[...free, ...resources]} />

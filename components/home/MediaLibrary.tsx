@@ -9,16 +9,16 @@ import type { CmsItem } from "@/lib/types";
 import styles from "./GiftMedia.module.css";
 
 const TABS: { id: GiftCategory; title: string }[] = [
-  { id: "podcast", title: "Podcast" },
-  { id: "meditation", title: "Бясалгал дасгал" },
   { id: "advice", title: "Зөвлөмж" },
+  { id: "meditation", title: "Бясалгал дасгал" },
+  { id: "podcast", title: "Podcast" },
 ];
 type Gift = { id: string; title: string; poster: string; category: GiftCategory; url?: string; article?: CmsItem };
 
 function MediaArtwork({ src, large = false }: { src: string; large?: boolean }) {
   const [failed, setFailed] = useState(false);
   const source = failed ? "/video/temple.jpg" : src;
-  return <Image src={source} alt="" fill sizes={large ? "(max-width:767px) 100vw, 65vw" : "260px"} unoptimized={!source.startsWith("/")} onError={() => setFailed(true)} />;
+  return <Image src={source} alt="" fill sizes={large ? "(max-width:767px) 100vw, 60vw" : "260px"} unoptimized={!source.startsWith("/")} onError={() => setFailed(true)} />;
 }
 
 /** Homepage has three tabs; the Gift menu shows the complete public library. */
