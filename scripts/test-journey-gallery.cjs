@@ -24,6 +24,7 @@ function load(relative) {
   const mod={exports:{}};modules.set(filename,mod);
   const code=ts.transpileModule(fs.readFileSync(filename,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText;
   const req=spec=> {
+    if(spec.endsWith('.module.css'))return {__esModule:true,default:new Proxy({}, {get:(_,key)=>String(key)})};
     if(spec==='@/lib/supabase')return storage;
     if(spec==='@/lib/auth')return {getSessionUserId:async()=>user};
     if(spec==='@/lib/repo')return {checkAdmin:async()=>({ok:admin})};
@@ -69,5 +70,5 @@ test('public gallery uses additional photos only and hides empty legacy gallerie
   assert.equal(render({...body,gallery:undefined}),'');
   const html=render({...body,gallery:photos});
   assert.ok(html.includes('/one.jpg'));assert.ok(html.includes('/two.jpg'));
-  assert.ok(!html.includes('/hero.jpg'));assert.ok(html.includes('rotate(-3deg)'));assert.ok(html.includes('padding-top:68px'));
+  assert.ok(!html.includes('/hero.jpg'));assert.ok(!html.includes('rotate('));assert.equal((html.match(/<img /g)||[]).length,2);assert.ok(!html.includes('түр зогсоох'));
 });
