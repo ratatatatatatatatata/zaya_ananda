@@ -4,7 +4,7 @@
 .rail { position:relative; display:flex; overflow-x:auto; gap:20px; padding:24px 2px 14px; scroll-snap-type:x mandatory; scrollbar-width:thin; scrollbar-color:#829675 #e5ebdc; }.railCard { flex:0 0 260px; min-width:0; overflow:hidden; display:flex; flex-direction:column; align-items:stretch; text-align:left; border:1px solid #d5dfcc; border-radius:16px; background:#fafbf7; color:#244831; scroll-snap-align:start; }.railCard[aria-pressed=true] { border-color:#345c3e; box-shadow:0 0 0 1px #345c3e; }.thumb { display:block; position:relative; aspect-ratio:16/9; background:#dce6d3; }.thumb img { object-fit:cover; }.thumb>span { position:absolute; right:12px; bottom:12px; display:grid; place-items:center; width:30px; height:30px; background:#fafbf7ed; border-radius:50%; }.number { margin:18px 18px 0; font-size:.75rem; color:#65775c; }.name { margin:10px 18px 18px; font-size:1rem; line-height:1.6; font-weight:600; }.more { margin:auto 18px 18px; font-size:.8rem; color:#345c3e; }.article { border:1px solid #d5dfcc; border-radius:16px; background:#fafbf7; padding:28px; margin-top:20px; line-height:1.8; }
 @media(max-width:767px) { .feature { grid-template-columns:1fr; }.featureCopy { padding:24px; gap:16px; }.railCard { flex-basis:240px; }.tabs { gap:8px; }.tabs button { padding:12px 16px; font-size:.9rem; } }
 
-.sections { display:grid; gap:72px; }.sections > section + section { padding-top:48px; border-top:1px solid #d5dfcc; }
+.sections { display:grid; grid-template-columns:minmax(0,1fr); gap:72px; }.sections > section { min-width:0; }.sections > section + section { padding-top:48px; border-top:1px solid #d5dfcc; }
 
 /* Compact layout for the Gift menu's stacked categories. */
 .sections { max-width:1040px; margin-inline:auto; gap:48px; }
