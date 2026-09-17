@@ -8,7 +8,6 @@ import { JourneyBooking } from "@/components/journey/JourneyBooking";
 import { DestinationGallery } from "@/components/journey/DestinationGallery";
 import { JourneyGallery } from "@/components/journey/JourneyGallery";
 import { JourneyReviews } from "@/components/journey/JourneyReviews";
-import { ContactSection } from "@/components/ContactSection";
 
 // Админ шинэ аялал нэмэнгүүт (эсвэл slug өөрчлөгдөнгүүт) шууд нээгдэж харагдахын тулд
 // статик param урьдчилан үүсгэхийг больж, хүсэлт болгонд шинэчлэн уншина (доод давхаргад unstable_cache 5 минут кэшилнэ).
@@ -304,7 +303,6 @@ export default async function JourneyPage({ params }: { params: { slug: string }
           ))}
         </div>
       </div></section>
-      <ContactSection />
     </>
   );
 }

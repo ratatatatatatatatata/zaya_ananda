@@ -57,7 +57,7 @@ body:has([data-cinematic-theme]) #mobile-navigation { position:absolute; top:100
 body:has([data-cinematic-theme]) .site-actions { gap:5px; }
 body:has([data-cinematic-theme]) .site-actions>button,body:has([data-cinematic-theme]) .site-actions>a { border:1px solid #dbe4da80; }
 body:has([data-cinematic-theme]) .site-footer { background:#ecf1e9; margin-top:0; }
-body:has([data-cinematic-theme]) .site-footer>div:first-child { padding-top:70px; padding-bottom:65px; }
+body:has([data-cinematic-theme]) .site-footer>div:first-child { padding-top:32px; padding-bottom:32px; }
 body:has([data-cinematic-theme]) .site-footer h3 { font-family:var(--font-sans); font-size:13px; }
 body:has([data-cinematic-theme]) .mobile-dock { margin:0 10px 10px; border:1px solid #dbe4da; border-radius:24px; background:#ffffffed; box-shadow:0 8px 32px #25483114; }
 /* Homepage: generous type, full imagery and one restrained motion language. */

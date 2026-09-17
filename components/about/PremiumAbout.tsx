@@ -14,8 +14,7 @@ type Props = {
   members: Member[]; sampleMembers: boolean;
   programs: { title: ReactNode; text: ReactNode }[];
   partners: { name: string; logo: string }[];
-  phone: string; email: string; address: ReactNode; hours: ReactNode; mapQuery: string;
-  media?: ReactNode; extra?: ReactNode; contactForm?: ReactNode;
+  media?: ReactNode; extra?: ReactNode;
 };
 
 function SymbolIcon({ index }: { index: number }) {
@@ -118,7 +117,6 @@ export function PremiumAbout(p: Props) {
     <Story items={p.story} sample={p.sample}/>
     <div className={styles.dark}><Team members={p.members} sample={p.sampleMembers}/><Programs items={p.programs}/>
       <section id="our-partners" className={`${styles.container} ${styles.partners}`}><p className={styles.label}>04 / CONNECTIONS</p><h2>Хамтын оролцоо.<br/><span>Нэгэн чиглэл.</span></h2><p className={styles.sectionIntro}>Дэмжлэг, хамтын ажиллагааны мэдээлэл.</p><div className={styles.partnerGrid}>{p.partners.length ? p.partners.map((partner,i)=><div className={styles.partnerPanel} key={i}>{partner.logo ? <Image src={partner.logo} alt={partner.name} unoptimized width={200} height={70} style={{objectFit:"contain",maxHeight:70}}/> : <span>{partner.name}</span>}</div>) : [1,2,3].map(i=><div className={styles.partnerPanel} key={i}><SymbolIcon index={i}/><span>ЛОГО БАЙРШУУЛАХ ХЭСЭГ</span><small>Жишиг {String(i).padStart(2,"0")} · Түншлэл зарлаагүй</small></div>)}</div>{p.extra}</section>
-      <footer id="contact" className={`${styles.container} ${styles.contact}`}><p className={styles.label}>05 / LET’S CONNECT</p><div className={styles.contactHeading}><h2>Ярилцъя<span>.</span></h2><a className={styles.contactArrow} href={`mailto:${p.email}`} aria-label="Имэйл илгээх">↗</a></div><div className={styles.contactGrid}><a href={`mailto:${p.email}`}>{p.email}</a><a href={`tel:${p.phone.replace(/[^+\d]/g,"")}`}>{p.phone}</a><a href={`https://www.google.com/maps?q=${encodeURIComponent(p.mapQuery)}`} target="_blank" rel="noreferrer">{p.address} ↗</a><p>{p.hours}</p></div>{p.contactForm}<div className={styles.footerLine}><span>Zaya’s Ananda</span><span>ӨӨРИЙГӨӨ ТАНИХ АЯЛАЛ</span><a href="#about-title">Дээш буцах ↑</a></div></footer>
     </div>
   </div>;
 }

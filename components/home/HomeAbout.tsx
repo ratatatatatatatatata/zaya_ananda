@@ -1,9 +1,9 @@
+import { publicTeam } from "@/lib/public-team";
 import { Reveal } from "../Reveal";
 import { T, Tr } from "../T";
 import { AboutFacts } from "./AboutFacts";
 import { aboutContent, team, faqs } from "@/data/content";
 import { getSettingsCached } from "@/lib/repo";
-import { ContactSection } from "@/components/ContactSection";
 import { signedDownloadUrl } from "@/lib/supabase";
 import { AboutGallery } from "./AboutGallery";
 import { AboutMilestones } from "./AboutMilestones";
@@ -34,10 +34,7 @@ export async function HomeAbout() {
     else { try { aboutVideoUrl = await signedDownloadUrl("lesson-videos", settings.aboutVideo); } catch { aboutVideoUrl = ""; } }
   }
 
-  const mergedTeam = [
-    ...(settings.teachers || []),
-    ...(settings.team || []).filter((m) => !(settings.teachers || []).some((t) => t.name === m.name)),
-  ];
+  const mergedTeam = publicTeam(settings.teachers || [], settings.team || []);
 
   return (
     <div className="space-y-16">
@@ -88,7 +85,7 @@ export async function HomeAbout() {
           <p className="eyebrow-line justify-center"><T k="about.teamEyebrow" /></p>
           <h3 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl"><T k="about.teamTitle" /></h3>
         </div>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid auto-rows-fr gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {mergedTeam.length > 0
             ? mergedTeam.map((m, i) => (
                 <Reveal key={m.name + i} delay={i * 80}>
@@ -134,10 +131,7 @@ export async function HomeAbout() {
         </div>
       </div>
 
-      {/* Холбоо барих мэдээлэл */}
-      <div className="-mx-4 sm:-mx-6 lg:-mx-8">
-        <ContactSection />
-      </div>
+
     </div>
   );
 }

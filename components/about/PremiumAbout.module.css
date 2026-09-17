@@ -72,14 +72,14 @@
 .statement span { color:#668378!important; }
 .sectionIntro { margin-top:24px; max-width:580px; color:#61716c; font-size:15px; }
 .teamTitle { margin-top:24px; font-size:clamp(30px,3.2vw,48px)!important; }
-.teamGrid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; margin-top:40px; align-items:start; }
-.memberCard { min-width:0; padding:24px; border:1px solid #dbe4da; border-radius:24px; background:#ffffff; box-shadow:0 6px 35px #33553706; }
+.teamGrid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; margin-top:40px; align-items:stretch; grid-auto-rows:1fr; }
+.memberCard { display:flex; flex-direction:column; height:100%; min-width:0; padding:24px; border:1px solid #dbe4da; border-radius:24px; background:#ffffff; box-shadow:0 6px 35px #33553706; }
 .memberHeading { display:flex; align-items:center; gap:16px; min-width:0; }
 .memberHeading>div:last-child { min-width:0; }
 .memberAvatar { position:relative; width:80px; height:80px; border-radius:50%; overflow:hidden; flex-shrink:0; border:1px solid #dbe4da; background:#e8efe6; display:grid; place-items:center; }
 .memberAvatar>span { font-size:23px; font-weight:500; color:#345c3e; }
 .memberCard h3 { font-size:19px; line-height:1.4; letter-spacing:-.02em; }
-.memberRole { margin-top:6px; font-size:13px; line-height:1.6!important; color:#477354; white-space:pre-line; }
+.memberRole { margin-top:6px; font-size:14px; line-height:1.6!important; color:#477354; white-space:pre-line; }
 .memberInfo { margin-top:20px; font-size:14px; line-height:1.8; color:#61716c; white-space:pre-line; overflow-wrap:anywhere; }
 .bioDialog { width:700px; overflow-y:auto; }
 .bioDialog>.close { position:absolute; top:20px; right:20px; }

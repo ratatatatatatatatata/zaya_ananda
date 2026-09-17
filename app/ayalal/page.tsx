@@ -4,7 +4,6 @@ import { heroMediaFor } from "@/lib/hero-video";
 import { JOURNEY_FAQ } from "@/data/journeys";
 import { listJourneysCached } from "@/lib/journeys-db";
 import { JourneyImage } from "@/components/journey/SceneArt";
-import { ContactSection } from "@/components/ContactSection";
 
 // Клиент талын Router Cache-д удаан "зогсчихдоггүй" байхаар — админ шинэ аялал нэмэнгүүт шинэчлэгдэж харагдана
 export const dynamic = "force-dynamic";
@@ -164,7 +163,6 @@ export default async function AyalalPage() {
       </div></section>
 
       {/* Холбоо барих — аяллын тухай асуухад бэлэн */}
-      <ContactSection />
     </>
   );
 }

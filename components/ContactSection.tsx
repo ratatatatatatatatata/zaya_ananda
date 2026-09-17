@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 
 type ContactInfo = { phone?: string; email?: string; address?: string; hours?: string; mapQuery?: string };
 
-/** Холбоо барих хэсэг — "Бидний тухай" хуудсанд нэгтгэгдсэн. */
+/** Нийтийн хуудсуудын авсаархан холбоо барих хэсэг. */
 export function ContactSection({ id = "contact" }: { id?: string }) {
   const { t, tr } = useI18n();
   const { user } = useAuth();
@@ -94,41 +94,23 @@ export function ContactSection({ id = "contact" }: { id?: string }) {
   ];
 
   return (
-    <section id={id} className="section bg-surface-2">
+    <section id={id} aria-label={t("contact.title")} className="scroll-mt-28 border-t border-line bg-surface-2 py-8 sm:py-10">
       <div className="container-px">
-        <div className="mx-auto mb-10 max-w-2xl text-center">
-          <h2 className="font-display text-3xl font-semibold text-ink">{t("contact.title")}</h2>
-          <p className="mt-2 text-muted">{t("contact.desc")}</p>
+        <div className="mb-5">
+          <h2 className="font-display text-2xl font-semibold text-ink">{t("contact.title")}</h2>
         </div>
 
-        {publicT.length > 0 && (
-          <div className="mx-auto mb-10 grid max-w-4xl gap-4 sm:grid-cols-3">
-            {publicT.map((r) => (
-              <blockquote key={r.id} className="rounded-2xl border border-line bg-cream p-5">
-                <span className="text-accent-300">{"★".repeat(r.rating)}</span>
-                <p className="mt-2 text-sm leading-relaxed text-ink/85">«{r.text}»</p>
-                <footer className="mt-3 text-sm font-semibold text-primary-700">— {r.name}</footer>
-              </blockquote>
-            ))}
-          </div>
-        )}
-
-        <div className={"grid gap-10 " + (user ? "lg:grid-cols-[1fr_1.3fr]" : "lg:grid-cols-[1fr_1.3fr_1fr]")}>
-          <div className="space-y-4">
-            {info.map((i) => (
-              <div key={i.label} className="flex items-center gap-4 rounded-3xl border border-line bg-cream p-5">
-                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary-50 text-xl">{i.icon}</div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wide text-muted">{i.label}</p>
-                  {i.href ? <a href={i.href} target={i.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="font-semibold text-ink transition hover:text-primary-700">{i.value}</a> : <p className="font-semibold text-ink">{i.value}</p>}
-                </div>
-              </div>
-            ))}
-            <div className="rounded-3xl bg-primary-grad p-6 text-white">
-              <p className="font-display text-lg leading-relaxed">{t("contact.quote")}</p>
-            </div>
-          </div>
-
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {info.map(i => <div key={i.label} className="min-w-0 border-l-2 border-primary-200 pl-4">
+            <p className="text-sm text-muted">{i.label}</p>
+            {i.href ? <a href={i.href} target={i.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="mt-1 block break-words text-sm font-semibold leading-6 text-ink hover:text-primary-700">{i.value}</a> : <p className="mt-1 text-sm font-semibold leading-6 text-ink">{i.value}</p>}
+          </div>)}
+        </div>
+        <details className="mt-5 rounded-2xl border border-line bg-white/70">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-primary-800">Зурвас илгээх, газрын зураг үзэх</summary>
+          <div className="border-t border-line p-4 sm:p-6">
+            {publicT.length > 0 && <div className="mb-6 grid gap-4 sm:grid-cols-3">{publicT.map(r => <blockquote key={r.id} className="rounded-xl bg-surface-2 p-4"><span className="text-accent-300">{"★".repeat(r.rating)}</span><p className="mt-2 text-sm leading-relaxed">«{r.text}»</p><footer className="mt-2 text-sm font-semibold">— {r.name}</footer></blockquote>)}</div>}
+            <div className={"grid gap-5 " + (!user ? "lg:grid-cols-2" : "mx-auto max-w-2xl")}>
           <div className="card p-6 sm:p-8">
             {status === "done" ? (
               <div className="flex h-full flex-col items-center justify-center py-12 text-center">
@@ -210,11 +192,13 @@ export function ContactSection({ id = "contact" }: { id?: string }) {
             )}
           </div>}
         </div>
-        <div className="mt-12">
+        <div className="mt-5">
           <div className="overflow-hidden rounded-3xl border border-line shadow-card">
-            <iframe title="Zaya's Ananda" src={mapEmbed} className="h-[380px] w-full" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+            <iframe title="Zaya's Ananda" src={mapEmbed} className="h-60 w-full" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
           </div>
         </div>
+          </div>
+        </details>
       </div>
     </section>
   );

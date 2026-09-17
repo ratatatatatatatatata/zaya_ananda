@@ -30,8 +30,8 @@ export function Footer() {
   ];
 
   return (
-    <footer className="site-footer mt-10 border-t border-line bg-surface-2">
-      <div className="container-px grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
+    <footer className="site-footer border-t border-line bg-surface-2">
+      <div className="container-px grid gap-6 py-8 sm:grid-cols-3">
         <div>
           <Link href="/" className="flex items-center gap-2.5">
             {settings.logo
@@ -74,15 +74,7 @@ export function Footer() {
           </div>
         ))}
 
-        <div>
-          <h3 className="font-display text-base font-semibold text-ink">{t("nav.contact")}</h3>
-          <ul className="mt-4 space-y-2.5 text-sm text-muted">
-            <li>📞 <a href={"tel:" + siteConfig.phone.replace(/\D/g, "")} className="transition hover:text-primary-700">{siteConfig.phone}</a></li>
-            <li>✉️ <a href={"mailto:" + siteConfig.email} className="transition hover:text-primary-700">{siteConfig.email}</a></li>
-            <li>📍 <a href={"https://www.google.com/maps?q=" + encodeURIComponent(siteConfig.mapQuery)} target="_blank" rel="noreferrer" className="transition hover:text-primary-700">{tr(siteConfig.address)}</a></li>
-            <li>🕒 {tr(siteConfig.workingHours)}</li>
-          </ul>
-        </div>
+
       </div>
 
       <div className="border-t border-line">

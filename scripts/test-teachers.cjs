@@ -101,3 +101,15 @@ function reset(){db={site_settings:[{id:'main',teachers:[copy(a),copy(b)],contac
   nodes(draw()).find(n=>n.type==='button'&&n.props.children===a.name).props.onClick();
   assert.equal(rows.length,1);assert.equal(rows[0].name,b.name);assert.equal(rows[0].image,b.image);
  });
+
+ test('public team removes legacy combined entries and merges whitespace variants',()=>{
+  const {publicTeam}=load('lib/public-team.ts');
+  const people=publicTeam([a,b,{...a,name:a.name+', '+b.name},{...b,name:b.name+', '+a.name}], [{name:'  Багш\tА  ',role:'Duplicate'}]);
+  assert.equal(people.length,2);assert.deepEqual(people,[a,b]);
+  assert.equal(publicTeam([{name:'Д. Есөн-Эрдэнэ'}],[{name:'Д.Есөн-Эрдэнэ',info:'Танилцуулга'}]).length,1);
+ });
+ test('public team preserves unknown group members without borrowing another person biography',()=>{
+  const {publicTeam}=load('lib/public-team.ts');
+  const people=publicTeam([a,{...a,name:a.name+', Шинэ багш'}]);
+  assert.equal(people.length,2);assert.deepEqual(people[1],{name:'Шинэ багш'});
+ });

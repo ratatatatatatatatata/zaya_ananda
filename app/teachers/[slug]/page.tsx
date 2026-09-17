@@ -1,3 +1,4 @@
+import { publicTeam, teacherNameKey } from "@/lib/public-team";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getSettings, listCmsCached } from "@/lib/repo";
@@ -10,13 +11,13 @@ export const dynamic = "force-dynamic";
 export default async function TeacherDetailPage({ params }: { params: { slug: string } }) {
   const name = decodeURIComponent(params.slug);
   const settings = await getSettings();
-  const all = [...(settings.teachers || []), ...(settings.team || [])];
-  const teacher = all.find((t) => t.name === name);
+  const all = publicTeam(settings.teachers || [], settings.team || []);
+  const teacher = all.find((t) => teacherNameKey(t.name) === teacherNameKey(name));
   if (!teacher) notFound();
 
   const [courses, services] = await Promise.all([listCmsCached("course"), listCmsCached("service")]);
   const classes: TeacherClass[] = [...courses, ...services]
-    .filter((i) => (i.teacherName || "").split(",").map((s) => s.trim()).includes(teacher.name.trim()))
+    .filter((i) => (i.teacherName || "").split(",").map(teacherNameKey).includes(teacherNameKey(teacher.name)))
     .map((i) => ({
       id: i.id, kind: i.kind, title: i.title, summary: i.summary, image: i.image,
       price: i.price, lessonsCount: i.lessons?.length ?? i.videoLessons, i18n: i.i18n,
