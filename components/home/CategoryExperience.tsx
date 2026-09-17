@@ -13,9 +13,9 @@ import type { CmsItem } from "@/lib/types";
 import type { Journey } from "@/data/journeys";
 
 const categories = [
-  { id: "services", key: "nav.services", image: "/video/stream.jpg", href: "/services", desc: "Аура оношилгоо, зурхай, лаа засал, озонатор — энергийн тэнцвэрээ сэргээх заслууд." },
   { id: "courses", key: "nav.courses", image: "/video/meditation.jpg", href: "/courses", desc: "Өөрийн хэмнэлээр суралцаж, дотоод ертөнцөө таних хичээлүүд. Худалдаж авсан сургалт тань хувийн буланд нээгдэнэ." },
   { id: "ayalal", key: "nav.journey", image: "/video/temple.jpg", href: "/ayalal", desc: "Одоо бүртгэл нээлттэй аяллууд. Аялал сонгоод дарвал өдөр өдрийн хөтөлбөр, хамт явах баг бүрэн харагдана." },
+  { id: "services", key: "nav.services", image: "/video/stream.jpg", href: "/services", desc: "Аура оношилгоо, зурхай, лаа засал, озонатор — энергийн тэнцвэрээ сэргээх заслууд." },
   { id: "shop", key: "nav.shop", image: "/video/stones.jpg", href: "/shop", desc: "Төрсөн огноогоо оруулаад өөрийн эрдэнийн чулуу, түүнд тохирсон бүтээгдэхүүнээ олоорой." },
 ] as const;
 
@@ -23,16 +23,16 @@ type Slide = { id: string; title: string; desc: string; image: string; tags: str
 
 export function CategoryExperience({ services, courses, products, journeys }: { services: CmsItem[]; courses: CmsItem[]; products: CmsItem[]; journeys: Journey[] }) {
   const { t, lang } = useI18n();
-  const lists = [services, courses, [], products.filter(p => p.category !== "Чулуунууд")];
+  const lists = { services, courses, shop: products.filter(p => p.category !== "Чулуунууд") };
   return <div id="discover" className="experience-collection">
     {categories.map((category, categoryIndex) => {
       const slides: Slide[] = category.id === "ayalal"
         ? journeys.map(j => ({ id:j.id, title:j.name, desc:j.summary, image:j.image || category.image, tags:[j.days,j.groupSize,j.tagline].filter(Boolean), href:`/ayalal/${encodeURIComponent(j.slug)}`, journey:j }))
-        : lists[categoryIndex].map(item => ({ id:item.id, title:locText(lang,item.title,item.i18n,"title"), desc:locText(lang,item.summary,item.i18n,"summary") || category.desc, image:item.image || item.images?.[0] || category.image, tags:[item.category,...itemTeachers(item).map(teacher => teacher.name),typeof item.price === "number" ? formatMNT(item.price) : ""].filter((v): v is string => !!v), href:`/item/${item.id}`, item }));
+        : lists[category.id].map(item => ({ id:item.id, title:locText(lang,item.title,item.i18n,"title"), desc:locText(lang,item.summary,item.i18n,"summary") || category.desc, image:item.image || item.images?.[0] || category.image, tags:[item.category,...itemTeachers(item).map(teacher => teacher.name),typeof item.price === "number" ? formatMNT(item.price) : ""].filter((v): v is string => !!v), href:`/item/${item.id}`, item }));
       return <section key={category.id} id={category.id} className="experience-section" aria-labelledby={`experience-${category.id}`}>
         {category.id === "courses" && <span id="capabilities" className="experience-anchor" aria-hidden="true"/>}
         <div className="experience-heading">
-          <p className="discovery-kicker">ZAYA’S ANANDA · {String(categoryIndex+1).padStart(2,"0")}</p>
+          <p className="discovery-kicker">ZAYA’S ANANDA · {String(categoryIndex+2).padStart(2,"0")}</p>
           <h2 id={`experience-${category.id}`}>{t(category.key)}</h2>
           <p className="experience-intro">{category.desc}</p>
         </div>

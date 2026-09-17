@@ -40,6 +40,13 @@ export async function HomeSections() {
 
   return (
     <HomeDetails items={[...services, ...courses, ...products]} journeys={JOURNEYS}><div className="home-catalog">
+      {/* Зурхай — дугуй сонголтууд. Сонгож дарахад доор нь тухайн тайлал нээгдэнэ. */}
+      <section id="zurhai" className="section activity-section scroll-mt-36">
+        <SectionBackdrop src="/poster_night.jpg" centered position="center 35%" />
+        <div className="container-px">
+        <ZurhaiSlider cards={settings.zurhaiCards} daily={<MergeToorog />} matrix={<InlineDestinyMatrix />} />
+      </div></section>
+
       {/* Хоёр гол зам — сургалт ба сүнслэг аялал */}
       <PathsHighlight
         courses={courses.map((c) => ({
@@ -51,20 +58,13 @@ export async function HomeSections() {
         }))}
       />
 
-      {/* Зурхай — слайдер. Сонгож дарахад доор нь тухайн тайлал нээгдэнэ. */}
-      <section id="zurhai" className="section activity-section scroll-mt-36">
-        <SectionBackdrop src="/poster_night.jpg" centered position="center 35%" />
-        <div className="container-px">
-        <ZurhaiSlider cards={settings.zurhaiCards} daily={<MergeToorog />} matrix={<InlineDestinyMatrix />} />
-      </div></section>
-
       <CategoryExperience services={services} courses={courses} products={products} journeys={JOURNEYS} />
 
       {/* Гэгээн бэлэг */}
       <section id="gift" className="section activity-section scroll-mt-36">
         <SectionBackdrop src="/video/meditation.jpg" position="center 60%" />
         <div className="container-px">
-        <SectionZoom eyebrow="04 / НЭЭЛТТЭЙ ХИЧЭЭЛ" title={<T k="nav.gift" />} desc={<Tr v={D.gift} />}>
+        <SectionZoom eyebrow="06 / НЭЭЛТТЭЙ ХИЧЭЭЛ" title={<T k="nav.gift" />} desc={<Tr v={D.gift} />}>
           <GiftOverview items={[...free, ...resources]} />
         </SectionZoom>
       </div></section>
