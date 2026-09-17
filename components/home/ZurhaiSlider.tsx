@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useId, useRef, useState, type ReactNode } from "react";
 import { useI18n } from "@/lib/i18n";
-import { TiltCard } from "@/components/motion/TiltCard";
+import styles from "./ZurhaiSlider.module.css";
 import type { Locale } from "@/lib/types";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
@@ -18,190 +18,56 @@ export const DEFAULT_ZURHAI: ZurhaiCard[] = [
 
 const EYEBROW = Lx("Зурхай", "Astrology", "점성술", "占い", "占星");
 const LEAD = Lx(
-  "Хажуу тийш гүйлгэн төрлөө сонгоно уу. «Эхлэх» дарвал доор нь төрсөн огноогоо оруулах хэсэг гарна.",
-  "Slide sideways to choose a type. Tap Start and the birth-date form opens below.",
-  "옆으로 밀어 유형을 고르세요. 누르면 아래에 단계가 나타납니다.",
-  "横にスライドして種類を選び、押すと下に手順が表示されます。",
-  "左右滑动选择类型，点击后下方会显示步骤。",
+  "Зурхайн төрлөө дарж мэдээлэл, тайллаа үзээрэй.",
+  "Choose an astrology type to view its information and reading.",
+  "유형을 선택하여 설명과 해석을 확인하세요.",
+  "種類を選んで説明と鑑定をご覧ください。",
+  "选择占星类型，查看介绍与解读。",
 );
-const OPEN = Lx("Эхлэх", "Start", "시작", "はじめる", "开始");
-const PREV = Lx("Өмнөх", "Previous", "이전", "前へ", "上一个");
-const NEXT = Lx("Дараах", "Next", "다음", "次へ", "下一个");
 
-const TONES = [
-  { from: "#3B2450", via: "#7A3B2E", to: "#D9762F" },
-  { from: "#0F2B26", via: "#155248", to: "#2BC8BB" },
-  { from: "#1B2350", via: "#3F3A7A", to: "#8B6EC4" },
-  { from: "#2C1E3D", via: "#7C4A46", to: "#E0995A" },
-];
-
-const AUTOPLAY_MS = 2000;
-
-/** Нүүр хуудасны зурхайн төрлүүд — хуучин байдлаараа (нэг бүтэн баннер, цэгүүд), 2 секунд тутам өөрөө солигдоно. Дарахад доор нь алхмууд нээгдэнэ. */
+/** Name-only circular selectors; details open only after an explicit choice. */
 export function ZurhaiSlider({ cards, daily, matrix }: {
   cards?: ZurhaiCard[];
-  /** Сонгосон картын доор нээгдэх тайллууд */
   daily?: ReactNode;
   matrix?: ReactNode;
 }) {
-  const { tr } = useI18n();
+  const { tr, tl } = useI18n();
   const list = cards && cards.length ? cards : DEFAULT_ZURHAI;
-  const [i, setI] = useState(0);
-  const [open, setOpen] = useState(false);
-  const hoveringRef = useRef(false);
-  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
-  // Идэвхтэй картын өөрийн өндөр — цонхны бусад (нуугдмал) картын урттай хамааралгүй,
-  // зөвхөн одоо харагдаж буй карт тааруулна. Жагсаалтад орсны дараа тэр даруй хэмжинэ
-  // (useLayoutEffect) — анхны рендерт өндөр "үсрэхээс" сэргийлнэ.
-  const [trackH, setTrackH] = useState<number>();
+  const [selected, setSelected] = useState<number | null>(null);
+  const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const panelId = useId();
+  const titleId = useId();
+  const active = selected === null ? undefined : list[selected];
 
-  useLayoutEffect(() => {
-    const el = slideRefs.current[i];
-    if (el) setTrackH(el.offsetHeight);
-  }, [i, list]);
-
-  useEffect(() => {
-    const el = slideRefs.current[i];
-    if (!el) return;
-    const measure = () => setTrackH(el.offsetHeight);
-    if (typeof ResizeObserver !== "undefined") {
-      const ro = new ResizeObserver(measure);
-      ro.observe(el);
-      return () => ro.disconnect();
-    }
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [i, list]);
-
-  const go = (dir: 1 | -1) => {
-    setOpen(false);
-    setI((v) => (v + dir + list.length) % list.length);
-  };
-
-  // Хэрэглэгч харж/тайлбар нээгээгүй үед 2 секунд тутам дараагийн карт руу өөрөө шилжинэ
-  useEffect(() => {
-    if (list.length < 2) return;
-    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => {
-      if (hoveringRef.current || open) return;
-      setI((v) => (v + 1) % list.length);
-    }, AUTOPLAY_MS);
-    return () => clearInterval(t);
-  }, [list.length, open]);
-
-  return (
-    <div>
-      <div className="mx-auto max-w-2xl text-center">
-        <p className="eyebrow-line justify-center"><span>🔮</span> <span className="ml-1">{tr(EYEBROW)}</span></p>
-        <p className="mt-3 leading-relaxed text-muted">{tr(LEAD)}</p>
-      </div>
-
-      {/* Баннер + хажуугийн сумнууд */}
-      <div
-        className="relative mt-8"
-        onMouseEnter={() => { hoveringRef.current = true; }}
-        onMouseLeave={() => { hoveringRef.current = false; }}
-      >
-        <button
-          type="button"
-          onClick={() => go(-1)}
-          aria-label={tr(PREV)}
-          className="focus-ring absolute left-0 top-1/2 z-20 grid h-11 w-11 -translate-x-1/3 -translate-y-1/2 place-items-center rounded-full border border-line bg-surface-1 text-lg text-ink shadow-sm transition hover:border-primary-500/45 hover:text-primary-700 sm:h-12 sm:w-12"
-        >
-          ‹
-        </button>
-        <button
-          type="button"
-          onClick={() => go(1)}
-          aria-label={tr(NEXT)}
-          className="focus-ring absolute right-0 top-1/2 z-20 grid h-11 w-11 -translate-y-1/2 translate-x-1/3 place-items-center rounded-full border border-line bg-surface-1 text-lg text-ink shadow-sm transition hover:border-primary-500/45 hover:text-primary-700 sm:h-12 sm:w-12"
-        >
-          ›
-        </button>
-
-        {/* Гулсах зурвас — өндөр нь зөвхөн идэвхтэй картын агуулгаар тодорхойлогдоно,
-            бусад (нуугдмал) картуудын урттай хамааралгүй, зөөлөн шилжинэ. */}
-        <TiltCard max={3} className="block overflow-hidden rounded-[1.75rem] shadow-lift">
-          <div
-            className="overflow-hidden transition-[height] duration-500 ease-out"
-            style={{ height: trackH }}
-          >
-          <div
-            className="flex transition-transform duration-500 ease-out"
-            style={{ transform: `translateX(-${i * 100}%)` }}
-          >
-            {list.map((card, k) => {
-              const t = TONES[k % TONES.length];
-              return (
-                <div key={card.title + k} className="w-full shrink-0 self-start">
-                  <div
-                    ref={(el) => { slideRefs.current[k] = el; }}
-                    data-cinema-surface={!card.image || undefined}
-                    className="night relative flex min-h-[16rem] flex-col justify-center overflow-hidden p-8 sm:min-h-[18rem] sm:p-12"
-                    style={
-                      card.image
-                        ? { backgroundImage: `linear-gradient(180deg, rgba(11,23,20,0.35) 0%, rgba(11,23,20,0.86) 100%), url(${card.image})`, backgroundSize: "cover", backgroundPosition: "center" }
-                        : { backgroundImage: `linear-gradient(115deg, ${t.from} 0%, ${t.via} 52%, ${t.to} 100%)` }
-                    }
-                  >
-                    {!card.image && (
-                      <>
-                        <div aria-hidden className="pointer-events-none absolute -right-16 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full"
-                          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.3), transparent 70%)", filter: "blur(14px)" }} />
-                        <div aria-hidden className="pointer-events-none absolute -bottom-16 left-1/3 h-56 w-56 rounded-full"
-                          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%)", filter: "blur(18px)" }} />
-                      </>
-                    )}
-
-                    <div className="relative z-10 max-w-xl">
-                      {!card.image && <span className="text-4xl sm:text-5xl">{card.emoji}</span>}
-                      <h3 className={"font-display text-3xl font-semibold text-white sm:text-4xl " + (card.image ? "" : "mt-4")}>{card.title}</h3>
-                      <p className="mt-3 leading-relaxed text-white/85">{card.desc}</p>
-                      <button
-                        type="button"
-                        onClick={() => setOpen((v) => (k === i ? !v : true))}
-                        aria-expanded={k === i && open}
-                        className="btn btn-gold btn-md mt-6"
-                      >
-                        {tr(OPEN)}
-                        <span aria-hidden className={"ml-1.5 inline-block transition-transform " + (k === i && open ? "rotate-180" : "")}>⌄</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          </div>
-        </TiltCard>
-
-        {/* Цэгүүд */}
-        <div className="mt-5 flex justify-center gap-2.5">
-          {list.map((_, k) => (
-            <button
-              key={k}
-              type="button"
-              onClick={() => { setOpen(false); setI(k); }}
-              aria-label={`${k + 1}`}
-              aria-current={k === i}
-              className={
-                "h-2.5 rounded-full transition-all " +
-                (k === i ? "w-7 bg-primary-600" : "w-2.5 bg-line hover:bg-primary-300")
-              }
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Дарахад доор нь гарч ирэх алхмууд — хуудас үсрэхгүй */}
-      <div
-        className="overflow-hidden transition-[max-height,opacity] duration-500 ease-out"
-        style={{ maxHeight: open ? "500rem" : 0, opacity: open ? 1 : 0 }}
-      >
-        <div className="mt-2">
-          {(list[i]?.href === "/matrix" || list[i]?.title.toLocaleLowerCase().includes("матри")) ? matrix : daily}
-        </div>
-      </div>
+  return <div className={styles.root}>
+    <div className={styles.heading}>
+      <h2 className="eyebrow-line justify-center">{tr(EYEBROW)}</h2>
+      <p className="mt-3 leading-relaxed text-muted">{tr(LEAD)}</p>
     </div>
-  );
+    <div className={styles.choices} role="group" aria-label={tr(EYEBROW)}>
+      {list.map((card, index) => <button key={card.title + index} type="button"
+        ref={element => { buttons.current[index] = element; }}
+        className={styles.circle} aria-expanded={selected === index} aria-controls={panelId}
+        onClick={() => setSelected(current => current === index ? null : index)}>
+        <span>{tl(card.title)}</span>
+      </button>)}
+    </div>
+    <div id={panelId} hidden={!active}>
+      {active && <section className={styles.panel} aria-labelledby={titleId}>
+        <div className={styles.intro}>
+          <div>
+            <h3 id={titleId}>{tl(active.title)}</h3>
+            {active.desc && <p>{tl(active.desc)}</p>}
+          </div>
+          <button type="button" className={styles.close} aria-label={tl("Дэлгэрэнгүйг хаах")} onClick={() => {
+            buttons.current[selected ?? 0]?.focus({ preventScroll: true });
+            setSelected(null);
+          }}>✕</button>
+        </div>
+        <div className={styles.reading}>
+          {(active.href === "/matrix" || active.title.toLocaleLowerCase().includes("матри")) ? matrix : daily}
+        </div>
+      </section>}
+    </div>
+  </div>;
 }
