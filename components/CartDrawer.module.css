@@ -1,0 +1,17 @@
+.drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0 0 0 auto;
+  width: min(100%, 448px);
+  max-width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+.drawer[open] { display: flex; flex-direction: column; }
+.drawer > header, .drawer > footer { flex-shrink: 0; }
+.drawer::backdrop { background: #0009; backdrop-filter: blur(4px); }
+:global(body):has(.drawer[open]) { overflow: hidden; }

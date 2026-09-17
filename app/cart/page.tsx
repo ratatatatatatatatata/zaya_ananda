@@ -6,7 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import { cx, formatMNT, toneStyles } from "@/lib/format";
 
 export default function CartPage() {
-  const { items, total, count, setQty, remove } = useCart();
+  const { items, total, count, setQty, remove, continueBrowsing } = useCart();
   const { t, tr } = useI18n();
 
   if (items.length === 0) {
@@ -19,7 +19,7 @@ export default function CartPage() {
             <p className="mt-3 text-muted">{t("cart.emptyHint")}</p>
             <div className="mt-8 flex justify-center gap-3">
               <Link href="/services" className="btn btn-primary btn-md">{t("nav.services")}</Link>
-              <Link href="/shop" className="btn btn-outline btn-md">{t("nav.shop")}</Link>
+              <button type="button" onClick={continueBrowsing} className="btn btn-outline btn-md">{t("common.continue")}</button>
             </div>
           </div>
         </div>
@@ -46,12 +46,12 @@ export default function CartPage() {
                     <p className="text-sm text-muted">{formatMNT(it.price)}</p>
                   </div>
                   <div className="inline-flex items-center rounded-full border border-line">
-                    <button onClick={() => setQty(it.kind, it.slug, it.qty - 1)} className="grid h-9 w-9 place-items-center text-ink/70 hover:text-ink">−</button>
+                    <button aria-label="Тоо хасах" onClick={() => setQty(it.kind, it.slug, it.qty - 1)} className="grid h-9 w-9 place-items-center text-ink/70 hover:text-ink">−</button>
                     <span className="w-8 text-center font-semibold">{it.qty}</span>
-                    <button onClick={() => setQty(it.kind, it.slug, it.qty + 1)} className="grid h-9 w-9 place-items-center text-ink/70 hover:text-ink">+</button>
+                    <button aria-label="Тоо нэмэх" onClick={() => setQty(it.kind, it.slug, it.qty + 1)} className="grid h-9 w-9 place-items-center text-ink/70 hover:text-ink">+</button>
                   </div>
                   <div className="w-24 text-right font-semibold text-ink">{formatMNT(it.price * it.qty)}</div>
-                  <button onClick={() => remove(it.kind, it.slug)} className="text-ink/40 transition hover:text-rose-500" aria-label="Remove">✕</button>
+                  <button onClick={() => remove(it.kind, it.slug)} className="text-ink/40 transition hover:text-rose-500" aria-label="Сагснаас устгах">✕</button>
                 </div>
               );
             })}
@@ -69,7 +69,7 @@ export default function CartPage() {
                 <span className="font-display text-xl font-semibold text-ink">{formatMNT(total)}</span>
               </div>
               <Link href="/checkout" className="btn btn-primary btn-lg mt-6 w-full">{t("cart.checkout")}</Link>
-              <Link href="/shop" className="btn btn-ghost btn-sm mt-2 w-full">{t("common.continue")}</Link>
+              <button type="button" onClick={continueBrowsing} className="btn btn-ghost btn-sm mt-2 w-full">{t("common.continue")}</button>
             </div>
           </aside>
         </div>

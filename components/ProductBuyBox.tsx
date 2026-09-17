@@ -11,7 +11,7 @@ const same = (s: string): L => ({ mn: s, en: s, ko: s, ja: s, zh: s });
 
 /** Бүтээгдэхүүний худалдан авалт — тоо ширхэг сонгож сагсанд нэмэх эсвэл шууд худалдаж авах. */
 export function ProductBuyBox({ id, title, price }: { id: string; title: string; price?: number }) {
-  const { add } = useCart();
+  const { add, close } = useCart();
   const router = useRouter();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
@@ -27,6 +27,7 @@ export function ProductBuyBox({ id, title, price }: { id: string; title: string;
   }
   function buyNow() {
     add(cartItem, qty);
+    close();
     router.push("/checkout");
   }
 
