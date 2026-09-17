@@ -44,7 +44,9 @@ export function CategoryExperience({ services, products, journeys }: { services:
 function CategoryScrollStory({ slides, category, title }: { slides: Slide[]; category: typeof categories[number]; title:string }) {
   const reduced = useReducedMotion();
   const [index, setIndex] = useState(0);
-  const [scrollMode, setScrollMode] = useState(false);
+  const [viewportScrollMode, setViewportScrollMode] = useState(false);
+  // Journey programs always remain visible as a vertical list, including new additions.
+  const scrollMode = category.id !== "ayalal" && viewportScrollMode;
   const track = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const progress = useMotionValue(0);
@@ -53,7 +55,7 @@ function CategoryScrollStory({ slides, category, title }: { slides: Slide[]; cat
   useEffect(() => {
     // Short / zoomed viewports and reduced motion use a fully readable list.
     const screen = window.matchMedia("(min-height: 700px)");
-    const update = () => setScrollMode(screen.matches && !reduced && list.length > 1);
+    const update = () => setViewportScrollMode(screen.matches && !reduced && list.length > 1);
     update();
     screen.addEventListener("change", update);
     return () => screen.removeEventListener("change", update);
