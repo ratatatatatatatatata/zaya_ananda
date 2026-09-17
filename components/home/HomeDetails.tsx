@@ -59,9 +59,11 @@ function DetailDialog({ title, onClose, children }: { title: string; onClose: ()
     const element = dialog.current;
     const trigger = document.activeElement as HTMLElement | null;
     const overflow = document.body.style.overflow;
+    const position = { left: window.scrollX, top: window.scrollY, behavior: "instant" as ScrollBehavior };
     element?.showModal();
     document.body.style.overflow = "hidden";
-    return () => { element?.close(); document.body.style.overflow = overflow; trigger?.focus({ preventScroll: true }); };
+    window.scrollTo(position);
+    return () => { element?.close(); document.body.style.overflow = overflow; trigger?.focus({ preventScroll: true }); window.scrollTo(position); };
   }, []);
   useEffect(() => { if (dialog.current) dialog.current.scrollTop = 0; }, [title]);
   return createPortal(<dialog ref={dialog} className={styles.dialog} aria-labelledby={titleId} onCancel={event => { event.preventDefault(); onClose(); }}>
