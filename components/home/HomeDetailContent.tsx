@@ -1,5 +1,6 @@
 "use client";
 
+import { formatMNT } from "@/lib/format";
 import type { CmsItem } from "@/lib/types";
 import { JOURNEY_FAQ, JOURNEY_PREP, type Journey } from "@/data/journeys";
 import { ItemVideos } from "@/components/ItemVideos";
@@ -16,6 +17,7 @@ export default function HomeDetailContent({ item, journey: j }: { item?: CmsItem
     const images = Array.from(new Set([item.image, ...(item.images || [])].filter((value): value is string => !!value)));
     return <div className={styles.detail}>
       {images.length > 0 && <div className={styles.gallery} aria-label="Зургийн цомог">{images.map(src => <img key={src} src={src} alt={item.title} />)}</div>}
+      {item.kind === "service" && <p>{[item.category, typeof item.price === "number" ? formatMNT(item.price) : ""].filter(Boolean).join(" · ")}</p>}
       {item.summary && <p>{item.summary}</p>}
       {item.body && <RichBody html={item.body} i18n={item.i18n} />}
       {item.kind !== "course" && item.link && <ItemVideos videos={[{ title: item.title, url: item.link }]} />}

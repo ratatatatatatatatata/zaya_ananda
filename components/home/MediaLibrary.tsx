@@ -24,7 +24,7 @@ function MediaArtwork({ src, large = false }: { src: string; large?: boolean }) 
 /** Homepage has three tabs; the Gift menu shows the complete public library. */
 export function MediaLibrary({ items, categorized = false }: { items: CmsItem[]; categorized?: boolean }) {
   const publicItems = items.filter(item => item.kind === "free" || item.kind === "resource");
-  const gifts: Gift[] = [...collectPublicMedia(publicItems), ...publicItems.filter(item => collectPublicMedia([item]).length === 0).map(item => ({
+  const gifts: Gift[] = [...collectPublicMedia(publicItems), ...publicItems.filter(item => collectPublicMedia([item]).length === 0 && (item.summary?.trim() || item.body?.trim())).map(item => ({
     id: item.id, title: item.title, poster: item.image || item.images?.[0] || "/video/meditation.jpg", category: giftCategory(item), article: item,
   }))];
   const [tab, setTab] = useState(0);
