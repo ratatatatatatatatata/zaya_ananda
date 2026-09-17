@@ -1,18 +1,21 @@
-.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:24px; margin-top:40px; }
-.card { position:relative; min-width:0; height:420px; overflow:hidden; border-radius:24px; background:#dce6d8; isolation:isolate; }
-.photo,.placeholder { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-.placeholder { display:grid; place-items:center; font-size:64px; color:#315e46; background:linear-gradient(140deg,#eaf0e5,#bfd0bc); }
-.toggle { position:absolute; inset:0; width:100%; text-align:left; color:#fff; z-index:1; background:linear-gradient(transparent 45%,#102b20dd); }
-.toggle:focus-visible { outline:3px solid #aaca95; outline-offset:-5px; border-radius:24px; }
-.caption { position:absolute; bottom:24px; left:24px; right:50px; display:grid; gap:8px; }
-.caption strong { font-size:21px; line-height:1.35; }
-.caption>span { font-size:14px; line-height:1.5; }
-.indicator { position:absolute; right:18px; bottom:22px; width:28px; height:28px; display:grid; place-items:center; border:1px solid #ffffff70; border-radius:50%; font-size:20px; }
-.details { position:absolute; inset:18px 18px 64px; z-index:2; padding:24px; border-radius:18px; background:#f8faf4f5; color:#203f2f; display:flex; flex-direction:column; pointer-events:none; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr)); gap:18px; margin-top:36px; }
+.card { position:relative; min-width:0; border:1px solid #dbe4da; border-radius:20px; background:#fff; }
+.card[data-open=true] { z-index:45; }
+.toggle { position:relative; display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; height:100%; min-height:200px; padding:22px 18px; text-align:center; color:#203f2f; border-radius:20px; }
+.photo,.placeholder { width:88px; height:88px; flex-shrink:0; border-radius:50%; object-fit:cover; }
+.placeholder { display:grid; place-items:center; font-size:28px; color:#315e46; background:#eaf0e5; }
+.caption { display:grid; gap:6px; }
+.caption strong { font-size:17px; line-height:1.4; }
+.caption>span { font-size:12px; line-height:1.5; color:#61716c; }
+.indicator { position:absolute; top:12px; right:12px; width:24px; height:24px; display:grid; place-items:center; border:1px solid #dbe4da; border-radius:50%; color:#547268; font-size:16px; }
+.details { position:fixed; z-index:45; padding:30px; border:1px solid #cbd8c5; border-radius:24px; background:#f8faf4; color:#203f2f; display:flex; flex-direction:column; box-shadow:0 18px 70px #173c3040; overflow:hidden; }
 .details[hidden] { display:none; }
-.details h4 { font-size:21px; line-height:1.4; font-weight:600; }
-.role { margin-top:8px; color:#4c705b; font-size:14px; line-height:1.5; }
-.bio { min-height:0; overflow:auto; overscroll-behavior:contain; pointer-events:auto; white-space:pre-line; overflow-wrap:anywhere; font-size:14px; line-height:1.8; margin-top:16px; }
-.bio:focus-visible { outline:2px solid #315e46; outline-offset:3px; }
-.card[data-open=true] .caption { visibility:hidden; }
-@media (max-width:600px) { .grid { gap:16px; margin-top:28px; }.card { height:400px; }.details { padding:20px; } }
+.heading { display:flex; align-items:center; gap:20px; padding-right:28px; }
+.heading>div { min-width:0; }
+.heading .photo,.heading .placeholder { width:72px; height:72px; }
+.details h4 { font-size:26px; line-height:1.35; font-weight:600; overflow-wrap:anywhere; }
+.role { margin-top:8px; color:#4c705b; font-size:16px; line-height:1.5; }
+.close { position:absolute; top:16px; right:16px; width:32px; height:32px; border-radius:50%; background:#e5edde; color:#315e46; font-size:22px; }
+.bio { min-height:0; overflow:auto; overscroll-behavior:contain; white-space:pre-line; overflow-wrap:anywhere; font-size:17px; line-height:1.9; margin-top:24px; padding-top:20px; border-top:1px solid #dbe4da; }
+.card :is(button,.bio):focus-visible { outline:2px solid #315e46; outline-offset:3px; }
+@media (max-width:600px) { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:28px; }.toggle { padding:18px 12px; min-height:190px; }.photo,.placeholder { width:72px; height:72px; }.caption strong { font-size:15px; }.details { padding:22px; }.heading { gap:12px; }.heading .photo,.heading .placeholder { width:56px; height:56px; }.details h4 { font-size:21px; }.role { font-size:14px; }.bio { font-size:16px; } }
