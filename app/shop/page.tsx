@@ -2,8 +2,6 @@ import { VideoHero } from "@/components/video/VideoHero";
 import { heroMediaFor } from "@/lib/hero-video";
 import { CmsCard } from "@/components/CmsCard";
 import { ShopSplit } from "@/components/ShopSplit";
-import { Stagger } from "@/components/motion/Stagger";
-import { TiltCard } from "@/components/motion/TiltCard";
 import { StoneReading } from "@/components/StoneReading";
 import { listCmsCached } from "@/lib/repo";
 import { T } from "@/components/T";
@@ -14,8 +12,7 @@ export const metadata = { title: "Дэлгүүр" };
 export default async function ShopPage() {
   const heroMedia = await heroMediaFor("shop");
   const all = await listCmsCached("product");
-  // "Чулуунууд" ангиллын зүйлс зөвхөн "Ордуудын ээлтэй чулуу" таб дотор харагдана —
-  // давхардуулахгүйн тулд "Бүтээгдэхүүн" табаас хасна.
+  // Stone products appear in the zodiac section above the main catalogue.
   const items = all.filter((i) => i.category !== "Чулуунууд");
   return (
     <>
@@ -33,7 +30,7 @@ export default async function ShopPage() {
           products={
             items.length === 0
               ? <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-14 text-center text-muted">Одоохондоо бүтээгдэхүүн нэмэгдээгүй байна.</p>
-              : <Stagger className="adaptive-cards">{items.map((i) => <TiltCard key={i.id} className="h-full"><CmsCard item={i} /></TiltCard>)}</Stagger>
+              : <div className="adaptive-cards">{items.map((i) => <CmsCard key={i.id} item={i} />)}</div>
           }
           stones={<StoneReading />}
         />

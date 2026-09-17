@@ -5,6 +5,8 @@ import Image from "next/image";
 import { HomeDetailLink as Link } from "@/components/home/HomeDetails";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { motion, useMotionValue, useReducedMotion } from "framer-motion";
+import { ShopSplit } from "../ShopSplit";
+import { CmsCard } from "../CmsCard";
 import { StoneReading } from "../StoneReading";
 import { locText } from "@/lib/cms-i18n";
 import { useI18n } from "@/lib/i18n";
@@ -34,8 +36,12 @@ export function CategoryExperience({ services, products, journeys }: { services:
           <h2 id={`experience-${category.id}`}>{t(category.key)}</h2>
           <p className="experience-intro">{category.desc}</p>
         </div>
-        <CategoryScrollStory slides={slides} category={category} title={t(category.key)} />
-        {category.id === "shop" && <div className="experience-stones"><StoneReading /></div>}
+        {category.id === "shop"
+          ? <ShopSplit stones={<StoneReading />} products={lists.shop.length
+              ? <div className="adaptive-cards">{lists.shop.map(item => <CmsCard key={item.id} item={item} />)}</div>
+              : <p className="text-muted">Одоохондоо бүтээгдэхүүн нэмэгдээгүй байна.</p>} />
+          : <CategoryScrollStory slides={slides} category={category} title={t(category.key)} />}
+
       </section>;
     })}
   </div>;

@@ -1,42 +1,15 @@
-"use client";
+import type { ReactNode } from "react";
 
-import { useState, type ReactNode } from "react";
-import { cx } from "@/lib/format";
-
-/** Энергийн хамгаалалт — 2 хэсэг: Бүтээгдэхүүн | Ордуудын ээлтэй чулуу. */
+/** Both sections stay visible: zodiac stones first, then the product catalogue. */
 export function ShopSplit({ products, stones }: { products: ReactNode; stones: ReactNode }) {
-  const [tab, setTab] = useState<"products" | "stones">("products");
-  const btn = (active: boolean) =>
-    cx(
-      "focus-ring flex-1 rounded-2xl px-5 py-3.5 font-display text-base font-semibold transition sm:text-lg",
-      active
-        ? "bg-primary-grad text-white shadow-[0_0_30px_-8px_rgba(76,200,189,0.55)]"
-        : "text-muted hover:text-ink"
-    );
-  return (
-    <div>
-      <div role="tablist" aria-label="Дэлгүүрийн хэсгүүд" className="mx-auto mb-10 flex max-w-2xl gap-1.5 rounded-3xl border border-line bg-surface-3 p-1.5">
-        <button type="button" role="tab" aria-selected={tab === "products"} className={btn(tab === "products")} onClick={() => setTab("products")}>
-          🛍 Бүтээгдэхүүн
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={tab === "stones"}
-          className={cx(
-            "focus-ring flex-1 rounded-2xl px-5 py-3.5 font-display text-base font-semibold transition sm:text-lg",
-            tab === "stones"
-              ? "text-[#1B1B2E] shadow-[0_0_30px_-8px_rgba(227,190,98,0.6)]"
-              : "text-muted hover:text-ink"
-          )}
-          style={tab === "stones" ? { backgroundImage: "linear-gradient(120deg,#E3BE62,#F0D48A)" } : undefined}
-          onClick={() => setTab("stones")}
-        >
-          💎 Ордуудын ээлтэй чулуу
-        </button>
-      </div>
-      <div className={tab === "products" ? "animate-fade-rise" : "hidden"}>{products}</div>
-      <div className={tab === "stones" ? "animate-fade-rise" : "hidden"}>{stones}</div>
-    </div>
-  );
+  return <div className="space-y-14">
+    <section aria-label="Ордуудын ээлтэй чулуу">
+      <h3 className="mb-6 font-display text-2xl font-semibold text-ink sm:text-3xl">Ордуудын ээлтэй чулуу</h3>
+      {stones}
+    </section>
+    <section aria-label="Бүтээгдэхүүн">
+      <h3 className="mb-6 font-display text-2xl font-semibold text-ink sm:text-3xl">Бүтээгдэхүүн</h3>
+      {products}
+    </section>
+  </div>;
 }

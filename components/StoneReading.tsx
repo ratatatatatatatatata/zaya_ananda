@@ -140,7 +140,7 @@ export function StoneReading() {
       {stoneProducts.length > 0 && (
         <div className="mt-10">
           <h3 className="font-display text-xl font-semibold text-ink sm:text-2xl">💎 Манай эрдэнийн чулуунууд</h3>
-          <p className="mt-2 max-w-2xl text-muted">Чулуу бүрийн зураг дээр ямар оронд ээлтэйг тэмдэглэсэн, доор нь дэлгэрэнгүй мэдээлэл.</p>
+          <p className="mt-2 max-w-2xl text-muted">Чулуу бүрийн ээлтэй ордыг тэмдэглэсэн. Зураг дээр курсороо аваачих эсвэл дарж мэдээллийг үзээрэй.</p>
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {stoneProducts.map((p) => <CmsCard key={p.id} item={p} />)}
           </div>
