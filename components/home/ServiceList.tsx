@@ -100,7 +100,7 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
                 </div>
               )}
 
-              <div className="mt-5 border-t border-line pt-4"><ItemTeachers item={item} /></div>
+              {itemTeachers(item).length < 2 && <div className="mt-5 border-t border-line pt-4"><ItemTeachers item={item} /></div>}
 
               <div className="mt-6">
                 <ServiceBooking teachers={itemTeachers(item)}

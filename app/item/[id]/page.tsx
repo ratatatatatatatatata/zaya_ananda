@@ -61,6 +61,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
   const item = await getCmsByIdCached(params.id);
   if (!item) notFound();
   const nav = kindNav[item.kind] || kindNav.service;
+  const hasTeacherChoice = (item.kind === "course" || item.kind === "service") && itemTeachers(item).length > 1;
   const isCourse = item.kind === "course";
   const isProduct = item.kind === "product";
   const isService = item.kind === "service";
@@ -120,7 +121,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
             <>
               <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
                 <div className="flex flex-wrap gap-x-8 gap-y-3 text-sm">
-                  <ItemTeachers item={item} compact />
+                  {!hasTeacherChoice && <ItemTeachers item={item} compact />}
                   {item.category && (
                     <div>
                       <p className="text-xs font-bold uppercase tracking-wide text-muted">Сэдэв</p>
@@ -153,7 +154,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
                         <RichBody html={item.body} i18n={item.i18n} className="mt-3 leading-relaxed text-muted" />
                       </>
                     )}
-                    <div className="mt-8"><ItemTeachers item={item} /></div>
+                    {!hasTeacherChoice && <div className="mt-8"><ItemTeachers item={item} /></div>}
                   </div>
                 }
                 practice={<CourseLessons id={item.id} nextNote={item.nextNote} nextItemId={item.nextItemId} nextTitle={nextItem?.title} />}
@@ -188,7 +189,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
             ? <div className="card p-6 text-center"><p className="text-3xl">🎁</p><p className="mt-2 font-display text-lg font-semibold text-jade-600">Нээлттэй хичээл</p><p className="mt-1 text-sm text-muted">Энэ хичээл танд бэлэг — чөлөөтэй үзээрэй.</p></div>
             : <PurchaseBox teachers={itemTeachers(item)} id={item.id} title={item.title} price={item.price} />}
 
-          {!isCourse && <ItemTeachers item={item} />}
+          {!isCourse && !hasTeacherChoice && <ItemTeachers item={item} />}
         </aside>
       </div>
 

@@ -25,7 +25,7 @@ export default function HomeDetailContent({ item, journey: j }: { item?: CmsItem
       {item.summary && <p>{item.summary}</p>}
       {item.body && <RichBody html={item.body} i18n={item.i18n} />}
       {item.kind !== "course" && item.link && <ItemVideos videos={[{ title: item.title, url: item.link }]} />}
-      <ItemTeachers item={item} />
+      {(!(item.kind === "course" || item.kind === "service") || itemTeachers(item).length < 2) && <ItemTeachers item={item} />}
       {item.kind === "service" && <ServiceBooking teachers={itemTeachers(item)} itemId={item.id} serviceName={item.title} workDays={item.bookingDays} startHour={item.bookingStartHour} endHour={item.bookingEndHour} />}
       {item.kind === "product" && <ProductBuyBox id={item.id} title={item.title} price={item.price} />}
       {item.kind === "course" && <><PurchaseBox teachers={itemTeachers(item)} id={item.id} title={item.title} price={item.price} /><CourseLessons id={item.id} nextNote={item.nextNote} /></>}

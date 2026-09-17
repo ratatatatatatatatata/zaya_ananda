@@ -58,14 +58,13 @@ export function PurchaseBox({ id, price, teachers = [] }: { id: string; title: s
 
   // Аль хэдийн худалдаж авсан бол энд юу ч харуулахгүй — үнэ, идэвхтэй эрхийн мэдээлэл
   // "Миний булан" (профайл) хэсэгт захиалгын жагсаалтад үлдсэн хоногийн хамт харагдана.
-  if (!loadingAccess && st === "active" && step === "idle") return access?.teacherName ? <p className="card p-5 text-sm font-semibold text-ink">Таны сонгосон багш: {access.teacherName}</p> : null;
+  if (!loadingAccess && st === "active" && step === "idle") return teachers.length > 1 ? <div className="card p-5"><TeacherChoice teachers={teachers} value={access?.teacherName || ""} onChange={setTeacherName} readOnly /></div> : null;
 
   return (
     <div className="card p-6">
       {typeof price === "number" && <p className="price mb-4 text-center text-3xl">{formatMNT(price)}</p>}
 
-      {step === "idle" && st !== "pending" && <TeacherChoice teachers={teachers} value={selectedTeacher} onChange={name => { setTeacherName(name); setErr(""); }} />}
-      {(access?.teacherName || (step !== "idle" && selectedTeacher)) && <p className="mb-4 text-sm font-semibold text-ink">Сонгосон багш: {access?.teacherName || selectedTeacher}</p>}
+      <TeacherChoice teachers={teachers} value={access?.teacherName || selectedTeacher} onChange={name => { setTeacherName(name); setErr(""); }} readOnly={step !== "idle" || st === "pending"} />
 
       {step === "idle" && (
         <>
