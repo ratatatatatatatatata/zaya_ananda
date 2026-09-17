@@ -6,6 +6,7 @@ import { JourneyImage } from "@/components/journey/SceneArt";
 import { LeadCard, CrewRow, Avatar } from "@/components/journey/PersonCard";
 import { JourneyBooking } from "@/components/journey/JourneyBooking";
 import { DestinationGallery } from "@/components/journey/DestinationGallery";
+import { JourneyGallery } from "@/components/journey/JourneyGallery";
 import { JourneyReviews } from "@/components/journey/JourneyReviews";
 import { ContactSection } from "@/components/ContactSection";
 
@@ -115,10 +116,12 @@ export default async function JourneyPage({ params }: { params: { slug: string }
         </div>
       </nav>
 
+      <div className="section"><div className="container-px"><JourneyGallery journey={j} /></div></div>
+
       {/* Товч мэдээлэл */}
       <section className="section"><div className="container-px">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,.65fr)]">
-          <article className="panel relative overflow-hidden p-6 sm:p-8">
+        <div className="grid gap-5 lg:grid-cols-2">
+          <article className="panel relative overflow-hidden p-6 sm:p-8 lg:col-span-2">
             <div aria-hidden className="absolute -right-16 -top-20 size-48 rounded-full bg-primary-100/60 blur-3xl" />
             <div className="relative">
               <span className="grid size-11 place-items-center rounded-2xl bg-primary-50 text-xl text-primary-700">✦</span>
@@ -127,28 +130,7 @@ export default async function JourneyPage({ params }: { params: { slug: string }
             </div>
           </article>
 
-          <aside className="panel flex flex-col justify-between overflow-hidden bg-[#0b3d35] p-6 text-white sm:p-8">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/60">Аяллын үнэ</p>
-              <p className="mt-2 font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                {formatJourneyPrice(j.price)}
-              </p>
-              <p className="mt-1.5 text-sm leading-6 text-white/65">Нэг хүний багц үнэ</p>
 
-              {j.lead?.name && (
-                <div className="mt-6">
-                  <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-white/10">
-                    <Avatar person={j.lead} size="lg" />
-                  </div>
-                  <p className="mt-4 truncate text-base font-semibold text-white">{j.lead.name}</p>
-                  {j.lead.role && <p className="truncate text-xs text-white/60">{j.lead.role}</p>}
-                </div>
-              )}
-            </div>
-            <a href="#zahialga" className="mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-primary-800 transition hover:-translate-y-0.5 hover:shadow-lg">
-              Бүртгүүлэх <span aria-hidden>→</span>
-            </a>
-          </aside>
 
           <article className="panel p-6 sm:p-8">
             <div className="flex items-center gap-3 border-b border-line pb-5">
@@ -245,13 +227,35 @@ export default async function JourneyPage({ params }: { params: { slug: string }
       <section id="zahialga" className="section scroll-mt-32 bg-surface-2"><div className="container-px">
         <div className="max-w-2xl">
           <p className="eyebrow-line"><span>🗓</span></p>
-          <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl">Аялах өдрөө сонгож захиалах</h2>
+          <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl">Аялалд бүртгүүлэх</h2>
           <p className="mt-3 leading-relaxed text-muted">
-            Хуанлиас өдрөө сонгоод бүртгүүлээрэй. Админ баталгаажуулсны дараа танд мэдэгдэл ирнэ.
+            Мэдээллээ бөглөөд аялалд бүртгүүлээрэй. Админ баталгаажуулсны дараа танд мэдэгдэл ирнэ.
           </p>
         </div>
-        <div className="mt-8">
-          <JourneyBooking slug={j.slug} journeyName={j.name} prepay={j.prepay} />
+        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(16rem,.7fr)_minmax(0,1.3fr)]">
+          <aside className="panel flex flex-col justify-between overflow-hidden bg-[#0b3d35] p-6 text-white sm:p-8">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/60">Аяллын үнэ</p>
+              <p className="mt-2 font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+                {formatJourneyPrice(j.price)}
+              </p>
+              <p className="mt-1.5 text-sm leading-6 text-white/65">Нэг хүний багц үнэ</p>
+
+              {j.lead?.name && (
+                <div className="mt-6">
+                  <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-white/10">
+                    <Avatar person={j.lead} size="lg" />
+                  </div>
+                  <p className="mt-4 truncate text-base font-semibold text-white">{j.lead.name}</p>
+                  {j.lead.role && <p className="truncate text-xs text-white/60">{j.lead.role}</p>}
+                </div>
+              )}
+            </div>
+            <a href="#ayalal-form" className="mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-primary-800 transition hover:-translate-y-0.5 hover:shadow-lg">
+              Бүртгүүлэх <span aria-hidden>→</span>
+            </a>
+          </aside>
+          <div id="ayalal-form" className="min-w-0 scroll-mt-36"><JourneyBooking slug={j.slug} journeyName={j.name} prepay={j.prepay} /></div>
         </div>
       </div></section>
 

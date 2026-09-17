@@ -11,6 +11,7 @@ import { ServiceBooking } from "@/components/ServiceBooking";
 import { ProductBuyBox } from "@/components/ProductBuyBox";
 import { PurchaseBox } from "@/components/PurchaseBox";
 import { CourseLessons } from "@/components/CourseLessons";
+import { JourneyGallery } from "@/components/journey/JourneyGallery";
 import { DestinationGallery } from "@/components/journey/DestinationGallery";
 import { JourneyBooking } from "@/components/journey/JourneyBooking";
 import styles from "./HomeDetails.module.css";
@@ -32,7 +33,7 @@ export default function HomeDetailContent({ item, journey: j }: { item?: CmsItem
   }
   if (!j) return null;
   return <div className={styles.detail}>
-    {j.image && <div className={styles.gallery}><img src={j.image} alt={j.name} /></div>}
+    <JourneyGallery journey={j} headingLevel={3} />
     <p>{j.tagline}</p><p>{j.summary}</p>
     <dl className="grid gap-4 sm:grid-cols-2">{[["Хугацаа",j.days],["Бүлэг",j.groupSize],["Тээвэр",j.transport],["Байр",j.stay],["Хэнд зориулсан",j.audience],["Үнэ",j.price],["Үнэд багтсан",j.included],["Үнэд багтаагүй",j.excluded]].filter(([,value]) => value).map(([label,value]) => <div key={label}><dt className="font-semibold">{label}</dt><dd className="mt-1 whitespace-pre-line">{value}</dd></div>)}</dl>
     <section className={styles.program}><h3>Аяллын хөтөлбөр</h3>{j.itinerary.map((day,index) => <article key={index}><p>{day.label}</p><h3>{day.title}</h3><p>{day.text}</p>{day.bullets && <ul className="mt-3 list-disc pl-5">{day.bullets.map((text,i) => <li key={i}>{text}</li>)}</ul>}{day.image && <img src={day.image} alt={day.title} />}</article>)}</section>
