@@ -1,5 +1,6 @@
 import type { L } from "@/lib/types";
 const entries: [string,string,string,string,string][] = [
+["Үндсэн цэс","Main navigation","주 메뉴","メインメニュー","主导航"],
 ["Зурхай","Astrology","점성술","占星術","占星学"],
 ["Энергийн засал","Energy healing","에너지 치유","エネルギーヒーリング","能量疗愈"],
 ["Ариусахуйн үйл","Meditation courses","명상 강좌","瞑想講座","冥想课程"],
