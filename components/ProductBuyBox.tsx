@@ -10,7 +10,7 @@ import type { L } from "@/lib/types";
 const same = (s: string): L => ({ mn: s, en: s, ko: s, ja: s, zh: s });
 
 /** Бүтээгдэхүүний худалдан авалт — тоо ширхэг сонгож сагсанд нэмэх эсвэл шууд худалдаж авах. */
-export function ProductBuyBox({ id, title, price }: { id: string; title: string; price?: number }) {
+export function ProductBuyBox({ id, title, price, compact = false }: { id: string; title: string; price?: number; compact?: boolean }) {
   const { add, close } = useCart();
   const router = useRouter();
   const [qty, setQty] = useState(1);
@@ -32,8 +32,8 @@ export function ProductBuyBox({ id, title, price }: { id: string; title: string;
   }
 
   return (
-    <div className="card p-6">
-      {typeof price === "number" && <p className="price mb-4 text-center text-3xl">{formatMNT(price)}</p>}
+    <div className={compact ? "border-t border-line pt-4" : "card p-6"}>
+      {typeof price === "number" && <p className={compact ? "price mb-3 text-center text-2xl" : "price mb-4 text-center text-3xl"}>{formatMNT(price)}</p>}
 
       <div className="mb-4 flex items-center justify-center gap-3">
         <span className="text-sm font-medium text-muted">Тоо ширхэг:</span>
@@ -49,8 +49,8 @@ export function ProductBuyBox({ id, title, price }: { id: string; title: string;
       )}
 
       <div className="space-y-2.5">
-        <button type="button" onClick={addToCart} className="btn btn-outline btn-lg w-full">{added ? "✓ Сагсанд нэмэгдлээ" : "🛒 Сагсанд нэмэх"}</button>
-        <button type="button" onClick={buyNow} className="btn btn-primary btn-lg w-full">Худалдаж авах</button>
+        <button type="button" onClick={addToCart} className={"btn btn-outline w-full " + (compact ? "btn-md" : "btn-lg")}>{added ? "✓ Сагсанд нэмэгдлээ" : "🛒 Сагсанд нэмэх"}</button>
+        <button type="button" onClick={buyNow} className={"btn btn-primary w-full " + (compact ? "btn-md" : "btn-lg")}>{compact ? "Шууд захиалах" : "Худалдаж авах"}</button>
       </div>
     </div>
   );

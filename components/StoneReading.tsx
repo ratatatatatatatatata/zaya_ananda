@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { ProductHoverCard } from "./ProductHoverCard";
 import { CmsCard } from "./CmsCard";
 import { STONE_LORE, type StoneLore } from "@/data/stone-lore";
 import { ZODIACS, zodiacOf, ALL_ZODIACS_KEY } from "@/data/zodiac";
@@ -12,7 +13,8 @@ function daysIn(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
 }
 
-function StoneCard({ s, products, universal }: { s: StoneLore; products: CmsItem[]; universal?: boolean }) {
+function StoneCard({ s, products, universal, interactiveProducts = false }: { s: StoneLore; products: CmsItem[]; universal?: boolean; interactiveProducts?: boolean }) {
+  const Card = interactiveProducts ? ProductHoverCard : CmsCard;
   const matched = useMemo(() => {
     const keys = s.match.map((k) => k.toLowerCase());
     return products.filter((p) => {
@@ -45,7 +47,7 @@ function StoneCard({ s, products, universal }: { s: StoneLore; products: CmsItem
           <div className="mt-5 border-t border-line pt-5">
             <p className="font-display text-sm font-semibold text-primary-300">Танд тохирох бүтээгдэхүүн:</p>
             <div className="mt-3 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {matched.slice(0, 3).map((p) => <CmsCard key={p.id} item={p} />)}
+              {matched.slice(0, 3).map((p) => <Card key={p.id} item={p} />)}
             </div>
           </div>
         )}
@@ -56,7 +58,8 @@ function StoneCard({ s, products, universal }: { s: StoneLore; products: CmsItem
 
 /** Ордуудын ээлтэй чулуу — төрсөн он, сар, өдрөө оруулахад орд нь шууд гарч,
  *  ээлтэй чулуунуудыг тайлбартай нь + тохирох бүтээгдэхүүнтэй харуулна. */
-export function StoneReading() {
+export function StoneReading({ interactiveProducts = false }: { interactiveProducts?: boolean }) {
+  const Card = interactiveProducts ? ProductHoverCard : CmsCard;
   const now = new Date().getFullYear();
   const years = useMemo(() => Array.from({ length: now - 1929 }, (_, i) => now - i), [now]);
   const [year, setYear] = useState<number | "">("");
@@ -140,9 +143,9 @@ export function StoneReading() {
       {stoneProducts.length > 0 && (
         <div className="mt-10">
           <h3 className="font-display text-xl font-semibold text-ink sm:text-2xl">💎 Манай эрдэнийн чулуунууд</h3>
-          <p className="mt-2 max-w-2xl text-muted">Чулуу бүрийн ээлтэй ордыг тэмдэглэсэн. Зураг дээр курсороо аваачих эсвэл дарж мэдээллийг үзээрэй.</p>
+          <p className="mt-2 max-w-2xl text-muted">{interactiveProducts ? "Чулуу бүрийн ээлтэй ордыг тэмдэглэсэн. Зураг дээр курсороо аваачих эсвэл дарж мэдээллийг үзээрэй." : "Чулуу бүрийн зураг дээр ямар ордод ээлтэйг тэмдэглэсэн. Дарж дэлгэрэнгүй мэдээллийг үзээрэй."}</p>
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {stoneProducts.map((p) => <CmsCard key={p.id} item={p} />)}
+            {stoneProducts.map((p) => <Card key={p.id} item={p} />)}
           </div>
         </div>
       )}
@@ -163,7 +166,7 @@ export function StoneReading() {
             <>
               <h3 className="mt-10 font-display text-xl font-semibold text-ink sm:text-2xl">💎 {z.name} ордод ээлтэй чулуунууд</h3>
               <div className="mt-5 space-y-6">
-                {zodiacStones.map((s) => <StoneCard key={s.key} s={s} products={products} />)}
+                {zodiacStones.map((s) => <StoneCard key={s.key} s={s} products={products} interactiveProducts={interactiveProducts} />)}
               </div>
             </>
           )}
@@ -171,7 +174,7 @@ export function StoneReading() {
           {/* Бүх ордод ээлтэй */}
           <h3 className="mt-10 font-display text-xl font-semibold text-ink sm:text-2xl">✨ Бүх ордод ээлтэй чулуунууд</h3>
           <div className="mt-5 space-y-6">
-            {universalStones.map((s) => <StoneCard key={s.key} s={s} products={products} universal />)}
+            {universalStones.map((s) => <StoneCard key={s.key} s={s} products={products} universal interactiveProducts={interactiveProducts} />)}
           </div>
 
           {/* Танд санал болгох бүтээгдэхүүн */}
@@ -180,7 +183,7 @@ export function StoneReading() {
               <h3 className="font-display text-xl font-semibold text-ink sm:text-2xl">🛍 Танд санал болгох бүтээгдэхүүн</h3>
               <p className="mt-2 text-sm text-muted">Таны ордод ээлтэй чулуутай холбоотой болон манай энергийн хамгаалалтын бүтээгдэхүүнүүд.</p>
               <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {suggested.map((p) => <CmsCard key={p.id} item={p} />)}
+                {suggested.map((p) => <Card key={p.id} item={p} />)}
               </div>
             </div>
           )}
@@ -193,7 +196,7 @@ export function StoneReading() {
               </button>
               {showOthers && (
                 <div className="mt-6 space-y-6">
-                  {otherStones.map((s) => <StoneCard key={s.key} s={s} products={products} />)}
+                  {otherStones.map((s) => <StoneCard key={s.key} s={s} products={products} interactiveProducts={interactiveProducts} />)}
                 </div>
               )}
             </div>

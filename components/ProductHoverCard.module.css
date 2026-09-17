@@ -1,4 +1,9 @@
-.card { min-width:0; height:100%; overflow:hidden; border:1px solid #dbe4da; border-radius:24px; background:#fff; }
+.card { position:relative; min-width:0; height:100%; min-height:416px; border-radius:24px; background:#edf2e8; }
+.surface { overflow:hidden; border:1px solid #dbe4da; border-radius:24px; background:#fff; height:100%; }
+.card[data-open=true] { z-index:45; }
+.card[data-open=true] .surface { position:fixed; z-index:45; height:auto; display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); overflow:auto; overscroll-behavior:contain; box-shadow:0 18px 70px #173c3040; }
+.card[data-open=true] .visual { height:auto; min-height:320px; }
+.card[data-open=true] .visual>img { position:absolute; inset:0; object-fit:contain; }
 .visual { position:relative; height:320px; background:#edf2e8; }
 .visual>img { width:100%; height:100%; object-fit:cover; }
 .placeholder { display:grid; place-items:center; height:100%; color:#547268; font-size:80px; }
@@ -7,14 +12,16 @@
 .indicator { position:absolute; bottom:14px; right:14px; display:grid; place-items:center; width:32px; height:32px; border-radius:50%; background:#fffffff0; color:#315e46; font-size:22px; box-shadow:0 2px 10px #203f2f20; }
 .zodiacs { position:absolute; top:14px; left:14px; display:flex; flex-wrap:wrap; gap:5px; pointer-events:none; }
 .zodiacs>span { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:#203f2fcc; color:#fff; font-size:16px; }
-.details { position:absolute; inset:14px 14px 56px; display:flex; flex-direction:column; border-radius:18px; padding:20px; background:#fffffff5; color:#203f2f; }
+.details { min-width:0; display:flex; flex-direction:column; gap:12px; padding:24px; background:#fff; color:#203f2f; }
 .details[hidden] { display:none; }
-.details>strong { font-size:18px; line-height:1.4; }
+.heading { display:flex; align-items:flex-start; gap:12px; justify-content:space-between; }
+.heading h3 { font-size:21px; line-height:1.4; font-weight:600; }
+.heading button { flex-shrink:0; width:32px; height:32px; border-radius:50%; background:#edf2e8; font-size:22px; }
 .zodiacNames { margin-top:8px; font-size:12px; color:#547268; }
-.description { min-height:0; overflow:auto; overscroll-behavior:contain; margin-top:12px; font-size:14px; line-height:1.7; white-space:pre-line; overflow-wrap:anywhere; }
-.detailLink { flex-shrink:0; margin-top:auto; padding-top:14px; font-size:13px; font-weight:600; color:#315e46; }
+.description { min-height:0; max-height:200px; overflow:auto; overscroll-behavior:contain; font-size:14px; line-height:1.7; white-space:pre-line; overflow-wrap:anywhere; }
 .caption { padding:20px 22px; }
 .caption h3 { font-size:18px; line-height:1.4; font-weight:600; color:#203f2f; }
 .caption p { margin-top:8px; font-size:16px; font-weight:600; color:#315e46; }
-.card :is(a,.description):focus-visible { outline:2px solid #315e46; outline-offset:3px; }
-@media(max-width:600px) { .visual { height:300px; } }
+.caption button { text-align:left; }
+.card :is(button,.description):focus-visible { outline:2px solid #315e46; outline-offset:3px; }
+@media(max-width:600px) { .visual { height:300px; }.card[data-open=true] .surface { grid-template-columns:1fr; }.card[data-open=true] .visual { height:170px; min-height:170px; }.details { padding:18px; }.description { max-height:120px; } }

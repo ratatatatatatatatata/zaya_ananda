@@ -1,6 +1,6 @@
 import { VideoHero } from "@/components/video/VideoHero";
 import { heroMediaFor } from "@/lib/hero-video";
-import { CmsCard } from "@/components/CmsCard";
+import { ProductHoverCard } from "@/components/ProductHoverCard";
 import { ShopSplit } from "@/components/ShopSplit";
 import { StoneReading } from "@/components/StoneReading";
 import { listCmsCached } from "@/lib/repo";
@@ -30,9 +30,9 @@ export default async function ShopPage() {
           products={
             items.length === 0
               ? <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-14 text-center text-muted">Одоохондоо бүтээгдэхүүн нэмэгдээгүй байна.</p>
-              : <div className="adaptive-cards">{items.map((i) => <CmsCard key={i.id} item={i} />)}</div>
+              : <div className="adaptive-cards">{items.map((i) => <ProductHoverCard key={i.id} item={i} />)}</div>
           }
-          stones={<StoneReading />}
+          stones={<StoneReading interactiveProducts />}
         />
       </div></section>
     </>
