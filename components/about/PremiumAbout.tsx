@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Logo } from "@/components/Logo";
 import { useEffect, useRef, useState, type ReactNode, type CSSProperties } from "react";
+import { TeamGallery } from "./TeamGallery";
 import { Pentagon } from "./AboutNavigation";
 import styles from "./PremiumAbout.module.css";
 
@@ -81,18 +82,7 @@ function Team({ members, sample }: { members: Member[]; sample: boolean }) {
       <h2 className={styles.teamTitle}>Багш, хамт олон</h2>
       <p className={styles.sectionIntro}>Таны өөрийгөө таних, суралцах аялалд хамт байх хүмүүс.</p>
       {sample && <p className={styles.sample}>Жишиг багийн картууд · Бодит гишүүдийг админаас нэмнэ</p>}
-      <div className={styles.teamGrid} aria-label="Багш, хамт олны танилцуулга">
-        {members.map((member, i) => <article key={`${member.name}-${i}`} className={styles.memberCard}>
-          <div className={styles.memberHeading}>
-            <div className={styles.memberAvatar}>
-              {member.image ? <Image src={member.image} unoptimized fill sizes="80px" alt={member.name} style={{objectFit:"cover", objectPosition:`50% ${member.focus ?? 50}%`}} />
-                : <span aria-hidden="true">{member.name.trim().split(/\s+/).map(part => part[0]).slice(0,2).join("")}</span>}
-            </div>
-            <div><h3>{member.name}</h3>{member.role && <p className={styles.memberRole}>{member.role}</p>}</div>
-          </div>
-          {member.info && <div className={styles.memberInfo}>{member.info}</div>}
-        </article>)}
-      </div>
+      <TeamGallery members={members} />
     </div>
   </section>;
 }

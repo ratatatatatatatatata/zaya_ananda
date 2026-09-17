@@ -4,6 +4,7 @@ import { aboutContent, faqs, siteConfig } from "@/data/content";
 import { getSettings } from "@/lib/repo";
 import { signedDownloadUrl } from "@/lib/supabase";
 import { AboutGallery } from "@/components/home/AboutGallery";
+import { FaqContact } from "@/components/about/FaqContact";
 import { PremiumAbout } from "@/components/about/PremiumAbout";
 import { sampleStory, sampleTeam, programSteps } from "@/data/about-editorial";
 import styles from "@/components/about/PremiumAbout.module.css";
@@ -39,9 +40,9 @@ export default async function AboutPage() {
       {video && <video controls playsInline preload="none" src={video} />}
       {!!settings.aboutGallery?.length && <details><summary>Манай орчин — зургийн цомог</summary><AboutGallery images={settings.aboutGallery} /></details>}
     </div>}
-    extra={<div className={styles.extras}>
+    extra={<><div className={styles.extras}>
       {!!settings.aboutValues?.length && <details><summary>Бидний үнэт зүйлс</summary>{settings.aboutValues.map((v,i)=><div key={i}><h3>{localeText(v.title)}</h3><p>{localeText(v.text)}</p></div>)}</details>}
-      <details><summary>Түгээмэл асуултууд</summary>{(settings.aboutFaqs?.length ? settings.aboutFaqs : faqs).map((f,i)=><details key={i}><summary>{localeText(f.q)}</summary><p>{localeText(f.a)}</p></details>)}</details>
-    </div>}
+
+    </div><FaqContact questions={settings.aboutFaqs?.length ? settings.aboutFaqs : faqs} mapQuery={settings.contact?.mapQuery} /></>}
   />;
 }

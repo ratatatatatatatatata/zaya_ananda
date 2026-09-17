@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { siteConfig } from "@/data/content";
 import { useI18n } from "@/lib/i18n";
+import { ContactForm } from "./ContactForm";
 import { useAuth } from "@/lib/auth-context";
 
 type ContactInfo = { phone?: string; email?: string; address?: string; hours?: string; mapQuery?: string };
@@ -11,8 +12,6 @@ type ContactInfo = { phone?: string; email?: string; address?: string; hours?: s
 export function ContactSection({ id = "contact" }: { id?: string }) {
   const { t, tr } = useI18n();
   const { user } = useAuth();
-  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
-  const [error, setError] = useState("");
   /** Админаас оруулсан холбоо барих мэдээлэл — байхгүй бол өгөгдмөл рүү шилжинэ. */
   const [cfg, setCfg] = useState<ContactInfo>({});
 
@@ -56,27 +55,6 @@ export function ContactSection({ id = "contact" }: { id?: string }) {
       .catch(() => {});
   }, []);
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const payload = Object.fromEntries(new FormData(form).entries());
-    if (!payload.email && !payload.phone) { setStatus("error"); setError("Имэйл эсвэл утасны дугаараа оруулна уу."); return; }
-    setStatus("sending");
-    setError("");
-    try {
-      const res = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || "Error");
-      }
-      setStatus("done");
-      form.reset();
-    } catch (err) {
-      setStatus("error");
-      setError(err instanceof Error ? err.message : "Error");
-    }
-  }
-
   const phone = cfg.phone?.trim() || siteConfig.phone;
   const email = cfg.email?.trim() || siteConfig.email;
   const address = cfg.address?.trim() || tr(siteConfig.address);
@@ -112,43 +90,7 @@ export function ContactSection({ id = "contact" }: { id?: string }) {
             {publicT.length > 0 && <div className="mb-6 grid gap-4 sm:grid-cols-3">{publicT.map(r => <blockquote key={r.id} className="rounded-xl bg-surface-2 p-4"><span className="text-accent-300">{"★".repeat(r.rating)}</span><p className="mt-2 text-sm leading-relaxed">«{r.text}»</p><footer className="mt-2 text-sm font-semibold">— {r.name}</footer></blockquote>)}</div>}
             <div className={"grid gap-5 " + (!user ? "lg:grid-cols-2" : "mx-auto max-w-2xl")}>
           <div className="card p-6 sm:p-8">
-            {status === "done" ? (
-              <div className="flex h-full flex-col items-center justify-center py-12 text-center">
-                <div className="grid h-20 w-20 place-items-center rounded-full bg-jade-400/15 text-4xl text-jade-600">✓</div>
-                <h3 className="mt-5 font-display text-2xl font-semibold text-ink">{t("contact.done")}</h3>
-                <p className="mt-2 text-muted">{t("contact.doneSub")}</p>
-                <button onClick={() => setStatus("idle")} className="btn btn-outline btn-md mt-6">{t("contact.newMsg")}</button>
-              </div>
-            ) : (
-              <form onSubmit={onSubmit} className="space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="field-label" htmlFor="c-name">{t("form.name")} *</label>
-                    <input id="c-name" name="name" required className="input" />
-                  </div>
-                  <div>
-                    <label className="field-label" htmlFor="c-phone">{t("form.phone")}</label>
-                    <input id="c-phone" name="phone" className="input" placeholder="9900 0000" />
-                  </div>
-                </div>
-                <div>
-                  <label className="field-label" htmlFor="c-email">{t("form.email")}</label>
-                  <input id="c-email" name="email" type="email" className="input" placeholder="name@email.com" />
-                </div>
-                <div>
-                  <label className="field-label" htmlFor="c-subject">{t("contact.subject")}</label>
-                  <input id="c-subject" name="subject" className="input" />
-                </div>
-                <div>
-                  <label className="field-label" htmlFor="c-message">{t("contact.message")} *</label>
-                  <textarea id="c-message" name="message" required className="textarea" />
-                </div>
-                {status === "error" && <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</p>}
-                <button type="submit" disabled={status === "sending"} className="btn btn-primary btn-md w-full">
-                  {status === "sending" ? t("contact.sending") : t("contact.send")}
-                </button>
-              </form>
-            )}
+            <ContactForm />
           </div>
 
           {!user && <div className="card p-6 sm:p-8">

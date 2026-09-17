@@ -1,6 +1,8 @@
 import { publicTeam } from "@/lib/public-team";
 import { Reveal } from "../Reveal";
 import { T, Tr } from "../T";
+import { TeamGallery } from "@/components/about/TeamGallery";
+import { FaqContact } from "@/components/about/FaqContact";
 import { AboutFacts } from "./AboutFacts";
 import { aboutContent, team, faqs } from "@/data/content";
 import { getSettingsCached } from "@/lib/repo";
@@ -85,51 +87,13 @@ export async function HomeAbout() {
           <p className="eyebrow-line justify-center"><T k="about.teamEyebrow" /></p>
           <h3 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl"><T k="about.teamTitle" /></h3>
         </div>
-        <div className="mt-10 adaptive-cards auto-rows-fr">
-          {mergedTeam.length > 0
-            ? mergedTeam.map((m, i) => (
-                <Reveal key={m.name + i} delay={i * 80}>
-                  <div className="card flex h-full flex-col items-center p-8 text-center">
-                    {m.image
-                      ? <img src={m.image} alt="" className="h-28 w-28 rounded-full object-cover shadow-card" style={{ objectPosition: "50% " + (m.focus ?? 50) + "%" }} />
-                      : <div className="grid h-28 w-28 place-items-center rounded-full bg-primary-50 text-3xl">👤</div>}
-                    <h4 className="mt-5 font-display text-xl font-semibold text-ink">{m.name}</h4>
-                    {m.role && <p className="mt-1 text-sm font-medium text-primary-600">{m.role}</p>}
-                    {m.info && <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted">{m.info}</p>}
-                  </div>
-                </Reveal>
-              ))
-            : team.map((m, i) => (
-                <Reveal key={m.id} delay={i * 80}>
-                  <div className="card flex h-full flex-col items-center p-8 text-center">
-                    <div className="grid h-28 w-28 place-items-center rounded-full bg-primary-50 text-3xl">{m.glyph}</div>
-                    <h4 className="mt-5 font-display text-xl font-semibold text-ink">{m.name}</h4>
-                    <p className="mt-1 text-sm font-medium text-primary-600"><Tr v={m.role} /></p>
-                    <p className="mt-3 text-sm leading-relaxed text-muted"><Tr v={m.bio} /></p>
-                  </div>
-                </Reveal>
-              ))}
-        </div>
+        <TeamGallery members={mergedTeam.length ? mergedTeam : team.map(member => ({
+          name: member.name, role: <Tr v={member.role} />, info: <Tr v={member.bio} />,
+        }))} />
       </div>
 
       {/* Түгээмэл асуултууд */}
-      <div className="mx-auto max-w-3xl">
-        <div className="text-center">
-          <p className="eyebrow-line justify-center"><T k="about.faqEyebrow" /></p>
-          <h3 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl"><T k="about.faqTitle" /></h3>
-        </div>
-        <div className="mt-8 space-y-3">
-          {(questions.length ? questions : faqs).map((f, i) => (
-            <details key={i} className="group rounded-2xl border border-line bg-surface-1 p-5 [&_summary]:cursor-pointer">
-              <summary className="flex items-center justify-between gap-4 font-semibold text-ink marker:content-['']">
-                {localeText(f.q)}
-                <span aria-hidden className="text-primary-600 transition group-open:rotate-45">＋</span>
-              </summary>
-              <p className="mt-3 leading-relaxed text-muted">{localeText(f.a)}</p>
-            </details>
-          ))}
-        </div>
-      </div>
+      <FaqContact questions={questions.length ? questions : faqs} mapQuery={settings.contact?.mapQuery} />
 
 
     </div>
