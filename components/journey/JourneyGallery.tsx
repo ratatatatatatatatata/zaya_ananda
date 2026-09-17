@@ -11,8 +11,8 @@ export function JourneyGallery({ journey, headingLevel = 2 }: { journey: Journey
   });
   if (!images.length) return null;
   const Heading = headingLevel === 3 ? "h3" : "h2";
-  return <section aria-label="Аяллын зургууд" className="mb-14 min-w-0 pt-6 sm:mb-20">
-    <Heading className="font-display text-3xl font-semibold text-ink sm:text-4xl">Аяллын зургууд</Heading>
+  return <section aria-label="Аяллын зургууд" className="min-w-0 py-6">
+    <Heading className="font-display text-2xl font-semibold text-ink sm:text-3xl">Аяллын зургууд</Heading>
     <div className="mt-6"><AboutGallery images={images} layout="scattered" label="Аяллын зургийн цомог" /></div>
   </section>;
 }

@@ -4,9 +4,8 @@ import { JOURNEY_FAQ, JOURNEY_PREP } from "@/data/journeys";
 import { getJourneyBySlugCached, getJourneyBySlug } from "@/lib/journeys-db";
 import { JourneyImage } from "@/components/journey/SceneArt";
 import { LeadCard, CrewRow, Avatar } from "@/components/journey/PersonCard";
-import { JourneyBooking } from "@/components/journey/JourneyBooking";
 import { DestinationGallery } from "@/components/journey/DestinationGallery";
-import { JourneyGallery } from "@/components/journey/JourneyGallery";
+import { JourneyRegistration } from "@/components/journey/JourneyRegistration";
 import { JourneyReviews } from "@/components/journey/JourneyReviews";
 
 // Админ шинэ аялал нэмэнгүүт (эсвэл slug өөрчлөгдөнгүүт) шууд нээгдэж харагдахын тулд
@@ -243,17 +242,13 @@ export default async function JourneyPage({ params }: { params: { slug: string }
 
       {/* Цаг захиалга */}
       <section className="section bg-surface-2"><div className="container-px">
-        <JourneyGallery journey={j} />
-        <div id="zahialga" className="max-w-2xl scroll-mt-32">
+        <JourneyRegistration journey={j} id="zahialga" heading={<>
           <p className="eyebrow-line"><span>🗓</span></p>
           <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl">Аялалд бүртгүүлэх</h2>
           <p className="mt-3 leading-relaxed text-muted">
             Мэдээллээ бөглөөд аялалд бүртгүүлээрэй. Админ баталгаажуулсны дараа танд мэдэгдэл ирнэ.
           </p>
-        </div>
-        <div className="mt-8">
-          <JourneyBooking slug={j.slug} journeyName={j.name} prepay={j.prepay} />
-        </div>
+        </>} />
       </div></section>
 
       {/* Аялагчдын зөвлөмж */}

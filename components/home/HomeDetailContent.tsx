@@ -11,9 +11,8 @@ import { ServiceBooking } from "@/components/ServiceBooking";
 import { ProductBuyBox } from "@/components/ProductBuyBox";
 import { PurchaseBox } from "@/components/PurchaseBox";
 import { CourseLessons } from "@/components/CourseLessons";
-import { JourneyGallery } from "@/components/journey/JourneyGallery";
+import { JourneyRegistration } from "@/components/journey/JourneyRegistration";
 import { DestinationGallery } from "@/components/journey/DestinationGallery";
-import { JourneyBooking } from "@/components/journey/JourneyBooking";
 import styles from "./HomeDetails.module.css";
 
 export default function HomeDetailContent({ item, journey: j }: { item?: CmsItem; journey?: Journey }) {
@@ -39,8 +38,7 @@ export default function HomeDetailContent({ item, journey: j }: { item?: CmsItem
     <section className={styles.program}><h3>Аяллын хөтөлбөр</h3>{j.itinerary.map((day,index) => <article key={index}><p>{day.label}</p><h3>{day.title}</h3><p>{day.text}</p>{day.bullets && <ul className="mt-3 list-disc pl-5">{day.bullets.map((text,i) => <li key={i}>{text}</li>)}</ul>}{day.image && <img src={day.image} alt={day.title} />}</article>)}</section>
     {!!j.destination?.length && <section><h3>Очих газрууд</h3><p>Зураг дээр дарж тухайн газрын дэлгэрэнгүй мэдээллийг үзээрэй.</p><DestinationGallery places={j.destination} scene={j.scene} /></section>}
     <section className={styles.program}><h3>Хамт явах баг</h3>{[j.lead,...j.crew].filter(person => person?.name).map((person,i) => <div className={styles.teacher} key={i}>{person.image && <img src={person.image} alt="" />}<div><h3>{person.name}</h3><p>{person.role}</p><p>{person.info}</p></div></div>)}</section>
-    <JourneyGallery journey={j} headingLevel={3} />
-    <JourneyBooking slug={j.slug} journeyName={j.name} prepay={j.prepay} />
+    <JourneyRegistration journey={j} headingLevel={3} />
     <section><h3>Аяллын бэлтгэл</h3><ul className="list-disc space-y-2 pl-5">{[...JOURNEY_PREP.packing,...JOURNEY_PREP.mind,...JOURNEY_PREP.etiquette].map(text => <li key={text}>{text}</li>)}</ul><p className="mt-4">{JOURNEY_PREP.food}</p></section>
     <section><h3>Түгээмэл асуултууд</h3>{JOURNEY_FAQ.map(faq => <details key={faq.q} className="border-b border-line py-4"><summary className="cursor-pointer font-semibold">{faq.q}</summary><p className="mt-3">{faq.a}</p></details>)}</section>
   </div>;

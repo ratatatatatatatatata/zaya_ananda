@@ -248,7 +248,7 @@ export function AdminJourneys() {
 
           <fieldset disabled={busy} className="rounded-2xl border border-line bg-primary-50/40 p-4">
             <legend className="px-2 font-display font-semibold text-ink">Нэмэлт зургууд</legend>
-            <p className="text-sm text-muted">Бүртгэлийн маягтын өмнө өөр өөр өндөрт байрлан автоматаар гүйнэ. Зургийг тайрахгүйгээр харуулна.</p>
+            <p className="text-sm text-muted">Том дэлгэц дээр бүртгэлийн маягтын зүүн талд өөр өөр өндөрт байрлан автоматаар гүйнэ. Утсан дээр маягтын дээр харагдана.</p>
             <label className="mt-3 block text-sm font-semibold text-ink">
               Зураг нэмэх (олноор сонгож болно)
               <input type="file" accept="image/*" multiple onChange={pickGallery} className="mt-2 block w-full text-sm" />
