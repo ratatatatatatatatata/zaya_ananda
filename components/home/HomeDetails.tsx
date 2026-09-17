@@ -4,6 +4,8 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { createContext, useContext, useEffect, useId, useRef, useState, type ComponentProps, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useI18n } from "@/lib/i18n";
+import { locText } from "@/lib/cms-i18n";
 import type { CmsItem } from "@/lib/types";
 import type { Journey } from "@/data/journeys";
 import styles from "./HomeDetails.module.css";
@@ -27,11 +29,12 @@ export function HomeDetailLink({ href, onClick, ...props }: ComponentProps<"a"> 
 }
 
 export function HomeDetails({ items, journeys, children }: { items: CmsItem[]; journeys: Journey[]; children: ReactNode }) {
+  const { lang } = useI18n();
   const [path, setPath] = useState<string | null>(null);
   const item = items.find(value => path === `/item/${value.id}`);
   const journey = journeys.find(value => path === `/ayalal/${encodeURIComponent(value.slug)}`);
   const category = path ? categories[path] : undefined;
-  const title = item?.title || journey?.name || category?.title || "Дэлгэрэнгүй";
+  const title = (item ? locText(lang,item.title,item.i18n,"title") : "") || journey?.name || category?.title || "Дэлгэрэнгүй";
   const open = (href: string) => {
     if (categories[href] || items.some(value => href === `/item/${value.id}`) || journeys.some(value => href === `/ayalal/${encodeURIComponent(value.slug)}`)) {
       setPath(href); return true;
@@ -43,7 +46,7 @@ export function HomeDetails({ items, journeys, children }: { items: CmsItem[]; j
     {path && <DetailDialog title={title} onClose={() => setPath(null)}>
       {category ? <div className={styles.list}>
         {category.kind ? items.filter(value => value.kind === category.kind).map(value => <button key={value.id} type="button" onClick={() => open(`/item/${value.id}`)}>
-          {value.image && <img src={value.image} alt="" />}<span><strong>{value.title}</strong><span>{value.summary}</span></span><span aria-hidden>→</span>
+          {value.image && <img src={value.image} alt="" />}<span><strong>{locText(lang,value.title,value.i18n,"title")}</strong><span>{locText(lang,value.summary,value.i18n,"summary")}</span></span><span aria-hidden>→</span>
         </button>) : journeys.map(value => <button key={value.id} type="button" onClick={() => open(`/ayalal/${encodeURIComponent(value.slug)}`)}>
           {value.image && <img src={value.image} alt="" />}<span><strong>{value.name}</strong><span>{value.summary}</span></span><span aria-hidden>→</span>
         </button>)}

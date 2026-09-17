@@ -5,13 +5,18 @@ import { createPortal } from "react-dom";
 import { ServiceBooking } from "@/components/ServiceBooking";
 import { itemTeachers } from "@/lib/item-teachers";
 import { ItemTeachers } from "@/components/ItemTeachers";
+import { useI18n } from "@/lib/i18n";
+import { locText } from "@/lib/cms-i18n";
+import { RichBody } from "@/components/RichBody";
 import type { CmsItem } from "@/lib/types";
 
 
 /** Нэг үйлчилгээний мөр — зүүн талд зураг, баруун талд бүх мэдээлэл. Цаг захиалга цонхоор нээгдэнэ. */
 function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
   const cover = item.image || item.images?.[0];
-  const paragraphs = (item.body || "").split("\n").map((p) => p.trim()).filter(Boolean);
+  const { lang } = useI18n();
+  const title = locText(lang,item.title,item.i18n,"title");
+  const summary = locText(lang,item.summary,item.i18n,"summary");
   const [booking, setBooking] = useState(false);
 
   // Нээлттэй үед арын хуудас гүйхийг зогсооно
@@ -30,7 +35,7 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
       {/* Зураг */}
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-3 lg:aspect-auto lg:h-full">
         {cover ? (
-          <img src={cover} alt={item.title} className="h-full w-full object-cover" />
+          <img src={cover} alt={title} className="h-full w-full object-cover" />
         ) : (
           <div className="h-full w-full" style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }} />
         )}
@@ -41,12 +46,12 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
 
       {/* Бүх мэдээлэл — нуухгүй, шууд харагдана */}
       <div className="min-w-0 p-6 sm:p-8">
-        <h3 className="font-display text-2xl font-semibold text-ink">{item.title}</h3>
-        {item.summary && <p className="mt-3 leading-relaxed text-muted">{item.summary}</p>}
+        <h3 className="font-display text-2xl font-semibold text-ink">{title}</h3>
+        {item.summary && <p className="mt-3 leading-relaxed text-muted">{summary}</p>}
 
-        {paragraphs.length > 0 && (
+        {!!item.body && (
           <div className="mt-5 space-y-3 leading-relaxed text-ink/85">
-            {paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+            <RichBody html={item.body!} i18n={item.i18n} />
           </div>
         )}
 
@@ -73,7 +78,7 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
     </article>
 
       {booking && typeof document !== "undefined" && createPortal(
-        <div role="dialog" aria-modal="true" aria-label={item.title}
+        <div role="dialog" aria-modal="true" aria-label={title}
           className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-[#0B1714]/70 p-4 backdrop-blur-sm sm:p-8">
           <div aria-hidden className="fixed inset-0" onClick={() => setBooking(false)} />
           <div className="relative z-10 my-auto w-full max-w-3xl rounded-4xl border border-line bg-surface-1 shadow-glow">
@@ -84,19 +89,19 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
 
             {cover && (
               <div className="relative aspect-[21/9] w-full overflow-hidden rounded-t-4xl">
-                <img src={cover} alt={item.title} className="h-full w-full object-cover" />
+                <img src={cover} alt={title} className="h-full w-full object-cover" />
                 <div aria-hidden className="absolute inset-0"
                   style={{ background: "linear-gradient(to top, rgba(8,20,17,0.85) 0%, transparent 60%)" }} />
-                <h3 className="absolute inset-x-0 bottom-0 p-6 font-display text-2xl font-semibold text-white sm:text-3xl">{item.title}</h3>
+                <h3 className="absolute inset-x-0 bottom-0 p-6 font-display text-2xl font-semibold text-white sm:text-3xl">{title}</h3>
               </div>
             )}
 
             <div className="min-w-0 p-6 sm:p-8">
-              {!cover && <h3 className="font-display text-2xl font-semibold text-ink">{item.title}</h3>}
-              {item.summary && <p className="mt-2 leading-relaxed text-muted">{item.summary}</p>}
-              {paragraphs.length > 0 && (
+              {!cover && <h3 className="font-display text-2xl font-semibold text-ink">{title}</h3>}
+              {item.summary && <p className="mt-2 leading-relaxed text-muted">{summary}</p>}
+              {!!item.body && (
                 <div className="mt-5 space-y-3 leading-relaxed text-ink/85">
-                  {paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+                  <RichBody html={item.body!} i18n={item.i18n} />
                 </div>
               )}
 

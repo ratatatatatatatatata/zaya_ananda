@@ -6,7 +6,8 @@
     "dev": "node tools/dev.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prebuild": "node scripts/collect-translation-sources.cjs"
   },
   "dependencies": {
     "@fontsource/barlow": "5.2.8",

@@ -1,4 +1,6 @@
 import type { L, Locale } from "@/lib/types";
+import { messages } from "./strings";
+import { siteTranslations } from "./site-translations";
 
 export const literalTranslations: Record<string, L> = {
   "— Он —": {"mn":"— Он —","en":"— Year —","ko":"— 연도 —","ja":"— 年 —","zh":"— 年 —"},
@@ -517,6 +519,16 @@ export const literalTranslations: Record<string, L> = {
 
 };
 
+const normalize = (value: string) => value.replace(/\s+/gu, " ").trim();
+const lookup = new Map<string,L>();
+// Resolve previous-language labels too, so switching repeatedly always works.
+for (const key of Object.keys(messages.mn)) {
+  const row = Object.fromEntries((["mn","en","ko","ja","zh"] as const).map(locale=>[locale,messages[locale][key] || messages.mn[key]])) as L;
+  for (const value of Object.values(row)) if (value) lookup.set(normalize(value),row);
+}
+for (const row of Object.values({...literalTranslations,...siteTranslations})) {
+  for (const value of Object.values(row)) if (value) lookup.set(normalize(value),row);
+}
 export function translateLiteral(source: string, locale: Locale): string {
-  return literalTranslations[source]?.[locale] ?? source;
+  return lookup.get(normalize(source))?.[locale] ?? source;
 }

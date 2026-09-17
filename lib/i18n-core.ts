@@ -12,5 +12,5 @@ export const localeMeta: { code: Locale; native: string; flag: string }[] = [
 
 export function pick(v: L | undefined, locale: Locale = defaultLocale): string {
   if (!v) return "";
-  return v[locale] ?? v[defaultLocale] ?? "";
+  return v[locale]?.trim() ? v[locale] : v[defaultLocale] || "";
 }

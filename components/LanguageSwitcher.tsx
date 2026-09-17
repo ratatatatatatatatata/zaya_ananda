@@ -21,11 +21,11 @@ export function LanguageSwitcher() {
   const current = localeMeta.find((m) => m.code === lang) ?? localeMeta[0];
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative" translate="no">
       <button
         onClick={() => setOpen((o) => !o)}
         className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white/10 px-3 py-2 text-sm font-semibold text-ink transition hover:border-primary/30"
-        aria-label="Language"
+        aria-label="Language" aria-expanded={open} aria-haspopup="true" data-testid="language-switcher"
       >
         <span>{current.flag}</span>
         <span className="hidden md:inline">{current.native}</span>
@@ -36,6 +36,7 @@ export function LanguageSwitcher() {
           {localeMeta.map((m) => (
             <button
               key={m.code}
+              lang={m.code} data-locale={m.code}
               onClick={() => {
                 setLang(m.code);
                 setOpen(false);
