@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { computeChart, localToUtc, splitLon, SIGNS, type NatalChart as Chart, type Element } from "@/lib/astro";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { computeChart, localToUtc, splitLon, SIGNS, type NatalChart as Chart, type Element, type HouseSystem } from "@/lib/astro";
+
+import { NatalAnalysis } from "./NatalAnalysis";
+import { natalAspects } from "@/lib/natal-analysis";
 
 /* ---------------- Хотууд ---------------- */
 
@@ -30,8 +33,8 @@ const MN_PLACES: Place[] = [
   { name: "Ховд", lat: 48.0056, lon: 91.6419, tz: "Asia/Hovd" },
   { name: "Өлгий", lat: 48.9683, lon: 89.9625, tz: "Asia/Hovd" },
   { name: "Улаангом", lat: 49.9811, lon: 92.0667, tz: "Asia/Hovd" },
-  { name: "Улиастай", lat: 47.7417, lon: 96.8444, tz: "Asia/Hovd" },
-  { name: "Алтай", lat: 46.3722, lon: 96.2583, tz: "Asia/Hovd" },
+  { name: "Улиастай", lat: 47.7417, lon: 96.8444, tz: "Asia/Ulaanbaatar" },
+  { name: "Алтай", lat: 46.3722, lon: 96.2583, tz: "Asia/Ulaanbaatar" },
 ];
 
 const cyr = /[Ѐ-ӿ]/;
@@ -55,6 +58,7 @@ const CX = 200, CY = 200;
 const R_OUT = 196, R_SIGN = 164, R_GLYPH = 146, R_DEG = 128, R_IN = 92;
 
 export function NatalWheel({ chart }: { chart: Chart }) {
+  const gradientId = useId();
   const rot = chart.asc ?? 0;
   const pt = (r: number, lon: number) => {
     const th = ((180 + lon - rot) * Math.PI) / 180;
@@ -88,7 +92,7 @@ export function NatalWheel({ chart }: { chart: Chart }) {
   return (
     <svg viewBox="0 0 400 400" className="h-auto w-full" role="img" aria-label="Натал зурхайн дугуй зураг">
       <defs>
-        <radialGradient id="natal-core" cx="50%" cy="50%" r="50%">
+        <radialGradient id={gradientId} cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#1E4A42" />
           <stop offset="100%" stopColor="#0E2622" />
         </radialGradient>
@@ -123,8 +127,13 @@ export function NatalWheel({ chart }: { chart: Chart }) {
       ))}
 
       <circle cx={CX} cy={CY} r={R_SIGN} fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
-      <circle cx={CX} cy={CY} r={R_IN} fill="url(#natal-core)" stroke="rgba(255,255,255,0.35)" strokeWidth="1" />
+      <circle cx={CX} cy={CY} r={R_IN} fill={`url(#${gradientId})`} stroke="rgba(255,255,255,0.35)" strokeWidth="1" />
 
+      {natalAspects(chart).map(a => {
+        const from = pt(R_IN - 3, a.a.lon), to = pt(R_IN - 3, a.b.lon);
+        return <line key={`${a.a.key}-${a.b.key}`} x1={from.x} y1={from.y} x2={to.x} y2={to.y}
+          stroke={a.angle === 90 || a.angle === 180 ? "#edaa91" : "#8ed5c1"} strokeOpacity="0.42" strokeWidth="0.7" />;
+      })}
       {/* Гэрүүд */}
       {chart.cusps?.map((c, i) => {
         const angle = i === 0 || i === 3 || i === 6 || i === 9;
@@ -184,9 +193,18 @@ const fmtPos = (lon: number) => {
 
 export function NatalChart() {
   const [date, setDate] = useState("");
-  const [time, setTime] = useState("12:00");
+  const [time, setTime] = useState("");
+  const formId = useId();
+  const [houseSystem, setHouseSystem] = useState<HouseSystem>("placidus");
+  const [manual, setManual] = useState(false);
+  const [lat, setLat] = useState("47.9077");
+  const [lon, setLon] = useState("106.8832");
+  const [tz, setTz] = useState("Asia/Ulaanbaatar");
+  const [offset, setOffset] = useState("");
+  const [searchError, setSearchError] = useState("");
+  const [resultPlace, setResultPlace] = useState("");
   const [timeUnknown, setTimeUnknown] = useState(false);
-  const [place, setPlace] = useState<Place>(MN_PLACES[0]);
+  const [place, setPlace] = useState<Place | null>(MN_PLACES[0]);
   const [query, setQuery] = useState(MN_PLACES[0].name);
   const [remote, setRemote] = useState<Place[]>([]);
   const [openList, setOpenList] = useState(false);
@@ -198,12 +216,13 @@ export function NatalChart() {
   // Латин нэрээр дэлхийн хотуудыг Open-Meteo геокодоос хайна (түлхүүргүй, үнэгүй)
   useEffect(() => {
     const q = query.trim();
-    if (!openList || q.length < 2 || cyr.test(q)) { setRemote([]); return; }
+    setRemote([]); setSearching(false); setSearchError("");
+    if (manual || !openList || q.length < 2 || cyr.test(q)) return;
     const ctrl = new AbortController();
     const t = setTimeout(() => {
       setSearching(true);
       fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=8&language=en&format=json`, { signal: ctrl.signal })
-        .then((r) => (r.ok ? r.json() : null))
+        .then((r) => { if (!r.ok) throw new Error("search"); return r.json(); })
         .then((d) => {
           const list: Place[] = (d?.results || [])
             .filter((x: { timezone?: string }) => x.timezone)
@@ -214,13 +233,13 @@ export function NatalChart() {
               lon: x.longitude,
               tz: x.timezone,
             }));
-          setRemote(list);
+          if (!ctrl.signal.aborted) { setRemote(list); if (!list.length) setSearchError("Хот олдсонгүй. Өөр нэрээр хайх эсвэл координатаа гараар оруулна уу."); }
         })
-        .catch(() => {})
-        .finally(() => setSearching(false));
+        .catch(() => { if (!ctrl.signal.aborted) setSearchError("Хотын хайлт түр ажиллахгүй байна. Координатаа гараар оруулж болно."); })
+        .finally(() => { if (!ctrl.signal.aborted) setSearching(false); });
     }, 350);
     return () => { clearTimeout(t); ctrl.abort(); };
-  }, [query, openList]);
+  }, [query, openList, manual]);
 
   const local = useMemo(() => {
     const q = query.trim().toLocaleLowerCase();
@@ -229,9 +248,11 @@ export function NatalChart() {
   }, [query]);
 
   const choose = (p: Place) => {
+    setChart(null); setErr("");
     setPlace(p);
     setQuery(p.country ? `${p.name} (${p.country})` : p.name);
     setOpenList(false);
+    setRemote([]); setSearchError("");
   };
 
   function calculate(e: React.FormEvent) {
@@ -240,16 +261,25 @@ export function NatalChart() {
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
     if (!m) { setErr("Төрсөн огноогоо оруулна уу."); return; }
     const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
-    if (y < 1800 || y > 2050) { setErr("1800–2050 оны хооронд төрсөн огноо оруулна уу."); return; }
+    if (y < 1800 || y > new Date().getFullYear()) { setErr("1800 оноос өнөөдрийг хүртэлх төрсөн огноо оруулна уу."); return; }
     let h = 12, mi = 0;
     if (!timeUnknown) {
       const t = /^(\d{1,2}):(\d{2})/.exec(time);
       if (!t) { setErr("Төрсөн цагаа оруулна уу, эсвэл «Цагаа мэдэхгүй» гэдгийг сонгоно уу."); return; }
       h = Number(t[1]); mi = Number(t[2]);
     }
-    const utcMs = localToUtc(y, mo, d, h, mi, place.tz);
-    setChart(computeChart({ utcMs, lat: place.lat, lon: place.lon, timeKnown: !timeUnknown }));
-    setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+    const chosen = manual ? { name: query.trim() || "Сонгосон координат", lat: Number(lat), lon: Number(lon), tz: tz.trim() } : place;
+    if (!chosen) { setErr("Төрсөн газраа хайлтын жагсаалтаас сонгоно уу, эсвэл координатаа гараар оруулна уу."); return; }
+    try {
+      const utcMs = localToUtc(y, mo, d, h, mi, chosen.tz, offset.trim() ? Number(offset) * 60 : undefined);
+      if (utcMs > Date.now()) throw new Error("Төрсөн огноо ирээдүйд байж болохгүй.");
+      setChart(computeChart({ utcMs, lat: chosen.lat, lon: chosen.lon, timeKnown: !timeUnknown, houseSystem }));
+      setResultPlace(chosen.name);
+      setTimeout(() => resultRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }), 60);
+    } catch (error) {
+      setChart(null);
+      setErr(error instanceof RangeError ? "Цагийн бүс буруу байна. Жишээ: Asia/Ulaanbaatar" : error instanceof Error ? error.message : "Тооцоолол амжилтгүй боллоо.");
+    }
   }
 
   const inputCls = "focus-ring w-full rounded-2xl border-2 border-line bg-surface-1 px-4 py-3 text-[1rem] text-ink outline-none transition hover:border-primary-400/60 focus:border-primary-500";
@@ -264,40 +294,39 @@ export function NatalChart() {
 
   return (
     <div className="space-y-6">
-      <form onSubmit={calculate} className="panel p-6 sm:p-8">
+      <form onSubmit={calculate} onChange={() => { setChart(null); setErr(""); }} className="panel p-6 sm:p-8">
         <p className="eyebrow-line">Натал зурхай</p>
         <h3 className="mt-3 font-display text-2xl font-semibold text-ink">Төрсөн мөчийн тэнгэрийн зураглал</h3>
         <p className="mt-2 max-w-2xl leading-relaxed text-muted">
           Төрсөн огноо, цаг, газраа оруулахад таныг төрөх агшинд Нар, Сар болон гарагууд аль ордод, аль гэрт байсныг
-          одон орны тооцооллоор гаргаж, натал дугуй зургийг зурна.
+          одон орны тооцооллоор гаргана. Зураглалын доор байрлал бүрийн дэлгэрэнгүй тайллыг уншаарай.
         </p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
-            <label className="field-label" htmlFor="nc-date">Төрсөн огноо *</label>
-            <input id="nc-date" type="date" required min="1800-01-01" max="2050-12-31" className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} />
+            <label className="field-label" htmlFor={`${formId}-date`}>Төрсөн огноо *</label>
+            <input id={`${formId}-date`} type="date" required min="1800-01-01" max={new Date().toISOString().slice(0, 10)} className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} />
           </div>
           <div>
-            <label className="field-label" htmlFor="nc-time">Төрсөн цаг</label>
-            <input id="nc-time" type="time" disabled={timeUnknown} className={inputCls + " disabled:opacity-50"} value={time} onChange={(e) => setTime(e.target.value)} />
+            <label className="field-label" htmlFor={`${formId}-time`}>Төрсөн цаг</label>
+            <input id={`${formId}-time`} type="time" required={!timeUnknown} disabled={timeUnknown} className={inputCls + " disabled:opacity-50"} value={time} onChange={(e) => setTime(e.target.value)} />
             <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm text-muted">
               <input type="checkbox" checked={timeUnknown} onChange={(e) => setTimeUnknown(e.target.checked)} className="h-4 w-4 accent-[#0F7A66]" />
               Цагаа мэдэхгүй
             </label>
           </div>
-          <div className="relative sm:col-span-2 lg:col-span-1">
-            <label className="field-label" htmlFor="nc-place">Төрсөн газар *</label>
+          <div className="relative sm:col-span-2 lg:col-span-1" onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpenList(false); }}>
+            <label className="field-label" htmlFor={`${formId}-place`}>Төрсөн газар *</label>
             <input
-              id="nc-place"
+              id={`${formId}-place`}
               autoComplete="off"
               className={inputCls}
               value={query}
               onFocus={(e) => { setOpenList(true); e.currentTarget.select(); }}
-              onBlur={() => setTimeout(() => setOpenList(false), 180)}
-              onChange={(e) => { setQuery(e.target.value); setOpenList(true); }}
+              onChange={(e) => { setQuery(e.target.value); setPlace(null); setOpenList(true); }}
               placeholder="Жишээ: Эрдэнэт, Seoul, Berlin"
             />
-            {openList && (local.length > 0 || remote.length > 0 || searching) && (
+            {!manual && openList && (local.length > 0 || remote.length > 0 || searching) && (
               <ul className="absolute z-30 mt-1.5 max-h-72 w-full overflow-auto rounded-2xl border border-line bg-surface-1 p-1.5 shadow-lift">
                 {local.map((p) => (
                   <li key={"mn-" + p.name}>
@@ -318,13 +347,33 @@ export function NatalChart() {
                 {searching && <li className="px-3 py-2 text-xs text-muted">Хайж байна…</li>}
               </ul>
             )}
-            <p className="mt-1.5 text-xs text-muted">Гадаадын хотыг латинаар бичнэ үү.</p>
+            <p className="mt-1.5 text-xs text-muted">{place && !manual ? `${place.name} · ${place.tz}` : "Гадаадын хотыг латинаар хайж, жагсаалтаас сонгоно уу."}</p>
+            {searchError && <p className="mt-2 text-xs text-rose-600" role="status">{searchError}</p>}
           </div>
         </div>
 
-        {err && <p className="mt-4 rounded-xl bg-rose-50 px-4 py-2.5 text-sm text-rose-600">{err}</p>}
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <label className="text-sm font-medium text-ink">Гэрийн систем
+            <select value={houseSystem} disabled={timeUnknown} onChange={e => setHouseSystem(e.target.value as HouseSystem)} className={inputCls + " mt-2"}>
+              <option value="placidus">Placidus</option><option value="whole">Бүтэн орд (Whole Sign)</option><option value="equal">Тэнцүү гэр (Equal)</option>
+            </select>
+          </label>
+          <label className="flex items-center gap-2 text-sm text-muted"><input type="checkbox" checked={manual} onChange={e => setManual(e.target.checked)} className="h-4 w-4" />Координатыг гараар оруулах</label>
+        </div>
+        {manual && <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <label className="text-sm">Өргөрөг (хойд + / өмнөд −)<input required type="number" step="any" min="-89.5" max="89.5" value={lat} onChange={e => setLat(e.target.value)} className={inputCls + " mt-2"} /></label>
+          <label className="text-sm">Уртраг (зүүн + / баруун −)<input required type="number" step="any" min="-180" max="180" value={lon} onChange={e => setLon(e.target.value)} className={inputCls + " mt-2"} /></label>
+          <label className="text-sm">Цагийн бүс (IANA)<input required value={tz} placeholder="Asia/Ulaanbaatar" onChange={e => setTz(e.target.value)} className={inputCls + " mt-2"} /></label>
+        </div>}
+        <details className="mt-4 text-sm text-muted"><summary className="cursor-pointer">Нэмэлт цагийн тохиргоо</summary>
+          <label className="mt-3 block max-w-sm">Тухайн үеийн UTC зөрүү (цаг)
+            <input type="number" min="-12" max="14" step="0.25" value={offset} onChange={e => setOffset(e.target.value)} placeholder="Автоматаар · жишээ: 8" className={inputCls + " mt-2"} />
+          </label><p className="mt-2">Ихэнх үед хоосон үлдээнэ. Зуны цаг дуусахад давтагдсан цагийг ялгахад ашиглана.</p>
+        </details>
 
-        <button type="submit" className="btn btn-primary btn-lg mt-6 w-full sm:w-auto">Натал зурхай гаргах ✦</button>
+        {err && <p role="alert" className="mt-4 rounded-xl bg-rose-50 px-4 py-2.5 text-sm text-rose-600">{err}</p>}
+
+        <button type="submit" className="btn btn-primary btn-lg mt-6 w-full sm:w-auto">Зурхайн шинжилгээ гаргах ✦</button>
       </form>
 
       {chart && (
@@ -361,7 +410,7 @@ export function NatalChart() {
               })}
             </div>
 
-            <div className="panel overflow-hidden p-0">
+            <div className="panel overflow-x-auto p-0">
               <table className="w-full text-sm">
                 <thead className="border-b border-line bg-surface-2 text-left text-xs uppercase tracking-wide text-muted">
                   <tr>
@@ -396,7 +445,7 @@ export function NatalChart() {
                             <td className="px-4 py-2.5 font-semibold text-ink"><span className="mr-2 inline-block w-4 text-center text-[0.65rem]">{r.k}</span>{r.n}</td>
                             <td className="px-4 py-2.5 text-ink"><span className="mr-1.5" style={{ color: ELEMENT_COLOR[f.element] }}>{T(f.glyph)}</span>{f.name}</td>
                             <td className="px-4 py-2.5 tabular-nums text-muted">{f.text}</td>
-                            {chart.cusps && <td className="px-4 py-2.5 text-center text-ink">{r.k === "ASC" ? 1 : 10}</td>}
+                            {chart.cusps && <td className="px-4 py-2.5 text-center text-ink">{r.k === "ASC" ? 1 : chart.houseSystem === "placidus" ? 10 : "—"}</td>}
                           </tr>
                         );
                       })}
@@ -408,13 +457,15 @@ export function NatalChart() {
 
             <p className="text-xs leading-relaxed text-muted">
               {chart.cusps
-                ? `Тропик зурхай · ${chart.houseSystem === "placidus" ? "Placidus" : "Тэнцүү"} гэрийн систем · ${place.name}`
-                : "Төрсөн цаг тодорхойгүй тул өгсөх орд болон гэрүүдийг тооцоогүй. Гарагуудыг 12:00 цагаар тооцсон — Сарны байрлал ±6° зөрж болно."}
-              {" "}℞ — ухрах хөдөлгөөнтэй гараг.
+                ? `Тропик зурхай · ${chart.houseSystem === "placidus" ? "Placidus" : chart.houseSystem === "whole" ? "Бүтэн орд" : "Тэнцүү"} гэрийн систем · ${resultPlace}`
+                : "Төрсөн цаг тодорхойгүй тул өгсөх орд болон гэрүүдийг тооцоогүй. Гарагуудыг 12:00 цагаар тооцсон — Сарны байрлал тухайн өдрийн турш өөрчлөгдөх тул урьдчилсан гэж үзнэ."}
+              {" "}℞ — ухрах хөдөлгөөнтэй гараг. Astronomy Engine тооцоолол.
+              {chart.cusps && houseSystem === "placidus" && chart.houseSystem === "equal" && " Энэ өргөрөгт Placidus тодорхойлогдохгүй тул тэнцүү гэрээр тооцов."}
             </p>
           </div>
         </div>
       )}
+      {chart && <NatalAnalysis chart={chart} />}
     </div>
   );
 }

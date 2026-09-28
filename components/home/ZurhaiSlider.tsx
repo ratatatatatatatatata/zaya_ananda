@@ -3,6 +3,7 @@
 import { useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { useI18n } from "@/lib/i18n";
 import styles from "./ZurhaiSlider.module.css";
+import { isNatalReading, isWealthReading, NATAL_HREF } from "@/lib/zurhai-cards";
 import type { Locale } from "@/lib/types";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
@@ -17,11 +18,11 @@ export const DEFAULT_ZURHAI: ZurhaiCard[] = [
 ];
 
 /** Натал зурхай — админ картууд тохируулсан ч гэсэн үргэлж харагдана (#zurhai-natal холбоостой карт байвал түүнийг ашиглана). */
-export const NATAL_HREF = "#zurhai-natal";
+export { NATAL_HREF } from "@/lib/zurhai-cards";
 const NATAL_CARD: ZurhaiCard = {
   emoji: "🪐",
-  title: "Натал зурхай",
-  desc: "Төрсөн огноо, цаг, газраараа төрөх агшны Нар, Сар, гарагуудын ордыг тооцоолж, натал дугуй зургаа гаргаарай.",
+  title: "Төрсөн үеийн зурхайн шинжилгээ",
+  desc: "Төрсөн огноо, цаг, газраар нар, сар, мандах орд, гаригуудын байрлал болон хоорондын холбоог тайлж үзээрэй.",
   href: NATAL_HREF,
 };
 
@@ -35,19 +36,21 @@ const LEAD = Lx(
 );
 
 /** Name-only circular selectors; details open only after an explicit choice. */
-export function ZurhaiSlider({ cards, daily, matrix, natal }: {
+export function ZurhaiSlider({ cards, daily, matrix, natal, initialNatal = false }: {
   cards?: ZurhaiCard[];
   daily?: ReactNode;
   matrix?: ReactNode;
   natal?: ReactNode;
+  initialNatal?: boolean;
 }) {
   const { tr, tl } = useI18n();
   const hasNatal = !!natal;
   const list = useMemo(() => {
-    const base = cards && cards.length ? cards : DEFAULT_ZURHAI;
-    return hasNatal && !base.some((c) => c.href === NATAL_HREF) ? [...base, NATAL_CARD] : base;
+    const base = (cards && cards.length ? cards : DEFAULT_ZURHAI).filter(c => !isWealthReading(c));
+    const normalized = base.map(c => isNatalReading(c) ? { ...c, href: NATAL_HREF, desc: c.desc || NATAL_CARD.desc } : c);
+    return hasNatal && !normalized.some(c => c.href === NATAL_HREF) ? [...normalized, NATAL_CARD] : normalized;
   }, [cards, hasNatal]);
-  const [selected, setSelected] = useState<number | null>(null);
+  const [selected, setSelected] = useState<number | null>(() => initialNatal ? list.findIndex(c => c.href === NATAL_HREF) : null);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const panelId = useId();
   const titleId = useId();

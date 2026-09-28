@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { isWealthReading } from "@/lib/zurhai-cards";
 
 type Card = { emoji: string; title: string; desc: string; href: string; image?: string };
 type Rule = { key: string; text: string };
@@ -44,7 +45,7 @@ export function AdminZurhai() {
       .then((d) => {
         const s = d?.settings;
         if (!s) return;
-        if (Array.isArray(s.zurhaiCards)) setCards(s.zurhaiCards);
+        if (Array.isArray(s.zurhaiCards)) setCards(s.zurhaiCards.filter((c: Card) => !isWealthReading(c)));
         if (Array.isArray(s.zurhaiRules)) setRules(s.zurhaiRules);
       })
       .catch(() => {});
@@ -57,7 +58,7 @@ export function AdminZurhai() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          zurhaiCards: cards.filter((c) => c.title.trim()),
+          zurhaiCards: cards.filter((c) => c.title.trim() && !isWealthReading(c)),
           zurhaiRules: rules.filter((r) => r.key.trim() && r.text.trim()),
         }),
       });
@@ -85,8 +86,8 @@ export function AdminZurhai() {
           <div>
             <h2 className="font-display text-lg font-semibold text-ink">Зурхайн төрлүүд</h2>
             <p className="mt-1 text-xs leading-relaxed text-muted">
-              Нүүр хуудасны «Зурхай» хэсэгт гулсдаг баннер болж харагдана. Хоосон орхивол өгөгдмөл 3 төрөл гарна.
-              «Натал зурхай» карт үргэлж нэмэгдэнэ — гарчиг, тайлбар, зургийг нь өөрчлөх бол холбоосыг <code>#zurhai-natal</code> гэж бичсэн карт нэмнэ үү.
+              Нүүр хуудас болон «Зурхай» цэсэнд дугуй сонголт болж харагдана. «Баялагийн зурхай» сонголтыг идэвхгүй болгосон. Хоосон орхивол өгөгдмөл 3 төрөл гарна.
+              Төрсөн үеийн зурхайн шинжилгээ үргэлж харагдана — гарчиг, тайлбар, зургийг нь өөрчлөх бол холбоосыг <code>#zurhai-natal</code> гэж бичсэн карт нэмнэ үү.
             </p>
           </div>
           <button type="button" onClick={() => setCards((c) => [...c, { ...EMPTY_CARD }])} className="btn btn-outline btn-sm">
@@ -134,6 +135,9 @@ export function AdminZurhai() {
 
         <div className="mt-3 rounded-xl bg-aqua px-4 py-3 text-xs leading-relaxed text-muted">
           <b>Түлхүүрийн жишээ:</b>
+          <br />• <code>natal:sun:leo</code> — Натал зурхайд Нар Арслан ордод байрлах тайлал
+          <br />• <code>natal:moon:cancer</code> — Сар Мэлхий ордод байрлах тайлал
+          <br />• <code>natal:asc:libra</code> — Мандах орд Жинлүүр бол
           <br />• <code>zodiac:leo</code> — Арслан ордтой хүнд харагдах тайлал
           <br />• <code>life:7</code> — Амьдралын зам 7 бол
           <br />• <code>arcana:12</code> — 12-р аркан гарвал
