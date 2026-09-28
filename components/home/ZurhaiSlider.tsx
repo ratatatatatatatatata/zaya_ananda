@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState, type ReactNode } from "react";
+import { useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { useI18n } from "@/lib/i18n";
 import styles from "./ZurhaiSlider.module.css";
 import type { Locale } from "@/lib/types";
@@ -16,6 +16,15 @@ export const DEFAULT_ZURHAI: ZurhaiCard[] = [
   { emoji: "🔮", title: "Бүтэн зурхай", desc: "Астрологи, тоон судлал, матрикс, Human Design — дөрвөн системийг нэгтгэсэн гүнзгий тайлал.", href: "/merge" },
 ];
 
+/** Натал зурхай — админ картууд тохируулсан ч гэсэн үргэлж харагдана (#zurhai-natal холбоостой карт байвал түүнийг ашиглана). */
+export const NATAL_HREF = "#zurhai-natal";
+const NATAL_CARD: ZurhaiCard = {
+  emoji: "🪐",
+  title: "Натал зурхай",
+  desc: "Төрсөн огноо, цаг, газраараа төрөх агшны Нар, Сар, гарагуудын ордыг тооцоолж, натал дугуй зургаа гаргаарай.",
+  href: NATAL_HREF,
+};
+
 const EYEBROW = Lx("Зурхай", "Astrology", "점성술", "占い", "占星");
 const LEAD = Lx(
   "Зурхайн төрлөө дарж мэдээлэл, тайллаа үзээрэй.",
@@ -26,13 +35,18 @@ const LEAD = Lx(
 );
 
 /** Name-only circular selectors; details open only after an explicit choice. */
-export function ZurhaiSlider({ cards, daily, matrix }: {
+export function ZurhaiSlider({ cards, daily, matrix, natal }: {
   cards?: ZurhaiCard[];
   daily?: ReactNode;
   matrix?: ReactNode;
+  natal?: ReactNode;
 }) {
   const { tr, tl } = useI18n();
-  const list = cards && cards.length ? cards : DEFAULT_ZURHAI;
+  const hasNatal = !!natal;
+  const list = useMemo(() => {
+    const base = cards && cards.length ? cards : DEFAULT_ZURHAI;
+    return hasNatal && !base.some((c) => c.href === NATAL_HREF) ? [...base, NATAL_CARD] : base;
+  }, [cards, hasNatal]);
   const [selected, setSelected] = useState<number | null>(null);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const panelId = useId();
@@ -65,7 +79,9 @@ export function ZurhaiSlider({ cards, daily, matrix }: {
           }}>✕</button>
         </div>
         <div className={styles.reading}>
-          {(active.href === "/matrix" || active.title.toLocaleLowerCase().includes("матри")) ? matrix : daily}
+          {active.href === NATAL_HREF
+            ? natal
+            : (active.href === "/matrix" || active.title.toLocaleLowerCase().includes("матри")) ? matrix : daily}
         </div>
       </section>}
     </div>

@@ -11,6 +11,7 @@ import { VideoBand } from "./video/VideoBand";
 import { SectionZoom } from "./home/SectionZoom";
 import { ZurhaiSlider } from "./home/ZurhaiSlider";
 import { InlineDestinyMatrix } from "./matrix/InlineDestinyMatrix";
+import { NatalChart } from "./zurhai/NatalChart";
 import { HomeAbout } from "./home/HomeAbout";
 import { listJourneysCached } from "@/lib/journeys-db";
 import type { Locale } from "@/lib/types";
@@ -45,7 +46,7 @@ export async function HomeSections() {
       <section id="zurhai" className="section activity-section scroll-mt-36">
         <SectionBackdrop src="/poster_night.jpg" centered position="center 35%" />
         <div className="container-px">
-        <ZurhaiSlider cards={settings.zurhaiCards} daily={<MergeToorog />} matrix={<InlineDestinyMatrix />} />
+        <ZurhaiSlider cards={settings.zurhaiCards} daily={<MergeToorog />} matrix={<InlineDestinyMatrix />} natal={<NatalChart />} />
       </div></section>
 
       {/* Хоёр гол зам — сургалт ба сүнслэг аялал */}

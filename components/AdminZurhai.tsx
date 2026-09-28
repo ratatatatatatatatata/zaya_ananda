@@ -86,6 +86,7 @@ export function AdminZurhai() {
             <h2 className="font-display text-lg font-semibold text-ink">Зурхайн төрлүүд</h2>
             <p className="mt-1 text-xs leading-relaxed text-muted">
               Нүүр хуудасны «Зурхай» хэсэгт гулсдаг баннер болж харагдана. Хоосон орхивол өгөгдмөл 3 төрөл гарна.
+              «Натал зурхай» карт үргэлж нэмэгдэнэ — гарчиг, тайлбар, зургийг нь өөрчлөх бол холбоосыг <code>#zurhai-natal</code> гэж бичсэн карт нэмнэ үү.
             </p>
           </div>
           <button type="button" onClick={() => setCards((c) => [...c, { ...EMPTY_CARD }])} className="btn btn-outline btn-sm">
