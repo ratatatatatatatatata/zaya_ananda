@@ -1,11 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import { DEFAULT_ZURHAI, NATAL_CARD } from "@/lib/zurhai-cards";
 
 type Card = { emoji: string; title: string; desc: string; href: string; image?: string };
 type Rule = { key: string; text: string };
 
 const EMPTY_CARD: Card = { emoji: "🔮", title: "", desc: "", href: "/merge", image: "" };
+const DEFAULT_ADMIN_CARDS: Card[] = [...DEFAULT_ZURHAI, NATAL_CARD].map((card) => ({ ...card, image: card.image || "" }));
+
+/** Preserve saved cards, then append any built-in homepage astrology types that are missing. */
+function withHomepageDefaults(saved: Card[]): Card[] {
+  const savedLinks = new Set(saved.map((card) => card.href));
+  return [...saved, ...DEFAULT_ADMIN_CARDS.filter((card) => !savedLinks.has(card.href))];
+}
 
 function compressImage(file: File, maxW = 800, quality = 0.85): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -44,7 +53,8 @@ export function AdminZurhai() {
       .then((d) => {
         const s = d?.settings;
         if (!s) return;
-        if (Array.isArray(s.zurhaiCards)) setCards(s.zurhaiCards);
+        if (Array.isArray(s.zurhaiCards)) setCards(withHomepageDefaults(s.zurhaiCards));
+        else setCards(DEFAULT_ADMIN_CARDS.map((card) => ({ ...card })));
         if (Array.isArray(s.zurhaiRules)) setRules(s.zurhaiRules);
       })
       .catch(() => {});
@@ -85,8 +95,8 @@ export function AdminZurhai() {
           <div>
             <h2 className="font-display text-lg font-semibold text-ink">Зурхайн төрлүүд</h2>
             <p className="mt-1 text-xs leading-relaxed text-muted">
-              Нүүр хуудасны «Зурхай» хэсэгт гулсдаг баннер болж харагдана. Хоосон орхивол өгөгдмөл 3 төрөл гарна.
-              «Натал зурхай» карт үргэлж нэмэгдэнэ — гарчиг, тайлбар, зургийг нь өөрчлөх бол холбоосыг <code>#zurhai-natal</code> гэж бичсэн карт нэмнэ үү.
+              Энд нүүр хуудсанд харагдах бүх зурхайн төрөл, гарчиг, тайлбар, холбоос, зургийг удирдана.
+              Зураг оруулбал нүүр хуудасны дугуй сонголтын дэвсгэрт нэртэйгээ хамт харагдана.
             </p>
           </div>
           <button type="button" onClick={() => setCards((c) => [...c, { ...EMPTY_CARD }])} className="btn btn-outline btn-sm">
@@ -106,14 +116,14 @@ export function AdminZurhai() {
               <textarea className="textarea mt-2 min-h-[70px]" placeholder="Товч тайлбар" value={c.desc} onChange={(e) => updCard(i, { desc: e.target.value })} />
               <div className="mt-2 flex items-center gap-3">
                 {c.image
-                  ? <img src={c.image} alt="" className="h-14 w-20 rounded-lg object-cover" />
+                  ? <span className="relative block h-14 w-20 shrink-0 overflow-hidden rounded-lg"><Image src={c.image} alt="" fill unoptimized sizes="80px" className="object-cover" /></span>
                   : <div className="grid h-14 w-20 place-items-center rounded-lg bg-surface-3 text-xs text-muted">Зураггүй</div>}
                 <input type="file" accept="image/*" className="text-sm" onChange={(e) => pickCardImage(e, i)} />
                 {c.image && <button type="button" onClick={() => updCard(i, { image: "" })} className="text-xs font-semibold text-rose-500 hover:underline">Зураг хасах</button>}
               </div>
             </div>
           ))}
-          {cards.length === 0 && <p className="text-sm text-muted">Одоогоор нэмээгүй — өгөгдмөл 3 төрөл харагдаж байна.</p>}
+          {cards.length === 0 && <p className="text-sm text-muted">Одоогоор зурхайн төрөл нэмээгүй байна.</p>}
         </div>
       </div>
 

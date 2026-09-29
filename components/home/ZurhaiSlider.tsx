@@ -1,29 +1,13 @@
 "use client";
 
 import { useId, useMemo, useRef, useState, type ReactNode } from "react";
+import Image from "next/image";
 import { useI18n } from "@/lib/i18n";
+import { DEFAULT_ZURHAI, NATAL_CARD, NATAL_HREF, type ZurhaiCard } from "@/lib/zurhai-cards";
 import styles from "./ZurhaiSlider.module.css";
 import type { Locale } from "@/lib/types";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
-
-export type ZurhaiCard = { emoji: string; title: string; desc: string; href: string; image?: string };
-
-/** Админ юу ч нэмээгүй үед харагдах өгөгдмөл 3 төрөл */
-export const DEFAULT_ZURHAI: ZurhaiCard[] = [
-  { emoji: "🌅", title: "Өдрийн зурхай", desc: "Төрсөн огноогоороо өнөөдрийн сэтгэл санаа, ажил хэрэг, харилцаа, эрүүл мэндийн урьдчилсан тайллыг аваарай.", href: "#zurhai-daily" },
-  { emoji: "🔢", title: "Тоон зурхайн матрикс", desc: "Хувь тавилангийн матриксаар үндсэн эрчим, сүнсний түвшин, далд чадамжаа тайлж үзнэ.", href: "/matrix" },
-  { emoji: "🔮", title: "Бүтэн зурхай", desc: "Астрологи, тоон судлал, матрикс, Human Design — дөрвөн системийг нэгтгэсэн гүнзгий тайлал.", href: "/merge" },
-];
-
-/** Натал зурхай — админ картууд тохируулсан ч гэсэн үргэлж харагдана (#zurhai-natal холбоостой карт байвал түүнийг ашиглана). */
-export const NATAL_HREF = "#zurhai-natal";
-const NATAL_CARD: ZurhaiCard = {
-  emoji: "🪐",
-  title: "Натал зурхай",
-  desc: "Төрсөн огноо, цаг, газраараа төрөх агшны Нар, Сар, гарагуудын ордыг тооцоолж, натал дугуй зургаа гаргаарай.",
-  href: NATAL_HREF,
-};
 
 const EYEBROW = Lx("Зурхай", "Astrology", "점성술", "占い", "占星");
 const LEAD = Lx(
@@ -34,7 +18,7 @@ const LEAD = Lx(
   "选择占星类型，查看介绍与解读。",
 );
 
-/** Name-only circular selectors; details open only after an explicit choice. */
+/** Circular selectors; an admin image becomes the background while the title stays readable. */
 export function ZurhaiSlider({ cards, daily, matrix, natal }: {
   cards?: ZurhaiCard[];
   daily?: ReactNode;
@@ -61,9 +45,11 @@ export function ZurhaiSlider({ cards, daily, matrix, natal }: {
     <div className={styles.choices} role="group" aria-label={tr(EYEBROW)}>
       {list.map((card, index) => <button key={card.title + index} type="button"
         ref={element => { buttons.current[index] = element; }}
-        className={styles.circle} aria-expanded={selected === index} aria-controls={panelId}
+        className={`${styles.circle} ${card.image ? styles.withImage : ""}`} aria-expanded={selected === index} aria-controls={panelId}
         onClick={() => setSelected(current => current === index ? null : index)}>
-        <span>{tl(card.title)}</span>
+        {card.image && <Image src={card.image} alt="" fill unoptimized sizes="(max-width: 480px) 45vw, 230px" className={styles.circleImage} />}
+        {card.image && <span className={styles.circleOverlay} aria-hidden="true" />}
+        <span className={styles.circleTitle}>{tl(card.title)}</span>
       </button>)}
     </div>
     <div id={panelId} hidden={!active}>
