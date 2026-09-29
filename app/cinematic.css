@@ -256,6 +256,39 @@ html:has([data-cinematic-theme]) { scroll-padding-top:88px; }
 @media(prefers-reduced-motion:reduce) { .experience-slide { animation:none; }.episode-card { transition:none; } }
 .experience-section { position:relative; }.experience-anchor { position:absolute; top:0; pointer-events:none; scroll-margin-top:90px; }
 .experience-copy h3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+
+/* Intro first: figures sit above the film, then the ordered sections follow. */
+.discovery-hero { background:#f7f8f2; }
+.discovery-hero-frame { height:auto; min-height:0; max-height:none; padding:0 0 clamp(22px,3vw,48px); }
+.discovery-hero-copy { width:100%; max-width:1600px; height:auto; min-height:0; margin:0 auto; padding:clamp(56px,7vw,110px) var(--page-gutter) clamp(30px,4vw,56px); display:block; }
+.discovery-hero h1 { color:#173d2e; max-width:1000px; }
+.discovery-hero h1 span:last-child { color:#60816c; }
+.discovery-hero .discovery-kicker { color:#557568; }
+.discovery-hero-summary { display:flex; max-width:none; align-items:end; justify-content:space-between; gap:32px; }
+.discovery-hero .discovery-intro { color:#536c60; }
+.discovery-hero .discovery-actions { margin-top:0; color:#244b38; }
+.discovery-hero .discovery-actions .btn { color:#fff; background:#285540!important; border-color:#285540!important; }
+.discovery-hero-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin-top:clamp(36px,5vw,72px); border-block:1px solid #d7e2d6; }
+.discovery-hero-stat { min-width:0; padding:24px clamp(12px,2vw,32px); display:flex; flex-direction:column; gap:5px; }
+.discovery-hero-stat:first-child { padding-left:0; }
+.discovery-hero-stat+.discovery-hero-stat { border-left:1px solid #d7e2d6; }
+.discovery-hero-stat strong { color:#173e2d; font-family:var(--font-sans); font-size:clamp(2rem,4vw,4rem); font-weight:500; line-height:1.1; }
+.discovery-hero-stat span { color:#607769; font-size:clamp(.8rem,1.2vw,1rem); line-height:1.4; }
+.discovery-hero-visual { position:relative; inset:auto; z-index:0; height:clamp(360px,44vw,700px); margin-inline:var(--page-gutter); border-radius:24px; clip-path:none; }
+.discovery-hero-wash { background:linear-gradient(0deg,#08251b77,transparent 38%); }
+.discovery-hero-foot { inset-inline:clamp(22px,4vw,64px); bottom:22px; }
+@media(max-width:900px) {
+ .discovery-hero-summary { display:block; }
+ .discovery-hero .discovery-actions { margin-top:22px; }
+}
+@media(max-width:600px) {
+ .discovery-hero-copy { padding-top:52px; padding-bottom:24px; }
+ .discovery-hero-stats { margin-top:34px; }
+ .discovery-hero-stat { padding:18px 9px; }
+ .discovery-hero-stat strong { font-size:clamp(1.55rem,8vw,2.4rem); }
+ .discovery-hero-stat span { font-size:.75rem; }
+ .discovery-hero-visual { min-height:340px; height:50svh; border-radius:18px; }
+}
 .experience-slide { min-height:560px; }.experience-related .glass-lux h3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }.experience-related .glass-lux p { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
 @media(max-width:767px) { .experience-slide { min-height:0; }.experience-copy { min-height:420px; } }
 .experience-copy .btn,.episode-feature-copy .btn { padding:13px 24px; }

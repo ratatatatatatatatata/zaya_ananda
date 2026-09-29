@@ -30,7 +30,7 @@ export function CategoryExperience({ services, products, journeys }: { services:
         : lists[category.id].map(item => ({ id:item.id, title:locText(lang,item.title,item.i18n,"title"), desc:locText(lang,item.summary,item.i18n,"summary") || category.desc, image:item.image || item.images?.[0] || category.image, tags:[item.category,...itemTeachers(item).map(teacher => teacher.name),typeof item.price === "number" ? formatMNT(item.price) : ""].filter((v): v is string => !!v), href:`/item/${item.id}`, item }));
       return <section key={category.id} id={category.id} className="experience-section" aria-labelledby={`experience-${category.id}`}>
         <div className="experience-heading">
-          <p className="discovery-kicker">ZAYA’S ANANDA · {String(categoryIndex+3).padStart(2,"0")}</p>
+          <p className="discovery-kicker">ZAYA’S ANANDA · {String(categoryIndex+5).padStart(2,"0")}</p>
           <h2 id={`experience-${category.id}`}>{t(category.key)}</h2>
           <p className="experience-intro">{category.desc}</p>
         </div>

@@ -75,7 +75,11 @@ export function AdminAbout() {
         const s = d.settings;
         setTitle(s.aboutTitle || ""); setBody(s.aboutBody || ""); setVideo(s.aboutVideo || "");
         setMission(s.aboutMission || ""); setStory(s.aboutStory || "");
-        if (Array.isArray(s.aboutStats)) setStats(s.aboutStats);
+        if (Array.isArray(s.aboutStats)) setStats(s.aboutStats.length ? s.aboutStats : [
+          { value: "", label: "Ажилласан жил" },
+          { value: "", label: "Манай хамт олон" },
+          { value: "", label: "Манайхтай нэгдсэн хүмүүс" },
+        ]);
         if (Array.isArray(s.aboutValues)) setValues(s.aboutValues);
         if (Array.isArray(s.aboutFaqs)) setFaqs(s.aboutFaqs);
         if (Array.isArray(s.aboutMilestones)) setMilestones(s.aboutMilestones);
@@ -162,7 +166,7 @@ export function AdminAbout() {
           <p className="font-display font-semibold text-ink">Тоо, баримт</p>
           <button type="button" onClick={() => setStats((a) => [...a, { value: "", label: "" }])} className="btn btn-outline btn-sm">+ Нэмэх</button>
         </div>
-        <p className="mt-1 text-xs leading-relaxed text-muted">Хоосон орхивол өгөгдмөл 4 тоо (жилийн туршлага, үйлчлүүлэгч гэх мэт) харагдана.</p>
+        <p className="mt-1 text-xs leading-relaxed text-muted">Нүүр хуудасны видеоны дээр ажилласан жил, хамт олон, нэгдсэн хүмүүсийн баталгаатай тоог энд оруулна. Хоосон тоо оронд зураас харагдана; хамт олны тоог багш нарын мэдээллээс автоматаар гаргана.</p>
         <div className="mt-3 space-y-2.5">
           {stats.map((s, i) => (
             <div key={i} className="flex flex-wrap items-center gap-2 rounded-xl border border-line bg-surface-1 px-3 py-2.5">

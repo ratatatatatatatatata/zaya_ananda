@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import "./cinematic.css";
 import { VisualTheme } from "@/components/VisualTheme";
@@ -63,6 +64,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="mn">
       <head>
+        <Script id="chatling-config" strategy="beforeInteractive">
+          {`window.chtlConfig = { chatbotId: "4876436798" };`}
+        </Script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
@@ -75,6 +79,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#FAF7F0" />
       </head>
       <body className="min-h-screen">
+        <Script
+          id="chtl-script"
+          src="https://chatling.ai/js/embed.js"
+          data-id="4876436798"
+          strategy="afterInteractive"
+        />
         <Providers>
           <VisualTheme />
           <CosmicBackdrop />
