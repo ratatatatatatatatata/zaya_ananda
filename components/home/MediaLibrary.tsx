@@ -9,9 +9,9 @@ import type { CmsItem } from "@/lib/types";
 import styles from "./GiftMedia.module.css";
 
 const TABS: { id: GiftCategory; title: string }[] = [
+  { id: "podcast", title: "Podcast" },
   { id: "advice", title: "Зөвлөмж" },
   { id: "meditation", title: "Бясалгал дасгал" },
-  { id: "podcast", title: "Podcast" },
 ];
 type Gift = { id: string; title: string; poster: string; category: GiftCategory; url?: string; article?: CmsItem };
 
