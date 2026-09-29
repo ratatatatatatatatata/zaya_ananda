@@ -6,7 +6,6 @@ import { FaqContact } from "@/components/about/FaqContact";
 import { AboutFacts } from "./AboutFacts";
 import { aboutContent, team, faqs } from "@/data/content";
 import { getSettingsCached } from "@/lib/repo";
-import { signedDownloadUrl } from "@/lib/supabase";
 import { AboutGallery } from "./AboutGallery";
 import { AboutMilestones } from "./AboutMilestones";
 import type { L } from "@/lib/types";
@@ -29,13 +28,6 @@ export async function HomeAbout() {
   const questions = (settings.aboutFaqs || []).filter(f => published(f.q) && published(f.a));
   const milestones = (settings.aboutMilestones || []).filter(m => published(m.text) && !/^(3janjfkakldfkavskmm|avhdbfasjdnfvasnlvasnvksdn)/.test(m.text));
 
-  // Танилцуулга видео — хадгалалтын замыг гарын үсэгтэй хаяг руу хөрвүүлнэ
-  let aboutVideoUrl = "";
-  if (settings.aboutVideo) {
-    if (/^https?:\/\//.test(settings.aboutVideo)) aboutVideoUrl = settings.aboutVideo;
-    else { try { aboutVideoUrl = await signedDownloadUrl("lesson-videos", settings.aboutVideo); } catch { aboutVideoUrl = ""; } }
-  }
-
   const mergedTeam = publicTeam(settings.teachers || [], settings.team || []);
 
   return (
@@ -44,7 +36,7 @@ export async function HomeAbout() {
       <AboutFacts />
 
       {/* Админаас оруулсан танилцуулга */}
-      {(aboutTitle || aboutBody || aboutVideoUrl) && (
+      {(aboutTitle || aboutBody) && (
         <Reveal>
           <div className="panel mx-auto max-w-3xl p-8 sm:p-10">
             {aboutTitle && (
@@ -53,7 +45,6 @@ export async function HomeAbout() {
             {aboutBody && (
               <div className="mt-4 whitespace-pre-line leading-relaxed text-muted">{aboutBody}</div>
             )}
-            {aboutVideoUrl && <video controls playsInline className="mt-6 w-full rounded-2xl bg-black" src={aboutVideoUrl} />}
           </div>
         </Reveal>
       )}

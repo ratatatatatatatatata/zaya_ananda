@@ -146,7 +146,8 @@ export function AdminAbout() {
         <div><label className="field-label">Гарчиг</label><input className="input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Жишээ: Бидний тухай" /></div>
         <div className="mt-3"><label className="field-label">Дэлгэрэнгүй</label><textarea className="textarea" rows={6} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Төвийн тухай мэдээлэл…" /></div>
         <div className="mt-3">
-          <label className="field-label">Танилцуулга видео</label>
+          <label className="field-label">Нүүр хуудасны танилцуулга видео</label>
+          <p className="mb-2 text-xs leading-relaxed text-muted">Нүүр хуудасны эхний зурагтай хэсгийн яг доор дүрс, дуутайгаа тоглоно. Хэрэглэгч тоглуулах, дууны түвшин болон бүтэн дэлгэцийг удирдана.</p>
           {video
             ? <div className="flex items-center gap-3"><span className="text-sm font-medium text-jade-600">✓ Видео орсон</span><button type="button" onClick={() => setVideo("")} className="text-xs font-semibold text-rose-500 hover:underline">Устгах</button></div>
             : videoProgress !== null

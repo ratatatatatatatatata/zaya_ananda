@@ -4,6 +4,8 @@ import { heroMediaFor } from "@/lib/hero-video";
 import { getSettingsCached, listCmsCached } from "@/lib/repo";
 import { publicTeam } from "@/lib/public-team";
 import { itemTeachers } from "@/lib/item-teachers";
+import { signedDownloadUrl } from "@/lib/supabase";
+import { HomeIntroVideo } from "@/components/home/HomeIntroVideo";
 
 // Router cache-аас болж шинэ аялал/агуулга хуучирсан хэвээр харагдахаас сэргийлж, хүсэлт болгонд шинэчилнэ
 // (доод давхаргын unstable_cache 5 минут тул серверийн ачаалал өсөхгүй).
@@ -23,9 +25,18 @@ export default async function HomePage() {
     stat(/хамт олон|багш|team|teacher/i) || (publishedTeamCount ? String(publishedTeamCount) : "—"),
     stat(/нэгд|үйлчлүүлэгч|хэрэглэгч|joined|client|member/i) || "—",
   ];
+  let introVideoUrl = "";
+  if (settings.aboutVideo) {
+    if (/^https?:\/\//.test(settings.aboutVideo)) introVideoUrl = settings.aboutVideo;
+    else {
+      try { introVideoUrl = await signedDownloadUrl("lesson-videos", settings.aboutVideo); }
+      catch { introVideoUrl = ""; }
+    }
+  }
   return (
     <>
       <HomeHero media={heroMedia} stats={heroStats} />
+      <HomeIntroVideo src={introVideoUrl} />
       <HomeSections />
     </>
   );
