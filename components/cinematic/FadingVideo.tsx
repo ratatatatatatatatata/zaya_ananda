@@ -6,7 +6,7 @@ const FADE_MS = 500;
 const FADE_OUT_LEAD = .55;
 
 /** Manually loop with interruptible rAF fades. No CSS video transitions. */
-export function FadingVideo({ src, poster, image, hero = false }: { src: string; poster: string; image?: string; hero?: boolean }) {
+export function FadingVideo({ src, poster, image, hero = false, showToggle = true }: { src: string; poster: string; image?: string; hero?: boolean; showToggle?: boolean }) {
   const wrap = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const [near, setNear] = useState(false);
@@ -75,6 +75,6 @@ export function FadingVideo({ src, poster, image, hero = false }: { src: string;
       <img src={image || poster} alt="" fetchPriority={hero ? "high" : "auto"} loading={hero ? "eager" : "lazy"} />
       {!image && allowed && near && !failed && <video ref={video} src={src} muted playsInline autoPlay={!paused} preload="auto" aria-hidden="true" style={{ opacity: 0 }} onError={() => setFailed(true)} />}
     </div>
-    {!image && allowed && !failed && <button type="button" className="cinema-video-toggle liquid-glass" aria-label={paused ? "Дэвсгэр видео тоглуулах" : "Дэвсгэр видео түр зогсоох"} aria-pressed={paused} onClick={() => setPaused(p => !p)}>{paused ? "▷" : "Ⅱ"}</button>}
+    {showToggle && !image && allowed && !failed && <button type="button" className="cinema-video-toggle liquid-glass" aria-label={paused ? "Дэвсгэр видео тоглуулах" : "Дэвсгэр видео түр зогсоох"} aria-pressed={paused} onClick={() => setPaused(p => !p)}>{paused ? "▷" : "Ⅱ"}</button>}
   </div>;
 }
