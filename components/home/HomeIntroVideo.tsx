@@ -1,9 +1,23 @@
-import { T } from "@/components/T";
+"use client";
 
-export function HomeIntroVideo({ src }: { src?: string }) {
+import { T } from "@/components/T";
+import { useI18n } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
+
+const statLabels: Record<Locale, string>[] = [
+  { mn: "Ажилласан жил", en: "Years of experience", ko: "활동 연수", ja: "活動年数", zh: "从业年数" },
+  { mn: "Манай хамт олон", en: "Our team", ko: "우리 팀", ja: "私たちのチーム", zh: "我们的团队" },
+  { mn: "Манайхтай нэгдсэн хүмүүс", en: "People we've welcomed", ko: "함께한 사람들", ja: "共に歩んだ方々", zh: "与我们同行的人" },
+];
+
+export function HomeIntroVideo({ src, stats }: { src?: string; stats: string[] }) {
+  const { lang, tl } = useI18n();
   return (
-    <section className="bg-[#f7f8f2] px-[var(--page-gutter)] pb-[clamp(56px,7vw,110px)]" aria-labelledby="home-intro-video-title">
+    <section className="home-intro-video bg-[#f7f8f2] px-[var(--page-gutter)] pb-[clamp(56px,7vw,110px)]" aria-labelledby="home-intro-video-title">
       <div className="mx-auto max-w-[1600px]">
+        <div className="discovery-hero-stats" aria-label={tl("Манай төвийн тухай тоон мэдээлэл")}>
+          {statLabels.map((label, i) => <div key={i} className="discovery-hero-stat"><strong>{stats[i]}</strong><span>{label[lang]}</span></div>)}
+        </div>
         <div className="mb-5 flex items-end justify-between gap-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#668174]">

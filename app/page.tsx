@@ -35,8 +35,8 @@ export default async function HomePage() {
   }
   return (
     <>
-      <HomeHero media={heroMedia} stats={heroStats} />
-      <HomeIntroVideo src={introVideoUrl} />
+      <HomeHero media={heroMedia} />
+      <HomeIntroVideo src={introVideoUrl} stats={heroStats} />
       <HomeSections />
     </>
   );

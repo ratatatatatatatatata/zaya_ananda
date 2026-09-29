@@ -259,8 +259,8 @@ html:has([data-cinematic-theme]) { scroll-padding-top:88px; }
 
 /* Intro first: figures sit above the film, then the ordered sections follow. */
 .discovery-hero { background:#f7f8f2; }
-.discovery-hero-frame { height:auto; min-height:0; max-height:none; padding:0 0 clamp(22px,3vw,48px); }
-.discovery-hero-copy { width:100%; max-width:1600px; height:auto; min-height:0; margin:0 auto; padding:clamp(56px,7vw,110px) var(--page-gutter) clamp(30px,4vw,56px); display:block; }
+.discovery-hero-frame { height:auto; min-height:0; max-height:none; padding:0; }
+.discovery-hero-copy { width:100%; max-width:1600px; height:auto; min-height:0; margin:0 auto; padding:clamp(56px,7vw,110px) var(--page-gutter) clamp(22px,2.2vw,34px); display:block; }
 .discovery-hero h1 { color:#173d2e; max-width:1000px; }
 .discovery-hero h1 span:last-child { color:#60816c; }
 .discovery-hero .discovery-kicker { color:#557568; }
@@ -268,7 +268,7 @@ html:has([data-cinematic-theme]) { scroll-padding-top:88px; }
 .discovery-hero .discovery-intro { color:#536c60; }
 .discovery-hero .discovery-actions { margin-top:0; color:#244b38; }
 .discovery-hero .discovery-actions .btn { color:#fff; background:#285540!important; border-color:#285540!important; }
-.discovery-hero-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin-top:clamp(36px,5vw,72px); border-block:1px solid #d7e2d6; }
+.discovery-hero-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-block:1px solid #d7e2d6; }
 .discovery-hero-stat { min-width:0; padding:24px clamp(12px,2vw,32px); display:flex; flex-direction:column; gap:5px; }
 .discovery-hero-stat:first-child { padding-left:0; }
 .discovery-hero-stat+.discovery-hero-stat { border-left:1px solid #d7e2d6; }
@@ -277,6 +277,8 @@ html:has([data-cinematic-theme]) { scroll-padding-top:88px; }
 .discovery-hero-visual { position:relative; inset:auto; z-index:0; height:clamp(360px,44vw,700px); margin-inline:var(--page-gutter); border-radius:24px; clip-path:none; }
 .discovery-hero-wash { background:linear-gradient(0deg,#08251b77,transparent 38%); }
 .discovery-hero-foot { inset-inline:clamp(22px,4vw,64px); bottom:22px; }
+.home-intro-video { padding-top:clamp(36px,4vw,64px); }
+.home-intro-video .discovery-hero-stats { margin-bottom:clamp(30px,4vw,52px); }
 @media(max-width:900px) {
  .discovery-hero-summary { display:block; }
  .discovery-hero .discovery-actions { margin-top:22px; }
