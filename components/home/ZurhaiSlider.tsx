@@ -36,6 +36,7 @@ export function ZurhaiSlider({ cards, daily, matrix, natal }: {
   const panelId = useId();
   const titleId = useId();
   const active = selected === null ? undefined : list[selected];
+  const activeTitle = active?.title.toLocaleLowerCase() || "";
 
   return <div className={styles.root}>
     <div className={styles.heading}>
@@ -67,6 +68,8 @@ export function ZurhaiSlider({ cards, daily, matrix, natal }: {
         <div className={styles.reading}>
           {active.href === NATAL_HREF
             ? natal
+            : activeTitle.includes("астрологи") || activeTitle.includes("одон орон")
+              ? natal
             : (active.href === "/matrix" || active.title.toLocaleLowerCase().includes("матри")) ? matrix : daily}
         </div>
       </section>}

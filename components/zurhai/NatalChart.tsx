@@ -45,6 +45,46 @@ const ELEMENT_COLOR: Record<Element, string> = {
   water: "#5CB8D6",
 };
 const ELEMENT_NAME: Record<Element, string> = { fire: "Гал", earth: "Шороо", air: "Агаар", water: "Ус" };
+const ELEMENT_TEXT: Record<Element, string> = {
+  fire: "зориг, санаачилга, хөдөлгөөн",
+  earth: "бодит байдал, тогтвортой чанар",
+  air: "сэтгэхүй, харилцаа, шинэ санаа",
+  water: "мэдрэмж, зөн совин, дотоод ертөнц",
+};
+
+const SIGN_TEXT: Record<string, string> = {
+  aries: "шууд, зоригтой, эхлүүлэх эрмэлзэлтэй",
+  taurus: "тууштай, мэдрэмжтэй, найдвартай",
+  gemini: "сониуч, хурдан сэтгэдэг, харилцаанд нээлттэй",
+  cancer: "халамжтай, зөн совинтой, хамгаалах чанартай",
+  leo: "бүтээлч, өгөөмөр, өөрийгөө илэрхийлэх хүсэлтэй",
+  virgo: "нягт нямбай, бодитой, сайжруулах чадвартай",
+  libra: "тэнцвэр эрхэмлэдэг, эвсэг, гоо зүйн мэдрэмжтэй",
+  scorpio: "гүн мэдрэмжтэй, төвлөрөлтэй, өөрчлөлтийг даван туулах чадвартай",
+  sagittarius: "өргөн сэтгэлгээтэй, эрэл хайгуулч, өөдрөг",
+  capricorn: "хариуцлагатай, зорилготой, тэвчээртэй",
+  aquarius: "бие даасан, шинэлэг, нийгмийн сэтгэлгээтэй",
+  pisces: "өрөвч, уран сэтгэмжтэй, дотоод мэдрэмж өндөр",
+};
+
+const PLANET_MEANING: Record<string, string> = {
+  sun: "өөрийн мөн чанар ба амьдралын гол чиглэл",
+  moon: "сэтгэл хөдлөл, аюулгүй байдлын хэрэгцээ",
+  mercury: "сэтгэх, суралцах, харилцах хэв маяг",
+  venus: "хайр, үнэ цэнэ, татагдах ба таашаах хэв маяг",
+  mars: "эрч хүч, үйлдэл, хүсэл зориг",
+  jupiter: "өсөлт, боломж, итгэл үнэмшил",
+  saturn: "хариуцлага, хязгаар, урт хугацааны сургамж",
+  uranus: "эрх чөлөө, шинэчлэл, гэнэтийн өөрчлөлт",
+  neptune: "зөн совин, мөрөөдөл, төсөөлөл",
+  pluto: "гүн өөрчлөлт, хүч, дахин төрөх чанар",
+};
+
+const HOUSE_MEANING = [
+  "өөрийн дүр төрх, эхлэл", "мөнгө, үнэ цэнэ", "суралцах, ойрын харилцаа", "гэр бүл, үндэс суурь",
+  "бүтээлч байдал, хайр, хүүхэд", "өдөр тутмын ажил, эрүүл дадал", "түншлэл, гэрээ", "дотно холбоо, хамтын нөөц",
+  "аялал, дээд боловсрол, итгэл үнэмшил", "мэргэжил, нэр хүнд", "найз нөхөд, хамтын зорилго", "дотоод ертөнц, амралт, далд ухамсар",
+];
 
 // Текстэн хэлбэрээр (emoji биш) харуулах
 const T = (g: string) => g + "︎";
@@ -179,15 +219,17 @@ export function NatalWheel({ chart }: { chart: Chart }) {
 
 const fmtPos = (lon: number) => {
   const s = splitLon(lon);
-  return { glyph: s.sign.glyph, name: s.sign.name, element: s.sign.element, text: `${s.deg}°${String(s.min).padStart(2, "0")}′` };
+  return { key: s.sign.key, glyph: s.sign.glyph, name: s.sign.name, element: s.sign.element, text: `${s.deg}°${String(s.min).padStart(2, "0")}′` };
 };
 
 export function NatalChart() {
+  const [name, setName] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("12:00");
   const [timeUnknown, setTimeUnknown] = useState(false);
   const [place, setPlace] = useState<Place>(MN_PLACES[0]);
   const [query, setQuery] = useState(MN_PLACES[0].name);
+  const [placeSelected, setPlaceSelected] = useState(true);
   const [remote, setRemote] = useState<Place[]>([]);
   const [openList, setOpenList] = useState(false);
   const [searching, setSearching] = useState(false);
@@ -231,6 +273,7 @@ export function NatalChart() {
   const choose = (p: Place) => {
     setPlace(p);
     setQuery(p.country ? `${p.name} (${p.country})` : p.name);
+    setPlaceSelected(true);
     setOpenList(false);
   };
 
@@ -241,6 +284,7 @@ export function NatalChart() {
     if (!m) { setErr("Төрсөн огноогоо оруулна уу."); return; }
     const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
     if (y < 1800 || y > 2050) { setErr("1800–2050 оны хооронд төрсөн огноо оруулна уу."); return; }
+    if (!placeSelected || !query.trim()) { setErr("Төрсөн хотоо хайж, жагсаалтаас зөв газраа сонгоно уу."); return; }
     let h = 12, mi = 0;
     if (!timeUnknown) {
       const t = /^(\d{1,2}):(\d{2})/.exec(time);
@@ -262,17 +306,35 @@ export function NatalChart() {
       ]
     : [];
 
+  const elementTotal = chart ? Object.values(chart.elements).reduce((sum, value) => sum + value, 0) : 0;
+  const strongestElement = chart
+    ? (Object.keys(chart.elements) as Element[]).reduce((best, key) => chart.elements[key] > chart.elements[best] ? key : best, "fire")
+    : null;
+
   return (
     <div className="space-y-6">
-      <form onSubmit={calculate} className="panel p-6 sm:p-8">
-        <p className="eyebrow-line">Натал зурхай</p>
-        <h3 className="mt-3 font-display text-2xl font-semibold text-ink">Төрсөн мөчийн тэнгэрийн зураглал</h3>
+      <form onSubmit={calculate} className="panel overflow-hidden p-0">
+        <div className="bg-[linear-gradient(135deg,#123c33,#285f4c)] px-6 py-7 text-white sm:px-8">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/65">Астрологи · Одон орон зурхай</p>
+          <h3 className="mt-3 font-display text-2xl font-semibold sm:text-3xl">Төрсөн мөчийн тэнгэрийн зураглал</h3>
+          <p className="mt-3 max-w-2xl leading-relaxed text-white/75">
+            Гурван мэдээллээ оруулаад Нар, Сар, Өгсөх орд, гарагууд, 12 гэр болон махбодын тэнцвэрээ нэг дор үзээрэй.
+          </p>
+          <div className="mt-5 grid max-w-2xl grid-cols-3 gap-2 text-center text-xs sm:text-sm">
+            {["1 · Огноо", "2 · Цаг", "3 · Төрсөн газар"].map((step) => <span key={step} className="rounded-full border border-white/20 bg-white/10 px-2 py-2">{step}</span>)}
+          </div>
+        </div>
+
+        <div className="p-6 sm:p-8">
         <p className="mt-2 max-w-2xl leading-relaxed text-muted">
-          Төрсөн огноо, цаг, газраа оруулахад таныг төрөх агшинд Нар, Сар болон гарагууд аль ордод, аль гэрт байсныг
-          одон орны тооцооллоор гаргаж, натал дугуй зургийг зурна.
+          Төрсөн цагаа тухайн газрын орон нутгийн цагаар бичнэ. Цагийн бүс болон зуны цагийн өөрчлөлтийг систем автоматаар тооцно.
         </p>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label className="field-label" htmlFor="nc-name">Нэр эсвэл хоч <span className="font-normal text-muted">(заавал биш)</span></label>
+            <input id="nc-name" className={inputCls} value={name} onChange={(e) => setName(e.target.value)} placeholder="Таны үр дүнгийн гарчигт л ашиглана" />
+          </div>
           <div>
             <label className="field-label" htmlFor="nc-date">Төрсөн огноо *</label>
             <input id="nc-date" type="date" required min="1800-01-01" max="2050-12-31" className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} />
@@ -285,7 +347,7 @@ export function NatalChart() {
               Цагаа мэдэхгүй
             </label>
           </div>
-          <div className="relative sm:col-span-2 lg:col-span-1">
+          <div className="relative sm:col-span-2">
             <label className="field-label" htmlFor="nc-place">Төрсөн газар *</label>
             <input
               id="nc-place"
@@ -294,7 +356,7 @@ export function NatalChart() {
               value={query}
               onFocus={(e) => { setOpenList(true); e.currentTarget.select(); }}
               onBlur={() => setTimeout(() => setOpenList(false), 180)}
-              onChange={(e) => { setQuery(e.target.value); setOpenList(true); }}
+              onChange={(e) => { setQuery(e.target.value); setOpenList(true); setPlaceSelected(false); }}
               placeholder="Жишээ: Эрдэнэт, Seoul, Berlin"
             />
             {openList && (local.length > 0 || remote.length > 0 || searching) && (
@@ -318,17 +380,30 @@ export function NatalChart() {
                 {searching && <li className="px-3 py-2 text-xs text-muted">Хайж байна…</li>}
               </ul>
             )}
-            <p className="mt-1.5 text-xs text-muted">Гадаадын хотыг латинаар бичнэ үү.</p>
+            <p className="mt-1.5 text-xs text-muted">Хотын нэрийг бичээд доорх жагсаалтаас заавал сонгоно. Гадаадын хотыг латинаар бичнэ.</p>
           </div>
         </div>
 
         {err && <p className="mt-4 rounded-xl bg-rose-50 px-4 py-2.5 text-sm text-rose-600">{err}</p>}
 
-        <button type="submit" className="btn btn-primary btn-lg mt-6 w-full sm:w-auto">Натал зурхай гаргах ✦</button>
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button type="submit" className="btn btn-primary btn-lg w-full sm:w-auto">Миний зурхайг гаргах ✦</button>
+          <p className="text-xs leading-relaxed text-muted">Таны оруулсан мэдээлэл хадгалагдахгүй, зөвхөн энэ төхөөрөмж дээр тооцоологдоно.</p>
+        </div>
+        </div>
       </form>
 
       {chart && (
-        <div ref={resultRef} className="scroll-mt-28 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+        <div ref={resultRef} className="scroll-mt-28 space-y-6">
+          <div className="panel flex flex-col gap-3 p-5 sm:flex-row sm:items-end sm:justify-between sm:p-6">
+            <div>
+              <p className="eyebrow-line">Таны натал зураг</p>
+              <h3 className="mt-2 font-display text-2xl font-semibold text-ink">{name.trim() ? `${name.trim()} — төрсөн мөчийн зураглал` : "Төрсөн мөчийн зураглал"}</h3>
+            </div>
+            <p className="text-sm text-muted">{date} · {timeUnknown ? "цаг тодорхойгүй" : time} · {place.name}</p>
+          </div>
+
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
           <div className="night relative overflow-hidden rounded-[1.75rem] p-5 sm:p-7"
             style={{ backgroundImage: "linear-gradient(150deg,#0F2B26 0%,#12302A 55%,#1E2A1C 100%)" }}>
             <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full"
@@ -356,9 +431,31 @@ export function NatalChart() {
                     <p className="mt-1.5 text-2xl" style={{ color: ELEMENT_COLOR[f.element] }}>{T(f.glyph)}</p>
                     <p className="font-display text-lg font-semibold text-ink">{f.name}</p>
                     <p className="text-xs text-muted">{b.sub}</p>
+                    <p className="mt-2 text-xs leading-relaxed text-muted">{SIGN_TEXT[f.key]}</p>
                   </div>
                 );
               })}
+            </div>
+
+            <div className="panel p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted">Махбодын тэнцвэр</p>
+                  <h4 className="mt-1 font-display text-lg font-semibold text-ink">
+                    {strongestElement ? `${ELEMENT_NAME[strongestElement]} махбод давамгай` : "Тэнцвэр"}
+                  </h4>
+                </div>
+                {strongestElement && <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ color: ELEMENT_COLOR[strongestElement], backgroundColor: `${ELEMENT_COLOR[strongestElement]}18` }}>{ELEMENT_TEXT[strongestElement]}</span>}
+              </div>
+              <div className="mt-4 space-y-3">
+                {(Object.keys(ELEMENT_COLOR) as Element[]).map((el) => {
+                  const percent = elementTotal ? Math.round(chart.elements[el] / elementTotal * 100) : 0;
+                  return <div key={el}>
+                    <div className="mb-1 flex justify-between text-xs"><span className="font-semibold text-ink">{ELEMENT_NAME[el]}</span><span className="tabular-nums text-muted">{percent}%</span></div>
+                    <div className="h-2 overflow-hidden rounded-full bg-surface-3"><div className="h-full rounded-full" style={{ width: `${percent}%`, backgroundColor: ELEMENT_COLOR[el] }} /></div>
+                  </div>;
+                })}
+              </div>
             </div>
 
             <div className="panel overflow-hidden p-0">
@@ -412,6 +509,29 @@ export function NatalChart() {
                 : "Төрсөн цаг тодорхойгүй тул өгсөх орд болон гэрүүдийг тооцоогүй. Гарагуудыг 12:00 цагаар тооцсон — Сарны байрлал ±6° зөрж болно."}
               {" "}℞ — ухрах хөдөлгөөнтэй гараг.
             </p>
+          </div>
+        </div>
+
+          <div className="panel p-5 sm:p-6">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted">Гараг бүрийн утга</p>
+            <h4 className="mt-2 font-display text-xl font-semibold text-ink">Таны зураглалыг энгийнээр унших нь</h4>
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              {chart.planets.map((planet) => {
+                const position = fmtPos(planet.lon);
+                return <details key={planet.key} className="group rounded-2xl border border-line bg-surface-1 p-4 open:bg-surface-2">
+                  <summary className="flex cursor-pointer list-none items-center gap-3">
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-xl text-white" style={{ backgroundColor: ELEMENT_COLOR[position.element] }}>{T(planet.glyph)}</span>
+                    <span className="min-w-0 flex-1"><b className="block text-ink">{planet.name} · {position.name}</b><span className="text-xs text-muted">{position.text}{planet.house ? ` · ${planet.house}-р гэр` : ""}</span></span>
+                    <span className="text-lg text-muted transition group-open:rotate-45">＋</span>
+                  </summary>
+                  <p className="mt-3 border-t border-line pt-3 text-sm leading-relaxed text-muted">
+                    <b className="text-ink">{planet.name}</b> нь {PLANET_MEANING[planet.key]}-ийг илэрхийлнэ. <b className="text-ink">{position.name}</b> ордод байрласнаар энэ чанар {SIGN_TEXT[position.key]} хэлбэрээр илэрнэ.
+                    {planet.house ? ` ${planet.house}-р гэр нь ${HOUSE_MEANING[planet.house - 1]}-тай холбоотой.` : " Төрсөн цаг тодорхойгүй тул гэрийн байрлалыг оруулаагүй."}
+                  </p>
+                </details>;
+              })}
+            </div>
+            <p className="mt-5 rounded-2xl bg-primary-50 px-4 py-3 text-xs leading-relaxed text-muted">Энэ тайлал нь өөрийгөө танин мэдэх, эргэцүүлэхэд зориулсан ерөнхий астрологийн мэдээлэл бөгөөд мэргэжлийн эмчилгээ, санхүү, хууль зүйн зөвлөгөөг орлохгүй.</p>
           </div>
         </div>
       )}
