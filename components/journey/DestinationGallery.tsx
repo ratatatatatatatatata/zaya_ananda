@@ -17,10 +17,11 @@ export function DestinationGallery({ places, scene }: { places: Destination[]; s
     if (!grid.current) return;
     const bounds = grid.current.getBoundingClientRect();
     const card = entry.getBoundingClientRect();
-    const width = Math.min(640, bounds.width);
+    const width = Math.min(440, bounds.width);
+    const availableHeight = window.innerHeight * 0.7;
     setPosition({
       left: Math.max(0, Math.min(card.left - bounds.left + (card.width - width) / 2, bounds.width - width)),
-      top: card.top - bounds.top,
+      top: Math.max(88, Math.min(card.top, window.innerHeight - availableHeight - 16)) - bounds.top,
     });
     active.current = entry;
     setSelected(index);
