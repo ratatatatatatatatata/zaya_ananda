@@ -319,7 +319,7 @@ export function AdminJourneys() {
                     <input className="input" placeholder="Шошго — жишээ: 1-р өдөр · өглөө" value={d.label} onChange={(e) => updDay(i, { label: e.target.value })} />
                     <input className="input" placeholder="Гарчиг" value={d.title} onChange={(e) => updDay(i, { title: e.target.value })} />
                   </div>
-                  <p className="mt-3 text-xs text-muted">Зураг, гарчиг нь дугуй сонголтод харагдана. Өдрийг сонгоход доорх дэлгэрэнгүй тайлбар бүтнээрээ нээгдэнэ.</p>
+                  <p className="mt-3 text-xs text-muted">Эхний 5 өдөр дугуй сонголтоор, дараагийн өдрүүд дияан аяллын зураг, тайлбартай мөрүүдээр харагдана. Дэлгэрэнгүй мэдээлэл бүтнээрээ гарна.</p>
                   <textarea className="textarea mt-2" rows={6} placeholder="Сургалт, лекц болон өдрийн дэлгэрэнгүй хөтөлбөр. Олон догол мөрөөр бичиж болно." value={d.text} onChange={(e) => updDay(i, { text: e.target.value })} />
                   <input className="input mt-2" placeholder="Хийх зүйлс — таслалаар тусгаарлана" value={(d.bullets || []).join(", ")}
                     onChange={(e) => updDay(i, { bullets: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })} />

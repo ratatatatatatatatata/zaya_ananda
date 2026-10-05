@@ -1,3 +1,4 @@
+import { SectionReels } from "@/components/SectionReels";
 import { VideoHero } from "@/components/video/VideoHero";
 import { ServiceList } from "@/components/home/ServiceList";
 import { heroMediaFor } from "@/lib/hero-video";
@@ -24,6 +25,7 @@ export default async function ServicesPage() {
       <section id="services" className="section"><div className="container-px">
         <ServiceList items={items} />
       </div></section>
+      <SectionReels section="services" />
     </>
   );
 }

@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { Journey } from "@/data/journeys";
 import styles from "./JourneyGallery.module.css";
 
-export function JourneyGallery({ journey, headingLevel = 2 }: { journey: Journey; headingLevel?: 2 | 3 }) {
+export function JourneyGallery({ journey, headingLevel = 2, layout = "compact" }: { journey: Journey; headingLevel?: 2 | 3; layout?: "compact" | "wide" }) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const rail = useRef<HTMLDivElement>(null);
   const stageId = useId();
@@ -23,14 +23,14 @@ export function JourneyGallery({ journey, headingLevel = 2 }: { journey: Journey
     const button = strip?.querySelector<HTMLElement>('[aria-pressed="true"]');
     if (!strip || !button) return;
     const offset = button.getBoundingClientRect().left - strip.getBoundingClientRect().left;
-    strip.scrollTo({ left: strip.scrollLeft + offset - (strip.clientWidth - button.clientWidth) / 2, behavior: "instant" as ScrollBehavior });
+    strip.scrollTo({ left: strip.scrollLeft + offset - (strip.clientWidth - button.clientWidth) / 2, top: strip.scrollTop + button.getBoundingClientRect().top - strip.getBoundingClientRect().top - (strip.clientHeight - button.clientHeight) / 2, behavior: "instant" as ScrollBehavior });
   }, [selected?.image]);
 
   if (!selected) return null;
   const Heading = headingLevel === 3 ? "h3" : "h2";
   const select = (next: number) => setSelectedImage(images[(next + images.length) % images.length].image);
 
-  return <section aria-label="Аяллын зургууд" className={styles.gallery}>
+  return <section aria-label="Аяллын зургууд" className={`${styles.gallery} ${layout === "wide" ? styles.wide : ""}`}>
     <Heading className="font-display text-3xl font-semibold text-ink sm:text-4xl">Аяллын зургууд</Heading>
     <figure id={stageId} className={styles.stage}>
       <img src={selected.image} alt={selected.caption || `Аяллын зураг ${index + 1}`} loading="lazy" />
@@ -41,7 +41,7 @@ export function JourneyGallery({ journey, headingLevel = 2 }: { journey: Journey
     {images.length > 1 && <div className={styles.controls}>
       <button type="button" className={styles.arrow} onClick={() => select(index - 1)} aria-label="Өмнөх зураг" aria-controls={stageId}>‹</button>
       <div ref={rail} className={styles.thumbnails} role="group" aria-label="Аяллын зураг сонгох" onKeyDown={event => {
-        const next = event.key === "ArrowRight" ? (index + 1) % images.length : event.key === "ArrowLeft" ? (index - 1 + images.length) % images.length : null;
+        const next = (event.key === "ArrowRight" || event.key === "ArrowDown") ? (index + 1) % images.length : (event.key === "ArrowLeft" || event.key === "ArrowUp") ? (index - 1 + images.length) % images.length : null;
         if (next === null) return;
         event.preventDefault(); select(next);
         rail.current?.querySelectorAll<HTMLButtonElement>("button")[next]?.focus({ preventScroll: true });

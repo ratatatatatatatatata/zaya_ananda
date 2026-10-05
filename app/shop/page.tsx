@@ -1,3 +1,4 @@
+import { SectionReels } from "@/components/SectionReels";
 import { VideoHero } from "@/components/video/VideoHero";
 import { heroMediaFor } from "@/lib/hero-video";
 import { ProductHoverCard } from "@/components/ProductHoverCard";
@@ -35,6 +36,7 @@ export default async function ShopPage() {
           stones={<StoneReading interactiveProducts />}
         />
       </div></section>
+      <SectionReels section="shop" />
     </>
   );
 }

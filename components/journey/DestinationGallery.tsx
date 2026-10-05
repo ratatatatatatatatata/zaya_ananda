@@ -6,7 +6,7 @@ import { JourneyImage } from "./SceneArt";
 import { useI18n } from "@/lib/i18n";
 import styles from "./DestinationGallery.module.css";
 
-export function DestinationGallery({ places, scene }: { places: Destination[]; scene: Scene }) {
+export function DestinationGallery({ places, scene, circular = false }: { places: Destination[]; scene: Scene; circular?: boolean }) {
   const { tl } = useI18n();
   const [selected, setSelected] = useState<number | null>(null);
   const [position, setPosition] = useState({ left: 0, top: 0 });
@@ -41,7 +41,7 @@ export function DestinationGallery({ places, scene }: { places: Destination[]; s
     };
   }, [selected]);
 
-  return <div ref={grid} className={styles.grid} onKeyDown={event => {
+  return <div ref={grid} className={`${styles.grid} ${circular ? styles.circular : ""}`} onKeyDown={event => {
     if (event.key === "Escape") { event.stopPropagation(); setSelected(null); }
   }}>
     {places.map((place, index) => <div key={index} className={styles.entry}

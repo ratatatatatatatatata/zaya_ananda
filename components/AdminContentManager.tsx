@@ -10,6 +10,7 @@ import { SERVICE_GROUPS, COURSE_CATS, COURSE_LEVELS, PRODUCT_CATS } from "@/data
 import { ZODIACS, ALL_ZODIACS_KEY } from "@/data/zodiac";
 import { weekdayLabels, DEFAULT_BOOKING_DAYS, DEFAULT_START_HOUR, DEFAULT_END_HOUR } from "@/lib/booking-slots";
 import { useMoods } from "@/lib/moods";
+import { isSectionReel } from "@/lib/section-reels";
 import { embedSrc } from "@/lib/video-embed";
 import type { CmsItem, TeacherPreset, CmsTranslations } from "@/lib/types";
 
@@ -81,7 +82,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
     fetch("/api/admin/content", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : { items: [] }))
       .then((d) => setItems((d.items || []).filter((i: CmsItem) => {
-        if (i.kind !== kind) return false;
+        if (i.kind !== kind || isSectionReel(i)) return false;
         if (!fixedCategory) return true;
         // "Бүтээгдэхүүн" таб: "Чулуунууд" биш бүх бүтээгдэхүүнийг харуулна (ангилал огт
         // онооогүй хуучин бичлэгүүд ч энд харагдаж, админ дараа нь олж засварлах боломжтой байх ёстой)

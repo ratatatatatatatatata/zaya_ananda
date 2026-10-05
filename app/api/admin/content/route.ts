@@ -15,7 +15,7 @@ const LANGS = ["en", "ko", "ja", "zh"] as const;
 // Purge cached public pages/data so admin edits show up immediately.
 function refreshPublic(id?: string) {
   revalidateTag("cms");
-  for (const p of ["/", "/services", "/courses", "/shop", "/resources", "/gift"]) revalidatePath(p);
+  for (const p of ["/", "/services", "/courses", "/shop", "/resources", "/gift", "/ayalal"]) revalidatePath(p);
   revalidatePath("/teachers");
   revalidatePath("/teachers/[slug]", "page");
   if (id) revalidatePath(`/item/${id}`);

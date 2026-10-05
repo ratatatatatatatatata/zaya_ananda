@@ -17,3 +17,12 @@
 @keyframes reveal { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
 @media(max-width:700px) { .grid { grid-template-columns:minmax(0,1fr); gap:18px; }.description { padding:20px; }.detail { max-height:70dvh; } }
 @media(prefers-reduced-motion:reduce) { .detail { animation:none; } }
+
+.circular { grid-template-columns:repeat(5,minmax(0,1fr)); gap:clamp(16px,2.5vw,40px); }
+.circular .preview { aspect-ratio:1; border-radius:50%; max-width:280px; margin:auto; text-align:center; }
+.circular .caption { inset:auto 15% 22%; }
+.circular .title { font-size:clamp(1rem,1.3vw,1.25rem); }
+.circular .action { justify-content:center; margin-top:8px; font-size:.7rem; }
+.circular .icon { display:none; }
+@media(max-width:1000px) { .circular { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media(max-width:650px) { .circular { grid-template-columns:repeat(2,minmax(0,1fr)); } }

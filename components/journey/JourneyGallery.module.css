@@ -13,3 +13,15 @@
 .arrow:hover { background:#e8efe6; }
 .arrow:focus-visible,.thumbnail:focus-visible { outline:2px solid #315d46; outline-offset:2px; }
 @media(max-width:600px) { .gallery { gap:14px; }.stage { min-height:230px; border-radius:14px; }.controls { gap:7px; grid-template-columns:32px minmax(0,1fr) 32px; }.arrow { width:32px; }.thumbnail { flex-basis:72px; height:58px; }.thumbnails { gap:8px; } }
+
+@media(min-width:800px) {
+  .wide { display:grid; grid-template-columns:112px minmax(0,1fr); grid-template-rows:auto minmax(0,1fr); gap:24px; height:auto; }
+  .wide>h2,.wide>h3 { grid-column:1/-1; }
+  .wide .stage { grid-column:2; grid-row:2; width:100%; height:clamp(360px,60vw,700px); min-height:0; aspect-ratio:auto; }
+  .wide .controls { grid-column:1; grid-row:2; display:flex; flex-direction:column; min-height:0; max-height:700px; height:clamp(360px,60vw,700px); }
+  .wide .thumbnails { flex:1; flex-direction:column; overflow-x:hidden; overflow-y:auto; width:100%; min-height:0; padding:3px; }
+  .wide .thumbnail { flex:0 0 82px; width:100%; }
+  .wide .arrow { flex-shrink:0; transform:rotate(90deg); }
+}
+
+@media(min-width:800px) { .wide:not(:has(.controls)) .stage { grid-column:1/-1; } }

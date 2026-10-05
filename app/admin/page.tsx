@@ -13,6 +13,7 @@ import { AdminSettings } from "@/components/AdminSettings";
 import { AdminPages } from "@/components/AdminPages";
 import { AdminTeachers } from "@/components/AdminTeachers";
 import { AdminJourney } from "@/components/AdminJourney";
+import { AdminSectionReels } from "@/components/AdminSectionReels";
 import { AdminJourneys } from "@/components/AdminJourneys";
 import { AdminZurhai } from "@/components/AdminZurhai";
 import { AdminMedia } from "@/components/AdminMedia";
@@ -219,10 +220,10 @@ export default function AdminPage() {
               />
             )}
 
-            {tab === "journeys" && <AdminJourneys />}
-            {tab === "services" && <AdminContentManager kind="service" />}
+            {tab === "journeys" && <><AdminJourneys /><AdminSectionReels key="ayalal-reels" section="ayalal" /></>}
+            {tab === "services" && <><AdminContentManager kind="service" /><AdminSectionReels key="services-reels" section="services" /></>}
             {tab === "courses" && <AdminContentManager kind="course" />}
-            {tab === "products" && <AdminContentManager kind="product" fixedCategory="Бүтээгдэхүүн" />}
+            {tab === "products" && <><AdminContentManager kind="product" fixedCategory="Бүтээгдэхүүн" /><AdminSectionReels key="shop-reels" section="shop" /></>}
             {tab === "stones" && <AdminContentManager kind="product" fixedCategory="Чулуунууд" />}
             {tab === "promos" && <AdminContentManager kind="promo" />}
             {tab === "zurhai" && <AdminZurhai />}

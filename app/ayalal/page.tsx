@@ -1,3 +1,4 @@
+import { SectionReels } from "@/components/SectionReels";
 import Link from "next/link";
 import { VideoHero } from "@/components/video/VideoHero";
 import { heroMediaFor } from "@/lib/hero-video";
@@ -163,6 +164,7 @@ export default async function AyalalPage() {
       </div></section>
 
       {/* Холбоо барих — аяллын тухай асуухад бэлэн */}
+      <SectionReels section="ayalal" />
     </>
   );
 }

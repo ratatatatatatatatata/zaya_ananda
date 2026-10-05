@@ -3,10 +3,11 @@ import { notFound } from "next/navigation";
 import { JOURNEY_FAQ, JOURNEY_PREP } from "@/data/journeys";
 import { getJourneyBySlugCached, getJourneyBySlug } from "@/lib/journeys-db";
 import { JourneyImage } from "@/components/journey/SceneArt";
-import { LeadCard, CrewRow, Avatar } from "@/components/journey/PersonCard";
+import { CrewRow, Avatar } from "@/components/journey/PersonCard";
 import { JourneyItinerary } from "@/components/journey/JourneyItinerary";
 import { DestinationGallery } from "@/components/journey/DestinationGallery";
-import { JourneyRegistration } from "@/components/journey/JourneyRegistration";
+import { JourneyGallery } from "@/components/journey/JourneyGallery";
+import { JourneyBooking } from "@/components/journey/JourneyBooking";
 import { JourneyReviews } from "@/components/journey/JourneyReviews";
 
 // Админ шинэ аялал нэмэнгүүт (эсвэл slug өөрчлөгдөнгүүт) шууд нээгдэж харагдахын тулд
@@ -113,12 +114,7 @@ export default async function JourneyPage({ params }: { params: { slug: string }
 
           <aside className="panel flex min-w-0 flex-col overflow-hidden bg-[#0b3d35] p-6 text-white sm:p-8">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/60">Аяллын үнэ</p>
-              <p className="mt-2 font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                {formatJourneyPrice(j.price)}
-              </p>
-              <p className="mt-1.5 text-sm leading-6 text-white/65">Нэг хүний багц үнэ</p>
-
+              <h2 className="font-display text-xl font-semibold text-white">Аяллыг хэн хариуцах вэ</h2>
               {j.lead?.name && (
                 <div className="mt-6">
                   <div className="relative h-64 w-full overflow-hidden rounded-2xl bg-white/10 [&>img]:absolute [&>img]:inset-0 [&>img]:object-top">
@@ -126,14 +122,53 @@ export default async function JourneyPage({ params }: { params: { slug: string }
                   </div>
                   <p className="mt-4 break-words text-base font-semibold text-white">{j.lead.name}</p>
                   {j.lead.role && <p className="mt-1 text-sm text-white/70">{j.lead.role}</p>}
+                  {j.lead.info && <p className="mt-3 whitespace-pre-line text-sm leading-7 text-white/85">{j.lead.info}</p>}
                 </div>
               )}
             </div>
-            <a href="#zahialga" className="mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-primary-800 transition hover:-translate-y-0.5 hover:shadow-lg">
-              Бүртгүүлэх <span aria-hidden>→</span>
-            </a>
           </aside>
 
+        </div>
+      </div></section>
+
+      {/* Өдөр өдрийн хөтөлбөр — зүүн талд зураг, баруун талд мэдээлэл */}
+      <section id="hutulbur" className="section scroll-mt-32 bg-surface-2"><div className="container-px">
+        <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Өдөр өдрийн хөтөлбөр</h2>
+        <p className="mt-2 max-w-2xl text-muted">Өдрөө сонгоод сургалт, лекц болон аяллын дэлгэрэнгүй хөтөлбөртэй танилцаарай.</p>
+
+        <JourneyItinerary days={j.itinerary || []} />
+      </div></section>
+
+      {/* Очих газрын тухай мэдээлэл — тусдаа том гарчигтай хэсэг, олон газар байж болно */}
+      {j.destination && j.destination.length > 0 && (
+        <section id="gazar" className="section scroll-mt-32"><div className="container-px">
+          <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Очих газрууд</h2>
+          <p className="mt-2 max-w-2xl text-muted">Зураг дээр курсороо аваачих эсвэл дарж дэлгэрэнгүй мэдээллийг томоор үзээрэй.</p>
+          <DestinationGallery places={j.destination} scene={j.scene} circular />
+        </div></section>
+      )}
+
+      {!!j.crew?.length && <section id="baga" className="section"><div className="container-px">
+        <h2 className="font-display text-3xl font-semibold text-ink">Хамт явах баг</h2>
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {j.crew.map((person) => <CrewRow key={person.name} person={person} />)}
+        </div>
+      </div></section>}
+
+      {j.gallery?.some(photo => photo.image?.trim()) && <section className="section"><div className="container-px">
+        <JourneyGallery journey={j} layout="wide" />
+      </div></section>}
+
+      <section id="zahialga" className="section scroll-mt-32 bg-surface-2"><div className="container-px">
+        <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Аялалд бүртгүүлэх</h2>
+        <p className="mt-3 text-muted">Багцын үнэ, багтсан үйлчилгээ болон төлбөрийн нөхцөлтэй танилцаад бүртгүүлээрэй.</p>
+        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)_minmax(0,1fr)]">
+          <article className="panel bg-[#0b3d35] p-6 text-white sm:p-8">
+            <h3 className="text-sm font-semibold text-white/75">Нийт төлбөр</h3>
+            <p className="mt-3 font-display text-3xl font-semibold">{formatJourneyPrice(j.price)}</p>
+            <p className="mt-2 text-sm text-white/75">Нэг хүний багц үнэ</p>
+            {!!j.prepay && <p className="mt-5 border-t border-white/20 pt-5 text-sm leading-7 text-white/85">Урьдчилгаа: {formatJourneyPrice(String(j.prepay))} / хүн</p>}
+          </article>
           <article className="panel p-6 sm:p-8">
             <div className="flex items-center gap-3 border-b border-line pb-5">
               <span className="grid size-10 place-items-center rounded-xl bg-primary-50 font-bold text-primary-700">✓</span>
@@ -156,53 +191,9 @@ export default async function JourneyPage({ params }: { params: { slug: string }
             <DetailList value={j.excluded} tone="rose" />
           </article>
         </div>
-      </div></section>
-
-      {/* Өдөр өдрийн хөтөлбөр — зүүн талд зураг, баруун талд мэдээлэл */}
-      <section id="hutulbur" className="section scroll-mt-32 bg-surface-2"><div className="container-px">
-        <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Өдөр өдрийн хөтөлбөр</h2>
-        <p className="mt-2 max-w-2xl text-muted">Өдрөө сонгоод сургалт, лекц болон аяллын дэлгэрэнгүй хөтөлбөртэй танилцаарай.</p>
-
-        <JourneyItinerary days={j.itinerary || []} />
-      </div></section>
-
-      {/* Очих газрын тухай мэдээлэл — тусдаа том гарчигтай хэсэг, олон газар байж болно */}
-      {j.destination && j.destination.length > 0 && (
-        <section id="gazar" className="section scroll-mt-32"><div className="container-px">
-          <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Очих газрууд</h2>
-          <p className="mt-2 max-w-2xl text-muted">Зураг дээр курсороо аваачих эсвэл дарж дэлгэрэнгүй мэдээллийг томоор үзээрэй.</p>
-          <DestinationGallery places={j.destination} scene={j.scene} />
-        </div></section>
-      )}
-
-      {/* Хариуцах хүн ба баг */}
-      <section id="baga" className="section scroll-mt-32"><div className="container-px">
-        <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Аяллыг хэн хариуцах вэ</h2>
-        <p className="mt-2 max-w-2xl text-muted">Аяллын турш тантай хамт явж, хөтөлбөрийг удирдах хүмүүс.</p>
-
-        <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,24rem)_1fr]">
-          <LeadCard person={j.lead || { name: "", role: "", info: "" }} />
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-muted">Хамт явах баг</p>
-            <div className="mt-4 space-y-4">
-              {(j.crew || []).map((c) => <CrewRow key={c.name} person={c} />)}
-            </div>
-          </div>
+        <div className="mx-auto mt-8 max-w-3xl">
+          <JourneyBooking slug={j.slug} journeyName={j.name} prepay={j.prepay} />
         </div>
-
-        {/* Аялсан хүмүүсийн сэтгэгдэл */}
-        <JourneyReviews slug={j.slug} />
-      </div></section>
-
-      {/* Цаг захиалга */}
-      <section className="section bg-surface-2"><div className="container-px">
-        <JourneyRegistration journey={j} id="zahialga" heading={<>
-          <p className="eyebrow-line"><span>🗓</span></p>
-          <h2 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl">Аялалд бүртгүүлэх</h2>
-          <p className="mt-3 leading-relaxed text-muted">
-            Мэдээллээ бөглөөд аялалд бүртгүүлээрэй. Админ баталгаажуулсны дараа танд мэдэгдэл ирнэ.
-          </p>
-        </>} />
       </div></section>
 
       {/* Аялагчдын зөвлөмж */}
@@ -236,6 +227,8 @@ export default async function JourneyPage({ params }: { params: { slug: string }
           </div>
         </div>
       </div></section>
+
+      <section className="section"><div className="container-px"><JourneyReviews slug={j.slug} /></div></section>
 
       {/* Түгээмэл асуултууд */}
       <section id="faq" className="section scroll-mt-32 bg-surface-2"><div className="container-px">
