@@ -17,7 +17,7 @@ export function observeDocumentTranslation(locale:Locale) {
   const queue=new Set<string>(), pending=new Set<string>(), ignored=new Set<string>();
   const attempts=new Map<string,number>();
   const cache=caches.get(locale) || new Map<string,string>(); caches.set(locale,cache);
-  const storageKey=`zaya_translations_v2_${locale}`;
+  const storageKey=`zaya_translations_azure_v1_${locale}`;
   try {
     const saved=JSON.parse(sessionStorage.getItem(storageKey)||"null");
     if(saved?.expires>Date.now()) for(const [key,value] of Object.entries(saved.translations||{})) if(typeof value==="string")cache.set(key,value);
@@ -112,12 +112,12 @@ export function observeDocumentTranslation(locale:Locale) {
         else sources.forEach(source=>ignored.add(source));
         return;
       }
-      const result=await response.json() as {translations?:Record<string,string>;ignored?:string[];pending?:string[];unavailable?:boolean;retryable?:boolean};
+      const result=await response.json() as {translations?:Record<string,string>;ignored?:string[];pending?:string[];unavailable?:boolean;retryable?:boolean;retryAfter?:number};
       if(disposed)return;
       unavailable=!!result.unavailable;
       for(const source of result.ignored||[])ignored.add(source);
       for(const [source,value] of Object.entries(result.translations||{})) if(typeof value==="string" && value)cache.set(source,value);
-      if(result.retryable)retry(result.pending||sources.filter(source=>!cache.has(source)&&!ignored.has(source)),2000);
+      if(result.retryable)retry(result.pending||sources.filter(source=>!cache.has(source)&&!ignored.has(source)),Math.min(60000,Math.max(2000,(result.retryAfter||2)*1000)));
       else retryDelay=100;
       try { sessionStorage.setItem(storageKey,JSON.stringify({expires:Date.now()+3600000,translations:Object.fromEntries([...cache].slice(-2000))})); } catch { /* optional */ }
       schedule();

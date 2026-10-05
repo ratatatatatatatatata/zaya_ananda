@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { normalizeTranslationSource, translationCatalog } from "@/lib/translation-catalog";
-import { cachedTranslations, supportedTranslationLocale, translationReady } from "@/lib/translation-service";
+import { cachedTranslations, supportedTranslationLocale, translationReady, translationIssue } from "@/lib/translation-service";
 import { translateLiteral } from "@/data/literal-translations";
 export const runtime="nodejs";
+export const maxDuration=60;
 export const dynamic="force-dynamic";
 const requests=new Map<string,{count:number;until:number}>();
-export async function GET() { return NextResponse.json({configured:translationReady(),languages:["mn","en","ko","ja","zh"]}); }
+export async function GET() { return NextResponse.json({provider:"azure",configured:translationReady(),languages:["mn","en","ko","ja","zh"]}); }
 export async function POST(req:Request) {
   if (Number(req.headers.get("content-length")) > 60000) return NextResponse.json({error:"too_large"},{status:413});
   const raw=await req.text();
@@ -34,9 +35,11 @@ export async function POST(req:Request) {
     try {
       Object.assign(translations,await cachedTranslations(missing,body.locale));
       return NextResponse.json({translations,ignored});
-    } catch {
+    } catch (error) {
       // Keep manual/built-in results when the provider has a temporary failure.
-      return NextResponse.json({translations,ignored,retryable:true,pending:missing});
+      const issue=translationIssue(error);
+      const unavailable=["not_configured","credentials","quota_or_access"].includes(issue);
+      return NextResponse.json({translations,ignored,unavailable,retryable:!unavailable,retryAfter:issue==="rate_limited"?60:2,pending:missing});
     }
   } catch {return NextResponse.json({error:"translation_unavailable"},{status:503});}
 }
