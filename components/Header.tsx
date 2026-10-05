@@ -15,7 +15,7 @@ import { NAV_LINKS } from "@/lib/nav-links";
 // Keep astrology available on the homepage and in admin, but not in the header.
 const links = NAV_LINKS.filter((link) => link.key !== "nav.merge");
 
-export function Header() {
+export function Header({ logoSrc }: { logoSrc?: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const { count, open } = useCart();
@@ -25,7 +25,6 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const accountRef = useRef<HTMLDivElement>(null);
-  const [logo, setLogo] = useState<string>();
   const [customPages, setCustomPages] = useState<{ id: string; navLabel: string; i18n?: Record<string, { navLabel?: string }> | null }[]>([]);
   const pageLabel = (p: { navLabel: string; i18n?: Record<string, { navLabel?: string }> | null }) =>
     (lang !== "mn" && p.i18n?.[lang]?.navLabel) || p.navLabel;
@@ -44,7 +43,6 @@ export function Header() {
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
-  useEffect(() => { fetch("/api/settings", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((d) => { if (d?.settings?.logo) setLogo(d.settings.logo); }).catch(() => {}); }, []);
   useEffect(() => { fetch("/api/pages", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((d) => { if (Array.isArray(d?.pages)) setCustomPages(d.pages); }).catch(() => {}); }, []);
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
@@ -52,7 +50,7 @@ export function Header() {
   return (
     <header className={cx("site-header sticky top-0 z-40 transition-all duration-300", scrolled ? "glass border-b border-line shadow-sm" : "border-b border-transparent bg-ivory/80 backdrop-blur-sm")}>
       <div className="site-header-row flex h-16 w-full items-center justify-between gap-3 px-4 lg:h-[72px] lg:px-6">
-        <Link href="/" aria-label="Zaya's Ananda" className="site-brand shrink-0"><Logo logoSrc={logo} /></Link>
+        <Link href="/" aria-label="Zaya's Ananda" className="site-brand shrink-0"><Logo logoSrc={logoSrc} priority /></Link>
 
         <nav aria-label="Үндсэн цэс" className="site-nav hidden min-w-0 items-center gap-2.5 xl:flex 2xl:gap-4">
           {links.map((l) => (

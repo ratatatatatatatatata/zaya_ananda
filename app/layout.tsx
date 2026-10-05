@@ -4,6 +4,8 @@ import "./globals.css";
 import "./cinematic.css";
 import { VisualTheme } from "@/components/VisualTheme";
 import { Providers } from "@/components/Providers";
+import { getSettingsCached } from "@/lib/repo";
+import { DEFAULT_LOGO_SRC } from "@/components/Logo";
 import { Header } from "@/components/Header";
 import { FooterGate } from "@/components/FooterGate";
 import { CosmicBackdrop } from "@/components/CosmicBackdrop";
@@ -60,10 +62,13 @@ const orgJsonLd = {
   areaServed: "MN",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const settings = await getSettingsCached();
+  const logoSrc = settings.logo?.trim() || DEFAULT_LOGO_SRC;
   return (
     <html lang="mn">
       <head>
+        {!logoSrc.startsWith("data:") && <link rel="preload" as="image" href={logoSrc} fetchPriority="high" />}
         <Script id="chatling-config" strategy="beforeInteractive">
           {`window.chtlConfig = { chatbotId: "4876436798" };`}
         </Script>
@@ -89,7 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <VisualTheme />
           <CosmicBackdrop />
           <div className="relative z-10 flex min-h-screen flex-col">
-            <Header />
+            <Header logoSrc={logoSrc} />
             <main className="flex-1">{children}</main>
             <FooterGate />
             <div className="about-layout-spacer h-20 lg:hidden" aria-hidden />
