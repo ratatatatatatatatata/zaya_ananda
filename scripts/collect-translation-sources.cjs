@@ -13,7 +13,10 @@ function walk(dir) {
     function visit(node) {
       if (ts.isJsxText(node) || ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) || ts.isTemplateHead(node) || ts.isTemplateMiddle(node) || ts.isTemplateTail(node)) {
         const value=normalize(node.text);
-        if (/[А-Яа-яӨөҮүЁё]/u.test(value)) sources.add(value);
+        const parent=node.parent;
+        const displayAttribute=ts.isJsxAttribute(parent) && ['title','alt','aria-label','placeholder'].includes(parent.name.getText(tree));
+        const prose=ts.isJsxText(node) || displayAttribute || (/\s/.test(value) && !/[{}=<>]/.test(value));
+        if (/[А-Яа-яӨөҮүЁё]/u.test(value) || (prose && /\p{L}/u.test(value) && !/^(https?:|data:|@\/)/.test(value))) sources.add(value);
       }
       ts.forEachChild(node,visit);
     }

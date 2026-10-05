@@ -3,20 +3,17 @@ import { getSettingsCached, listCmsCached, listPagesCached } from "./repo";
 import { listJourneysCached } from "./journeys-db";
 import type { Locale } from "./types";
 
-export const normalizeTranslationSource = (value: string) => value.replace(/\s+/gu, " ").trim();
-const fields = new Set(["name", "title", "summary", "body", "navLabel", "category", "level", "nextNote", "teacherRole", "teacherInfo", "role", "info", "text", "description", "desc", "caption", "label", "q", "a", "days", "groupSize", "tagline", "audience", "route", "duration", "location", "activity", "meals", "stay", "highlights", "includes", "excludes", "included", "excluded", "transport", "bullets", "schedule", "note", "address", "hours"]);
-function decode(value: string) {
-  return value.replace(/&(?:nbsp|amp|lt|gt|quot|apos|#39|#\d+|#x[0-9a-f]+);/gi, entity => {
-    const known: Record<string,string> = {"&nbsp;":" ","&amp;":"&","&lt;":"<","&gt;":">","&quot;":'"',"&apos;":"'","&#39;":"'"};
-    if (known[entity]) return known[entity];
-    const code = entity.startsWith("&#x") ? parseInt(entity.slice(3),16) : parseInt(entity.slice(2),10);
-    return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : entity;
-  });
-}
+import { normalizeTranslationSource, splitTranslationText, hasTranslatableText, decodeTranslationEntities } from "./translation-text";
+export { normalizeTranslationSource } from "./translation-text";
+const fields = new Set(["name", "title", "summary", "body", "navLabel", "category", "level", "nextNote", "teacherName", "teacherRole", "teacherInfo", "role", "info", "text", "description", "desc", "caption", "label", "q", "a", "days", "groupSize", "tagline", "audience", "route", "duration", "location", "activity", "meals", "stay", "highlights", "includes", "excludes", "included", "excluded", "transport", "bullets", "schedule", "note", "address", "hours", "price"]);
 export function addPublicText(set: Set<string>, value: string) {
-  for (const part of [value, ...value.split(/<[^>]*>|\r?\n/g)]) {
-    const text = normalizeTranslationSource(decode(part));
-    if (text && /[А-Яа-яӨөҮүЁё]/u.test(text)) set.add(text);
+  const clean = value.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, "");
+  const parts = [clean, clean.replace(/<[^>]*>/g, " "), ...clean.split(/<[^>]*>|\r?\n/g)];
+  for (const part of parts) {
+    const text = normalizeTranslationSource(decodeTranslationEntities(part));
+    if (!hasTranslatableText(text)) continue;
+    set.add(text);
+    splitTranslationText(text).forEach(chunk => set.add(chunk));
   }
 }
 export function collectPublicText(set: Set<string>, value: unknown, key = "") {
@@ -35,9 +32,13 @@ export async function translationCatalog(locale: Locale) {
     listJourneysCached(), getSettingsCached(), listPagesCached(),
   ]);
   collectPublicText(allowed,items); collectPublicText(allowed,journeys); collectPublicText(allowed,pages);
+  // Lesson titles are public catalogue labels; never include protected media paths.
+  for (const item of items) for (const lesson of item.lessons || []) addPublicText(allowed, lesson.title);
+  // Known, explicitly authored language variants may also appear in CMS previews.
+  for (const item of [...items, ...pages]) for (const row of Object.values(item.i18n || {})) collectPublicText(allowed, row);
   // Only published settings text. No users, orders, submissions, or bank details.
   for (const key of ["aboutTitle","aboutBody","aboutMission","aboutStory"] as const) if (settings[key]) addPublicText(allowed,settings[key]!);
-  for (const key of ["aboutStats","aboutValues","aboutFaqs","aboutGallery","aboutMilestones","aboutProgramMilestones","teachers","team","zurhaiCards","customMoods","zurhaiRules","contact"] as const) collectPublicText(allowed,settings[key]);
+  for (const key of ["aboutStats","aboutValues","aboutFaqs","aboutGallery","aboutMilestones","aboutProgramMilestones","aboutPartners","teachers","team","zurhaiCards","customMoods","zurhaiRules","contact"] as const) collectPublicText(allowed,settings[key]);
   const overrides = new Map<string,string>();
   for (const item of [...items,...pages]) for (const field of ["title","summary","body","navLabel"] as const) {
     const source = (item as unknown as Record<string,unknown>)[field];

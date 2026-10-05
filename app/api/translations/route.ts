@@ -31,7 +31,12 @@ export async function POST(req:Request) {
       else ignored.push(source);
     }
     if(missing.length && !translationReady()) return NextResponse.json({translations,ignored,unavailable:true});
-    Object.assign(translations,await cachedTranslations(missing,body.locale));
-    return NextResponse.json({translations,ignored});
+    try {
+      Object.assign(translations,await cachedTranslations(missing,body.locale));
+      return NextResponse.json({translations,ignored});
+    } catch {
+      // Keep manual/built-in results when the provider has a temporary failure.
+      return NextResponse.json({translations,ignored,retryable:true,pending:missing});
+    }
   } catch {return NextResponse.json({error:"translation_unavailable"},{status:503});}
 }

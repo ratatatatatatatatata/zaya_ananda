@@ -1,8 +1,9 @@
 // Автомат орчуулга — Google Cloud Translation API.
 // Env: GOOGLE_TRANSLATE_API_KEY (байхгүй бол орчуулга хийгдэхгүй, гараар оруулсан нь хэвээр үлдэнэ).
+import { decodeTranslationEntities } from "./translation-text";
 import type { CmsTranslations } from "./types";
 
-const KEY = process.env.GOOGLE_TRANSLATE_API_KEY;
+const getKey = () => process.env.GOOGLE_TRANSLATE_API_KEY;
 const LANGS: { l: "en" | "ko" | "ja" | "zh"; code: string }[] = [
   { l: "en", code: "en" },
   { l: "ko", code: "ko" },
@@ -11,16 +12,19 @@ const LANGS: { l: "en" | "ko" | "ja" | "zh"; code: string }[] = [
 ];
 
 async function tr(text: string, target: string, format: "text" | "html"): Promise<string | null> {
-  if (!KEY || !text || !text.trim()) return null;
+  const key = getKey();
+  if (!key || !text || !text.trim()) return null;
   try {
-    const res = await fetch("https://translation.googleapis.com/language/translate/v2?key=" + KEY, {
+    const res = await fetch("https://translation.googleapis.com/language/translate/v2", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ q: text, source: "mn", target, format }),
+      headers: { "Content-Type": "application/json", "X-goog-api-key": key },
+      signal: AbortSignal.timeout(12000),
+      body: JSON.stringify({ q: text, target, format }),
     });
     if (!res.ok) return null;
     const data = (await res.json()) as { data?: { translations?: { translatedText?: string }[] } };
-    return data?.data?.translations?.[0]?.translatedText || null;
+    const value = data?.data?.translations?.[0]?.translatedText;
+    return value ? (format === "text" ? decodeTranslationEntities(value) : value) : null;
   } catch {
     return null;
   }
@@ -34,7 +38,7 @@ export async function autoTranslate(
   mn: { title?: string; summary?: string; body?: string; navLabel?: string },
   existing?: CmsTranslations
 ): Promise<CmsTranslations | undefined> {
-  if (!KEY) return existing;
+  if (!getKey()) return existing;
   const out: CmsTranslations = { ...(existing || {}) };
   for (const { l, code } of LANGS) {
     const cur = { ...(out[l] || {}) };
@@ -52,4 +56,4 @@ export async function autoTranslate(
   return Object.keys(out).length ? out : undefined;
 }
 
-export const translateConfigured = !!KEY;
+export const translateConfigured = !!getKey();

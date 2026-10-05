@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AdminTranslationStatus } from "./AdminTranslationStatus";
 import type { BankInfo } from "@/lib/types";
 
 function compressImage(file: File, maxW = 800, quality = 0.85): Promise<string> {
@@ -79,6 +80,7 @@ export function AdminSettings() {
   return (
     <form onSubmit={save} className="card max-w-3xl space-y-5 p-6">
       <h2 className="font-display text-lg font-semibold text-ink">Сайтын тохиргоо</h2>
+      <AdminTranslationStatus />
 
       <div>
         <label className="field-label">Лого</label>
