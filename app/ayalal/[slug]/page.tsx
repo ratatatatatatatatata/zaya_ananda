@@ -4,6 +4,7 @@ import { JOURNEY_FAQ, JOURNEY_PREP } from "@/data/journeys";
 import { getJourneyBySlugCached, getJourneyBySlug } from "@/lib/journeys-db";
 import { JourneyImage } from "@/components/journey/SceneArt";
 import { LeadCard, CrewRow, Avatar } from "@/components/journey/PersonCard";
+import { JourneyItinerary } from "@/components/journey/JourneyItinerary";
 import { DestinationGallery } from "@/components/journey/DestinationGallery";
 import { JourneyRegistration } from "@/components/journey/JourneyRegistration";
 import { JourneyReviews } from "@/components/journey/JourneyReviews";
@@ -98,35 +99,19 @@ export default async function JourneyPage({ params }: { params: { slug: string }
         </div>
       </section>
 
-      {/* Дотоод цэс — гүйлгэхэд толгойн доор наалдаж, хамт хөдөлнө */}
-      <nav className="night sticky top-16 z-30 border-y border-white/10 bg-[#0B1714]/90 backdrop-blur lg:top-[72px]">
-        <div className="container-px flex gap-x-7 gap-y-2 overflow-x-auto py-3.5 sm:flex-wrap sm:justify-center sm:overflow-visible">
-          {[
-            { id: "hutulbur", label: "Өдөр өдрийн хөтөлбөр" },
-            ...(j.destination && j.destination.length > 0 ? [{ id: "gazar", label: "Очих газрууд" }] : []),
-            { id: "baga", label: "Хариуцах баг" },
-            { id: "zahialga", label: "Цаг захиалах" },
-            { id: "zuvlumj", label: "Аялагчдын зөвлөмж" },
-            { id: "faq", label: "Асуулт хариулт" },
-          ].map((n) => (
-            <a key={n.id} href={"#" + n.id} className="shrink-0 whitespace-nowrap text-sm font-semibold text-white/70 transition hover:text-primary-300">{n.label}</a>
-          ))}
-        </div>
-      </nav>
-
       {/* Товч мэдээлэл */}
       <section className="section"><div className="container-px">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,.65fr)]">
-          <article className="panel relative overflow-hidden p-6 sm:p-8">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)]">
+          <article className="panel relative min-w-0 overflow-hidden p-6 sm:p-8">
             <div aria-hidden className="absolute -right-16 -top-20 size-48 rounded-full bg-primary-100/60 blur-3xl" />
             <div className="relative">
               <span className="grid size-11 place-items-center rounded-2xl bg-primary-50 text-xl text-primary-700">✦</span>
               <p className="mt-5 text-xs font-bold uppercase tracking-[0.14em] text-primary-700">Хэнд тохирох вэ</p>
-              <p className="mt-3 max-w-3xl whitespace-pre-line text-[1.02rem] leading-8 text-ink/80">{j.audience}</p>
+              <p className="mt-3 whitespace-pre-line break-words text-lg leading-8 text-ink/80">{j.audience}</p>
             </div>
           </article>
 
-          <aside className="panel flex flex-col justify-between overflow-hidden bg-[#0b3d35] p-6 text-white sm:p-8">
+          <aside className="panel flex min-w-0 flex-col overflow-hidden bg-[#0b3d35] p-6 text-white sm:p-8">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/60">Аяллын үнэ</p>
               <p className="mt-2 font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
@@ -136,11 +121,11 @@ export default async function JourneyPage({ params }: { params: { slug: string }
 
               {j.lead?.name && (
                 <div className="mt-6">
-                  <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-white/10">
+                  <div className="relative h-64 w-full overflow-hidden rounded-2xl bg-white/10 [&>img]:absolute [&>img]:inset-0 [&>img]:object-top">
                     <Avatar person={j.lead} size="lg" />
                   </div>
-                  <p className="mt-4 truncate text-base font-semibold text-white">{j.lead.name}</p>
-                  {j.lead.role && <p className="truncate text-xs text-white/60">{j.lead.role}</p>}
+                  <p className="mt-4 break-words text-base font-semibold text-white">{j.lead.name}</p>
+                  {j.lead.role && <p className="mt-1 text-sm text-white/70">{j.lead.role}</p>}
                 </div>
               )}
             </div>
@@ -176,40 +161,9 @@ export default async function JourneyPage({ params }: { params: { slug: string }
       {/* Өдөр өдрийн хөтөлбөр — зүүн талд зураг, баруун талд мэдээлэл */}
       <section id="hutulbur" className="section scroll-mt-32 bg-surface-2"><div className="container-px">
         <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Өдөр өдрийн хөтөлбөр</h2>
-        <p className="mt-2 max-w-2xl text-muted">Өдөр бүрийн урсгал, юу үзэж, юу хийхийг дарааллаар нь харуулав.</p>
+        <p className="mt-2 max-w-2xl text-muted">Өдрөө сонгоод сургалт, лекц болон аяллын дэлгэрэнгүй хөтөлбөртэй танилцаарай.</p>
 
-        <div className="mt-10 space-y-8">
-          {(j.itinerary || []).map((d, i) => (
-            <article key={i} className="card grid gap-0 overflow-hidden lg:grid-cols-[minmax(0,22rem)_1fr]">
-              {/* Урд тал — зураг */}
-              <div className="relative aspect-[4/3] w-full overflow-hidden lg:aspect-auto lg:h-full">
-                <JourneyImage src={d.image} scene={d.scene} alt={d.title} className="h-full w-full object-cover" />
-                <span className="absolute left-4 top-4 rounded-full bg-[#0B1714]/80 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide text-accent-300 backdrop-blur">
-                  {d.label}
-                </span>
-              </div>
-
-              {/* Ард тал — товч гарчиг, мэдээлэл, үзэх зүйлс */}
-              <div className="p-6 sm:p-8">
-                <h3 className="font-display text-2xl font-semibold text-ink">{d.title}</h3>
-                <p className="mt-3 whitespace-pre-line leading-relaxed text-muted">{d.text}</p>
-                {d.bullets && d.bullets.length > 0 && (
-                  <>
-                    <p className="mt-6 text-xs font-bold uppercase tracking-wide text-primary-700">Үзэх, хийх зүйлс</p>
-                    <ul className="mt-2.5 grid gap-2 sm:grid-cols-2">
-                      {d.bullets.map((b) => (
-                        <li key={b} className="flex gap-2.5 text-[0.98rem] leading-relaxed text-ink/85">
-                          <span aria-hidden className="mt-0.5 text-accent-300">✦</span>
-                          <span>{b}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-              </div>
-            </article>
-          ))}
-        </div>
+        <JourneyItinerary days={j.itinerary || []} />
       </div></section>
 
       {/* Очих газрын тухай мэдээлэл — тусдаа том гарчигтай хэсэг, олон газар байж болно */}
