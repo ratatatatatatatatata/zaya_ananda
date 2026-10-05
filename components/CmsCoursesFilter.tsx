@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { CmsCard } from "./CmsCard";
+import { CourseCatalogCard } from "./CourseCatalogCard";
+import styles from "./CourseCatalogCard.module.css";
 import { Stagger } from "./motion/Stagger";
-import { TiltCard } from "./motion/TiltCard";
 import type { CmsItem, Locale } from "@/lib/types";
 import { cx } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
@@ -49,8 +49,8 @@ export function CmsCoursesFilter({ items }: { items: CmsItem[] }) {
       {shown.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-line bg-white/5 px-5 py-12 text-center text-muted">{tr(EMPTY)}</p>
       ) : (
-        <Stagger className="adaptive-cards">
-          {shown.map((i) => <TiltCard key={i.id} className="h-full"><CmsCard item={i} /></TiltCard>)}
+        <Stagger className={styles.grid}>
+          {shown.map((i) => <CourseCatalogCard key={i.id} item={i} />)}
         </Stagger>
       )}
     </div>

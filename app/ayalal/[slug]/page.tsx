@@ -1,4 +1,5 @@
 import Link from "next/link";
+import styles from "@/components/journey/JourneyPage.module.css";
 import { notFound } from "next/navigation";
 import { JOURNEY_FAQ, JOURNEY_PREP } from "@/data/journeys";
 import { getJourneyBySlugCached, getJourneyBySlug } from "@/lib/journeys-db";
@@ -102,32 +103,22 @@ export default async function JourneyPage({ params }: { params: { slug: string }
 
       {/* Товч мэдээлэл */}
       <section className="section"><div className="container-px">
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)]">
-          <article className="panel relative min-w-0 overflow-hidden p-6 sm:p-8">
-            <div aria-hidden className="absolute -right-16 -top-20 size-48 rounded-full bg-primary-100/60 blur-3xl" />
-            <div className="relative">
-              <span className="grid size-11 place-items-center rounded-2xl bg-primary-50 text-xl text-primary-700">✦</span>
-              <p className="mt-5 text-xs font-bold uppercase tracking-[0.14em] text-primary-700">Хэнд тохирох вэ</p>
-              <p className="mt-3 whitespace-pre-line break-words text-lg leading-8 text-ink/80">{j.audience}</p>
-            </div>
+        <div className={styles.overview}>
+          <article className={styles.overviewCard}>
+            <h2>Хэнд тохирох вэ</h2>
+            <p className={styles.audience}>{j.audience}</p>
           </article>
-
-          <aside className="panel flex min-w-0 flex-col overflow-hidden bg-[#0b3d35] p-6 text-white sm:p-8">
-            <div>
-              <h2 className="font-display text-xl font-semibold text-white">Аяллыг хэн хариуцах вэ</h2>
-              {j.lead?.name && (
-                <div className="mt-6">
-                  <div className="relative h-64 w-full overflow-hidden rounded-2xl bg-white/10 [&>img]:absolute [&>img]:inset-0 [&>img]:object-top">
-                    <Avatar person={j.lead} size="lg" />
-                  </div>
-                  <p className="mt-4 break-words text-base font-semibold text-white">{j.lead.name}</p>
-                  {j.lead.role && <p className="mt-1 text-sm text-white/70">{j.lead.role}</p>}
-                  {j.lead.info && <p className="mt-3 whitespace-pre-line text-sm leading-7 text-white/85">{j.lead.info}</p>}
-                </div>
-              )}
-            </div>
+          <aside className={styles.leadCard}>
+            <h2>Аяллыг хэн хариуцах вэ</h2>
+            {j.lead?.name && <div className={styles.leadBody}>
+              <div className={styles.portrait}><Avatar person={j.lead} size="lg" /></div>
+              <div className={styles.leadCopy}>
+                <h3>{j.lead.name}</h3>
+                {j.lead.role && <p className={styles.role}>{j.lead.role}</p>}
+                {j.lead.info && <p className={styles.bio}>{j.lead.info}</p>}
+              </div>
+            </div>}
           </aside>
-
         </div>
       </div></section>
 
@@ -144,7 +135,7 @@ export default async function JourneyPage({ params }: { params: { slug: string }
         <section id="gazar" className="section scroll-mt-32"><div className="container-px">
           <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Очих газрууд</h2>
           <p className="mt-2 max-w-2xl text-muted">Зураг дээр курсороо аваачих эсвэл дарж дэлгэрэнгүй мэдээллийг томоор үзээрэй.</p>
-          <DestinationGallery places={j.destination} scene={j.scene} circular />
+          <DestinationGallery places={j.destination} scene={j.scene} fourColumns />
         </div></section>
       )}
 
@@ -162,37 +153,20 @@ export default async function JourneyPage({ params }: { params: { slug: string }
       <section id="zahialga" className="section scroll-mt-32 bg-surface-2"><div className="container-px">
         <h2 className="font-display text-3xl font-semibold text-ink sm:text-4xl">Аялалд бүртгүүлэх</h2>
         <p className="mt-3 text-muted">Багцын үнэ, багтсан үйлчилгээ болон төлбөрийн нөхцөлтэй танилцаад бүртгүүлээрэй.</p>
-        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)_minmax(0,1fr)]">
-          <article className="panel bg-[#0b3d35] p-6 text-white sm:p-8">
-            <h3 className="text-sm font-semibold text-white/75">Нийт төлбөр</h3>
-            <p className="mt-3 font-display text-3xl font-semibold">{formatJourneyPrice(j.price)}</p>
-            <p className="mt-2 text-sm text-white/75">Нэг хүний багц үнэ</p>
-            {!!j.prepay && <p className="mt-5 border-t border-white/20 pt-5 text-sm leading-7 text-white/85">Урьдчилгаа: {formatJourneyPrice(String(j.prepay))} / хүн</p>}
-          </article>
-          <article className="panel p-6 sm:p-8">
-            <div className="flex items-center gap-3 border-b border-line pb-5">
-              <span className="grid size-10 place-items-center rounded-xl bg-primary-50 font-bold text-primary-700">✓</span>
-              <div>
-                <p className="font-display text-xl font-semibold text-ink">Үнэд багтсан</p>
-                <p className="mt-0.5 text-sm text-muted">Аяллын багцад багтах үйлчилгээ</p>
-              </div>
+        <div className={styles.payment}>
+          <div className={styles.price}>
+            <div><h3>Нийт төлбөр</h3>
+              <p className={styles.amount}>{formatJourneyPrice(j.price)} <span>/ нэг хүн</span></p>
             </div>
-            <DetailList value={j.included} />
-          </article>
-
-          <article className="panel p-6 sm:p-8">
-            <div className="flex items-center gap-3 border-b border-line pb-5">
-              <span className="grid size-10 place-items-center rounded-xl bg-rose-50 font-bold text-rose-700">–</span>
-              <div>
-                <p className="font-display text-xl font-semibold text-ink">Үнэд багтаагүй</p>
-                <p className="mt-0.5 text-sm text-muted">Тусад нь тооцогдох зардал</p>
-              </div>
-            </div>
-            <DetailList value={j.excluded} tone="rose" />
-          </article>
-        </div>
-        <div className="mx-auto mt-8 max-w-3xl">
-          <JourneyBooking slug={j.slug} journeyName={j.name} prepay={j.prepay} />
+            {!!j.prepay && <p className={styles.prepay}>Урьдчилгаа: <strong>{formatJourneyPrice(String(j.prepay))}</strong> / хүн</p>}
+          </div>
+          <div className={styles.costs}>
+            <article><h3>Үнэд багтсан</h3><DetailList value={j.included} /></article>
+            <article><h3>Үнэд багтаагүй</h3><DetailList value={j.excluded} tone="rose" /></article>
+          </div>
+          <div className={styles.booking}><div>
+            <JourneyBooking slug={j.slug} journeyName={j.name} prepay={j.prepay} />
+          </div></div>
         </div>
       </div></section>
 
