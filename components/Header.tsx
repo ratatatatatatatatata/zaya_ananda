@@ -10,8 +10,10 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NotificationBell } from "./NotificationBell";
 import { Logo } from "./Logo";
 import { cx } from "@/lib/format";
-import { NAV_LINKS as links } from "@/lib/nav-links";
+import { NAV_LINKS } from "@/lib/nav-links";
 
+// Keep astrology available on the homepage and in admin, but not in the header.
+const links = NAV_LINKS.filter((link) => link.key !== "nav.merge");
 
 export function Header() {
   const pathname = usePathname();

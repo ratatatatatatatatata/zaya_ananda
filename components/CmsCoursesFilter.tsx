@@ -7,15 +7,9 @@ import { TiltCard } from "./motion/TiltCard";
 import type { CmsItem, Locale } from "@/lib/types";
 import { cx } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
+import { COURSE_LEVELS } from "@/data/cms-taxonomy";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
-
-/** Ганцхан түвшний ангилал — бүгд / онлайн / танхим */
-const TABS: { k: "all" | "online" | "tankhim"; icon: string; label: Record<Locale, string> }[] = [
-  { k: "all", icon: "✦", label: Lx("Бүгд", "All", "전체", "すべて", "全部") },
-  { k: "online", icon: "💻", label: Lx("Онлайн сургалт", "Online courses", "온라인 강좌", "オンライン講座", "线上课程") },
-  { k: "tankhim", icon: "🏛", label: Lx("Танхимын сургалт", "In-studio courses", "오프라인 강좌", "対面講座", "线下课程") },
-];
 
 const EMPTY = Lx(
   "Одоохондоо сургалт нэмэгдээгүй байна.",
@@ -27,20 +21,23 @@ const EMPTY = Lx(
 
 export function CmsCoursesFilter({ items }: { items: CmsItem[] }) {
   const { tr } = useI18n();
-  const [mode, setMode] = useState<"all" | "online" | "tankhim">("all");
+  const [level, setLevel] = useState("anhan");
 
-  const shown = mode === "all" ? items : items.filter((i) => i.mode === mode || i.mode === "both");
+  // Same level field and fallback as the homepage; delivery mode stays on the card.
+  const shown = items.filter((item) => (item.level || "anhan") === level);
 
   return (
     <div>
       <div className="mx-auto mb-8 flex w-full max-w-2xl flex-wrap justify-center gap-2">
-        {TABS.map((tb) => (
+        {COURSE_LEVELS.map((tb) => (
           <button
-            key={tb.k}
-            onClick={() => setMode(tb.k)}
+            key={tb.key}
+            type="button"
+            aria-pressed={level === tb.key}
+            onClick={() => setLevel(tb.key)}
             className={cx(
               "focus-ring inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[1rem] font-semibold transition",
-              mode === tb.k ? "bg-primary-grad text-white shadow-glow" : "border border-line bg-surface-1 text-ink/70 hover:border-primary-400 hover:text-primary-700",
+              level === tb.key ? "bg-primary-grad text-white shadow-glow" : "border border-line bg-surface-1 text-ink/70 hover:border-primary-400 hover:text-primary-700",
             )}
           >
             <span aria-hidden>{tb.icon}</span>

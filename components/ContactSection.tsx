@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { siteConfig } from "@/data/content";
 import { useI18n } from "@/lib/i18n";
 import { ContactForm } from "./ContactForm";
@@ -10,7 +11,8 @@ type ContactInfo = { phone?: string; email?: string; address?: string; hours?: s
 
 /** Нийтийн хуудсуудын авсаархан холбоо барих хэсэг. */
 export function ContactSection({ id = "contact" }: { id?: string }) {
-  const { t, tr } = useI18n();
+  const { t, tr, tl } = useI18n();
+  const isHome = usePathname() === "/";
   const { user } = useAuth();
   /** Админаас оруулсан холбоо барих мэдээлэл — байхгүй бол өгөгдмөл рүү шилжинэ. */
   const [cfg, setCfg] = useState<ContactInfo>({});
@@ -78,14 +80,18 @@ export function ContactSection({ id = "contact" }: { id?: string }) {
           <h2 className="font-display text-2xl font-semibold text-ink">{t("contact.title")}</h2>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_1.2fr_1.4fr_1fr_minmax(180px,1.2fr)]">
           {info.map(i => <div key={i.label} className="min-w-0 border-l-2 border-primary-200 pl-4">
             <p className="text-sm text-muted">{i.label}</p>
             {i.href ? <a href={i.href} target={i.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="mt-1 block break-words text-sm font-semibold leading-6 text-ink hover:text-primary-700">{i.value}</a> : <p className="mt-1 text-sm font-semibold leading-6 text-ink">{i.value}</p>}
           </div>)}
+          <div className="min-w-0 overflow-hidden rounded-2xl border border-line bg-white sm:col-span-2 lg:col-span-1">
+            <iframe title={tl("Zaya’s Ananda — байршил")} src={mapEmbed} className="h-36 w-full" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+            <a href={mapUrl} target="_blank" rel="noreferrer" className="block px-3 py-2 text-center text-xs font-semibold text-primary-800 hover:underline">{tl("Газрын зураг дээр нээх")} ↗</a>
+          </div>
         </div>
-        <details className="mt-5 rounded-2xl border border-line bg-white/70">
-          <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-primary-800">Зурвас илгээх, газрын зураг үзэх</summary>
+        {!isHome && <details className="mt-5 rounded-2xl border border-line bg-white/70">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-primary-800">{tl("Зурвас илгээх")}</summary>
           <div className="border-t border-line p-4 sm:p-6">
             {publicT.length > 0 && <div className="mb-6 grid gap-4 sm:grid-cols-3">{publicT.map(r => <blockquote key={r.id} className="rounded-xl bg-surface-2 p-4"><span className="text-accent-300">{"★".repeat(r.rating)}</span><p className="mt-2 text-sm leading-relaxed">«{r.text}»</p><footer className="mt-2 text-sm font-semibold">— {r.name}</footer></blockquote>)}</div>}
             <div className={"grid gap-5 " + (!user ? "lg:grid-cols-2" : "mx-auto max-w-2xl")}>
@@ -134,13 +140,8 @@ export function ContactSection({ id = "contact" }: { id?: string }) {
             )}
           </div>}
         </div>
-        <div className="mt-5">
-          <div className="overflow-hidden rounded-3xl border border-line shadow-card">
-            <iframe title="Zaya's Ananda" src={mapEmbed} className="h-60 w-full" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
           </div>
-        </div>
-          </div>
-        </details>
+        </details>}
       </div>
     </section>
   );
