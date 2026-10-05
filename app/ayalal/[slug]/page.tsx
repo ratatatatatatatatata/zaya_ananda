@@ -1,3 +1,4 @@
+import { SectionReels } from "@/components/SectionReels";
 import Link from "next/link";
 import styles from "@/components/journey/JourneyPage.module.css";
 import { notFound } from "next/navigation";
@@ -169,6 +170,8 @@ export default async function JourneyPage({ params }: { params: { slug: string }
           </div></div>
         </div>
       </div></section>
+
+      <SectionReels section="ayalal" />
 
       {/* Аялагчдын зөвлөмж */}
       <section id="zuvlumj" className="section scroll-mt-32"><div className="container-px">

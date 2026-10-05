@@ -84,7 +84,7 @@ export async function HomeAbout() {
       </div>
 
       {/* Түгээмэл асуултууд */}
-      <FaqContact questions={questions.length ? questions : faqs} mapQuery={settings.contact?.mapQuery} />
+      <FaqContact questions={questions.length ? questions : faqs} />
 
 
     </div>

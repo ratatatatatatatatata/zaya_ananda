@@ -13,10 +13,5 @@
 .form { padding:28px; border:1px solid #dbe4da; border-radius:22px; background:#fff; box-shadow:0 12px 40px #23443108; }
 .form .heading { font-size:26px; }
 .form textarea { min-height:110px; }
-.map { grid-column:1 / -1; min-width:0; overflow:hidden; border:1px solid #dbe4da; border-radius:22px; background:#fff; }
-.mapHeading { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; padding:20px 24px; }
-.mapHeading h3 { font-size:22px; font-weight:600; color:#203f2f; }
-.map iframe { display:block; width:100%; height:340px; border:0; }
-.mapLink { padding:10px 16px; border:1px solid #dbe4da; border-radius:999px; background:#f8faf4; color:#315e46; font-size:14px; font-weight:600; }
 @media(max-width:900px) { .layout { grid-template-columns:1fr; gap:24px; } }
-@media(max-width:480px) { .form { padding:20px; }.questions details { padding:18px; }.mapHeading { padding:18px; }.map iframe { height:280px; } }
+@media(max-width:480px) { .form { padding:20px; }.questions details { padding:18px; } }

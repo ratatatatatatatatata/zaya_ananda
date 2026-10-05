@@ -43,6 +43,6 @@ export default async function AboutPage() {
     extra={<><div className={styles.extras}>
       {!!settings.aboutValues?.length && <details><summary>Бидний үнэт зүйлс</summary>{settings.aboutValues.map((v,i)=><div key={i}><h3>{localeText(v.title)}</h3><p>{localeText(v.text)}</p></div>)}</details>}
 
-    </div><FaqContact questions={settings.aboutFaqs?.length ? settings.aboutFaqs : faqs} mapQuery={settings.contact?.mapQuery} /></>}
+    </div><FaqContact questions={settings.aboutFaqs?.length ? settings.aboutFaqs : faqs} /></>}
   />;
 }

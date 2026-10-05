@@ -67,17 +67,24 @@ async function storageReq(path: string, init?: RequestInit): Promise<unknown> {
   return text ? JSON.parse(text) : null;
 }
 
-export async function ensureBucket(id: string): Promise<void> {
+export async function ensureBucket(id: string, options: { public?: boolean; fileSizeLimit?: number; allowedMimeTypes?: string[] } = {}): Promise<void> {
   try {
-    await storageReq("bucket", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, name: id, public: false }) });
+    await storageReq("bucket", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, name: id, public: false, ...options }) });
   } catch (e) {
     if (!/already exists|Duplicate|409/i.test(String(e))) throw e;
   }
 }
 
 function fullStorageUrl(u: string): string {
+  if (!u) throw new Error("Storage URL missing");
+  if (u.startsWith("https://")) return u;
   const rel = u.startsWith("/storage/v1") ? u : `/storage/v1${u.startsWith("/") ? "" : "/"}${u}`;
   return `${URL}${rel}`;
+}
+
+export function publicStorageUrl(bucket: string, path: string): string {
+  assertEnv();
+  return `${STORAGE()}/object/public/${encodeURIComponent(bucket)}/${path.split("/").map(encodeURIComponent).join("/")}`;
 }
 
 export async function signedUploadUrl(bucket: string, path: string): Promise<string> {

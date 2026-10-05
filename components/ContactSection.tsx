@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { siteConfig } from "@/data/content";
 import { useI18n } from "@/lib/i18n";
+import styles from "./ContactSection.module.css";
 import { ContactForm } from "./ContactForm";
 import { useAuth } from "@/lib/auth-context";
 
@@ -67,27 +68,29 @@ export function ContactSection({ id = "contact" }: { id?: string }) {
   const mapUrl = "https://www.google.com/maps?q=" + encodeURIComponent(mapQuery);
   const mapEmbed = mapUrl + "&z=17&output=embed";
   const info = [
-    { icon: "📞", label: t("form.phone"), value: phone, href: "tel:" + digits },
-    { icon: "✉️", label: t("form.email"), value: email, href: "mailto:" + email },
-    { icon: "📍", label: t("contact.address"), value: address, href: mapUrl },
-    { icon: "🕒", label: t("contact.hours"), value: hours, href: "" },
+    { label: t("form.phone"), value: phone, href: "tel:" + digits },
+    { label: t("form.email"), value: email, href: "mailto:" + email },
+    { label: t("contact.address"), value: address, href: mapUrl },
+    { label: t("contact.hours"), value: hours, href: "" },
   ];
 
   return (
-    <section id={id} aria-label={t("contact.title")} className="scroll-mt-28 border-t border-line bg-surface-2 py-8 sm:py-10">
+    <section id={id} aria-label={t("contact.title")} className={styles.section}>
       <div className="container-px">
-        <div className="mb-5">
-          <h2 className="font-display text-2xl font-semibold text-ink">{t("contact.title")}</h2>
+        <div className={styles.heading}>
+          <p>ZAYA’S ANANDA</p>
+          <h2>{t("contact.title")}</h2>
         </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_1.2fr_1.4fr_1fr_minmax(180px,1.2fr)]">
-          {info.map(i => <div key={i.label} className="min-w-0 border-l-2 border-primary-200 pl-4">
-            <p className="text-sm text-muted">{i.label}</p>
-            {i.href ? <a href={i.href} target={i.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="mt-1 block break-words text-sm font-semibold leading-6 text-ink hover:text-primary-700">{i.value}</a> : <p className="mt-1 text-sm font-semibold leading-6 text-ink">{i.value}</p>}
-          </div>)}
-          <div className="min-w-0 overflow-hidden rounded-2xl border border-line bg-white sm:col-span-2 lg:col-span-1">
-            <iframe title={tl("Zaya’s Ananda — байршил")} src={mapEmbed} className="h-36 w-full" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
-            <a href={mapUrl} target="_blank" rel="noreferrer" className="block px-3 py-2 text-center text-xs font-semibold text-primary-800 hover:underline">{tl("Газрын зураг дээр нээх")} ↗</a>
+        <div className={styles.panel}>
+          <dl className={styles.details}>
+            {info.map(i => <div key={i.label} className={styles.info}>
+              <dt>{i.label}</dt>
+              <dd>{i.href ? <a href={i.href} target={i.href.startsWith("http") ? "_blank" : undefined} rel={i.href.startsWith("http") ? "noreferrer" : undefined}>{i.value}</a> : i.value}</dd>
+            </div>)}
+          </dl>
+          <div className={styles.map}>
+            <div className={styles.mapHeading}><h3>{tl("Байршил")}</h3><a href={mapUrl} target="_blank" rel="noreferrer">{tl("Газрын зураг дээр нээх")} <span aria-hidden>↗</span></a></div>
+            <iframe title={tl("Zaya’s Ananda — байршил")} src={mapEmbed} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
           </div>
         </div>
         {!isHome && <details className="mt-5 rounded-2xl border border-line bg-white/70">

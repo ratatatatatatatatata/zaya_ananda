@@ -11,7 +11,8 @@ import { ZODIACS, ALL_ZODIACS_KEY } from "@/data/zodiac";
 import { weekdayLabels, DEFAULT_BOOKING_DAYS, DEFAULT_START_HOUR, DEFAULT_END_HOUR } from "@/lib/booking-slots";
 import { useMoods } from "@/lib/moods";
 import { isSectionReel } from "@/lib/section-reels";
-import { embedSrc } from "@/lib/video-embed";
+import { uploadReelMedia } from "@/lib/reel-upload";
+import { embedSrc, isVideoLink } from "@/lib/video-embed";
 import type { CmsItem, TeacherPreset, CmsTranslations } from "@/lib/types";
 
 
@@ -62,6 +63,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
   const [form, setForm] = useState(EMPTY);
+  const [imageUploading, setImageUploading] = useState(false);
   const [images, setImages] = useState<string[]>([]);
   const [lessons, setLessons] = useState<LessonRow[]>([]);
   const [selectedTeachers, setSelectedTeachers] = useState<TeacherDraft[]>([]);
@@ -104,11 +106,12 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
   async function addImage(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
+    setImageUploading(true);
     try {
       const datas: string[] = [];
-      for (const f of files.slice(0, MAX_IMAGES)) datas.push(await compressImage(f));
+      for (const f of files.slice(0, MAX_IMAGES)) datas.push(kind === "free" ? await uploadReelMedia(f, () => {}) : await compressImage(f));
       setImages((prev) => (multiImage ? [...prev, ...datas].slice(0, MAX_IMAGES) : [datas[0]]));
-    } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
+    } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); } finally { setImageUploading(false); }
     e.target.value = "";
   }
 
@@ -118,8 +121,13 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
     const file = e.target.files?.[0]; if (!file) return;
     updLesson(idx, { uploading: true, progress: 0, filename: file.name });
     try {
-      const path = await uploadVideo(file, (p) => updLesson(idx, { progress: p }));
-      updLesson(idx, { path, uploading: false, progress: 100 });
+      if (kind === "free") {
+        const url = await uploadReelMedia(file, (p) => updLesson(idx, { progress: p }));
+        updLesson(idx, { path: "", url, uploading: false, progress: 100 });
+      } else {
+        const path = await uploadVideo(file, (p) => updLesson(idx, { progress: p }));
+        updLesson(idx, { path, url: "", uploading: false, progress: 100 });
+      }
     } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Видео байршуулахад алдаа."); updLesson(idx, { uploading: false }); }
   }
   async function onPickSub(e: React.ChangeEvent<HTMLInputElement>, idx: number) {
@@ -169,6 +177,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (imageUploading || lessons.some(lesson => lesson.uploading)) { setErr("Upload дууссаны дараа хадгална уу."); return; }
     if (!form.title.trim()) { setErr("Гарчиг оруулна уу."); return; }
     if (selectedTeachers.some(teacher => !teacher.name.trim() || teacher.name.includes(","))) { setErr("Багш бүрийг тусдаа мөрөнд нэрээр нь нэмнэ үү."); return; }
     if (normalizeTeachers(selectedTeachers).length !== selectedTeachers.length) { setErr("Ижил нэртэй багшийг давхар сонгосон байна."); return; }
@@ -261,7 +270,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
                 {(multiImage ? images.length < MAX_IMAGES : images.length === 0) && (
                   <label className={"grid cursor-pointer place-items-center rounded-xl border border-dashed border-line text-2xl text-muted hover:bg-white/10 " + (isPromo ? "h-40 w-full max-w-md" : "h-24 w-32")}>
                     🖼+
-                    <input type="file" accept="image/*" multiple={multiImage} onChange={addImage} className="hidden" />
+                    <input disabled={imageUploading || saving} type="file" accept={kind === "free" ? "image/jpeg,image/png,image/webp,image/gif" : "image/*"} multiple={multiImage} onChange={addImage} className="hidden" />
                   </label>
                 )}
               </div>
@@ -283,7 +292,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
                       <select className="input w-28 shrink-0" value={l.quality} onChange={(e) => updLesson(idx, { quality: e.target.value })}>
                         <option value="480p">480p</option><option value="720p">720p</option><option value="1080p">1080p</option><option value="1440p">1440p (2K)</option><option value="4K">4K</option>
                       </select>
-                      <button type="button" onClick={() => setLessons((ls) => ls.filter((_, i) => i !== idx))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
+                      <button type="button" disabled={lessons.some(lesson => lesson.uploading)} onClick={() => setLessons((ls) => ls.filter((_, i) => i !== idx))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
                     </div>
                     <div className="flex items-center gap-3 pl-9">
                       {l.path
@@ -296,12 +305,12 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
                     {!l.path && !l.uploading && (
                       <div className="pl-9">
                         <div className="flex items-center gap-2">
-                          <span className="shrink-0 text-xs font-medium text-muted">YouTube / Shorts линк:</span>
+                          <span className="shrink-0 text-xs font-medium text-muted">Бичлэгийн холбоос:</span>
                           <input className="input flex-1 !py-1.5 text-sm" placeholder="https://www.youtube.com/watch?v=… эсвэл https://youtu.be/… эсвэл /shorts/…" value={l.url || ""} onChange={(e) => updLesson(idx, { url: e.target.value })} />
                         </div>
                         {(() => {
                           const e2 = embedSrc((l.url || "").trim());
-                          if (!(l.url || "").trim() || e2.type !== "iframe") {
+                          if (!(l.url || "").trim() || !isVideoLink((l.url || "").trim())) {
                             return (l.url || "").trim()
                               ? <p className="mt-1.5 text-xs font-semibold text-rose-500">Линк танигдсангүй — YouTube эсвэл Vimeo хаяг оруулна уу.</p>
                               : null;
@@ -310,7 +319,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
                             <div className="mt-2 flex flex-wrap items-center gap-3">
                               <span className="text-xs font-semibold text-jade-600">✓ Бичлэг танигдлаа</span>
                               <div className="overflow-hidden rounded-xl border border-line">
-                                <iframe src={e2.src} title="preview" className="h-[7.5rem] w-[13.5rem]" allow="encrypted-media" allowFullScreen />
+                                {e2.type === "iframe" ? <iframe src={e2.src} title="preview" className="h-[7.5rem] w-[13.5rem]" allow="encrypted-media" allowFullScreen /> : <video src={e2.src} controls preload="metadata" className="h-[7.5rem] w-[13.5rem]" />}
                               </div>
                             </div>
                           );
@@ -329,6 +338,8 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
               </div>
             </div>
           </div>
+
+          {imageUploading && <p role="status" className="text-sm text-primary-700">Зураг upload хийж байна…</p>}
 
           {/* Чулуу: зурган доор шууд ээлтэй орд сонгоно (дараа нь гарчиг/мэдээлэл оруулна) */}
           {isStoneCategory && (
@@ -370,7 +381,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
 
           {isFree && (
             <div className="rounded-2xl border border-primary-500/30 bg-primary-50/60 p-4">
-              <label className="field-label">YouTube Reel холбоос</label>
+              <label className="field-label">Reel / бичлэгийн холбоос</label>
               <input
                 className="input"
                 type="url"
@@ -379,21 +390,15 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
                 placeholder="https://youtube.com/shorts/..."
               />
               <p className="mt-2 text-xs leading-relaxed text-muted">
-                YouTube Shorts, youtube.com/watch эсвэл youtu.be холбоос оруулна. Бичлэг сайт дээрээ 9:16 босоо хэмжээгээр тоглоно.
+                YouTube, Vimeo, Facebook Reel, Instagram Reel эсвэл шууд видео холбоос оруулна. Дээрх Видео хэсэгт файл upload хийж болно. Зураг 10 MB, видео 50 MB хүртэл.
               </p>
               {form.link.trim() && (() => {
                 const preview = embedSrc(form.link.trim());
-                return preview.youtubeId ? (
-                  <div className="mt-3 w-40 overflow-hidden rounded-2xl border border-line bg-black shadow-card">
-                    <iframe
-                      src={preview.src}
-                      title="YouTube Reel preview"
-                      className="aspect-[9/16] w-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
+                return isVideoLink(form.link.trim()) ? (
+                  <div className="mt-3 max-w-md overflow-hidden rounded-2xl border border-line bg-black shadow-card">
+                    {preview.type === "iframe" ? <iframe src={preview.src} title="Reel preview" className="aspect-video w-full" allow="encrypted-media; picture-in-picture" allowFullScreen /> : <video src={preview.src} className="aspect-video w-full" controls preload="metadata" />}
                   </div>
-                ) : <p className="mt-2 text-xs font-semibold text-rose-500">YouTube холбоос танигдсангүй.</p>;
+                ) : <p className="mt-2 text-xs font-semibold text-rose-500">Бичлэгийн холбоос танигдсангүй.</p>;
               })()}
             </div>
           )}
@@ -561,7 +566,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
 
           {err && <p className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-600">{err}</p>}
           <div className="flex gap-2">
-            <button type="submit" disabled={saving} className="btn btn-primary btn-md">{saving ? "Хадгалж байна..." : editingId ? "Засварыг хадгалах" : "Хадгалах"}</button>
+            <button type="submit" disabled={saving || imageUploading || lessons.some(lesson => lesson.uploading)} className="btn btn-primary btn-md">{saving ? "Хадгалж байна..." : editingId ? "Засварыг хадгалах" : "Хадгалах"}</button>
             <button type="button" onClick={resetForm} className="btn btn-outline btn-md">Болих</button>
           </div>
         </form>

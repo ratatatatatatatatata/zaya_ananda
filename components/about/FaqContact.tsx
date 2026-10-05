@@ -1,11 +1,9 @@
 import { ContactForm } from "@/components/ContactForm";
 import { T, Tr } from "@/components/T";
-import { siteConfig } from "@/data/content";
 import type { L } from "@/lib/types";
 import styles from "./FaqContact.module.css";
 
-export function FaqContact({ questions, mapQuery }: { questions: { q: string | L; a: string | L }[]; mapQuery?: string }) {
-  const mapUrl = "https://www.google.com/maps?q=" + encodeURIComponent(mapQuery?.trim() || siteConfig.mapQuery);
+export function FaqContact({ questions }: { questions: { q: string | L; a: string | L }[] }) {
   const text = (value: string | L) => typeof value === "string" ? value : <Tr v={value} />;
   return <div className={styles.layout}>
     <section className={styles.faq} aria-label="Түгээмэл асуултууд">
@@ -24,12 +22,6 @@ export function FaqContact({ questions, mapQuery }: { questions: { q: string | L
         <ContactForm />
       </div>
     </section>
-    <section className={styles.map} aria-label="Байршил">
-      <div className={styles.mapHeading}>
-        <h3>Байршил</h3>
-        <a className={styles.mapLink} href={mapUrl} target="_blank" rel="noreferrer">Газрын зураг дээр нээх ↗</a>
-      </div>
-      <iframe title="Zaya’s Ananda — байршил" src={mapUrl + "&z=17&output=embed"} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
-    </section>
+
   </div>;
 }

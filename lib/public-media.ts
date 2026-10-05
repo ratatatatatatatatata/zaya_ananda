@@ -1,4 +1,5 @@
-import { embedSrc, youtubeThumb } from "./video-embed";
+import { embedSrc, youtubeThumb, isVideoLink } from "./video-embed";
+import { isSectionReel } from "./section-reels";
 import type { CmsItem } from "./types";
 
 export type GiftCategory = "podcast" | "meditation" | "advice";
@@ -9,25 +10,27 @@ export function giftCategory(item: Pick<CmsItem, "title" | "category">): GiftCat
   return "advice";
 }
 
-export type PublicEpisode = { id:string; title:string; url:string; poster:string; kind:"reel"|"podcast"; category:GiftCategory };
+export type PublicEpisode = { id:string; title:string; url:string; poster:string; kind:"reel"|"podcast"; category:GiftCategory; mediaType?:"image"; summary?:string };
 /** Only public media records are passed here; paid course lessons are never included. */
 export function collectPublicMedia(items:CmsItem[]):PublicEpisode[] {
   const seen = new Set<string>();
   const videos:PublicEpisode[] = [];
   for(const item of items) {
     if(item.kind !== "free" && item.kind !== "resource") continue;
-    const sources = [{title:item.title,url:item.link}, ...(item.lessons || [])];
+    if (Number(item.price || 0) > 0) continue;
+    const sources = [{title:item.title,url:item.link,uploaded:false}, ...(item.lessons || []).map((lesson,index) => ({...lesson, uploaded:!!lesson.path, url:lesson.path ? `/api/public-media?itemId=${encodeURIComponent(item.id)}&index=${index}` : lesson.url}))];
+    const startLength = videos.length;
     for(const source of sources) {
-      if(!source.url || !/^https:\/\//i.test(source.url)) continue;
+      if(!source.url || (!source.uploaded && !isVideoLink(source.url))) continue;
       const embed = embedSrc(source.url);
-      if(embed.type !== "iframe" && !/\.(mp4|webm|m4v)(\?|$)/i.test(source.url)) continue;
       const key=embed.youtubeId || embed.src;
       if(seen.has(key)) continue;
       seen.add(key);
       const title=source.title || item.title;
       const podcast=/podcast|подкаст|season\s*\d|episode\s*\d/i.test(`${title} ${item.title} ${item.category || ""}`);
-      videos.push({id:`${item.id}-${videos.length}`,title,url:source.url,poster:item.image || item.images?.[0] || (embed.youtubeId ? youtubeThumb(embed.youtubeId) : "/video/meditation.jpg"),kind:podcast?"podcast":"reel",category:podcast ? "podcast" : giftCategory(item)});
+      videos.push({id:`${item.id}-${videos.length}`,title,url:source.url,poster:item.image || item.images?.[0] || (embed.youtubeId ? youtubeThumb(embed.youtubeId) : "/video/meditation.jpg"),kind:podcast?"podcast":"reel",category:podcast ? "podcast" : giftCategory(item),summary:item.summary});
     }
+    if (isSectionReel(item) && startLength === videos.length && item.image) videos.push({id:item.id,title:item.title,url:"",poster:item.image,kind:"reel",category:"advice",mediaType:"image",summary:item.summary});
   }
   return videos;
 }

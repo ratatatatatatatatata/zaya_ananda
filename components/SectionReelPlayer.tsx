@@ -2,25 +2,38 @@
 import { useState } from "react";
 import { embedSrc } from "@/lib/video-embed";
 import type { PublicEpisode } from "@/lib/public-media";
+import styles from "./home/GiftMedia.module.css";
 
 export function SectionReelPlayer({ reels }: { reels: PublicEpisode[] }) {
-  const [playing, setPlaying] = useState<string | null>(null);
-  return <div className="mt-6 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4" aria-label="Reel бичлэгүүд">
-    {reels.map(reel => {
-      const embed = embedSrc(reel.url, true);
-      const open = playing === reel.id;
-      return <article key={reel.id} className="w-[min(78vw,280px)] shrink-0 snap-start">
-        <div className="relative aspect-[9/16] overflow-hidden rounded-2xl bg-[#10251e]">
-          {open ? embed.type === "iframe" ? <iframe src={embed.src} title={reel.title} className="absolute inset-0 h-full w-full" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
-            : <video src={embed.src} className="absolute inset-0 h-full w-full object-contain" controls autoPlay playsInline aria-label={reel.title} />
-            : <button type="button" onClick={() => setPlaying(reel.id)} aria-label={`${reel.title} — тоглуулах`} className="group absolute inset-0 h-full w-full focus-visible:outline focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-white">
-              <img src={reel.poster} alt="" loading="lazy" className="h-full w-full object-cover opacity-80" />
-              <span className="absolute inset-0 grid place-items-center"><span className="grid size-14 place-items-center rounded-full bg-white text-xl text-primary-800 shadow-lg transition group-hover:scale-110">▶</span></span>
-            </button>}
-        </div>
-        <h3 className="mt-3 text-base font-semibold leading-6 text-ink">{reel.title}</h3>
-        {open && <button type="button" className="mt-2 text-sm font-semibold text-primary-700 underline" onClick={() => setPlaying(null)}>Тоглуулагчийг хаах</button>}
-      </article>;
-    })}
+  const [selected, setSelected] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const reel = reels[selected] || reels[0];
+  if (!reel) return null;
+  const choose = (index: number) => { setPlaying(false); setFailed(false); setSelected(index); };
+  const embed = embedSrc(reel.url, true);
+  return <div className="mt-6 min-w-0" aria-label="Reel бичлэгүүд">
+    <div className={styles.heading}><p className="text-sm text-muted">{selected + 1} / {reels.length}</p><div className={styles.arrows}>
+      <button type="button" disabled={reels.length < 2} onClick={() => choose((selected - 1 + reels.length) % reels.length)} aria-label="Өмнөх Reel">←</button>
+      <button type="button" disabled={reels.length < 2} onClick={() => choose((selected + 1) % reels.length)} aria-label="Дараах Reel">→</button>
+    </div></div>
+    <div className={styles.feature}>
+      <div className={styles.player}>
+        {playing && reel.url ? embed.type === "iframe" ? <iframe key={reel.id} src={embed.src} title={reel.title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
+          : <video key={reel.id} src={embed.src} poster={reel.poster} className="object-contain" controls autoPlay playsInline onError={() => setFailed(true)} aria-label={reel.title} />
+          : reel.mediaType === "image" ? <img src={reel.poster} alt={reel.title} className="absolute inset-0 h-full w-full object-contain" />
+          : <button type="button" className={styles.poster} aria-label={`${reel.title} — тоглуулах`} onClick={() => setPlaying(true)}>
+            <img src={reel.poster} alt="" className="h-full w-full object-contain" loading="lazy" /><span className={styles.play} aria-hidden>▶</span>
+          </button>}
+      </div>
+      <div className={styles.featureCopy}><p>{reel.mediaType === "image" ? "ЗУРАГ" : "ОДОО ҮЗЭХ"}</p><h4>{reel.title}</h4>
+        {reel.summary && <p>{reel.summary}</p>}
+        {reel.url && <button type="button" onClick={() => { setFailed(false); setPlaying(!playing); }}>{playing ? "Тоглуулагчийг хаах" : "Энд үзэх ▶"}</button>}
+        {failed && <p role="alert">Бичлэг ачаалагдсангүй. Дахин тоглуулж үзнэ үү.</p>}
+      </div>
+    </div>
+    {reels.length > 1 && <div className={styles.rail} aria-label="Reel сонгох">{reels.map((item, index) => <button key={item.id} type="button" className={styles.railCard} aria-pressed={index === selected} onClick={() => choose(index)}>
+      <span className={styles.thumb}><img src={item.poster} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />{item.url && <span aria-hidden>▶</span>}</span><span className={styles.name}>{item.title}</span>
+    </button>)}</div>}
   </div>;
 }

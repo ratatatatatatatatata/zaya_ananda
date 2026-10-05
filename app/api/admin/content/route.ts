@@ -16,6 +16,7 @@ const LANGS = ["en", "ko", "ja", "zh"] as const;
 function refreshPublic(id?: string) {
   revalidateTag("cms");
   for (const p of ["/", "/services", "/courses", "/shop", "/resources", "/gift", "/ayalal"]) revalidatePath(p);
+  revalidatePath("/ayalal/[slug]", "page");
   revalidatePath("/teachers");
   revalidatePath("/teachers/[slug]", "page");
   if (id) revalidatePath(`/item/${id}`);
@@ -50,9 +51,9 @@ function parseInput(body: any) {
     price: num(body.price),
     category: body.category ? String(body.category) : undefined,
     mode: body.mode,
-    image: body.image ? String(body.image) : undefined,
+    image: body.image !== undefined ? String(body.image || "") : undefined,
     images: Array.isArray(body.images) ? body.images.map((s: unknown) => String(s)).filter(Boolean).slice(0, 3) : undefined,
-    link: body.link ? String(body.link) : undefined,
+    link: body.link !== undefined ? String(body.link || "") : undefined,
     videoLessons: num(body.videoLessons),
     students: num(body.students),
     views: num(body.views),

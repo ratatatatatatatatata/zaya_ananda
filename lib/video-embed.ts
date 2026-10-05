@@ -22,7 +22,19 @@ export function embedSrc(url: string, autoplay = false): Embed {
   }
   const vm = url.match(VIMEO);
   if (vm) return { type: "iframe", src: `https://player.vimeo.com/video/${vm[1]}${autoplay ? "?autoplay=1" : ""}` };
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === "https:" && /^(www\.|m\.)?facebook\.com$/.test(parsed.hostname) && /^\/(reel\/|watch\/?|[^/]+\/videos\/|share\/r\/)/.test(parsed.pathname)) {
+      return { type: "iframe", src: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false&autoplay=${autoplay ? "true" : "false"}` };
+    }
+    const instagram = parsed.pathname.match(/^\/(?:reel|p)\/([\w-]+)\/?$/);
+    if (parsed.protocol === "https:" && /^(www\.)?instagram\.com$/.test(parsed.hostname) && instagram) return { type: "iframe", src: `https://www.instagram.com/p/${instagram[1]}/embed/` };
+  } catch { /* Native video and internal public-media endpoint. */ }
   return { type: "video", src: url };
+}
+
+export function isVideoLink(url: string): boolean {
+  return /^https:\/\//i.test(url) && (embedSrc(url).type === "iframe" || /\.(mp4|webm|m4v|mov)(\?|$)/i.test(url));
 }
 
 /** YouTube-ийн урьдчилсан зураг (thumbnail) */
