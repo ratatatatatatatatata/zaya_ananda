@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
 import "./cinematic.css";
+import "./responsive.css";
 import { VisualTheme } from "@/components/VisualTheme";
 import { Providers } from "@/components/Providers";
 import { getSettingsCached } from "@/lib/repo";
@@ -14,6 +15,8 @@ import { PromoModal } from "@/components/PromoModal";
 import { BottomNav } from "@/components/BottomNav";
 import { siteConfig } from "@/data/content";
 import { pick } from "@/lib/i18n-core";
+
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export const metadata: Metadata = {
   title: {

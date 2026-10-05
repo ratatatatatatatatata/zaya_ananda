@@ -31,3 +31,9 @@
 @media(max-width:900px) { .levels { grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }.level { padding:22px; } }
 @media(max-width:540px) { .level { padding:18px; }.levelTitle { font-size:1.15rem; }.levelDesc { font-size:.85rem; }.courseLink { grid-template-columns:84px minmax(0,1fr); gap:14px; padding:14px; }.photo { height:84px; }.courseInfo h4 { font-size:1rem; }.summary { font-size:.85rem; }.panelHeader h3 { font-size:1.2rem; } }
 @media(prefers-reduced-motion:reduce) { .level { transition:none; } }
+.level { min-width:0; overflow-wrap:anywhere; }
+.levelAction { gap:10px; }
+.levelAction>span,.close { flex-shrink:0; }
+.panelHeader h3 { min-width:0; flex-wrap:wrap; }
+.close { width:44px; height:44px; }
+@media(max-width:380px) { .courseLink { grid-template-columns:1fr; }.photo { width:100%; height:150px; aspect-ratio:auto; }.levels { gap:10px; }.level { padding:14px; } }

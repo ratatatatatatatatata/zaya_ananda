@@ -29,7 +29,7 @@ function useScrollScene(ref: React.RefObject<HTMLElement>, count: number) {
   const [active, setActive] = useState(0);
   const [pinned, setPinned] = useState(false);
   useEffect(() => {
-    const desktop = matchMedia("(min-width: 1024px) and (min-height: 700px)");
+    const desktop = matchMedia("(min-width: 1024px) and (min-height: 800px)");
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0;
     const measure = () => {

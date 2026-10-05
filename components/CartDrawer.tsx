@@ -42,11 +42,11 @@ export function CartDrawer() {
             <h2 className="text-xl font-semibold text-ink">{t("cart.title")}</h2>
             <p className="text-sm text-muted">{count} {t("cart.items")}</p>
           </div>
-          <button onClick={close} className="grid h-10 w-10 place-items-center rounded-full text-ink/60 transition hover:bg-ink/5 hover:text-ink" autoFocus aria-label="Сагсыг хаах">✕</button>
+          <button onClick={close} className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-ink/60 transition hover:bg-ink/5 hover:text-ink" autoFocus aria-label="Сагсыг хаах">✕</button>
         </header>
 
         {items.length === 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto items-center justify-center gap-4 px-6 text-center">
             <div className="grid h-20 w-20 place-items-center rounded-full bg-primary-50 text-3xl">🧺</div>
             <p className="text-muted">{t("cart.empty")}</p>
             <button type="button" onClick={continueBrowsing} className="btn btn-outline btn-sm">{t("common.continue")}</button>
@@ -57,28 +57,28 @@ export function CartDrawer() {
               {items.map((it) => {
                 const tn = toneStyles[it.tone] ?? toneStyles.violet;
                 return (
-                  <div key={it.kind + it.slug} className="flex gap-3 rounded-2xl border border-line bg-surface-1 p-3">
+                  <div key={it.kind + it.slug} className="relative flex gap-3 rounded-2xl border border-line bg-surface-1 p-3">
                     <div className={cx("grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-gradient-to-br text-xl text-white", tn.grad)}>{it.glyph}</div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{t("kind." + it.kind)}</p>
-                      <p className="truncate text-sm font-semibold text-ink">{tr(it.title)}</p>
-                      <div className="mt-2 flex items-center justify-between">
+                      <p className="pr-7 text-sm font-semibold text-ink">{tr(it.title)}</p>
+                      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
                         <div className="inline-flex items-center rounded-full border border-line">
-                          <button onClick={() => setQty(it.kind, it.slug, it.qty - 1)} className="grid h-7 w-7 place-items-center text-ink/70 hover:text-ink" aria-label="Тоо хасах">−</button>
+                          <button onClick={() => setQty(it.kind, it.slug, it.qty - 1)} className="grid h-11 w-11 place-items-center text-ink/70 hover:text-ink" aria-label="Тоо хасах">−</button>
                           <span className="w-6 text-center text-sm font-semibold">{it.qty}</span>
-                          <button onClick={() => setQty(it.kind, it.slug, it.qty + 1)} className="grid h-7 w-7 place-items-center text-ink/70 hover:text-ink" aria-label="Тоо нэмэх">+</button>
+                          <button onClick={() => setQty(it.kind, it.slug, it.qty + 1)} className="grid h-11 w-11 place-items-center text-ink/70 hover:text-ink" aria-label="Тоо нэмэх">+</button>
                         </div>
                         <span className="text-sm font-semibold text-ink">{formatMNT(it.price * it.qty)}</span>
                       </div>
                     </div>
-                    <button onClick={() => remove(it.kind, it.slug)} className="self-start text-ink/40 transition hover:text-rose-500" aria-label="Сагснаас устгах">✕</button>
+                    <button onClick={() => remove(it.kind, it.slug)} className="absolute right-1 top-1 grid h-9 w-9 place-items-center text-ink/40 transition hover:text-rose-500" aria-label="Сагснаас устгах">✕</button>
                   </div>
                 );
               })}
             </div>
 
             <footer className="border-t border-line bg-surface-1 px-6 py-5">
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                 <span className="text-muted">{t("cart.total")}</span>
                 <span className="text-xl font-semibold text-ink">{formatMNT(total)}</span>
               </div>

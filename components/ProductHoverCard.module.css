@@ -25,3 +25,5 @@
 .caption button { text-align:left; }
 .card :is(button,.description):focus-visible { outline:2px solid #315e46; outline-offset:3px; }
 @media(max-width:600px) { .visual { height:300px; }.card[data-open=true] .surface { grid-template-columns:1fr; }.card[data-open=true] .visual { height:170px; min-height:170px; }.details { padding:18px; }.description { max-height:120px; } }
+.heading button { width:44px; height:44px; }
+@media(max-height:600px) { .card[data-open=true] .visual { min-height:160px; }.details { padding:16px; } }

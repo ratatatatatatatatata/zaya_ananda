@@ -19,3 +19,8 @@
 .bio { min-height:0; overflow:auto; overscroll-behavior:contain; white-space:pre-line; overflow-wrap:anywhere; font-size:17px; line-height:1.9; margin-top:24px; padding-top:20px; border-top:1px solid #dbe4da; }
 .card :is(button,.bio):focus-visible { outline:2px solid #315e46; outline-offset:3px; }
 @media (max-width:600px) { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:28px; }.toggle { padding:18px 12px; min-height:190px; }.photo,.placeholder { width:72px; height:72px; }.caption strong { font-size:15px; }.details { padding:22px; }.heading { gap:12px; }.heading .photo,.heading .placeholder { width:56px; height:56px; }.details h4 { font-size:21px; }.role { font-size:14px; }.bio { font-size:16px; } }
+/* Keep the biography reachable in landscape and when text is enlarged. */
+.details { overflow-y:auto; }
+.heading { flex-shrink:0; }
+.close { width:44px; height:44px; top:10px; right:10px; }
+@media(max-height:600px) { .details { padding:18px; }.heading .photo,.heading .placeholder { width:48px; height:48px; }.details h4 { font-size:19px; }.bio { flex-shrink:0; margin-top:14px; padding-top:14px; } }

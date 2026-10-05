@@ -1,0 +1,82 @@
+/* Shared viewport rules, applied after the visual theme. */
+body .site-header .site-nav {
+  display:flex;
+  flex:none;
+  width:max-content;
+  max-width:none;
+}
+body .site-header[data-compact=true] .site-nav {
+  position:fixed;
+  top:0;
+  left:-10000px;
+  visibility:hidden;
+  pointer-events:none;
+}
+body .site-header[data-compact=false] .site-menu-toggle,
+body .site-header[data-compact=false] #mobile-navigation { display:none; }
+.site-header-row { min-width:0; }
+body .site-header .site-actions { gap:4px; }
+.site-actions > button,
+.site-actions > a,
+.site-actions > div > button { min-height:44px; min-width:44px; flex-shrink:0; }
+#mobile-navigation { overscroll-behavior:contain; }
+#mobile-navigation nav { padding-bottom:max(20px,env(safe-area-inset-bottom)); }
+.btn { max-width:100%; white-space:normal; text-align:center; line-height:1.45; }
+main :is(section,article,form,fieldset) { min-width:0; }
+main :is(h1,h2,h3,h4,a,p,label) { overflow-wrap:break-word; }
+.about-layout-spacer { height:calc(80px + env(safe-area-inset-bottom)); }
+
+/* A short laptop or landscape screen must not trap content in a pinned frame. */
+.discovery-hero-frame {
+  min-height:0;
+  height:auto;
+  max-height:none;
+}
+.discovery-hero-copy {
+  min-height:clamp(480px,calc(100svh - 72px),850px);
+  height:auto;
+  padding-block:clamp(60px,10svh,110px) 120px;
+}
+.discovery-hero-visual { min-height:0; }
+.category-scroll-story[data-scroll-mode=false] .experience-slide { min-height:0; }
+.category-scroll-story[data-scroll-mode=false] .experience-copy { min-height:0; }
+.category-scroll-story[data-scroll-mode=false] .experience-copy h3 {
+  display:block;
+  overflow:visible;
+  -webkit-line-clamp:unset;
+}
+.category-scroll-story[data-scroll-mode=true] .experience-copy { overflow-y:auto; overscroll-behavior:auto; }
+
+@media(max-width:1023px) {
+  .notification-panel { position:fixed; top:80px; left:16px; right:16px; width:auto; max-width:none; }
+  .category-scroll-story[data-scroll-mode=false] .experience-image { min-height:280px; }
+}
+@media(max-width:767px) {
+  .discovery-hero-copy { min-height:clamp(440px,calc(100svh - 66px),720px); padding-block:56px 110px; }
+  .category-scroll-story[data-scroll-mode=false] .experience-image { height:auto; min-height:0; aspect-ratio:4/3; }
+  .category-scroll-story[data-scroll-mode=false] .experience-copy { padding:24px; }
+  .experience-scroll-meta { height:auto; min-height:36px; flex-wrap:wrap; padding-block:8px; }
+  .experience-scroll-controls { flex-wrap:wrap; }
+}
+@media(max-width:440px) {
+  body .site-header .site-brand > span > span { display:none; }
+  body .site-header .site-brand img { width:40px; height:40px; }
+  body .site-header .site-header-row { gap:8px; }
+  .category-scroll-story[data-scroll-mode=false] .experience-copy { padding:20px; }
+  .experience-copy h3 { font-size:1.55rem; }
+  .discovery-hero-stats { gap:0; }
+  .discovery-hero-stat { padding-inline:8px; }
+}
+@media(max-height:600px) and (orientation:landscape) {
+  .discovery-hero-copy { min-height:400px; padding-block:40px 100px; }
+  .discovery-hero h1 { font-size:clamp(2rem,4vw,3rem); }
+  #mobile-navigation { max-height:calc(100dvh - 80px); }
+}
+@supports(padding:max(0px)) {
+  .container-px { padding-left:max(var(--page-gutter),env(safe-area-inset-left)); padding-right:max(var(--page-gutter),env(safe-area-inset-right)); }
+  body .site-header .site-header-row { padding-left:max(var(--page-gutter),env(safe-area-inset-left)); padding-right:max(var(--page-gutter),env(safe-area-inset-right)); }
+}
+.rich-body { min-width:0; max-width:100%; overflow-x:auto; overflow-wrap:anywhere; }
+.rich-body :is(img,video,iframe) { max-width:100%; }
+.rich-body img { height:auto; }
+.rich-body table { max-width:100%; }

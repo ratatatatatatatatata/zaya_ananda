@@ -54,7 +54,7 @@ function CategoryScrollStory({ slides, category, title }: { slides: Slide[]; cat
 
   useEffect(() => {
     // Short / zoomed viewports and reduced motion use a fully readable list.
-    const screen = window.matchMedia("(min-height: 700px)");
+    const screen = window.matchMedia("(min-width: 1024px) and (min-height: 800px)");
     const update = () => setViewportScrollMode(screen.matches && !reduced && list.length > 1);
     update();
     screen.addEventListener("change", update);

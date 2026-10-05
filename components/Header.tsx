@@ -24,6 +24,12 @@ export function Header({ logoSrc }: { logoSrc?: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [compact, setCompact] = useState(true);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const brandRef = useRef<HTMLAnchorElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
   const accountRef = useRef<HTMLDivElement>(null);
   const [customPages, setCustomPages] = useState<{ id: string; navLabel: string; i18n?: Record<string, { navLabel?: string }> | null }[]>([]);
   const pageLabel = (p: { navLabel: string; i18n?: Record<string, { navLabel?: string }> | null }) =>
@@ -45,14 +51,48 @@ export function Header({ logoSrc }: { logoSrc?: string }) {
   }, []);
   useEffect(() => { fetch("/api/pages", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((d) => { if (Array.isArray(d?.pages)) setCustomPages(d.pages); }).catch(() => {}); }, []);
 
+  // Measure the translated labels and custom pages, rather than assuming every
+  // navigation fits the same device breakpoint. Hidden navigation stays measurable.
+  useEffect(() => {
+    let frame = 0;
+    const measure = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const row = rowRef.current, brand = brandRef.current, nav = navRef.current, actions = actionsRef.current;
+        if (!row || !brand || !nav || !actions) return;
+        const rowStyle = getComputedStyle(row);
+        const actionGap = parseFloat(getComputedStyle(actions).columnGap) || 0;
+        const toggleWidth = toggleRef.current?.getBoundingClientRect().width || 0;
+        const required = brand.getBoundingClientRect().width + nav.getBoundingClientRect().width
+          + actions.getBoundingClientRect().width - (toggleWidth ? toggleWidth + actionGap : 0)
+          + 2 * (parseFloat(rowStyle.columnGap) || 0);
+        const available = row.clientWidth - parseFloat(rowStyle.paddingLeft) - parseFloat(rowStyle.paddingRight);
+        setCompact(window.innerWidth < 1024 || required + 8 > available);
+      });
+    };
+    const observer = new ResizeObserver(measure);
+    [rowRef.current, brandRef.current, navRef.current, actionsRef.current].forEach(node => node && observer.observe(node));
+    window.addEventListener("resize", measure);
+    measure();
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); window.removeEventListener("resize", measure); };
+  }, []);
+  useEffect(() => { if (!compact) setMenuOpen(false); }, [compact]);
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setMenuOpen(false); setAccountOpen(false); }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   return (
-    <header className={cx("site-header sticky top-0 z-40 transition-all duration-300", scrolled ? "glass border-b border-line shadow-sm" : "border-b border-transparent bg-ivory/80 backdrop-blur-sm")}>
-      <div className="site-header-row flex h-16 w-full items-center justify-between gap-3 px-4 lg:h-[72px] lg:px-6">
-        <Link href="/" aria-label="Zaya's Ananda" className="site-brand shrink-0"><Logo logoSrc={logoSrc} priority /></Link>
+    <header data-compact={compact} className={cx("site-header sticky top-0 z-40 transition-all duration-300", scrolled ? "glass border-b border-line shadow-sm" : "border-b border-transparent bg-ivory/80 backdrop-blur-sm")}>
+      <div ref={rowRef} className="site-header-row flex h-16 w-full items-center justify-between gap-3 px-4 lg:h-[72px] lg:px-6">
+        <Link ref={brandRef} href="/" aria-label="Zaya's Ananda" className="site-brand shrink-0"><Logo logoSrc={logoSrc} priority /></Link>
 
-        <nav aria-label="Үндсэн цэс" className="site-nav hidden min-w-0 items-center gap-2.5 xl:flex 2xl:gap-4">
+        <nav ref={navRef} aria-hidden={compact} aria-label="Үндсэн цэс" className="site-nav items-center gap-2.5 2xl:gap-4">
           {links.map((l) => (
             <Link key={l.href} href={l.href}
               className={cx("nav-link relative whitespace-nowrap py-1 text-[13px] 2xl:text-[14.5px]", isActive(l.href) && "text-primary-700 after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:rounded-full after:bg-primary-grad")}>
@@ -67,7 +107,7 @@ export function Header({ logoSrc }: { logoSrc?: string }) {
           ))}
         </nav>
 
-        <div className="site-actions flex shrink-0 items-center gap-1.5 sm:gap-2">
+        <div ref={actionsRef} className="site-actions flex shrink-0 items-center gap-1.5 sm:gap-2">
           <div className="hidden sm:block"><LanguageSwitcher /></div>
           <button onClick={open} className="relative grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-primary-50 hover:text-primary-700" aria-label="Cart">
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M6 7h14l-2 9H8L5 3H2M9 20h.01M17 20h.01" strokeLinecap="round"/></svg>
@@ -111,12 +151,12 @@ export function Header({ logoSrc }: { logoSrc?: string }) {
           ) : (
             <Link href="/login" className="grid h-10 w-10 place-items-center rounded-full text-ink/70 transition hover:bg-primary-50 hover:text-primary-700" aria-label="Account"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg></Link>
           )}
-          <button onClick={() => setMenuOpen((o) => !o)} className="grid h-11 w-11 place-items-center rounded-full text-2xl text-ink/80 transition hover:bg-primary-50 xl:hidden" aria-label={menuOpen ? "Цэс хаах" : "Цэс нээх"} aria-expanded={menuOpen} aria-controls="mobile-navigation">{menuOpen ? "✕" : "☰"}</button>
+          <button ref={toggleRef} onClick={() => setMenuOpen((o) => !o)} className="site-menu-toggle grid h-11 w-11 place-items-center rounded-full text-2xl text-ink/80 transition hover:bg-primary-50" aria-label={menuOpen ? "Цэс хаах" : "Цэс нээх"} aria-expanded={menuOpen} aria-controls="mobile-navigation">{menuOpen ? "✕" : "☰"}</button>
         </div>
       </div>
 
       {/* mobile / tablet menu */}
-      <div id="mobile-navigation" className={cx("border-t border-line bg-ivory/95 backdrop-blur xl:hidden", menuOpen ? "visible max-h-[calc(100dvh-4.5rem)] overflow-y-auto opacity-100" : "invisible max-h-0 overflow-hidden opacity-0")} style={{ transition: "max-height 0.3s ease, opacity 0.2s ease, visibility 0.3s" }}>
+      <div id="mobile-navigation" className={cx("border-t border-line bg-ivory/95 backdrop-blur", menuOpen ? "visible max-h-[calc(100dvh-4.5rem)] overflow-y-auto opacity-100" : "invisible max-h-0 overflow-hidden opacity-0")} style={{ transition: "max-height 0.3s ease, opacity 0.2s ease, visibility 0.3s" }}>
         <nav className="container-px flex flex-col gap-1 py-4">
           {links.map((l) => (
             <Link key={l.href} href={l.href}
