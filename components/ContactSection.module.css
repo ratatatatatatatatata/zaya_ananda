@@ -17,6 +17,5 @@
 .mapHeading a { font-size:12px; color:#42654f; text-underline-offset:4px; }
 .mapHeading a:hover { text-decoration:underline; }
 .map iframe { display:block; width:100%; height:210px; border:0; }
-@media(min-width:1600px) { .panel { grid-template-columns:minmax(0,3fr) minmax(360px,1fr); }.details { padding-inline:24px; grid-template-columns:1fr 1.3fr 1.7fr 1.2fr; align-content:center; }.info:nth-child(-n+2) { border-bottom:0; }.info + .info { border-left:1px solid #e3e9df; }.info { padding:8px 22px; } }
 @media(max-width:1000px) { .panel { grid-template-columns:minmax(0,1fr); }.map { border-left:0; border-top:1px solid #d7e1d6; }.map iframe { height:210px; }.details { padding:0 12px; } }
 @media(max-width:540px) { .section { padding:28px 0; }.heading { display:block; }.heading h2 { margin-top:8px; }.details { grid-template-columns:1fr; padding:0 20px; }.info { padding:18px 0; }.info + .info { border-top:1px solid #e3e9df; }.info:nth-child(-n+2) { border-bottom:0; }.mapHeading { padding:14px 16px; }.map iframe { height:190px; } }
