@@ -69,7 +69,7 @@ async function storageReq(path: string, init?: RequestInit): Promise<unknown> {
 
 export async function ensureBucket(id: string, options: { public?: boolean; fileSizeLimit?: number; allowedMimeTypes?: string[] } = {}): Promise<void> {
   try {
-    await storageReq("bucket", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, name: id, public: false, ...options }) });
+    await storageReq("bucket", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, name: id, public: options.public ?? false, file_size_limit: options.fileSizeLimit, allowed_mime_types: options.allowedMimeTypes }) });
   } catch (e) {
     if (!/already exists|Duplicate|409/i.test(String(e))) throw e;
   }
@@ -79,7 +79,7 @@ export async function ensureBucket(id: string, options: { public?: boolean; file
 export async function configureBucket(id: string, options: { public: boolean; fileSizeLimit: number; allowedMimeTypes: string[] }): Promise<void> {
   await ensureBucket(id, options);
   await storageReq(`bucket/${encodeURIComponent(id)}`, {
-    method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(options),
+    method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, name: id, public: options.public, file_size_limit: options.fileSizeLimit, allowed_mime_types: options.allowedMimeTypes }),
   });
 }
 
