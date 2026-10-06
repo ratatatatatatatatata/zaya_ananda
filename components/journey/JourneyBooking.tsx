@@ -1,13 +1,52 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import styles from "./JourneyBooking.module.css";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
 /** Аяллын цаг захиалга — энгийн бүртгэл (огноо сонгохгүй, шууд бүртгүүлнэ). */
-export function JourneyBooking({ slug, journeyName, prepay: prepayPerPerson = 0 }: { slug: string; journeyName: string; prepay?: number }) {
+type BookingProps = { slug: string; journeyName: string; prepay?: number };
+
+export function JourneyBooking(props: BookingProps) {
+  const [open, setOpen] = useState(false);
+  return <>
+    <button type="button" className="btn btn-primary btn-lg w-full" aria-haspopup="dialog" onClick={() => setOpen(true)}>Аялалд бүртгүүлэх</button>
+    {open && <BookingDialog {...props} onClose={() => setOpen(false)} />}
+  </>;
+}
+
+function BookingDialog({ onClose, ...props }: BookingProps & { onClose: () => void }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+  useEffect(() => {
+    const element = dialog.current;
+    const trigger = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow;
+    element?.showModal();
+    document.body.style.overflow = "hidden";
+    return () => {
+      element?.close();
+      document.body.style.overflow = overflow;
+      trigger?.focus({ preventScroll: true });
+    };
+  }, []);
+  return createPortal(<dialog ref={dialog} className={styles.dialog} aria-labelledby={titleId}
+    onCancel={event => { event.preventDefault(); onClose(); }}
+    onClick={event => { if (event.target === event.currentTarget) onClose(); }}>
+    <div className={styles.content}>
+      <header className={styles.header}><h2 id={titleId}>Аялалд бүртгүүлэх</h2>
+        <button type="button" autoFocus onClick={onClose} aria-label="Хаах">✕</button>
+      </header>
+      <BookingForm {...props} />
+    </div>
+  </dialog>, document.body);
+}
+
+function BookingForm({ slug, journeyName, prepay: prepayPerPerson = 0 }: BookingProps) {
   const { user } = useAuth();
   const today = useMemo(() => new Date(), []);
   const todayKey = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;

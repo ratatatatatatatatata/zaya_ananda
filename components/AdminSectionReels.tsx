@@ -59,7 +59,7 @@ export function AdminSectionReels({ section }: { section: ReelSection }) {
   }
   return <section className="mt-10 space-y-5 border-t border-line pt-8">
     <div><h2 className="font-display text-xl font-semibold text-ink">{REEL_SECTIONS[section]} — Reel</h2>
-      <p className="mt-2 text-sm text-muted">Холбоос оруулах эсвэл зураг, видео шууд upload хийнэ. Аяллын Reel нь аяллын хөтөлбөр дотор мөн харагдана. Зураг 10 MB, видео 50 MB хүртэл.</p></div>
+      <p className="mt-2 text-sm text-muted">Холбоос оруулах эсвэл зураг, видео шууд upload хийнэ. Аяллын Reel нь аяллын хөтөлбөр дотор мөн харагдана. Зураг 10 MB, видео 500 MB хүртэл.</p></div>
     <form onSubmit={save} className="card space-y-4 p-5">
       <label className="block"><span className="field-label">Гарчиг</span><input required disabled={busy || uploading} className="input" value={draft.title} onChange={event => setDraft({ ...draft, title: event.target.value })} /></label>
       <label className="block"><span className="field-label">Reel холбоос</span><input disabled={busy || uploading} type="url" placeholder="https://youtube.com/shorts/..." className="input" value={draft.link} onChange={event => setDraft({ ...draft, link: event.target.value, lessons: [] })} /></label>

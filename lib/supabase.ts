@@ -75,6 +75,14 @@ export async function ensureBucket(id: string, options: { public?: boolean; file
   }
 }
 
+/** Configure only the named bucket; existing buckets also receive the new limits. */
+export async function configureBucket(id: string, options: { public: boolean; fileSizeLimit: number; allowedMimeTypes: string[] }): Promise<void> {
+  await ensureBucket(id, options);
+  await storageReq(`bucket/${encodeURIComponent(id)}`, {
+    method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(options),
+  });
+}
+
 function fullStorageUrl(u: string): string {
   if (!u) throw new Error("Storage URL missing");
   if (u.startsWith("https://")) return u;

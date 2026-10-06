@@ -8,18 +8,18 @@ import styles from "./JourneyItinerary.module.css";
 
 export function JourneyItinerary({ days }: { days: JourneyDay[] }) {
   const { tl } = useI18n();
-  const [selected, setSelected] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
   const id = useId();
   const trainingDays = days.slice(0, 5);
   const travelDays = days.slice(5);
-  const day = trainingDays[selected];
-  if (!day) return null;
+  const day = selected === null ? null : trainingDays[selected];
+  if (!days.length) return null;
 
   return <div className={styles.itinerary}>
     <div className={styles.choices} role="group" aria-label={tl("Өдөр өдрийн хөтөлбөр")}>
       {trainingDays.map((item, index) => <button key={index} type="button"
         className={styles.choice} aria-pressed={selected === index}
-        aria-controls={`${id}-detail`} onClick={() => setSelected(index)}>
+        aria-expanded={selected === index} aria-controls={selected === index ? `${id}-detail` : undefined} onClick={() => setSelected(selected === index ? null : index)}>
         <JourneyImage src={item.image} scene={item.scene} alt="" className={styles.cover} />
         <span className={styles.shade} aria-hidden />
         <span className={styles.choiceText}>
@@ -28,7 +28,7 @@ export function JourneyItinerary({ days }: { days: JourneyDay[] }) {
         </span>
       </button>)}
     </div>
-    <DayDetail day={day} id={`${id}-detail`} titleId={`${id}-title`} />
+    {day && <DayDetail day={day} id={`${id}-detail`} titleId={`${id}-title`} />}
     {!!travelDays.length && <div className={styles.travel}>
       <h3 className="font-display text-3xl font-semibold text-ink">{tl("Дияан аялал")}</h3>
       {travelDays.map((item, index) => <DayDetail key={index} day={item} titleId={`${id}-travel-${index}`} />)}

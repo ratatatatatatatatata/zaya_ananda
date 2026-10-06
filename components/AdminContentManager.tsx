@@ -390,7 +390,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
                 placeholder="https://youtube.com/shorts/..."
               />
               <p className="mt-2 text-xs leading-relaxed text-muted">
-                YouTube, Vimeo, Facebook Reel, Instagram Reel эсвэл шууд видео холбоос оруулна. Дээрх Видео хэсэгт файл upload хийж болно. Зураг 10 MB, видео 50 MB хүртэл.
+                YouTube, Vimeo, Facebook Reel, Instagram Reel эсвэл шууд видео холбоос оруулна. Дээрх Видео хэсэгт файл upload хийж болно. Зураг 10 MB, видео 500 MB хүртэл.
               </p>
               {form.link.trim() && (() => {
                 const preview = embedSrc(form.link.trim());

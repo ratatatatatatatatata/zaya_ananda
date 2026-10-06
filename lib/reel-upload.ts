@@ -1,5 +1,5 @@
 export const REEL_BUCKET = "reel-media";
-export const REEL_MAX_BYTES = 50 * 1024 * 1024;
+export const REEL_MAX_BYTES = 500 * 1024 * 1024;
 export const REEL_MIME_EXT: Record<string, string> = {
   "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif",
   "video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov", "video/x-m4v": "m4v",
@@ -23,7 +23,7 @@ export async function uploadReelMedia(file: File, onProgress: (percent: number) 
     xhr.open("PUT", data.uploadUrl);
     xhr.setRequestHeader("Content-Type", file.type);
     xhr.setRequestHeader("Cache-Control", "max-age=31536000");
-    xhr.timeout = 10 * 60 * 1000;
+    xhr.timeout = 30 * 60 * 1000;
     xhr.upload.onprogress = event => { if (event.lengthComputable) onProgress(Math.round(event.loaded / event.total * 100)); };
     xhr.onload = () => xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`Upload амжилтгүй (${xhr.status}). Файлын хэмжээ, төрлийг шалгаад дахин оролдоно уу.`));
     xhr.onerror = xhr.ontimeout = () => reject(new Error("Upload тасарлаа. Сүлжээгээ шалгаад дахин сонгоно уу."));
