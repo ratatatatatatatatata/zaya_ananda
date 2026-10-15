@@ -1,5 +1,7 @@
 "use client";
 
+import { useImageUpload } from "@/lib/use-image-upload";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { DEFAULT_ZURHAI, NATAL_CARD } from "@/lib/zurhai-cards";
@@ -16,31 +18,9 @@ function withHomepageDefaults(saved: Card[]): Card[] {
   return [...saved, ...DEFAULT_ADMIN_CARDS.filter((card) => !savedLinks.has(card.href))];
 }
 
-function compressImage(file: File, maxW = 800, quality = 0.85): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error("Зураг уншиж чадсангүй."));
-    reader.onload = () => {
-      const img = new window.Image();
-      img.onload = () => {
-        const scale = Math.min(1, maxW / img.width);
-        const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
-        const canvas = document.createElement("canvas");
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return reject(new Error("canvas алдаа"));
-        ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      };
-      img.onerror = () => reject(new Error("Зураг буруу байна."));
-      img.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
 /** Нүүр хуудасны зурхайн төрлүүд ба тайллын үндсэн алгоритм. */
 export function AdminZurhai() {
+  const { uploadImage, isUploading, hasPendingUploads } = useImageUpload();
   const [cards, setCards] = useState<Card[]>([]);
   const [rules, setRules] = useState<Rule[]>([]);
   const [saving, setSaving] = useState(false);
@@ -61,6 +41,7 @@ export function AdminZurhai() {
   }, []);
 
   async function save() {
+    if (hasPendingUploads()) { setErr("Зураг upload дууссаны дараа хадгална уу."); return; }
     setSaving(true); setErr(""); setMsg("");
     try {
       const res = await fetch("/api/settings", {
@@ -82,7 +63,7 @@ export function AdminZurhai() {
 
   async function pickCardImage(e: React.ChangeEvent<HTMLInputElement>, i: number) {
     const file = e.target.files?.[0]; if (!file) return;
-    try { updCard(i, { image: await compressImage(file) }); }
+    try { updCard(i, { image: await uploadImage(file) }); }
     catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
     e.target.value = "";
   }
@@ -116,9 +97,9 @@ export function AdminZurhai() {
               <textarea className="textarea mt-2 min-h-[70px]" placeholder="Товч тайлбар" value={c.desc} onChange={(e) => updCard(i, { desc: e.target.value })} />
               <div className="mt-2 flex items-center gap-3">
                 {c.image
-                  ? <span className="relative block h-14 w-20 shrink-0 overflow-hidden rounded-lg"><Image src={c.image} alt="" fill unoptimized sizes="80px" className="object-cover" /></span>
+                  ? <span className="relative block h-14 w-20 shrink-0 overflow-hidden rounded-lg"><Image src={c.image} alt="" fill unoptimized sizes="80px" className="object-contain" /></span>
                   : <div className="grid h-14 w-20 place-items-center rounded-lg bg-surface-3 text-xs text-muted">Зураггүй</div>}
-                <input type="file" accept="image/*" className="text-sm" onChange={(e) => pickCardImage(e, i)} />
+                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="text-sm" onChange={(e) => pickCardImage(e, i)} />
                 {c.image && <button type="button" onClick={() => updCard(i, { image: "" })} className="text-xs font-semibold text-rose-500 hover:underline">Зураг хасах</button>}
               </div>
             </div>
@@ -166,7 +147,7 @@ export function AdminZurhai() {
       </div>
 
       <div className="flex flex-wrap items-center gap-4">
-        <button type="button" onClick={save} disabled={saving} className="btn btn-primary btn-md disabled:opacity-60">
+        <button type="button" onClick={save} disabled={saving || isUploading} className="btn btn-primary btn-md disabled:opacity-60">
           {saving ? "Хадгалж байна…" : "Хадгалах"}
         </button>
         {msg && <span className="text-sm font-semibold text-jade-600">{msg}</span>}

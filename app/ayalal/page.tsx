@@ -107,7 +107,7 @@ export default async function AyalalPage() {
           {JOURNEYS.map((j) => (
             <Link key={j.slug} href={`/ayalal/${encodeURIComponent(j.slug)}`} prefetch={false} className="card group block overflow-hidden transition hover:-translate-y-1 hover:shadow-glow">
               <div className="relative aspect-[16/10] w-full overflow-hidden">
-                <JourneyImage src={j.image} scene={j.scene} alt={j.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.06]" />
+                <JourneyImage src={j.image} scene={j.scene} alt={j.name} className="h-full w-full object-contain transition duration-700" />
                 <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,20,17,0.86) 0%, rgba(8,20,17,0.15) 55%, transparent 100%)" }} />
                 <div className="absolute inset-x-0 bottom-0 p-6">
                   <p className="text-xs font-bold uppercase tracking-[0.24em] text-accent-300">{j.tagline}</p>

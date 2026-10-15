@@ -10,7 +10,7 @@ export function Logo({ withText = true, className = "", logoSrc, priority = fals
         height={56}
         loading={priority ? "eager" : undefined}
         fetchPriority={priority ? "high" : undefined}
-        className="h-14 w-14 shrink-0 rounded-2xl object-cover"
+        className="h-14 w-14 shrink-0 rounded-2xl object-contain"
       />
       {withText && (
         <span className="flex flex-col leading-none">

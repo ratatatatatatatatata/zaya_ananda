@@ -58,10 +58,11 @@ export function VideoHero({
     const onVis = () => (document.hidden ? v.pause() : v.play().catch(() => {}));
     document.addEventListener("visibilitychange", onVis);
     return () => { ob.disconnect(); document.removeEventListener("visibilitychange", onVis); };
-  }, [motion]);
+  }, [motion, media?.kind]);
 
   // Parallax — зураг удаан, текст хурдан
   useEffect(() => {
+    if (layer.current && media?.kind === "image") layer.current.style.transform = "";
     if (!motion) return;
     let raf = 0;
     const onScroll = () => {
@@ -71,7 +72,7 @@ export function VideoHero({
         if (!el) return;
         const r = el.getBoundingClientRect();
         const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height)));
-        if (layer.current) layer.current.style.transform = `translate3d(0, ${(p * 16).toFixed(2)}%, 0) scale(${(1.06 + p * 0.06).toFixed(3)})`;
+        if (layer.current && media?.kind !== "image") layer.current.style.transform = `translate3d(0, ${(p * 16).toFixed(2)}%, 0) scale(${(1.06 + p * 0.06).toFixed(3)})`;
         if (copy.current) {
           copy.current.style.transform = `translate3d(0, ${(-p * 40).toFixed(1)}px, 0)`;
           copy.current.style.opacity = String(Math.max(0, 1 - p * 1.35));
@@ -81,7 +82,7 @@ export function VideoHero({
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => { cancelAnimationFrame(raf); window.removeEventListener("scroll", onScroll); };
-  }, [motion]);
+  }, [motion, media?.kind]);
 
   const h = height === "tall" ? "min-h-[86svh]" : height === "mid" ? "min-h-[64svh]" : "min-h-[46svh]";
 
@@ -90,7 +91,7 @@ export function VideoHero({
       {/* Дүрслэл */}
       <div ref={layer} aria-hidden className="absolute inset-0 -z-10 will-change-transform">
         {media?.kind === "image" ? (
-          <img src={media.url} alt="" className="h-full w-full object-cover" />
+          <img src={media.url} alt="" className="h-full w-full object-contain" />
         ) : motion ? (
           <video
             ref={video}
@@ -103,7 +104,7 @@ export function VideoHero({
             preload="metadata"
           />
         ) : (
-          <img src={`/video/${clip}.jpg`} alt="" className="h-full w-full object-cover" />
+          <img src={`/video/${clip}.jpg`} alt="" className="h-full w-full object-contain" />
         )}
       </div>
 

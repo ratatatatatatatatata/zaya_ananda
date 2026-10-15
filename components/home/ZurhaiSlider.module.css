@@ -2,7 +2,7 @@
 .heading { margin-inline:auto; max-width:42rem; text-align:center; }
 .choices { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:clamp(18px,4vw,64px); margin-top:32px; padding:8px 0; }
 .circle { position:relative; isolation:isolate; overflow:hidden; display:grid; place-items:center; flex:0 0 clamp(148px,19vw,230px); width:clamp(148px,19vw,230px); aspect-ratio:1; border:1px solid #bacdbd; border-radius:50%; padding:26px; background:#f6f8ef; color:#315e48; box-shadow:0 8px 28px #24483108; cursor:pointer; transition:background .2s ease,color .2s ease,border-color .2s ease,transform .2s ease; }
-.circleImage { z-index:-2; object-fit:cover; }
+.circleImage { z-index:-2; object-fit:contain; }
 .circleOverlay { position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(12,39,27,.12),rgba(12,39,27,.72)); }
 .circleTitle { max-width:100%; font-size:clamp(1rem,1.65vw,1.4rem); line-height:1.4; font-weight:600; text-align:center; overflow-wrap:anywhere; }
 .withImage { color:#fff; border-color:rgba(255,255,255,.65); text-shadow:0 2px 14px rgba(0,0,0,.55); }

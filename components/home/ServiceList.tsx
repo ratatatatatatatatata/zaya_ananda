@@ -35,7 +35,7 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
       {/* Зураг */}
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-3 lg:aspect-auto lg:h-full">
         {cover ? (
-          <img src={cover} alt={title} className="h-full w-full object-cover" />
+          <img src={cover} alt={title} className="h-full w-full object-contain" />
         ) : (
           <div className="h-full w-full" style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }} />
         )}
@@ -89,7 +89,7 @@ function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
 
             {cover && (
               <div className="relative aspect-[21/9] w-full overflow-hidden rounded-t-4xl">
-                <img src={cover} alt={title} className="h-full w-full object-cover" />
+                <img src={cover} alt={title} className="h-full w-full object-contain" />
                 <div aria-hidden className="absolute inset-0"
                   style={{ background: "linear-gradient(to top, rgba(8,20,17,0.85) 0%, transparent 60%)" }} />
                 <h3 className="absolute inset-x-0 bottom-0 p-6 font-display text-2xl font-semibold text-white sm:text-3xl">{title}</h3>

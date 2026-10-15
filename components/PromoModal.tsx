@@ -113,7 +113,7 @@ export function PromoModal() {
           <Wrap p={main} className="block overflow-hidden rounded-2xl">
             <div className="relative">
               {main.image ? (
-                <img src={main.image} alt={mainTitle} className="max-h-[32rem] w-full object-cover" />
+                <img src={main.image} alt={mainTitle} className="max-h-[32rem] w-full object-contain" />
               ) : (
                 <div className="grid min-h-[20rem] w-full place-items-center px-6 text-center"
                   style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#155248 55%,#2BC8BB)" }}>
@@ -142,7 +142,7 @@ export function PromoModal() {
                 return (
                   <Wrap key={p.id} p={p} className="group block overflow-hidden rounded-2xl border border-line bg-surface-2 transition hover:-translate-y-0.5 hover:shadow-sm">
                     {p.image ? (
-                      <img src={p.image} alt={t} className="h-32 w-full object-cover transition duration-500 group-hover:scale-105" />
+                      <img src={p.image} alt={t} className="h-32 w-full object-contain transition duration-500" />
                     ) : (
                       <div className="h-32 w-full" style={{ backgroundImage: "linear-gradient(140deg,#0F2B26,#2BC8BB)" }} />
                     )}

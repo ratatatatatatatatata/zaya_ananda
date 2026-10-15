@@ -44,7 +44,7 @@ function VideoSlot({ v, active, onPlay, onClose, tr }: {
         ) : (
           <>
             {poster
-              ? <img src={poster} alt="" className="h-full w-full object-cover" />
+              ? <img src={poster} alt="" className="h-full w-full object-contain" />
               : <div className="h-full w-full" style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }} />}
             <button
               type="button"

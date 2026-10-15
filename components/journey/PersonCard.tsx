@@ -8,7 +8,7 @@ function initials(name: string) {
 export function Avatar({ person, size = "lg" }: { person: Person; size?: "lg" | "sm" }) {
   const box = size === "lg" ? "h-full w-full" : "h-16 w-16";
   if (person.image) {
-    return <img src={person.image} alt={person.name} className={`${box} object-cover`} />;
+    return <img src={person.image} alt={person.name} className={`${box} object-contain`} />;
   }
   return (
     <div

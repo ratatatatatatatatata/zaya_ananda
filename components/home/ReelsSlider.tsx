@@ -128,7 +128,7 @@ export function ReelsSlider({ items }: { items: CmsItem[] }) {
                   ) : (
                     <>
                       {r.poster
-                        ? <img src={r.poster} alt="" className="h-full w-full object-cover" />
+                        ? <img src={r.poster} alt="" className="h-full w-full object-contain" />
                         : <div className="h-full w-full" style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }} />}
                       <div aria-hidden className="absolute inset-0"
                         style={{ background: "linear-gradient(to top, rgba(8,20,17,0.9) 0%, rgba(8,20,17,0.1) 55%, transparent 100%)" }} />

@@ -1,33 +1,13 @@
 "use client";
 
+import { useImageUpload } from "@/lib/use-image-upload";
+
 import { useEffect, useState } from "react";
 import type { TeacherPreset } from "@/lib/types";
 
-function compressImage(file: File, maxW = 800, quality = 0.85): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error("Зураг уншиж чадсангүй."));
-    reader.onload = () => {
-      const img = new window.Image();
-      img.onload = () => {
-        const scale = Math.min(1, maxW / img.width);
-        const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
-        const canvas = document.createElement("canvas");
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return reject(new Error("canvas алдаа"));
-        ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      };
-      img.onerror = () => reject(new Error("Зураг буруу байна."));
-      img.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
 /** "Удирдагч багш нар" цэсэнд харагдах багш нарын профайлыг удирдана. */
 export function AdminTeachers() {
+  const { uploadImage, isUploading, hasPendingUploads } = useImageUpload();
   const [teachers, setTeachers] = useState<TeacherPreset[]>([]);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
@@ -52,10 +32,11 @@ export function AdminTeachers() {
   const upd = (i: number, patch: Partial<TeacherPreset>) => setTeachers((t) => t.map((m, x) => (x === i ? { ...m, ...patch } : m)));
   async function pickImage(e: React.ChangeEvent<HTMLInputElement>, i: number) {
     const file = e.target.files?.[0]; if (!file) return;
-    try { upd(i, { image: await compressImage(file) }); } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
+    try { upd(i, { image: await uploadImage(file) }); } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
   }
 
   async function save() {
+    if (hasPendingUploads()) { setErr("Зураг upload дууссаны дараа хадгална уу."); return; }
     setSaving(true); setErr(""); setMsg("");
     try {
       const res = await fetch("/api/settings", {
@@ -83,9 +64,9 @@ export function AdminTeachers() {
             <div className="flex items-start gap-4">
               <div className="flex w-36 shrink-0 flex-col items-center gap-1.5">
                 {t.image
-                  ? <img src={t.image} alt="" className="h-44 w-36 rounded-2xl object-cover" style={{ objectPosition: "50% " + (t.focus ?? 50) + "%" }} />
+                  ? <img src={t.image} alt="" className="h-44 w-36 rounded-2xl object-contain" style={{ objectPosition: "50% " + (t.focus ?? 50) + "%" }} />
                   : <div className="grid h-44 w-36 place-items-center rounded-2xl border border-dashed border-line text-2xl text-muted">👤</div>}
-                <label className="cursor-pointer text-xs font-semibold text-primary-700 hover:underline">Зураг солих<input type="file" accept="image/*" className="hidden" onChange={(e) => pickImage(e, i)} /></label>
+                <label className="cursor-pointer text-xs font-semibold text-primary-700 hover:underline">Зураг солих<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={(e) => pickImage(e, i)} /></label>
                 {t.image && (
                   <div className="w-full">
                     <div className="flex justify-between text-[10px] font-semibold text-muted"><span>↑ Дээш</span><span>Доош ↓</span></div>
@@ -112,7 +93,7 @@ export function AdminTeachers() {
 
       {err && <p className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-600">{err}</p>}
       {msg && <p className="rounded-xl bg-jade-400/10 px-4 py-2 text-sm text-jade-600">{msg}</p>}
-      <button onClick={save} disabled={saving} className="btn btn-primary btn-md">{saving ? "Хадгалж байна..." : "Хадгалах"}</button>
+      <button onClick={save} disabled={saving || isUploading} className="btn btn-primary btn-md">{isUploading ? "Зураг upload хийж байна…" : saving ? "Хадгалж байна..." : "Хадгалах"}</button>
     </div>
   );
 }

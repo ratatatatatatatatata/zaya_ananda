@@ -87,7 +87,7 @@ export default async function JourneyPage({ params }: { params: { slug: string }
       {/* Толгой — зураг дээр гарчиг */}
       <section className="night relative isolate flex min-h-[64svh] items-end overflow-hidden">
         <div aria-hidden className="absolute inset-0 -z-10">
-          <JourneyImage src={j.image} scene={j.scene} alt={j.name} className="h-full w-full object-cover" />
+          <JourneyImage src={j.image} scene={j.scene} alt={j.name} className="h-full w-full object-contain" />
         </div>
         <div aria-hidden className="absolute inset-0 -z-10"
           style={{ background: "linear-gradient(to top, rgba(8,20,17,0.94) 0%, rgba(8,20,17,0.45) 42%, rgba(8,20,17,0.2) 100%)" }} />

@@ -130,7 +130,7 @@ export function AdminMedia() {
             <div key={it.id} className="overflow-hidden rounded-2xl border border-line bg-surface-1">
               <div className="aspect-square w-full bg-surface-2">
                 {it.kind === "image" && it.url ? (
-                  <img src={it.url} alt={it.filename} className="h-full w-full object-cover" />
+                  <img src={it.url} alt={it.filename} className="h-full w-full object-contain" />
                 ) : it.kind === "video" && it.url ? (
                   <video src={it.url} className="h-full w-full object-cover" muted />
                 ) : (

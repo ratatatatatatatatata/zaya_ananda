@@ -23,7 +23,7 @@ function TeamCard({ m, onOpen }: { m: Member; onOpen: () => void }) {
           <img
             src={m.image}
             alt=""
-            className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+            className="h-full w-full object-contain transition duration-700"
             style={{ objectPosition: "50% " + (m.focus ?? 50) + "%" }}
           />
         ) : (
@@ -65,7 +65,7 @@ function BioModal({ m, onClose }: { m: Member; onClose: () => void }) {
         </button>
         <div className="relative aspect-[3/4] w-full overflow-hidden sm:aspect-auto sm:h-full">
           {m.image ? (
-            <img src={m.image} alt="" className="h-full w-full object-cover" style={{ objectPosition: "50% " + (m.focus ?? 50) + "%" }} />
+            <img src={m.image} alt="" className="h-full w-full object-contain" style={{ objectPosition: "50% " + (m.focus ?? 50) + "%" }} />
           ) : (
             <div className="grid h-full w-full place-items-center text-5xl font-display font-semibold text-ink/40"
               style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }}>

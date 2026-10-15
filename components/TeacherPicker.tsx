@@ -1,12 +1,11 @@
 "use client";
 
 import type { TeacherPreset } from "@/lib/types";
-import { compressImage } from "@/lib/image-compress";
 
 export type TeacherDraft = TeacherPreset & { key: string };
 export const teacherDraft = (teacher: TeacherPreset): TeacherDraft => ({ ...teacher, key: crypto.randomUUID() });
 
-export function TeacherPicker({ value, presets, onChange, onError }: { value: TeacherDraft[]; presets: TeacherPreset[]; onChange: React.Dispatch<React.SetStateAction<TeacherDraft[]>>; onError: (message: string) => void }) {
+export function TeacherPicker({ value, presets, onChange, onError, uploadImage }: { uploadImage: (file: File) => Promise<string>; value: TeacherDraft[]; presets: TeacherPreset[]; onChange: React.Dispatch<React.SetStateAction<TeacherDraft[]>>; onError: (message: string) => void }) {
   const available = presets.filter(person => person.name?.trim() && !person.name.includes(","));
   const update = (key: string, patch: Partial<TeacherPreset>) => onChange(rows => rows.map(row => row.key === key ? { ...row, ...patch } : row));
   const toggle = (teacher: TeacherPreset) => onChange(rows => rows.some(row => row.name === teacher.name) ? rows.filter(row => row.name !== teacher.name) : [...rows, teacherDraft(teacher)]);
@@ -17,10 +16,10 @@ export function TeacherPicker({ value, presets, onChange, onError }: { value: Te
     <div className="mt-4 space-y-4">{value.map((teacher,index) => <fieldset key={teacher.key} className="rounded-2xl border border-line bg-surface-1 p-4">
       <legend className="px-2 font-semibold text-ink">Багш {index + 1}{teacher.name ? ` — ${teacher.name}` : ""}</legend>
       <div className="flex flex-wrap items-center gap-3">
-        {teacher.image && <img src={teacher.image} alt={teacher.name} className="h-20 w-20 rounded-full object-cover" />}
-        <label className="min-w-0 flex-1 text-sm text-muted">Багшийн зураг<input type="file" accept="image/*" className="mt-1 block w-full text-sm" onChange={async event => {
+        {teacher.image && <img src={teacher.image} alt={teacher.name} className="h-20 w-20 rounded-full object-contain" />}
+        <label className="min-w-0 flex-1 text-sm text-muted">Багшийн зураг<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="mt-1 block w-full text-sm" onChange={async event => {
           const file = event.target.files?.[0]; event.target.value = ""; if (!file) return;
-          try { update(teacher.key, { image: await compressImage(file) }); } catch (error) { onError(error instanceof Error ? error.message : "Зураг оруулахад алдаа гарлаа."); }
+          try { update(teacher.key, { image: await uploadImage(file) }); } catch (error) { onError(error instanceof Error ? error.message : "Зураг оруулахад алдаа гарлаа."); }
         }} /></label>
         {teacher.image && <button type="button" onClick={() => update(teacher.key,{image:""})} className="text-sm text-rose-600">Зураг арилгах</button>}
       </div>

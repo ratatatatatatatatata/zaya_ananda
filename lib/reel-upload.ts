@@ -11,7 +11,7 @@ export function reelUploadError(mime: string, size: number): string | null {
   return null;
 }
 
-/** Only intentionally public Reel/Gift assets use this uploader. Paid lessons stay private. */
+/** Only intentionally public CMS images and Reel/Gift assets use this uploader. Paid lessons stay private. */
 export async function uploadReelMedia(file: File, onProgress: (percent: number) => void): Promise<string> {
   const error = reelUploadError(file.type, file.size);
   if (error) throw new Error(error);

@@ -1,7 +1,8 @@
 "use client";
 
+import { useImageUpload } from "@/lib/use-image-upload";
+
 import { useCallback, useEffect, useState } from "react";
-import { compressImage } from "@/lib/image-compress";
 import { itemTeachers, normalizeTeachers } from "@/lib/item-teachers";
 import { TeacherPicker, teacherDraft, type TeacherDraft } from "./TeacherPicker";
 import { formatMNT } from "@/lib/format";
@@ -14,7 +15,6 @@ import { isSectionReel } from "@/lib/section-reels";
 import { uploadReelMedia } from "@/lib/reel-upload";
 import { embedSrc, isVideoLink } from "@/lib/video-embed";
 import type { CmsItem, TeacherPreset, CmsTranslations } from "@/lib/types";
-
 
 const EMPTY = { title: "", category: "", summary: "", body: "", price: "", mode: "online", link: "", videoLessons: "", students: "", views: "", teacherName: "", teacherImage: "", teacherRole: "", teacherInfo: "", accessDays: "", level: "anhan", nextNote: "", nextItemId: "" };
 
@@ -57,6 +57,7 @@ type LessonRow = { title: string; path: string; url?: string; quality: string; s
 const MAX_IMAGES = 3;
 
 export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["kind"]; fixedCategory?: string }) {
+  const { uploadImage, isUploading, hasPendingUploads } = useImageUpload();
   const MOODS = useMoods();
   const [items, setItems] = useState<CmsItem[]>([]);
   const [open, setOpen] = useState(false);
@@ -109,7 +110,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
     setImageUploading(true);
     try {
       const datas: string[] = [];
-      for (const f of files.slice(0, MAX_IMAGES)) datas.push(kind === "free" ? await uploadReelMedia(f, () => {}) : await compressImage(f));
+      for (const f of files.slice(0, MAX_IMAGES)) datas.push(await uploadImage(f));
       setImages((prev) => (multiImage ? [...prev, ...datas].slice(0, MAX_IMAGES) : [datas[0]]));
     } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); } finally { setImageUploading(false); }
     e.target.value = "";
@@ -177,7 +178,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    if (imageUploading || lessons.some(lesson => lesson.uploading)) { setErr("Upload дууссаны дараа хадгална уу."); return; }
+    if (hasPendingUploads() || imageUploading || lessons.some(lesson => lesson.uploading)) { setErr("Upload дууссаны дараа хадгална уу."); return; }
     if (!form.title.trim()) { setErr("Гарчиг оруулна уу."); return; }
     if (selectedTeachers.some(teacher => !teacher.name.trim() || teacher.name.includes(","))) { setErr("Багш бүрийг тусдаа мөрөнд нэрээр нь нэмнэ үү."); return; }
     if (normalizeTeachers(selectedTeachers).length !== selectedTeachers.length) { setErr("Ижил нэртэй багшийг давхар сонгосон байна."); return; }
@@ -261,7 +262,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
               <div className="flex flex-wrap items-center gap-3">
                 {images.map((img, i) => (
                   <div key={i} className="relative">
-                    <img src={img} alt="" className={"rounded-xl object-cover " + (isPromo ? "h-40 w-full max-w-md" : "h-24 w-32")} />
+                    <img src={img} alt="" className={"rounded-xl object-contain " + (isPromo ? "h-40 w-full max-w-md" : "h-24 w-32")} />
                     <button type="button" onClick={() => setImages((arr) => arr.filter((_, x) => x !== i))}
                       className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs font-bold text-white shadow">✕</button>
                     {i === 0 && images.length > 1 && <span className="absolute bottom-1 left-1 rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-bold text-primary-700">Нүүр</span>}
@@ -339,7 +340,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
             </div>
           </div>
 
-          {imageUploading && <p role="status" className="text-sm text-primary-700">Зураг upload хийж байна…</p>}
+          {(imageUploading || isUploading) && <p role="status" className="text-sm text-primary-700">Зураг upload хийж байна…</p>}
 
           {/* Чулуу: зурган доор шууд ээлтэй орд сонгоно (дараа нь гарчиг/мэдээлэл оруулна) */}
           {isStoneCategory && (
@@ -560,13 +561,13 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
                   : <RichTextEditor key={langTab} value={i18n[langTab]?.body || ""} onChange={(html) => setTr(langTab, "body", html)} />}
               </div>
 
-              {hasTeacher && <TeacherPicker value={selectedTeachers} presets={teachers} onChange={setSelectedTeachers} onError={setErr} />}
+              {hasTeacher && <TeacherPicker uploadImage={uploadImage} value={selectedTeachers} presets={teachers} onChange={setSelectedTeachers} onError={setErr} />}
             </>
           )}
 
           {err && <p className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-600">{err}</p>}
           <div className="flex gap-2">
-            <button type="submit" disabled={saving || imageUploading || lessons.some(lesson => lesson.uploading)} className="btn btn-primary btn-md">{saving ? "Хадгалж байна..." : editingId ? "Засварыг хадгалах" : "Хадгалах"}</button>
+            <button type="submit" disabled={saving || isUploading || imageUploading || lessons.some(lesson => lesson.uploading)} className="btn btn-primary btn-md">{saving ? "Хадгалж байна..." : editingId ? "Засварыг хадгалах" : "Хадгалах"}</button>
             <button type="button" onClick={resetForm} className="btn btn-outline btn-md">Болих</button>
           </div>
         </form>
@@ -584,7 +585,7 @@ export function AdminContentManager({ kind, fixedCategory }: { kind: CmsItem["ki
           <tbody>
             {items.map((i) => (
               <tr key={i.id} className="border-b border-line last:border-0">
-                <td className="px-4 py-2">{i.image ? <img src={i.image} alt="" className="h-10 w-14 rounded-lg object-cover" /> : <span className="text-muted">—</span>}</td>
+                <td className="px-4 py-2">{i.image ? <img src={i.image} alt="" className="h-10 w-14 rounded-lg object-contain" /> : <span className="text-muted">—</span>}</td>
                 <td className="px-4 py-3 text-sm font-medium text-ink">
                   {i.title}
                   {isCourse && (

@@ -1,29 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useImageUpload } from "@/lib/use-image-upload";
 
-function compressImage(file: File, maxW = 1000, quality = 0.85): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error("Зураг уншиж чадсангүй."));
-    reader.onload = () => {
-      const img = new window.Image();
-      img.onload = () => {
-        const scale = Math.min(1, maxW / img.width);
-        const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
-        const canvas = document.createElement("canvas");
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return reject(new Error("canvas алдаа"));
-        ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      };
-      img.onerror = () => reject(new Error("Зураг буруу байна."));
-      img.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  });
-}
+import { useEffect, useState } from "react";
 
 const SB_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 async function uploadVideo(file: File, onProgress: (p: number) => void): Promise<string> {
@@ -48,6 +27,7 @@ async function uploadVideo(file: File, onProgress: (p: number) => void): Promise
  *  тоо баримт, үнэт зүйлс, түгээмэл асуултууд. Тус бүрийг хоосон орхивол data/content.ts-ийн
  *  өгөгдмөл (олон хэлтэй) агуулга харагдсаар байна. */
 export function AdminAbout() {
+  const { uploadImage, isUploading, hasPendingUploads } = useImageUpload();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [video, setVideo] = useState("");
@@ -94,7 +74,7 @@ export function AdminAbout() {
     const files = Array.from(e.target.files || []); if (files.length === 0) return;
     setErr(""); setGalleryBusy(true);
     try {
-      const added = await Promise.all(files.map(async (f) => ({ image: await compressImage(f), caption: "" })));
+      const added = await Promise.all(files.map(async (f) => ({ image: await uploadImage(f), caption: "" })));
       setGallery((g) => [...g, ...added]);
     } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг оруулахад алдаа."); }
     finally { setGalleryBusy(false); e.target.value = ""; }
@@ -104,7 +84,7 @@ export function AdminAbout() {
     const file = e.target.files?.[0]; if (!file) return;
     setErr(""); setPartnerBusy(i);
     try {
-      const img = await compressImage(file, 600, 0.9);
+      const img = await uploadImage(file);
       setPartners((a) => a.map((x, k) => (k === i ? { ...x, logo: img } : x)));
     } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Лого оруулахад алдаа."); }
     finally { setPartnerBusy(null); e.target.value = ""; }
@@ -120,6 +100,7 @@ export function AdminAbout() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (hasPendingUploads()) { setErr("Зураг upload дууссаны дараа хадгална уу."); return; }
     setSaving(true); setErr(""); setMsg("");
     try {
       const payload = {
@@ -275,13 +256,13 @@ export function AdminAbout() {
           </div>
           <label className="btn btn-outline btn-sm cursor-pointer">
             {galleryBusy ? "Оруулж байна…" : "+ Зураг нэмэх"}
-            <input type="file" accept="image/*" multiple onChange={pickGalleryImages} disabled={galleryBusy} className="hidden" />
+            <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={pickGalleryImages} disabled={galleryBusy} className="hidden" />
           </label>
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {gallery.map((g, i) => (
             <div key={i} className="flex gap-3 rounded-xl border border-line bg-surface-1 p-3">
-              <img src={g.image} alt="" className="h-20 w-20 shrink-0 rounded-lg object-cover" />
+              <img src={g.image} alt="" className="h-20 w-20 shrink-0 rounded-lg object-contain" />
               <div className="min-w-0 flex-1 space-y-1.5">
                 <input className="input !py-1.5 text-sm" placeholder="Тайлбар (заавал биш)" value={g.caption}
                   onChange={(e) => setGallery((a) => a.map((x, k) => (k === i ? { ...x, caption: e.target.value } : x)))} />
@@ -310,7 +291,7 @@ export function AdminAbout() {
                 : <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-surface-2 text-[10px] text-muted">Лого</div>}
               <label className="btn btn-outline btn-sm shrink-0 cursor-pointer">
                 {partnerBusy === i ? "…" : "Лого сонгох"}
-                <input type="file" accept="image/*" onChange={(e) => pickPartnerLogo(i, e)} disabled={partnerBusy === i} className="hidden" />
+                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => pickPartnerLogo(i, e)} disabled={partnerBusy === i} className="hidden" />
               </label>
               <input className="input min-w-[10rem] flex-1" placeholder="Байгууллагын нэр" value={p.name} onChange={(e) => setPartners((a) => a.map((x, k) => (k === i ? { ...x, name: e.target.value } : x)))} />
               <button type="button" onClick={() => setPartners((a) => a.filter((_, k) => k !== i))} className="shrink-0 text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
@@ -324,7 +305,7 @@ export function AdminAbout() {
 
       {err && <p className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-600">{err}</p>}
       {msg && <p className="rounded-xl bg-jade-400/10 px-4 py-2 text-sm text-jade-600">{msg}</p>}
-      <button type="submit" disabled={saving} className="btn btn-primary btn-md">{saving ? "Хадгалж байна..." : "Хадгалах"}</button>
+      <button type="submit" disabled={saving || isUploading} className="btn btn-primary btn-md">{isUploading ? "Зураг upload хийж байна…" : saving ? "Хадгалж байна..." : "Хадгалах"}</button>
     </form>
   );
 }

@@ -25,7 +25,7 @@ export default async function CustomPage({ params }: { params: { id: string } })
       />
       <section className="section">
         <div className="container-px">
-          {page.image && <img src={page.image} alt="" className="mb-8 max-h-[520px] w-full rounded-3xl object-cover" />}
+          {page.image && <img src={page.image} alt="" className="mb-8 max-h-[520px] w-full rounded-3xl object-contain" />}
           {videoUrl && (
             <video controls playsInline className="mb-8 w-full rounded-3xl bg-black" src={videoUrl} />
           )}

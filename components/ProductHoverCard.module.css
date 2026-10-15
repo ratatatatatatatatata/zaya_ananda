@@ -5,7 +5,7 @@
 .card[data-open=true] .visual { height:auto; min-height:320px; }
 .card[data-open=true] .visual>img { position:absolute; inset:0; object-fit:contain; }
 .visual { position:relative; height:320px; background:#edf2e8; }
-.visual>img { width:100%; height:100%; object-fit:cover; }
+.visual>img { width:100%; height:100%; object-fit:contain; }
 .placeholder { display:grid; place-items:center; height:100%; color:#547268; font-size:80px; }
 .toggle { position:absolute; inset:0; width:100%; height:100%; text-align:right; }
 .toggle:focus-visible { outline:3px solid #315e46; outline-offset:-5px; border-radius:20px; }

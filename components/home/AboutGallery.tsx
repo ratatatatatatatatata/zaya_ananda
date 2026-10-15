@@ -100,7 +100,7 @@ export function AboutGallery({ images, layout = "mosaic", label = "Манай о
             <div key={ci} style={layout === "scattered" ? { paddingTop: [12, 68, 28, 92, 42][ci % 5], paddingBottom: 24 } : undefined} className={layout === "scattered" ? "flex w-52 shrink-0 flex-col gap-4 sm:w-72" : layout === "landscape" ? "flex w-[75vw] max-w-[28rem] shrink-0 flex-col gap-4 sm:w-[28rem]" : "flex w-48 shrink-0 flex-col gap-4 sm:w-60"}>
               {col.map((img, ii) => (
                 <div key={ii} className="relative overflow-hidden rounded-2xl bg-surface-3" style={layout === "scattered" ? { transform: `rotate(${[-3, 2, -1, 3, -2][ci % 5]}deg)`, marginInline: 8 } : undefined}>
-                  <img src={img.image} alt={img.caption || ""} className={layout === "landscape" ? "aspect-[4/3] w-full object-cover" : layout === "scattered" ? "h-auto max-h-80 w-full object-contain sm:max-h-96" : "h-auto w-full"} loading="lazy" />
+                  <img src={img.image} alt={img.caption || ""} className={layout === "landscape" ? "aspect-[4/3] w-full object-contain" : layout === "scattered" ? "h-auto max-h-80 w-full object-contain sm:max-h-96" : "h-auto w-full"} loading="lazy" />
                   {img.caption && (
                     <span className="absolute inset-x-2 bottom-2 line-clamp-2 rounded-lg bg-black/60 px-2.5 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
                       {img.caption}

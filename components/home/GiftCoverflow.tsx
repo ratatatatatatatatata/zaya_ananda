@@ -58,7 +58,7 @@ function GiftCard({ reel }: { reel: Reel }) {
         ) : (
           <button type="button" onClick={() => setOpen(true)} aria-label={reel.title} className="absolute inset-0 h-full w-full">
             {reel.poster ? (
-              <img src={reel.poster} alt={reel.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+              <img src={reel.poster} alt={reel.title} className="h-full w-full object-contain transition duration-700" />
             ) : (
               <div className="h-full w-full" style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }} />
             )}

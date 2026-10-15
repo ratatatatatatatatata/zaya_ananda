@@ -1,5 +1,7 @@
 "use client";
 
+import { useImageUpload } from "@/lib/use-image-upload";
+
 import { useCallback, useEffect, useState } from "react";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import type { SitePage, CmsTranslations } from "@/lib/types";
@@ -15,29 +17,6 @@ const LANG_TABS = [
   { k: "zh" as const, l: "🇨🇳 中文" },
 ];
 type TrLang = "en" | "ko" | "ja" | "zh";
-
-function compressImage(file: File, maxW = 1200, quality = 0.82): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error("Зураг уншиж чадсангүй."));
-    reader.onload = () => {
-      const img = new window.Image();
-      img.onload = () => {
-        const scale = Math.min(1, maxW / img.width);
-        const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
-        const canvas = document.createElement("canvas");
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return reject(new Error("canvas алдаа"));
-        ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      };
-      img.onerror = () => reject(new Error("Зураг буруу байна."));
-      img.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  });
-}
 
 const SB_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 async function uploadVideo(file: File, onProgress: (p: number) => void): Promise<string> {
@@ -62,6 +41,7 @@ const EMPTY = { title: "", navLabel: "", body: "", image: "", video: "", positio
 
 /** Ерөнхий тохиргоо — цэсэнд шинэ мөр (хуудас) нэмж, агуулгыг нь засварлана. */
 export function AdminPages() {
+  const { uploadImage, isUploading, hasPendingUploads } = useImageUpload();
   const { t } = useI18n();
   const [pages, setPages] = useState<SitePage[]>([]);
   const [open, setOpen] = useState(false);
@@ -86,7 +66,7 @@ export function AdminPages() {
 
   async function pickImage(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]; if (!file) return;
-    try { set("image", await compressImage(file)); } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
+    try { set("image", await uploadImage(file)); } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
   }
   async function pickVideo(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]; if (!file) return;
@@ -106,6 +86,7 @@ export function AdminPages() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (hasPendingUploads()) { setErr("Зураг upload дууссаны дараа хадгална уу."); return; }
     if (!form.title.trim()) { setErr("Гарчиг оруулна уу."); return; }
     setSaving(true); setErr("");
     try {
@@ -205,8 +186,8 @@ export function AdminPages() {
             <div>
               <label className="field-label">Зураг</label>
               {form.image
-                ? <div className="flex items-center gap-2"><img src={form.image} alt="" className="h-14 w-20 rounded-lg object-cover" /><button type="button" onClick={() => set("image", "")} className="text-xs font-semibold text-rose-500 hover:underline">Устгах</button></div>
-                : <input type="file" accept="image/*" onChange={pickImage} className="text-sm" />}
+                ? <div className="flex items-center gap-2"><img src={form.image} alt="" className="h-14 w-20 rounded-lg object-contain" /><button type="button" onClick={() => set("image", "")} className="text-xs font-semibold text-rose-500 hover:underline">Устгах</button></div>
+                : <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={pickImage} className="text-sm" />}
             </div>
             <div>
               <label className="field-label">Видео</label>
@@ -225,7 +206,7 @@ export function AdminPages() {
           </div>
           {err && <p className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-600">{err}</p>}
           <div className="flex gap-2">
-            <button type="submit" disabled={saving} className="btn btn-primary btn-md">{saving ? "Хадгалж байна..." : editingId ? "Засварыг хадгалах" : "Хадгалах"}</button>
+            <button type="submit" disabled={saving || isUploading} className="btn btn-primary btn-md">{isUploading ? "Зураг upload хийж байна…" : saving ? "Хадгалж байна..." : editingId ? "Засварыг хадгалах" : "Хадгалах"}</button>
             <button type="button" onClick={resetForm} className="btn btn-outline btn-md">Болих</button>
           </div>
         </form>

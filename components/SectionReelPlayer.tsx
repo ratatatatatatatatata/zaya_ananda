@@ -33,7 +33,7 @@ export function SectionReelPlayer({ reels }: { reels: PublicEpisode[] }) {
       </div>
     </div>
     {reels.length > 1 && <div className={styles.rail} aria-label="Reel сонгох">{reels.map((item, index) => <button key={item.id} type="button" className={styles.railCard} aria-pressed={index === selected} onClick={() => choose(index)}>
-      <span className={styles.thumb}><img src={item.poster} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />{item.url && <span aria-hidden>▶</span>}</span><span className={styles.name}>{item.title}</span>
+      <span className={styles.thumb}><img src={item.poster} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-contain" />{item.url && <span aria-hidden>▶</span>}</span><span className={styles.name}>{item.title}</span>
     </button>)}</div>}
   </div>;
 }

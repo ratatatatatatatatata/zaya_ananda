@@ -104,7 +104,7 @@ export function ProductStage({ images, alt = "" }: { images: string[]; alt?: str
         {/* Зураг — гүнтэй шилжилт */}
         <div ref={imgWrap} className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-surface-4 transition-transform duration-300 ease-out will-change-transform" style={{ transformStyle: "preserve-3d" }} data-stage-img>
           {prev !== null && !failed[prev] && (
-            <img key={"p" + prev} src={images[prev]} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" style={{ animation: "zaStageOut 0.6s ease forwards" }} />
+            <img key={"p" + prev} src={images[prev]} alt="" aria-hidden className="absolute inset-0 h-full w-full object-contain" style={{ animation: "zaStageOut 0.6s ease forwards" }} />
           )}
           {failed[active] ? (
             <div className="grid h-full w-full place-items-center bg-gradient-to-br from-surface-1 to-surface-4 text-center">
@@ -120,7 +120,7 @@ export function ProductStage({ images, alt = "" }: { images: string[]; alt?: str
               src={src}
               alt={alt}
               onError={() => setFailed((f) => ({ ...f, [active]: true }))}
-              className="h-full w-full cursor-zoom-in object-cover"
+              className="h-full w-full cursor-zoom-in object-contain"
               style={reduced.current ? undefined : { animation: "zaStageIn 0.65s cubic-bezier(0.22,1,0.36,1) both" }}
               onClick={() => setZoom(true)}
             />
@@ -139,7 +139,7 @@ export function ProductStage({ images, alt = "" }: { images: string[]; alt?: str
         {/* Тусгал */}
         <div aria-hidden className="pointer-events-none relative mx-6 h-14 overflow-hidden opacity-30" style={{ transform: "scaleY(-1)" }}>
           {!failed[active] && (
-            <img src={src} alt="" className="h-auto w-full rounded-3xl object-cover blur-[3px]" style={{ maskImage: "linear-gradient(to top, rgba(0,0,0,0.5), transparent 70%)", WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,0.5), transparent 70%)" }} />
+            <img src={src} alt="" className="h-auto w-full rounded-3xl object-contain blur-[3px]" style={{ maskImage: "linear-gradient(to top, rgba(0,0,0,0.5), transparent 70%)", WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,0.5), transparent 70%)" }} />
           )}
         </div>
 
@@ -153,7 +153,7 @@ export function ProductStage({ images, alt = "" }: { images: string[]; alt?: str
           {images.map((img, i) => (
             <button key={i} type="button" onClick={() => pick(i)} aria-label={`Зураг ${i + 1}`}
               aria-current={i === active} className={cx("focus-ring h-20 w-28 shrink-0 overflow-hidden rounded-xl border-2 transition", i === active ? "border-primary-500 shadow-glow" : "border-line/60 opacity-70 hover:opacity-100")}>
-              <img src={img} alt="" className="h-full w-full object-cover" />
+              <img src={img} alt="" className="h-full w-full object-contain" />
             </button>
           ))}
         </div>

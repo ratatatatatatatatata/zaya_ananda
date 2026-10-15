@@ -100,7 +100,7 @@ function CategoryScrollStory({ slides, category, title }: { slides: Slide[]; cat
               initial={false} animate={{ opacity:active ? 1 : 0, y:scrollMode && !active ? direction*36 : 0 }}
               transition={{ duration:reduced ? 0 : .55, ease:[.22,1,.36,1] }} style={{ pointerEvents:active ? "auto" : "none", zIndex:active ? 1 : 0 }}>
               <div className="experience-image">
-                <motion.div className="experience-image-motion" initial={false} animate={{scale:active ? 1 : 1.07}} transition={{duration:reduced ? 0 : .9, ease:[.22,1,.36,1]}}>
+                <motion.div className="experience-image-motion" initial={false} animate={{opacity:active ? 1 : 0}} transition={{duration:reduced ? 0 : .9, ease:[.22,1,.36,1]}}>
                   <Image src={slide.image} alt={slide.title} fill sizes="(max-width:767px) 100vw, 55vw" unoptimized={!slide.image.startsWith("/")} />
                 </motion.div>
                 <span>{title}</span>

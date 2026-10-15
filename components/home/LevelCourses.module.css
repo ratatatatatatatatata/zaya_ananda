@@ -16,14 +16,14 @@
 .course { min-width:0; border:1px solid #dce4d6; border-radius:18px; background:#fff; overflow:hidden; }
 .courseLink { display:grid; grid-template-columns:150px minmax(0,1fr); gap:22px; height:100%; padding:18px; border-radius:18px; color:#244831; }
 .photo { aspect-ratio:1; height:150px; border-radius:12px; overflow:hidden; background:#eaf0e3; display:grid; place-items:center; align-self:start; }
-.photo img { width:100%; height:100%; object-fit:cover; }
+.photo img { width:100%; height:100%; object-fit:contain; }
 .photo>span { font-size:2rem; }
 .courseInfo { min-width:0; display:flex; flex-direction:column; }
 .courseInfo h4 { margin:0; font-size:1.1rem; line-height:1.45; font-weight:600; overflow-wrap:anywhere; }
 .summary { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; margin:10px 0 0; color:#657462; font-size:.9rem; line-height:1.7; overflow-wrap:anywhere; }
 .teachers { display:grid; gap:8px; list-style:none; margin:16px 0 0; padding:0; }
 .teachers li { display:flex; align-items:center; gap:8px; font-size:.8rem; line-height:1.4; color:#627361; }
-.teachers img { width:28px; height:28px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+.teachers img { width:28px; height:28px; border-radius:50%; object-fit:contain; flex-shrink:0; }
 .courseFooter { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-top:auto; padding-top:20px; color:#315e48; font-size:.85rem; }
 .courseFooter strong { font-size:1rem; font-weight:600; }.courseFooter>span { font-weight:600; }
 .empty { margin:0; padding:24px; color:#657462; text-align:center; line-height:1.7; }

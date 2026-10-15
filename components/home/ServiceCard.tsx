@@ -38,7 +38,7 @@ export function ServiceCard({ item, onOpenChange }: { item: CmsItem; onOpenChang
           >
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-[1.75rem] bg-surface-3">
               {cover ? (
-                <img src={cover} alt={item.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                <img src={cover} alt={item.title} className="h-full w-full object-contain transition duration-700" />
               ) : (
                 <div className="h-full w-full" style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }} />
               )}
@@ -81,7 +81,7 @@ export function ServiceCard({ item, onOpenChange }: { item: CmsItem; onOpenChang
 
             {cover && (
               <div className="relative aspect-[21/9] w-full overflow-hidden rounded-t-4xl">
-                <img src={cover} alt={item.title} className="h-full w-full object-cover" />
+                <img src={cover} alt={item.title} className="h-full w-full object-contain" />
                 <div aria-hidden className="absolute inset-0"
                   style={{ background: "linear-gradient(to top, rgba(8,20,17,0.85) 0%, transparent 60%)" }} />
                 <h3 className="absolute inset-x-0 bottom-0 p-6 font-display text-2xl font-semibold text-white sm:text-3xl">{item.title}</h3>

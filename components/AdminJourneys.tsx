@@ -1,67 +1,10 @@
 "use client";
 
+import { useImageUpload } from "@/lib/use-image-upload";
+
 import { useCallback, useEffect, useState } from "react";
 import { parseJourneyGallery } from "@/lib/journey-gallery";
 import type { Destination, Journey, JourneyDay, JourneyPhoto, Person, Scene } from "@/data/journeys";
-
-function compressImage(file: File, maxW = 1200, quality = 0.82): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error("Зураг уншиж чадсангүй."));
-    reader.onload = () => {
-      const img = new window.Image();
-      img.onload = () => {
-        const scale = Math.min(1, maxW / img.width);
-        const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
-        const canvas = document.createElement("canvas");
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return reject(new Error("canvas алдаа"));
-        ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      };
-      img.onerror = () => reject(new Error("Зураг буруу байна."));
-      img.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-/** Өдөр өдрийн хөтөлбөр болон очих газрын зургуудад ашиглана — ямар хэмжээ/харьцаатай
- *  зураг оруулсан ч төвөөс нь тайрч, ЯГ ИЖИЛ (4:3) харьцаа, хэмжээтэй болгож хадгална.
- *  Ингэснээр карт бүрийн зураг харагдах үедээ үргэлж нэг стандарт хэмжээтэй байна. */
-function compressImageCropped(file: File, targetW = 1200, targetH = 900, quality = 0.82): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error("Зураг уншиж чадсангүй."));
-    reader.onload = () => {
-      const img = new window.Image();
-      img.onload = () => {
-        const targetRatio = targetW / targetH;
-        const srcRatio = img.width / img.height;
-        let sx = 0, sy = 0, sw = img.width, sh = img.height;
-        if (srcRatio > targetRatio) {
-          // Эх зураг илүү өргөн — хажуу талыг нь тайрна (төвөөс)
-          sw = Math.round(img.height * targetRatio);
-          sx = Math.round((img.width - sw) / 2);
-        } else {
-          // Эх зураг илүү өндөр (нарийн) — дээд/доод талыг нь тайрна (төвөөс)
-          sh = Math.round(img.width / targetRatio);
-          sy = Math.round((img.height - sh) / 2);
-        }
-        const canvas = document.createElement("canvas");
-        canvas.width = targetW; canvas.height = targetH;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return reject(new Error("canvas алдаа"));
-        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetW, targetH);
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      };
-      img.onerror = () => reject(new Error("Зураг буруу байна."));
-      img.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  });
-}
 
 const SCENES: { key: Scene; label: string }[] = [
   { key: "gobi", label: "Говь" },
@@ -85,6 +28,7 @@ const EMPTY = {
 
 /** Сүнслэг аяллын мэдээлэл нэмэх/засах — жагсаалт, хөтөлбөр, баг, урьдчилгаа. */
 export function AdminJourneys() {
+  const { uploadImage, isUploading, hasPendingUploads } = useImageUpload();
   const [items, setItems] = useState<Journey[]>([]);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -96,7 +40,7 @@ export function AdminJourneys() {
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [gallery, setGallery] = useState<JourneyPhoto[]>([]);
   const [uploadingGallery, setUploadingGallery] = useState(false);
-  const busy = saving || uploadingGallery;
+  const busy = saving || uploadingGallery || isUploading;
   const [lead, setLead] = useState<Person>(EMPTY_PERSON);
   const [crew, setCrew] = useState<Person[]>([]);
 
@@ -136,14 +80,7 @@ export function AdminJourneys() {
 
   async function pickImage(e: React.ChangeEvent<HTMLInputElement>, onDone: (data: string) => void) {
     const file = e.target.files?.[0]; if (!file) return;
-    try { onDone(await compressImage(file)); } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
-    e.target.value = "";
-  }
-
-  // Хөтөлбөрийн өдөр болон очих газрын зурагт — төвөөс тайрч, үргэлж ижил (4:3) хэмжээтэй болгоно.
-  async function pickImageCropped(e: React.ChangeEvent<HTMLInputElement>, onDone: (data: string) => void) {
-    const file = e.target.files?.[0]; if (!file) return;
-    try { onDone(await compressImageCropped(file)); } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
+    try { onDone(await uploadImage(file)); } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
     e.target.value = "";
   }
 
@@ -155,7 +92,7 @@ export function AdminJourneys() {
     setUploadingGallery(true); setErr("");
     try {
       const photos: JourneyPhoto[] = [];
-      for (const file of files) photos.push({ image: await compressImage(file, 1000, 0.76), caption: "" });
+      for (const file of files) photos.push({ image: await uploadImage(file), caption: "" });
       setGallery(parseJourneyGallery([...gallery, ...photos]));
     } catch (error) { setErr(error instanceof Error ? error.message : "Зураг оруулахад алдаа гарлаа."); }
     finally { setUploadingGallery(false); }
@@ -184,6 +121,7 @@ export function AdminJourneys() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (hasPendingUploads()) { setErr("Зураг upload дууссаны дараа хадгална уу."); return; }
     if (busy) return;
     if (!form.name.trim()) { setErr("Аяллын нэрийг оруулна уу."); return; }
     setSaving(true); setErr("");
@@ -229,12 +167,12 @@ export function AdminJourneys() {
             <p className="mb-2 font-display font-semibold text-ink">Нүүр зураг</p>
             <div className="flex items-center gap-3">
               {form.image
-                ? <div className="relative"><img src={form.image} alt="" className="h-24 w-40 rounded-xl object-cover" />
+                ? <div className="relative"><img src={form.image} alt="" className="h-24 w-40 rounded-xl object-contain" />
                     <button type="button" onClick={() => set("image", "")} className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-rose-500 text-xs font-bold text-white shadow">✕</button>
                   </div>
                 : <label className="grid h-24 w-40 cursor-pointer place-items-center rounded-xl border border-dashed border-line text-2xl text-muted hover:bg-white/10">
                     🖼+
-                    <input type="file" accept="image/*" onChange={(e) => pickImage(e, (d) => set("image", d))} className="hidden" />
+                    <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => pickImage(e, (d) => set("image", d))} className="hidden" />
                   </label>}
             </div>
             <p className="mt-2 text-xs text-muted">Байхгүй бол доор сонгосон дүр зураг (Говь/Уул гэх мэт) автоматаар зурагдана.</p>
@@ -251,7 +189,7 @@ export function AdminJourneys() {
             <p className="text-sm text-muted">Том дэлгэц дээр бүртгэлийн маягтын зүүн талд нэг том зураг, доороо дарж сонгох жижиг зургуудтай цомог харагдана. Утсан дээр маягтын дээр байрлана.</p>
             <label className="mt-3 block text-sm font-semibold text-ink">
               Зураг нэмэх (олноор сонгож болно)
-              <input type="file" accept="image/*" multiple onChange={pickGallery} className="mt-2 block w-full text-sm" />
+              <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={pickGallery} className="mt-2 block w-full text-sm" />
             </label>
             {uploadingGallery && <p role="status" className="mt-2 text-sm text-muted">Зургуудыг бэлдэж байна...</p>}
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -328,10 +266,10 @@ export function AdminJourneys() {
                       {SCENES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
                     </select>
                     {d.image
-                      ? <div className="relative"><img src={d.image} alt="" className="aspect-[4/3] h-14 w-auto rounded-lg object-cover" />
+                      ? <div className="relative"><img src={d.image} alt="" className="aspect-[4/3] h-14 w-auto rounded-lg object-contain" />
                           <button type="button" onClick={() => updDay(i, { image: "" })} className="absolute -right-2 -top-2 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-bold text-white">✕</button>
                         </div>
-                      : <input type="file" accept="image/*" className="text-sm" onChange={(e) => pickImageCropped(e, (dd) => updDay(i, { image: dd }))} />}
+                      : <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="text-sm" onChange={(e) => pickImage(e, (dd) => updDay(i, { image: dd }))} />}
                   </div>
                 </div>
               ))}
@@ -353,10 +291,10 @@ export function AdminJourneys() {
                     </div>
                     <div className="mt-2 flex flex-wrap items-center gap-3">
                       {d.image
-                        ? <div className="relative"><img src={d.image} alt="" className="aspect-[4/3] h-16 w-auto rounded-lg object-cover" />
+                        ? <div className="relative"><img src={d.image} alt="" className="aspect-[4/3] h-16 w-auto rounded-lg object-contain" />
                             <button type="button" onClick={() => updDestination(i, { image: "" })} className="absolute -right-2 -top-2 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] font-bold text-white">✕</button>
                           </div>
-                        : <input type="file" accept="image/*" className="text-sm" onChange={(e) => pickImageCropped(e, (dd) => updDestination(i, { image: dd }))} />}
+                        : <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="text-sm" onChange={(e) => pickImage(e, (dd) => updDestination(i, { image: dd }))} />}
                     </div>
                     <input className="input mt-2" placeholder="Газрын нэр — жишээ: Хөвсгөл нуур" value={d.title}
                       onChange={(e) => updDestination(i, { title: e.target.value })} />
@@ -374,9 +312,9 @@ export function AdminJourneys() {
             <p className="mb-3 font-display font-semibold text-ink">Аяллыг хариуцах хүн</p>
             <div className="flex items-center gap-3">
               {lead.image
-                ? <img src={lead.image} alt="" className="h-16 w-16 rounded-full object-cover" />
+                ? <img src={lead.image} alt="" className="h-16 w-16 rounded-full object-contain" />
                 : <div className="grid h-16 w-16 place-items-center rounded-full border border-dashed border-line text-xl text-muted">👤</div>}
-              <input type="file" accept="image/*" className="text-sm" onChange={(e) => pickImage(e, (d) => setLead((p) => ({ ...p, image: d })))} />
+              <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="text-sm" onChange={(e) => pickImage(e, (d) => setLead((p) => ({ ...p, image: d })))} />
             </div>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <input className="input" placeholder="Нэр" value={lead.name} onChange={(e) => setLead((p) => ({ ...p, name: e.target.value }))} />
@@ -396,9 +334,9 @@ export function AdminJourneys() {
                 <div key={i} className="rounded-xl border border-line bg-surface-3 p-3">
                   <div className="flex items-center gap-3">
                     {c.image
-                      ? <img src={c.image} alt="" className="h-12 w-12 rounded-full object-cover" />
+                      ? <img src={c.image} alt="" className="h-12 w-12 rounded-full object-contain" />
                       : <div className="grid h-12 w-12 place-items-center rounded-full border border-dashed border-line text-lg text-muted">👤</div>}
-                    <input type="file" accept="image/*" className="text-sm" onChange={(e) => pickImage(e, (d) => updCrew(i, { image: d }))} />
+                    <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="text-sm" onChange={(e) => pickImage(e, (d) => updCrew(i, { image: d }))} />
                     <button type="button" onClick={() => delCrew(i)} className="ml-auto text-sm font-semibold text-rose-500 hover:underline">Устгах</button>
                   </div>
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -414,7 +352,7 @@ export function AdminJourneys() {
 
           {err && <p className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-600">{err}</p>}
           <div className="flex gap-2">
-            <button type="submit" disabled={busy} className="btn btn-primary btn-md">{saving ? "Хадгалж байна..." : editingId ? "Засварыг хадгалах" : "Хадгалах"}</button>
+            <button type="submit" disabled={busy} className="btn btn-primary btn-md">{isUploading ? "Зураг upload хийж байна…" : saving ? "Хадгалж байна..." : editingId ? "Засварыг хадгалах" : "Хадгалах"}</button>
             <button type="button" disabled={busy} onClick={resetForm} className="btn btn-outline btn-md">Болих</button>
           </div>
         </form>
@@ -431,7 +369,7 @@ export function AdminJourneys() {
           <tbody>
             {items.map((j) => (
               <tr key={j.id} className="border-b border-line last:border-0">
-                <td className="px-4 py-2">{j.image ? <img src={j.image} alt="" className="h-10 w-14 rounded-lg object-cover" /> : <span className="text-muted">—</span>}</td>
+                <td className="px-4 py-2">{j.image ? <img src={j.image} alt="" className="h-10 w-14 rounded-lg object-contain" /> : <span className="text-muted">—</span>}</td>
                 <td className="px-4 py-3 text-sm font-medium text-ink">{j.name}<span className="ml-2 text-xs text-muted">/{j.slug}</span></td>
                 <td className="px-4 py-3 text-sm text-ink/80">{j.prepay ? j.prepay.toLocaleString("mn-MN") + "₮" : "—"}</td>
                 <td className="px-4 py-3 text-right"><div className="flex justify-end gap-3"><button disabled={busy} onClick={() => startEdit(j)} className="text-sm font-semibold text-primary-700 hover:underline">Засах</button><button disabled={busy} onClick={() => del(j.id)} className="text-sm font-semibold text-rose-500 hover:underline">Устгах</button></div></td>

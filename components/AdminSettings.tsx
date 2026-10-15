@@ -1,31 +1,10 @@
 "use client";
 
+import { useImageUpload } from "@/lib/use-image-upload";
+
 import { useEffect, useState } from "react";
 import { AdminTranslationStatus } from "./AdminTranslationStatus";
 import type { BankInfo } from "@/lib/types";
-
-function compressImage(file: File, maxW = 800, quality = 0.85): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error("Зураг уншиж чадсангүй."));
-    reader.onload = () => {
-      const img = new window.Image();
-      img.onload = () => {
-        const scale = Math.min(1, maxW / img.width);
-        const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
-        const canvas = document.createElement("canvas");
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return reject(new Error("canvas алдаа"));
-        ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      };
-      img.onerror = () => reject(new Error("Зураг буруу байна."));
-      img.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  });
-}
 
 const EMPTY = { logo: "", facebook: "", instagram: "", youtube: "" };
 const EMPTY_BANK: BankInfo = { bankName: "", account: "", holder: "" };
@@ -34,6 +13,7 @@ type ContactInfo = { phone: string; email: string; address: string; hours: strin
 const EMPTY_CONTACT: ContactInfo = { phone: "", email: "", address: "", hours: "", mapQuery: "" };
 
 export function AdminSettings() {
+  const { uploadImage, isUploading, hasPendingUploads } = useImageUpload();
   const [form, setForm] = useState(EMPTY);
   const [bank, setBank] = useState<BankInfo>(EMPTY_BANK);
   const [contact, setContact] = useState<ContactInfo>(EMPTY_CONTACT);
@@ -64,10 +44,11 @@ export function AdminSettings() {
 
   async function pickLogo(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]; if (!file) return;
-    try { set("logo", await compressImage(file, 400)); } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
+    try { set("logo", await uploadImage(file)); } catch (e2) { setErr(e2 instanceof Error ? e2.message : "Зураг алдаа"); }
   }
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (hasPendingUploads()) { setErr("Зураг upload дууссаны дараа хадгална уу."); return; }
     setSaving(true); setErr(""); setMsg("");
     try {
       const payload = { ...form, bank, contact, servicePrepay: Number(prepay) || 0, customMoods: moods };
@@ -86,10 +67,10 @@ export function AdminSettings() {
         <label className="field-label">Лого</label>
         <div className="flex items-center gap-3">
           {form.logo
-            ? <img src={form.logo} alt="" className="h-16 w-16 rounded-2xl border border-line object-cover" />
+            ? <img src={form.logo} alt="" className="h-16 w-16 rounded-2xl border border-line object-contain" />
             : <div className="grid h-16 w-16 place-items-center rounded-2xl border border-dashed border-line text-2xl text-muted">✶</div>}
           <div className="flex flex-col gap-1">
-            <input type="file" accept="image/*" onChange={pickLogo} className="text-sm" />
+            <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={pickLogo} className="text-sm" />
             {form.logo && <button type="button" onClick={() => set("logo", "")} className="text-left text-xs font-semibold text-rose-500">Устгах (өгөгдмөл лого руу буцаана)</button>}
           </div>
         </div>
@@ -197,7 +178,7 @@ export function AdminSettings() {
 
       {err && <p className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-600">{err}</p>}
       {msg && <p className="rounded-xl bg-jade-400/10 px-4 py-2 text-sm text-jade-600">{msg}</p>}
-      <button type="submit" disabled={saving} className="btn btn-primary btn-md">{saving ? "Хадгалж байна..." : "Хадгалах"}</button>
+      <button type="submit" disabled={saving || isUploading} className="btn btn-primary btn-md">{isUploading ? "Зураг upload хийж байна…" : saving ? "Хадгалж байна..." : "Хадгалах"}</button>
     </form>
   );
 }

@@ -114,7 +114,7 @@ export function Journey3D({
         {/* Дүрслэл */}
         {media ? (
           media.kind === "image"
-            ? <img aria-hidden src={media.url} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            ? <img aria-hidden src={media.url} alt="" className="absolute inset-0 h-full w-full object-contain" />
             : <video aria-hidden src={media.url} className="absolute inset-0 h-full w-full object-cover" muted loop autoPlay playsInline preload="metadata" />
         ) : null}
         {isWebgl && near && <Worlds world={world} progress={progress} />}
