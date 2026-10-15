@@ -85,10 +85,13 @@ function GiftShelf({ gifts, title, modalOpen, onOpen }: { gifts: Gift[]; title: 
 }
 
 function GiftCard({ gift, duplicate, onOpen }: { gift: Gift; duplicate: boolean; onOpen: (gift: Gift) => void }) {
+  const episode = gift.title.match(/^Ananda\s+Podcast\s+Season\s*(\d+)[,\s]+Episode\s*(\d+)\s*[:–—-]\s*/i);
+  const displayTitle = episode ? gift.title.slice(episode[0].length) || gift.title : gift.title;
   return <button type="button" className={wall.card} data-duplicate={duplicate} aria-hidden={duplicate ? true : undefined} tabIndex={duplicate ? -1 : 0} aria-haspopup="dialog" aria-label={`${gift.title} — ${gift.url ? "тоглуулах" : "унших"}`} onClick={() => onOpen(gift)}>
+    <span className={wall.ambience} aria-hidden><MediaArtwork key={gift.poster} src={gift.poster} /></span>
     <span className={wall.artwork}><MediaArtwork key={gift.poster} src={gift.poster} /></span>
     <span className={wall.cardIcon} aria-hidden>{gift.url ? "▶" : "↗"}</span>
-    <span className={wall.cardCopy}><span className={wall.category}>{TABS.find(tab => tab.id === gift.category)?.title}</span><strong>{gift.title}</strong><span className={wall.action}>{gift.url ? "Үзэх" : "Унших"} <span aria-hidden>↗</span></span></span>
+    <span className={wall.cardCopy}><span className={wall.category}>{TABS.find(tab => tab.id === gift.category)?.title}{episode ? ` · ${episode[1]}.${episode[2]}` : ""}</span><strong>{displayTitle}</strong><span className={wall.action}>{gift.url ? "Үзэх" : "Унших"} <span aria-hidden>↗</span></span></span>
   </button>;
 }
 

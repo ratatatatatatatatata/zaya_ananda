@@ -9,7 +9,9 @@
 .track[data-reverse=true] { animation-direction:reverse; }
 .group { display:flex; flex-shrink:0; gap:var(--gap); padding-right:var(--gap); min-width:100cqw; }
 .card { position:relative; isolation:isolate; display:block; flex:0 0 var(--card-width); width:var(--card-width); aspect-ratio:3/4; overflow:hidden; text-align:left; border:1px solid #d2ddd0; border-radius:12px; background:#183a2e; color:#fff; cursor:pointer; transition:border-color .2s,box-shadow .2s; }
-.artwork { position:absolute; inset:0; z-index:-2; }
+.ambience { position:absolute; inset:-20px; z-index:-3; filter:blur(18px); opacity:.6; pointer-events:none; }
+.ambience img { object-fit:cover; }
+.artwork { position:absolute; inset:0 0 20%; z-index:-2; }
 .artwork img { object-fit:contain; }
 .card::after { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,transparent 30%,#10291c20 45%,#10291cdd 80%,#10291cf5 100%); }
 .cardIcon { position:absolute; top:12px; right:12px; display:grid; place-items:center; width:32px; height:32px; border:1px solid #ffffff55; border-radius:50%; background:#143528a6; color:#fff; font-size:.75rem; }
