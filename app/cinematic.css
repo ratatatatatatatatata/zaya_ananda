@@ -43,11 +43,6 @@ body:has([data-cinematic-theme]) .coverflow-controls>div { flex-wrap:wrap; justi
 /* The existing navigation, language picker, account and cart controls. */
 body:has([data-cinematic-theme]) .site-header { position:sticky; top:0; margin:0; border-radius:0; background:#fffffff0; border:0; border-bottom:1px solid #233a2510; box-shadow:none; backdrop-filter:blur(24px); overflow:visible; }
 body:has([data-cinematic-theme]) .site-header-row { height:72px; padding:10px 32px; gap:18px; max-width:1920px; margin:auto; }
-body:has([data-cinematic-theme]) .site-brand>span { gap:10px; }
-body:has([data-cinematic-theme]) .site-brand :is(img,svg) { width:46px; height:46px; border-radius:50%; object-fit:contain; }
-body:has([data-cinematic-theme]) .site-brand>span>span { display:flex; }
-body:has([data-cinematic-theme]) .site-brand>span>span>span:first-child { font-family:var(--font-sans); font-size:18px; letter-spacing:-.045em; color:#18392f; background:none!important; -webkit-text-fill-color:currentColor; }
-body:has([data-cinematic-theme]) .site-brand>span>span>span:last-child { font-size:9px; letter-spacing:.3em; color:#547268; background:none!important; -webkit-text-fill-color:currentColor; margin-top:5px; }
 body:has([data-cinematic-theme]) .site-nav { gap:3px; justify-content:center; flex:1; }
 body:has([data-cinematic-theme]) .site-nav .nav-link { font-size:14px; padding:10px 10px; border-radius:999px; color:#48584c; }
 body:has([data-cinematic-theme]) .site-nav .nav-link:hover { background:#eef3ec; }
@@ -172,9 +167,6 @@ body:has([data-cinematic-theme]) .home-catalog .course-level { background:transp
 @media(max-width:600px) {
  html:has([data-cinematic-theme]) { scroll-padding-top:124px; }
  body:has([data-cinematic-theme]) .site-header-row { height:66px; padding:8px 16px; gap:6px; }
- body:has([data-cinematic-theme]) .site-brand :is(img,svg) { width:36px; height:36px; }
- body:has([data-cinematic-theme]) .site-brand>span>span>span:first-child { font-size:15px; }
- body:has([data-cinematic-theme]) .site-brand>span>span>span:last-child { font-size:8px; }
  .discovery-hero-copy { padding:42px 24px 32px; }.discovery-hero h1 { font-size:clamp(2rem,7.5vw,2.8rem); line-height:1.17; letter-spacing:-.045em; margin-top:18px; }
  .discovery-hero-summary { margin-top:22px; }.discovery-intro { font-size:1rem; line-height:1.7; }.discovery-kicker { font-size:.75rem; letter-spacing:.12em; }
  .discovery-actions { gap:24px; margin-top:25px; }.discovery-actions a { font-size:.875rem; }.discovery-actions .btn { padding:13px 20px; min-height:48px; }

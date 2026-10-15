@@ -15,6 +15,9 @@ body .site-header[data-compact=true] .site-nav {
 body .site-header[data-compact=false] .site-menu-toggle,
 body .site-header[data-compact=false] #mobile-navigation { display:none; }
 .site-header-row { min-width:0; }
+/* The uploaded logo is the complete brand mark; show it without a second wordmark. */
+.site-header .site-brand img { width:176px; height:52px; border-radius:0; object-fit:contain; }
+@media(max-width:767px) { .site-header .site-brand img { width:132px; height:46px; } }
 body .site-header .site-actions { gap:4px; }
 .site-actions > button,
 .site-actions > a,
@@ -59,8 +62,7 @@ main :is(h1,h2,h3,h4,a,p,label) { overflow-wrap:break-word; }
   .experience-scroll-controls { flex-wrap:wrap; }
 }
 @media(max-width:440px) {
-  body .site-header .site-brand > span > span { display:none; }
-  body .site-header .site-brand img { width:40px; height:40px; }
+  body .site-header .site-brand img { width:112px; height:44px; }
   body .site-header .site-header-row { gap:8px; }
   .category-scroll-story[data-scroll-mode=false] .experience-copy { padding:20px; }
   .experience-copy h3 { font-size:1.55rem; }

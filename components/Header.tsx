@@ -90,7 +90,7 @@ export function Header({ logoSrc }: { logoSrc?: string }) {
   return (
     <header data-compact={compact} className={cx("site-header sticky top-0 z-40 transition-all duration-300", scrolled ? "glass border-b border-line shadow-sm" : "border-b border-transparent bg-ivory/80 backdrop-blur-sm")}>
       <div ref={rowRef} className="site-header-row flex h-16 w-full items-center justify-between gap-3 px-4 lg:h-[72px] lg:px-6">
-        <Link ref={brandRef} href="/" aria-label="Zaya's Ananda" className="site-brand shrink-0"><Logo logoSrc={logoSrc} priority /></Link>
+        <Link ref={brandRef} href="/" aria-label="Zaya's Ananda" className="site-brand shrink-0"><Logo logoSrc={logoSrc} withText={false} priority /></Link>
 
         <nav ref={navRef} aria-hidden={compact} aria-label="Үндсэн цэс" className="site-nav items-center gap-2.5 2xl:gap-4">
           {links.map((l) => (
