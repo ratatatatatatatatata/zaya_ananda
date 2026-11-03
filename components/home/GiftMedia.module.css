@@ -23,3 +23,10 @@
 .sections .name { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin:8px 12px 12px; font-size:.85rem; line-height:1.5; }
 .sections .more { margin:auto 12px 12px; font-size:.75rem; }
 @media(max-width:767px) { .sections .feature { grid-template-columns:1fr; }.sections .featureCopy { padding:16px; gap:10px; }.sections .railCard { flex-basis:172px; }.sections { gap:36px; } }
+
+/* Fine outlined tabs keep the media, rather than the controls, prominent. */
+.tabs { gap:8px; margin-bottom:40px; }
+.tabs button { background:#fffefa9c; border-color:#a3ad9b40; color:#65705e; font-size:.875rem; font-weight:500; border-radius:4px; box-shadow:none; transition:background .2s,color .2s,border-color .2s; }
+.tabs button:hover { background:#edf2e8; border-color:#899b7b70; }
+.tabs button[aria-selected=true] { background:#e9efe3; border-color:#8a9a7970; color:#364c3d; box-shadow:inset 0 -2px #879875; }
+.heading h3 { color:#34483c; font-weight:400; }
