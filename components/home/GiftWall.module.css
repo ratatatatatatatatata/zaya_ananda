@@ -4,7 +4,9 @@
 .controls button { display:inline-flex; align-items:center; gap:8px; min-height:42px; padding:9px 15px; border:1px solid #d7d1c7; border-radius:6px; background:#f8f7f6; color:#514a3f; font-size:.8rem; font-weight:500; }
 .controls button[aria-pressed=true] { background:#514a3f; color:#fff; border-color:#514a3f; }
 .wall { --card-width:clamp(184px,15.6vw,280px); --gap:clamp(12px,1.1vw,20px); display:grid; gap:var(--gap); container-type:inline-size; }
-.viewport { overflow-x:auto; overflow-y:hidden; padding:5px 0 12px; scrollbar-width:thin; scrollbar-color:#b9aa90 transparent; overscroll-behavior-x:contain; cursor:grab; }
+.viewport { overflow-x:auto; overflow-y:hidden; padding:5px 0; scrollbar-width:thin; scrollbar-color:#b9aa90 transparent; overscroll-behavior-x:contain; cursor:grab; }
+.viewport[data-animated=true] { overflow:hidden; touch-action:pan-y pinch-zoom; }
+.viewport[data-animated=true] .track { will-change:transform; }
 .viewport[data-dragging=true] { cursor:grabbing; user-select:none; }
 .viewport img { user-select:none; -webkit-user-drag:none; }
 .viewport:focus-visible { outline:2px solid #8d7247; outline-offset:3px; }
