@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { resolveLogoSrc } from "@/lib/brand-logo";
 import { SOCIALS } from "./SocialIcons";
 import { siteConfig } from "@/data/content";
 import { useEffect, useState } from "react";
@@ -35,7 +36,7 @@ export function Footer() {
         <div>
           <Link href="/" className="flex items-center gap-2.5">
             {settings.logo
-              ? <img src={settings.logo} alt="" className="h-10 w-10 rounded-2xl object-contain" />
+              ? <img src={resolveLogoSrc(settings.logo)} alt="" className="h-10 w-10 rounded-2xl object-contain" />
               : <span className="grid h-10 w-10 place-items-center rounded-2xl bg-primary-grad text-lg text-white">✶</span>}
             <span className="font-display text-lg font-semibold text-ink">Zaya&apos;s Ananda</span>
           </Link>

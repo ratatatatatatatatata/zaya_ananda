@@ -1,16 +1,17 @@
-export const DEFAULT_LOGO_SRC = "/brand/zaya-ananda-logo-clean.png";
+import { resolveLogoSrc } from "@/lib/brand-logo";
+export { DEFAULT_LOGO_SRC } from "@/lib/brand-logo";
 
 export function Logo({ withText = true, className = "", logoSrc, priority = false }: { withText?: boolean; className?: string; logoSrc?: string; priority?: boolean }) {
   return (
     <span className={"inline-flex items-center gap-3 " + className}>
       <img
-        src={logoSrc || DEFAULT_LOGO_SRC}
+        src={resolveLogoSrc(logoSrc)}
         alt="Zaya's Ananda"
         width={56}
         height={56}
         loading={priority ? "eager" : undefined}
         fetchPriority={priority ? "high" : undefined}
-        className="h-14 w-14 shrink-0 rounded-2xl object-contain"
+        className="h-14 w-14 shrink-0 rounded-2xl bg-white object-contain"
       />
       {withText && (
         <span className="flex flex-col leading-none">

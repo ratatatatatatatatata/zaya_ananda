@@ -2,7 +2,7 @@
 
 import { isSectionReel } from "@/lib/section-reels";
 import Image from "next/image";
-import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { collectPublicMedia, giftCategory, type GiftCategory } from "@/lib/public-media";
 import { embedSrc } from "@/lib/video-embed";
@@ -10,6 +10,7 @@ import { RichBody } from "@/components/RichBody";
 import type { CmsItem } from "@/lib/types";
 import styles from "./GiftMedia.module.css";
 import wall from "./GiftWall.module.css";
+import { GiftRow } from "./GiftRow";
 
 const TABS: { id: GiftCategory; title: string }[] = [
   { id: "podcast", title: "Podcast" },
@@ -21,7 +22,7 @@ type Gift = { id: string; title: string; poster: string; category: GiftCategory;
 function MediaArtwork({ src, large = false }: { src: string; large?: boolean }) {
   const [failed, setFailed] = useState(false);
   const source = failed ? "/video/temple.jpg" : src;
-  return <Image src={source} alt="" fill sizes={large ? "(max-width:767px) 100vw, 1000px" : "(max-width:600px) 170px, (max-width:1600px) 16vw, 280px"} unoptimized={!source.startsWith("/")} onError={() => setFailed(true)} />;
+  return <Image src={source} alt="" fill sizes={large ? "(max-width:767px) 100vw, 1000px" : "(max-width:600px) 170px, (max-width:1600px) 16vw, 280px"} draggable={false} unoptimized={!source.startsWith("/")} onError={() => setFailed(true)} />;
 }
 
 /** Homepage keeps its three tabs; the Gift page keeps all three category headings. */
@@ -57,6 +58,7 @@ export function MediaLibrary({ items, categorized = false }: { items: CmsItem[];
 function GiftShelf({ gifts, title, modalOpen, onOpen }: { gifts: Gift[]; title: string; modalOpen: boolean; onOpen: (gift: Gift) => void }) {
   const [paused, setPaused] = useState(false);
   const [browsing, setBrowsing] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const rows = gifts.length > 3 ? [gifts.filter((_, i) => i % 2 === 0), gifts.filter((_, i) => i % 2 === 1)] : [gifts];
   return <section aria-label={title} className={wall.shelf}>
     <div className={styles.heading}>
@@ -66,19 +68,17 @@ function GiftShelf({ gifts, title, modalOpen, onOpen }: { gifts: Gift[]; title: 
         {!browsing && <button type="button" aria-pressed={paused} aria-label={paused ? `${title} — хөдөлгөөн үргэлжлүүлэх` : `${title} — хөдөлгөөн зогсоох`} onClick={() => setPaused(value => !value)}><span aria-hidden>{paused ? "▷" : "Ⅱ"}</span> {paused ? "Үргэлжлүүлэх" : "Түр зогсоох"}</button>}
       </div>}
     </div>
-    {!gifts.length ? <p className="media-empty">{title} агуулга удахгүй нэмэгдэнэ.</p> : <div className={wall.wall} data-paused={paused || modalOpen} data-browsing={browsing}>
+    {!gifts.length ? <p className="media-empty">{title} агуулга удахгүй нэмэгдэнэ.</p> : <div className={wall.wall} data-paused={paused || modalOpen} data-browsing={browsing} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
       {rows.map((row, rowIndex) => {
         const moving = row.length > 1;
         // Repeat a short row enough to cover wide screens; duplicates are not keyboard stops.
         const repetitions = moving ? Math.max(1, Math.ceil(8 / row.length)) : 1;
         const strip = Array.from({ length: repetitions }, () => row).flat();
-        return <div key={rowIndex} className={wall.viewport} data-moving={moving}>
-          <div className={wall.track} data-reverse={rowIndex === 1} style={{ "--travel-time": `${strip.length * 7}s` } as CSSProperties}>
+        return <GiftRow key={rowIndex} paused={paused || modalOpen || hovered} browsing={browsing} moving={moving} reverse={rowIndex === 1} duration={strip.length * 7} label={`${title} — ${rowIndex + 1}-р мөр, хоёр тийш гүйлгэх`} onManual={() => setPaused(true)}>
             {[0, ...(moving ? [1] : [])].map(copy => <div key={copy} className={wall.group} aria-hidden={copy === 1 ? true : undefined} data-copy={copy}>
               {strip.map((item, index) => <GiftCard key={`${item.id}-${index}`} gift={item} duplicate={copy === 1 || index >= row.length} onOpen={onOpen} />)}
             </div>)}
-          </div>
-        </div>;
+        </GiftRow>;
       })}
     </div>}
   </section>;

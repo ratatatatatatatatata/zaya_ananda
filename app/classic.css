@@ -30,7 +30,7 @@ body:has([data-cinematic-theme]) :is(.card,.card-lux,.glass-lux,.glass,.panel) {
   border-radius:10px; border-color:#ded6c9; box-shadow:0 8px 28px #493c2805;
 }
 body:has([data-cinematic-theme]) .site-header {
-  background:#fffdf9f5; border-bottom:1px solid #ded6c9; border-radius:0;
+  background:#ffffff; border-bottom:1px solid #ded6c9; border-radius:0;
 }
 body:has([data-cinematic-theme]) .site-nav .nav-link { border-radius:3px; color:#61594d; }
 body:has([data-cinematic-theme]) .site-nav .text-primary-700 { background:#f0e9dc; color:#574527; }

@@ -7,7 +7,7 @@ import "./classic.css";
 import { VisualTheme } from "@/components/VisualTheme";
 import { Providers } from "@/components/Providers";
 import { getSettingsCached } from "@/lib/repo";
-import { DEFAULT_LOGO_SRC } from "@/components/Logo";
+import { resolveLogoSrc } from "@/lib/brand-logo";
 import { Header } from "@/components/Header";
 import { FooterGate } from "@/components/FooterGate";
 import { CosmicBackdrop } from "@/components/CosmicBackdrop";
@@ -68,7 +68,7 @@ const orgJsonLd = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSettingsCached();
-  const logoSrc = settings.logo?.trim() || DEFAULT_LOGO_SRC;
+  const logoSrc = resolveLogoSrc(settings.logo);
   return (
     <html lang="mn">
       <head>

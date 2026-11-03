@@ -4,9 +4,12 @@
 .controls button { display:inline-flex; align-items:center; gap:8px; min-height:42px; padding:9px 15px; border:1px solid #d7d1c7; border-radius:6px; background:#f8f7f6; color:#514a3f; font-size:.8rem; font-weight:500; }
 .controls button[aria-pressed=true] { background:#514a3f; color:#fff; border-color:#514a3f; }
 .wall { --card-width:clamp(184px,15.6vw,280px); --gap:clamp(12px,1.1vw,20px); display:grid; gap:var(--gap); container-type:inline-size; }
-.viewport { overflow:hidden; padding:5px 0; }
-.track { display:flex; width:max-content; animation:drift var(--travel-time) linear infinite; }
-.track[data-reverse=true] { animation-direction:reverse; }
+.viewport { overflow-x:auto; overflow-y:hidden; padding:5px 0 12px; scrollbar-width:thin; scrollbar-color:#b9aa90 transparent; overscroll-behavior-x:contain; cursor:grab; }
+.viewport[data-dragging=true] { cursor:grabbing; user-select:none; }
+.viewport img { user-select:none; -webkit-user-drag:none; }
+.viewport:focus-visible { outline:2px solid #8d7247; outline-offset:3px; }
+.track { display:flex; width:max-content; }
+
 .group { display:flex; flex-shrink:0; gap:var(--gap); padding-right:var(--gap); min-width:100cqw; }
 .card { position:relative; isolation:isolate; display:block; flex:0 0 var(--card-width); width:var(--card-width); aspect-ratio:3/4; overflow:hidden; text-align:left; border:1px solid #ddd8d0; border-radius:12px; background:#2e2a24; color:#fff; cursor:pointer; transition:border-color .2s,box-shadow .2s; }
 .ambience { position:absolute; inset:-20px; z-index:-3; filter:blur(18px); opacity:.6; pointer-events:none; }
@@ -21,19 +24,19 @@
 .action { display:flex; gap:12px; align-items:center; font-size:.72rem; color:#e7e4df; }
 .card:hover { border-color:#998e7b; box-shadow:inset 0 0 0 1px #998e7b; }
 .card:focus-visible,.controls button:focus-visible,.dialogHeader button:focus-visible { outline:3px solid #a19786; outline-offset:3px; }
-.wall[data-paused=true] .track,.wall:focus-within .track { animation-play-state:paused; }
-@media(hover:hover) { .wall:hover .track { animation-play-state:paused; } }
+
+
 .viewport[data-moving=false] .track { animation:none; }
 .viewport[data-moving=false] .group { min-width:0; }
-@keyframes drift { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+
 /* Show every original once for keyboard navigation, small libraries and reduced motion. */
 .wall[data-browsing=true] .viewport { overflow:visible; }
-.wall[data-browsing=true] .track,.wall:has(.card:focus-visible) .track { animation:none; transform:none; width:100%; }
+.wall[data-browsing=true] .track { animation:none; transform:none; width:100%; }
 .wall[data-browsing=true] .group { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,var(--card-width)),1fr)); width:100%; padding:0; min-width:0; }
 .wall[data-browsing=true] .card { width:100%; }
-.wall[data-browsing=true] [data-duplicate=true],.wall:has(.card:focus-visible) [data-duplicate=true] { display:none; }
-.wall[data-browsing=true] [data-copy="1"],.wall:has(.card:focus-visible) [data-copy="1"] { display:none; }
-.wall:has(.card:focus-visible) .viewport { overflow-x:auto; }
+.wall[data-browsing=true] [data-duplicate=true] { display:none; }
+.wall[data-browsing=true] [data-copy="1"] { display:none; }
+
 .dialog { width:min(1050px,calc(100vw - 32px)); max-height:calc(100dvh - 40px); margin:auto; padding:0; border:1px solid #d7d1c7; border-radius:10px; background:#faf9f7; color:#3d382f; overflow:auto; box-shadow:0 28px 100px #081d2450; }
 .dialog::backdrop { background:#13120fbd; backdrop-filter:blur(8px); }
 .dialogContent { width:100%; }
