@@ -1,0 +1,50 @@
+/* Shared public-page backgrounds. Keep component colors, typography and motion
+   independent of this layer, so a background change cannot recolor controls. */
+body:has([data-cinematic-theme]) {
+  --site-paper:#f5f0e8;
+  --site-background:
+    radial-gradient(ellipse at 0% 18%,#fffefa 0%,#fffefa00 58%),
+    radial-gradient(ellipse at 100% 80%,#ded0ba66 0%,#ded0ba00 55%),
+    linear-gradient(115deg,#f9f6f0 5%,#eee6d9 100%);
+  --site-background-soft:
+    radial-gradient(ellipse at 85% 0%,#e3d4bb55,transparent 58%),
+    linear-gradient(135deg,#fffdf8,#f1ece3);
+  --site-background-header:
+    radial-gradient(ellipse at 12% 10%,#fffdf8c9,transparent 62%),
+    linear-gradient(112deg,#efe7d9,#e5d8c4);
+  background:var(--site-background);
+}
+html:has([data-cinematic-theme]) { background:#f5f0e8; }
+body:has([data-cinematic-theme]) main { background:transparent; }
+body:has([data-cinematic-theme]) :is(.home-catalog,.home-intro-video,.discovery-overview,.discovery-story) {
+  background:var(--site-background);
+}
+body:has([data-cinematic-theme]) main .section,
+body:has([data-cinematic-theme]) .home-catalog .section,
+body:has([data-cinematic-theme]) .home-catalog .section:nth-child(even),
+body:has([data-cinematic-theme]) .experience-section,
+body:has([data-cinematic-theme]) .experience-section:nth-child(even) {
+  background:var(--site-background);
+}
+body:has([data-cinematic-theme]) main .section:nth-of-type(even),
+body:has([data-cinematic-theme]) .home-catalog .section:nth-child(even),
+body:has([data-cinematic-theme]) .experience-section:nth-child(even) {
+  background:var(--site-background-soft);
+}
+/* Remove the previous faded photographs behind section content. */
+body:has([data-cinematic-theme]) .activity-backdrop { display:none; }
+body:has([data-cinematic-theme]) .page-header { background:var(--site-background-header); }
+body:has([data-cinematic-theme]) .site-footer {
+  background:linear-gradient(125deg,#eee5d7,#e4d8c5);
+}
+/* Dark backgrounds support the existing white authentication text. */
+body:has([data-cinematic-theme]) .cinema-auth {
+  background:radial-gradient(ellipse at 85% 15%,#8d785657,transparent 55%),linear-gradient(125deg,#2b2925,#4c4337);
+}
+body:has([data-cinematic-theme]) .cinema-auth > [aria-hidden] { display:none; }
+@media(max-width:767px) {
+  body:has([data-cinematic-theme]) {
+    --site-background:linear-gradient(140deg,#faf7f1,#eee5d7);
+    --site-background-soft:linear-gradient(150deg,#fffdf8,#f0e9df);
+  }
+}

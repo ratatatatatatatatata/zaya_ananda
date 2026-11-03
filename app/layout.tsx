@@ -4,6 +4,7 @@ import "./globals.css";
 import "./cinematic.css";
 import "./responsive.css";
 import "./classic.css";
+import "./backgrounds.css";
 import { VisualTheme } from "@/components/VisualTheme";
 import { Providers } from "@/components/Providers";
 import { getSettingsCached } from "@/lib/repo";

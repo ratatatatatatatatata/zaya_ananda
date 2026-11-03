@@ -198,3 +198,9 @@
  .heroLogo { padding:28px 0; }
  .heroLogo :is(img,svg) { width:220px; }
 }
+
+/* Share the site background while retaining this page's editorial components. */
+.page { --paper:var(--site-paper,#f8faf9); background:var(--site-background,var(--paper)); }
+.page .hero { background:var(--site-background-header,var(--paper)); }
+.page .dark,.page .team { background:var(--site-background-soft,var(--paper)); }
+.page .program { background:var(--site-background,var(--paper)); }
