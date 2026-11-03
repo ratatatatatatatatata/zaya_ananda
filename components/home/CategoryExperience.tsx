@@ -4,8 +4,8 @@ import { serviceImage } from "@/lib/service-image";
 import { itemTeachers } from "@/lib/item-teachers";
 import Image from "next/image";
 import { HomeDetailLink as Link } from "@/components/home/HomeDetails";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { motion, useMotionValue, useReducedMotion } from "framer-motion";
+import { useId, useRef, useState, type KeyboardEvent } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { StoneReading } from "../StoneReading";
 import { locText } from "@/lib/cms-i18n";
 import { useI18n } from "@/lib/i18n";
@@ -35,93 +35,50 @@ export function CategoryExperience({ services, products, journeys }: { services:
           <h2 id={`experience-${category.id}`}>{t(category.key)}</h2>
           <p className="experience-intro">{category.desc}</p>
         </div>
-        <CategoryScrollStory slides={slides} category={category} title={t(category.key)} />
+        <CategoryTabs slides={slides} category={category} title={t(category.key)} />
         {category.id === "shop" && <div className="experience-stones"><StoneReading /></div>}
       </section>;
     })}
   </div>;
 }
 
-function CategoryScrollStory({ slides, category, title }: { slides: Slide[]; category: typeof categories[number]; title:string }) {
+function CategoryTabs({ slides, category, title }: { slides: Slide[]; category: typeof categories[number]; title: string }) {
   const reduced = useReducedMotion();
-  const [index, setIndex] = useState(0);
-  const [viewportScrollMode, setViewportScrollMode] = useState(false);
-  // Journey programs always remain visible as a vertical list, including new additions.
-  const scrollMode = category.id !== "ayalal" && viewportScrollMode;
-  const track = useRef<HTMLDivElement>(null);
-  const stage = useRef<HTMLDivElement>(null);
-  const progress = useMotionValue(0);
-  const list: Slide[] = slides.length ? slides : [{ id:category.id, title, desc:category.desc, image:category.image, tags:[], href:category.href }];
-
-  useEffect(() => {
-    // Short / zoomed viewports and reduced motion use a fully readable list.
-    const screen = window.matchMedia("(min-width: 1024px) and (min-height: 800px)");
-    const update = () => setViewportScrollMode(screen.matches && !reduced && list.length > 1);
-    update();
-    screen.addEventListener("change", update);
-    return () => screen.removeEventListener("change", update);
-  }, [reduced, list.length]);
-
-  useEffect(() => {
-    if (!scrollMode) return;
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      if (!track.current || !stage.current) return;
-      const top = parseFloat(getComputedStyle(stage.current).top) || 0;
-      const distance = track.current.offsetHeight - stage.current.offsetHeight;
-      const value = Math.min(1, Math.max(0, (top - track.current.getBoundingClientRect().top) / Math.max(1, distance)));
-      progress.set(value);
-      setIndex(Math.min(list.length - 1, Math.floor(value * list.length)));
-    };
-    const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
-    const observer = new ResizeObserver(schedule);
-    observer.observe(track.current!);
-    observer.observe(stage.current!);
-    window.addEventListener("scroll", schedule, { passive:true });
-    window.addEventListener("resize", schedule);
-    schedule();
-    return () => {
-      cancelAnimationFrame(frame);
-      observer.disconnect();
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-    };
-  }, [scrollMode, list.length, progress]);
-
-  return <div className="category-carousel category-scroll-story" aria-label={title} data-scroll-mode={scrollMode}>
-    <div ref={track} className="experience-scroll-track" style={{ "--experience-steps":list.length } as CSSProperties}>
-      <div ref={stage} className="experience-scroll-stage">
-        {scrollMode && <div className="experience-scroll-meta"><span>{title}</span><span>Доош гүйлгэж танилцаарай ↓</span></div>}
-        <div className="experience-window">
-          {list.map((slide, i) => {
-            const active = !scrollMode || i === index;
-            const direction = i < index ? -1 : 1;
-            return <motion.article key={slide.id} className="experience-slide" aria-label={`${i+1} / ${list.length}`} aria-hidden={!active} data-active={active}
-              initial={false} animate={{ opacity:active ? 1 : 0, y:scrollMode && !active ? direction*36 : 0 }}
-              transition={{ duration:reduced ? 0 : .55, ease:[.22,1,.36,1] }} style={{ pointerEvents:active ? "auto" : "none", zIndex:active ? 1 : 0 }}>
-              <div className="experience-image">
-                <motion.div className="experience-image-motion" initial={false} animate={{opacity:active ? 1 : 0}} transition={{duration:reduced ? 0 : .9, ease:[.22,1,.36,1]}}>
-                  {slide.image && <Image src={slide.image} alt={slide.title} fill sizes="(max-width:767px) 100vw, 55vw" unoptimized={!slide.image.startsWith("/")} />}
-                </motion.div>
-                <span>{title}</span>
-              </div>
-              <motion.div className="experience-copy" initial={false} animate={{y:scrollMode && !active ? direction*22 : 0}} transition={{duration:reduced ? 0 : .65, ease:[.22,1,.36,1]}}>
-                <p className="discovery-kicker">ZAYA’S ANANDA · {String(i+1).padStart(2,"0")}</p>
-                <h3>{slide.title}</h3><p className="experience-description">{slide.desc}</p>
-                <div className="experience-tags">{slide.tags.map(tag => <span key={tag}>{tag}</span>)}</div>
-                <Link href={slide.href} tabIndex={active ? undefined : -1} className="btn btn-primary">Дэлгэрэнгүй үзэх</Link>
-              </motion.div>
-            </motion.article>;
-          })}
-        </div>
-        {scrollMode && <div className="experience-scroll-controls">
-          <span className="experience-scroll-count">{String(index+1).padStart(2,"0")} / {String(list.length).padStart(2,"0")}</span>
-          <div className="experience-scroll-progress" aria-hidden="true"><motion.div style={{scaleX:progress}} /></div>
-          <Link href={category.href}>Бүгдийг үзэх ↗</Link>
-        </div>}
-      </div>
+  const [selected, setSelected] = useState(0);
+  const tabs = useRef<(HTMLButtonElement | null)[]>([]);
+  const id = useId();
+  const list: Slide[] = slides.length ? slides : [{ id:category.id, title, desc:category.desc, image:category.id === "services" ? "" : category.image, tags:[], href:category.href }];
+  const index = Math.min(selected, list.length - 1);
+  const journey = category.id === "ayalal";
+  const onKey = (event: KeyboardEvent<HTMLButtonElement>, current: number) => {
+    let next = current;
+    if (event.key === "ArrowRight") next = (current + 1) % list.length;
+    else if (event.key === "ArrowLeft") next = (current - 1 + list.length) % list.length;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = list.length - 1;
+    else return;
+    event.preventDefault(); setSelected(next); tabs.current[next]?.focus({ preventScroll: true });
+    tabs.current[next]?.scrollIntoView({ block:"nearest", inline:"nearest", behavior:"instant" as ScrollBehavior });
+  };
+  const panel = (slide: Slide, i: number) => <motion.div key={slide.id} className="editorial-panel" initial={reduced ? false : {opacity:0}} animate={{opacity:1}} transition={{duration:.3}}>
+    <div className="editorial-panel-image">
+      {slide.image && <Image src={slide.image} alt={slide.title} fill sizes="(max-width:767px) 100vw, 48vw" unoptimized={!slide.image.startsWith("/")} />}
+      <span>{String(i + 1).padStart(2,"0")} / {String(list.length).padStart(2,"0")}</span>
     </div>
-    <div className="experience-browse"><Link href={category.href}>Бүгдийг үзэх <span aria-hidden>→</span></Link></div>
+    <div className="editorial-panel-copy">
+      <p className="discovery-kicker">{title}</p>
+      <h3>{slide.title}</h3><p>{slide.desc}</p>
+      <div className="experience-tags">{slide.tags.map(tag => <span key={tag}>{tag}</span>)}</div>
+      <Link href={slide.href} className="btn btn-primary">Дэлгэрэнгүй үзэх</Link>
+    </div>
+  </motion.div>;
+  return <div className="editorial-catalog">
+    {journey ? <div className="editorial-journeys">{list.map(panel)}</div> : <>
+      <div role="tablist" aria-label={title} className="editorial-tabs">
+        {list.map((slide,i) => <button key={slide.id} ref={node=>{tabs.current[i]=node;}} type="button" role="tab" id={`${id}-tab-${i}`} aria-controls={`${id}-panel`} aria-selected={i === index} tabIndex={i === index ? 0 : -1} onClick={()=>setSelected(i)} onKeyDown={e=>onKey(e,i)}><span>{String(i+1).padStart(2,"0")}</span>{slide.title}</button>)}
+      </div>
+      <div role="tabpanel" id={`${id}-panel`} aria-labelledby={`${id}-tab-${index}`} tabIndex={0}>{panel(list[index],index)}</div>
+    </>}
+    <div className="editorial-browse"><span>{title} · {slides.length}</span><Link href={category.href}>Бүгдийг үзэх</Link></div>
   </div>;
 }

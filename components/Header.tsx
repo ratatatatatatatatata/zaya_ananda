@@ -22,6 +22,8 @@ export function Header({ logoSrc }: { logoSrc?: string }) {
   const { user, logout } = useAuth();
   const { t, lang } = useI18n();
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [activeSection, setActiveSection] = useState("top");
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [compact, setCompact] = useState(true);
@@ -36,11 +38,28 @@ export function Header({ logoSrc }: { logoSrc?: string }) {
     (lang !== "mn" && p.i18n?.[lang]?.navLabel) || p.navLabel;
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    let last = window.scrollY, frame = 0;
+    const update = () => {
+      frame = 0;
+      const y = window.scrollY;
+      setScrolled(y > 10);
+      if (Math.abs(y - last) > 6) setHidden(y > 180 && y > last);
+      last = y;
+      if (pathname === "/") {
+        let active = "top";
+        for (const link of links) {
+          const id = link.href === "/" ? "top" : link.href.slice(1);
+          const section = document.getElementById(id);
+          if (section && section.getBoundingClientRect().top <= 160) active = id;
+        }
+        setActiveSection(active);
+      }
+    };
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", onScroll, { passive:true });
+    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(frame); };
+  }, [pathname]);
   useEffect(() => { setMenuOpen(false); setAccountOpen(false); }, [pathname]);
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -85,16 +104,17 @@ export function Header({ logoSrc }: { logoSrc?: string }) {
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
-  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  const destination = (href: string) => pathname === "/" ? (href === "/" ? "#top" : `#${href.slice(1)}`) : href;
+  const isActive = (href: string) => pathname === "/" ? activeSection === (href === "/" ? "top" : href.slice(1)) : pathname.startsWith(href) && href !== "/";
 
   return (
-    <header data-compact={compact} className={cx("site-header sticky top-0 z-40 transition-all duration-300", scrolled ? "glass border-b border-line shadow-sm" : "border-b border-transparent bg-ivory/80 backdrop-blur-sm")}>
+    <header data-hidden={hidden && !menuOpen && !accountOpen} data-compact={compact} className={cx("site-header sticky top-0 z-40 transition-all duration-300", scrolled ? "glass border-b border-line shadow-sm" : "border-b border-transparent bg-ivory/80 backdrop-blur-sm")}>
       <div ref={rowRef} className="site-header-row flex h-16 w-full items-center justify-between gap-3 px-4 lg:h-[72px] lg:px-6">
         <Link ref={brandRef} href="/" aria-label="Zaya's Ananda" className="site-brand shrink-0"><Logo logoSrc={logoSrc} withText={false} priority /></Link>
 
         <nav ref={navRef} aria-hidden={compact} aria-label="Үндсэн цэс" className="site-nav items-center gap-2.5 2xl:gap-4">
           {links.map((l) => (
-            <Link key={l.href} href={l.href}
+            <Link key={l.href} href={destination(l.href)} onClick={() => { setMenuOpen(false); setHidden(false); }} aria-current={isActive(l.href) ? (pathname === "/" ? "location" : "page") : undefined}
               className={cx("nav-link relative whitespace-nowrap py-1 text-[13px] 2xl:text-[14.5px]", isActive(l.href) && "text-primary-700 after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:rounded-full after:bg-primary-grad")}>
               {t(l.key)}
             </Link>
@@ -159,7 +179,7 @@ export function Header({ logoSrc }: { logoSrc?: string }) {
       <div id="mobile-navigation" className={cx("border-t border-line bg-ivory/95 backdrop-blur", menuOpen ? "visible max-h-[calc(100dvh-4.5rem)] overflow-y-auto opacity-100" : "invisible max-h-0 overflow-hidden opacity-0")} style={{ transition: "max-height 0.3s ease, opacity 0.2s ease, visibility 0.3s" }}>
         <nav className="container-px flex flex-col gap-1 py-4">
           {links.map((l) => (
-            <Link key={l.href} href={l.href}
+            <Link key={l.href} href={destination(l.href)} onClick={() => { setMenuOpen(false); setHidden(false); }} aria-current={isActive(l.href) ? (pathname === "/" ? "location" : "page") : undefined}
               className={cx("rounded-xl px-3 py-2.5 text-[15px] font-medium transition", isActive(l.href) ? "bg-primary-50 text-primary-700" : "text-ink/80 hover:bg-primary-50")}>
               {t(l.key)}
             </Link>

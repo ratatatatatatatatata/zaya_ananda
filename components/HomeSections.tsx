@@ -10,6 +10,7 @@ import { SectionZoom } from "./home/SectionZoom";
 import { ZurhaiSlider } from "./home/ZurhaiSlider";
 import { InlineDestinyMatrix } from "./matrix/InlineDestinyMatrix";
 import { NatalChart } from "./zurhai/NatalChart";
+import { HomeGuide } from "./home/HomeGuide";
 import { HomeAbout } from "./home/HomeAbout";
 import { listJourneysCached } from "@/lib/journeys-db";
 import type { Locale } from "@/lib/types";
@@ -71,6 +72,8 @@ export async function HomeSections() {
       />
 
       <CategoryExperience services={services} products={products} journeys={JOURNEYS} />
+
+      <HomeGuide />
 
       {/* Бидний тухай — үндсэн дарааллын төгсгөлд */}
       <section id="about" className="section scroll-mt-36"><div className="container-px">
