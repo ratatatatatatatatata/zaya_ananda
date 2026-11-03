@@ -18,7 +18,7 @@ export function CinematicLanding({ media }: { media?: HeroMedia }) {
       <div className="discovery-hero-frame">
         <m.div className="discovery-hero-copy" style={reduced ? undefined : { y: titleY }}><p className="discovery-kicker">ZAYA’S ANANDA CENTER</p><h1 id="discovery-home-heading">{[t("home.heroTitleLine1"),t("home.heroTitleLine2")].map((line,i) => <span key={i}>{line}</span>)}</h1><div className="discovery-hero-summary"><p className="discovery-intro">{t("home.heroDescription")}</p></div>
         </m.div>
-        <m.div className="discovery-hero-visual"><m.div className="discovery-hero-parallax" style={reduced ? undefined : { y: imageY }}><FadingVideo src={media?.kind === "video" ? media.url : "/video/meditation.mp4"} poster="/video/meditation.jpg" image={media?.kind === "image" ? media.url : undefined} hero showToggle={false}/></m.div><div className="discovery-hero-wash" aria-hidden="true"/><div className="discovery-hero-foot"><span>{tl("Өөртэйгөө ойртох нэг алхам.")}</span><span>INNER BALANCE</span></div></m.div>
+        <m.div className="discovery-hero-visual"><m.div className="discovery-hero-parallax" style={reduced ? undefined : { y: imageY }}><FadingVideo src={media?.kind === "video" ? media.url : "/video/meditation.mp4"} poster="/backgrounds/meditation-dawn.webp" image={media?.kind === "image" ? media.url : media ? undefined : "/backgrounds/meditation-dawn.webp"} hero showToggle={false}/></m.div><div className="discovery-hero-wash" aria-hidden="true"/><div className="discovery-hero-foot"><span>{tl("Өөртэйгөө ойртох нэг алхам.")}</span><span>INNER BALANCE</span></div></m.div>
       </div>
     </section>
   </LazyMotion>;
