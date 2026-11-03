@@ -2,7 +2,7 @@
 
 import { isSectionReel } from "@/lib/section-reels";
 import Image from "next/image";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useId, useRef, useState } from "react";
 import { collectPublicMedia, giftCategory, type GiftCategory } from "@/lib/public-media";
 import { embedSrc } from "@/lib/video-embed";
 import { RichBody } from "@/components/RichBody";
@@ -36,7 +36,34 @@ export function MediaLibrary({ items, categorized = false }: { items: CmsItem[];
   const [activeGift, setActiveGift] = useState<GiftSelection | null>(null);
   const id = useId();
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const pendingScroll = useRef<{ x: number; y: number } | null>(null);
+  const anchorStyle = useRef<string | null>(null);
+  const preservePosition = () => {
+    pendingScroll.current = { x: window.scrollX, y: window.scrollY };
+    if (anchorStyle.current === null) anchorStyle.current = document.documentElement.style.overflowAnchor;
+    document.documentElement.style.overflowAnchor = "none";
+  };
+  const openGift = (selection: GiftSelection) => {
+    preservePosition();
+    setActiveGift(selection);
+  };
+  useLayoutEffect(() => {
+    const position = pendingScroll.current;
+    if (position) window.scrollTo({ left: position.x, top: position.y, behavior: "instant" });
+    pendingScroll.current = null;
+    if (!activeGift && anchorStyle.current !== null) {
+      const frame = requestAnimationFrame(() => {
+        document.documentElement.style.overflowAnchor = anchorStyle.current || "";
+        anchorStyle.current = null;
+      });
+      return () => cancelAnimationFrame(frame);
+    }
+  }, [activeGift]);
+  useEffect(() => () => {
+    if (anchorStyle.current !== null) document.documentElement.style.overflowAnchor = anchorStyle.current;
+  }, []);
   const closeGift = () => {
+    preservePosition();
     const trigger = activeGift?.trigger;
     setActiveGift(null);
     requestAnimationFrame(() => trigger?.focus({ preventScroll: true }));
@@ -55,8 +82,8 @@ export function MediaLibrary({ items, categorized = false }: { items: CmsItem[];
       }}>{item.title}</button>)}
     </div>}
     {categorized ? TABS.map((item,index) => <div key={item.id} role="tabpanel" id={`${id}-panel-${index}`} aria-labelledby={`${id}-tab-${index}`} hidden={tab !== index} tabIndex={0}>
-      {tab === index && <GiftShelf key={item.id} gifts={visible} title={item.title} selection={activeGift} onOpen={setActiveGift} onClose={closeGift} />}
-    </div>) : <div className={styles.sections}>{TABS.map(category => <GiftShelf key={category.id} gifts={gifts.filter(gift => gift.category === category.id)} title={category.title} selection={activeGift} onOpen={setActiveGift} onClose={closeGift} />)}</div>}
+      {tab === index && <GiftShelf key={item.id} gifts={visible} title={item.title} selection={activeGift} onOpen={openGift} onClose={closeGift} />}
+    </div>) : <div className={styles.sections}>{TABS.map(category => <GiftShelf key={category.id} gifts={gifts.filter(gift => gift.category === category.id)} title={category.title} selection={activeGift} onOpen={openGift} onClose={closeGift} />)}</div>}
   </div>;
 }
 
