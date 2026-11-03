@@ -46,13 +46,13 @@
 .dialogContent { width:100%; }
 .dialogHeader { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; padding:22px 26px; }
 .dialogHeader p { color:#7f7462; font-size:.7rem; letter-spacing:.08em; margin-bottom:7px; }
-.dialogHeader h2 { color:#3d382f; font-size:clamp(1.1rem,2vw,1.5rem); line-height:1.4; overflow-wrap:anywhere; }
+.dialogHeader h4 { color:#3d382f; font-size:clamp(1.1rem,2vw,1.5rem); line-height:1.4; overflow-wrap:anywhere; }
 .dialogHeader button { display:grid; place-items:center; flex-shrink:0; width:40px; height:40px; border:1px solid #d6d1c7; border-radius:50%; font-size:1.7rem; color:#3d382f; }
 .dialogPlayer { position:relative; aspect-ratio:16/9; background:#191714; }
 .dialogPlayer iframe,.dialogPlayer video { position:absolute; inset:0; width:100%; height:100%; border:0; object-fit:contain; }
 .dialogPlayer img { object-fit:contain; }
 .description { margin:0; padding:24px 26px; font-size:.95rem; line-height:1.8; white-space:pre-line; }
-@media(max-width:600px) { .wall { --card-width:164px; --gap:12px; }.cardCopy { padding:14px; gap:7px; }.cardCopy strong { font-size:1rem; }.controls button { min-height:40px; padding:8px 12px; font-size:.75rem; }.dialog { width:calc(100vw - 16px); max-height:calc(100dvh - 24px); border-radius:14px; }.dialogHeader { padding:16px; gap:12px; }.description { padding:18px; }.dialogHeader h2 { font-size:1rem; } }
+@media(max-width:600px) { .wall { --card-width:164px; --gap:12px; }.cardCopy { padding:14px; gap:7px; }.cardCopy strong { font-size:1rem; }.controls button { min-height:40px; padding:8px 12px; font-size:.75rem; }.dialog { width:calc(100vw - 16px); max-height:calc(100dvh - 24px); border-radius:14px; }.dialogHeader { padding:16px; gap:12px; }.description { padding:18px; }.dialogHeader h4 { font-size:1rem; } }
 @media(prefers-reduced-motion:reduce) { .track { animation:none; transform:none; }.viewport { min-width:0; max-width:100%; overflow-x:auto; }.group { min-width:0; }.wall [data-duplicate=true],.wall [data-copy="1"] { display:none; }.card { transition:none; } }
 
 /* Expand inside the selected row; keep its loop mounted at the same position. */
@@ -61,5 +61,23 @@
 .rowSlot[data-expanded=true] .rowCards { visibility:hidden; pointer-events:none; }
 .inlinePlayer { position:relative; align-self:start; justify-self:center; width:min(100%,980px); border:1px solid #d7d1c7; border-radius:10px; background:#faf9f7; color:#3d382f; overflow:hidden; box-shadow:0 14px 40px #514a3f16; }
 .inlinePlayer .dialogHeader { padding:14px 20px; }
-.inlinePlayer .dialogHeader h2 { font-size:clamp(1rem,1.7vw,1.3rem); }
+.inlinePlayer .dialogHeader h4 { font-size:clamp(1rem,1.7vw,1.3rem); }
 @media(max-width:600px) { .inlinePlayer .dialogHeader { padding:12px; gap:12px; } }
+
+/* Phone controls remain reachable without squeezing the video or its heading. */
+.dialogHeader > div { min-width:0; }
+@media(max-width:767px) {
+  .controls { width:100%; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .controls button { min-height:44px; justify-content:center; padding:10px 8px; line-height:1.4; }
+  .controls button:only-child { grid-column:1 / -1; }
+  .inlinePlayer { width:100%; border-radius:8px; }
+  .inlinePlayer .dialogHeader { padding:12px; gap:10px; }
+  .inlinePlayer .dialogHeader h4 { margin:0; font-size:1rem; line-height:1.45; }
+  .inlinePlayer .dialogHeader button { width:44px; height:44px; touch-action:manipulation; }
+  .inlinePlayer .description { padding:16px; font-size:.875rem; overflow-wrap:anywhere; }
+  .inlinePlayer .dialogPlayer { width:100%; aspect-ratio:16/9; }
+}
+@media(max-width:380px) { .wall { --card-width:148px; --gap:10px; } }
+@media(max-width:767px) and (orientation:landscape) and (max-height:500px) {
+  .inlinePlayer .dialogPlayer { max-height:70svh; }
+}

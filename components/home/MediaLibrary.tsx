@@ -146,7 +146,7 @@ function GiftPlayer({ gift, onClose }: { gift: Gift; onClose: () => void }) {
     if (event.key === "Escape") { event.preventDefault(); onClose(); }
   }}>
     <div className={wall.dialogContent}>
-      <header className={wall.dialogHeader}><div><p>{TABS.find(tab => tab.id === gift.category)?.title}</p><h2 id={titleId}>{gift.title}</h2></div><button ref={closeButton} type="button" onClick={onClose} aria-label="Хаах">×</button></header>
+      <header className={wall.dialogHeader}><div><p>{TABS.find(tab => tab.id === gift.category)?.title}</p><h4 id={titleId}>{gift.title}</h4></div><button ref={closeButton} type="button" onClick={onClose} aria-label="Хаах">×</button></header>
       <div className={wall.dialogPlayer}>
         {embed ? embed.type === "iframe" ? <iframe src={embed.src} title={gift.title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen /> : <video src={embed.src} poster={gift.poster} controls autoPlay playsInline aria-label={gift.title} onError={() => setFailed(true)} /> : <MediaArtwork src={gift.poster} large />}
       </div>

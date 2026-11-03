@@ -23,3 +23,9 @@
 .sections .name { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin:8px 12px 12px; font-size:.85rem; line-height:1.5; }
 .sections .more { margin:auto 12px 12px; font-size:.75rem; }
 @media(max-width:767px) { .sections .feature { grid-template-columns:1fr; }.sections .featureCopy { padding:16px; gap:10px; }.sections .railCard { flex-basis:172px; }.sections { gap:36px; } }
+
+@media(max-width:767px) {
+  .tabs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin-bottom:24px; }
+  .tabs button { min-width:0; min-height:48px; padding:10px 6px; font-size:.8rem; line-height:1.4; overflow-wrap:anywhere; }
+  .heading { gap:12px; margin-bottom:18px; }
+}
