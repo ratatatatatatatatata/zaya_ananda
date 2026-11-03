@@ -61,7 +61,7 @@ export function TeacherClasses({ classes }: { classes: TeacherClass[] }) {
                       {typeof c.lessonsCount === "number" && c.lessonsCount > 0 && <span>🎬 {c.lessonsCount} видео хичээл</span>}
                       {typeof c.price === "number" && <span className="price text-base">{formatMNT(c.price)}</span>}
                     </div>
-                    <Link href={"/item/" + c.id} className="btn btn-primary btn-md mt-4">Дэлгэрэнгүй үзэх →</Link>
+                    <Link href={"/item/" + c.id} className="btn btn-primary btn-md mt-4">Дэлгэрэнгүй үзэх</Link>
                   </div>
                 </div>
               </div>

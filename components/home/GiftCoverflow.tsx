@@ -72,7 +72,7 @@ function GiftCard({ reel }: { reel: Reel }) {
       <div className="flex flex-1 flex-col p-5">
         <h3 className="font-display text-lg font-semibold text-ink">{reel.title}</h3>
         <Link href="/gift" className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-primary-700">
-          Дэлгэрэнгүй <span aria-hidden>→</span>
+          Дэлгэрэнгүй
         </Link>
       </div>
     </div>

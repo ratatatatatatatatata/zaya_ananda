@@ -54,7 +54,7 @@ export function DestinationGallery({ places, scene, fourColumns = false }: { pla
         <JourneyImage src={place.image} scene={scene} alt="" className={styles.image} />
         <span className={styles.caption}>
           <strong className={styles.title}>{place.title || tl("Очих газар") + " " + (index + 1)}</strong>
-          <span className={styles.action}>{tl("Дэлгэрэнгүй үзэх")}<span className={styles.icon} aria-hidden>↗</span></span>
+          <span className={styles.action}>{tl("Дэлгэрэнгүй үзэх")}</span>
         </span>
       </button>
       {selected === index && <section id={id + "-" + index} className={styles.detail} style={position}

@@ -106,7 +106,7 @@ export function LevelCourses({ courses }: { courses: LevelCourse[] }) {
                 </ul>}
                 <div className={styles.courseFooter}>
                   {typeof course.price === "number" && <strong>{formatMNT(course.price)}</strong>}
-                  <span>{tl("Дэлгэрэнгүй үзэх")} <span aria-hidden>↗</span></span>
+                  <span>{tl("Дэлгэрэнгүй үзэх")}</span>
                 </div>
               </div>
             </Link>

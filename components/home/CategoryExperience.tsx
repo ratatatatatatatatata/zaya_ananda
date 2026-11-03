@@ -109,7 +109,7 @@ function CategoryScrollStory({ slides, category, title }: { slides: Slide[]; cat
                 <p className="discovery-kicker">ZAYA’S ANANDA · {String(i+1).padStart(2,"0")}</p>
                 <h3>{slide.title}</h3><p className="experience-description">{slide.desc}</p>
                 <div className="experience-tags">{slide.tags.map(tag => <span key={tag}>{tag}</span>)}</div>
-                <Link href={slide.href} tabIndex={active ? undefined : -1} className="btn btn-primary">Дэлгэрэнгүй үзэх <span aria-hidden>↗</span></Link>
+                <Link href={slide.href} tabIndex={active ? undefined : -1} className="btn btn-primary">Дэлгэрэнгүй үзэх</Link>
               </motion.div>
             </motion.article>;
           })}

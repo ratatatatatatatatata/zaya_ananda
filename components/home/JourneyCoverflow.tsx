@@ -26,7 +26,7 @@ export function JourneyCard({ j }: { j: Journey }) {
             <span>🗓 {j.days}</span><span>👥 {j.groupSize}</span><span>⛺ {j.stay}</span>
           </div>
           <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-primary-700">
-            Дэлгэрэнгүй <span aria-hidden>→</span>
+            Дэлгэрэнгүй
           </span>
         </div>
       </Link>

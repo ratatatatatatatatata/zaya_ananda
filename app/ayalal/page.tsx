@@ -119,7 +119,7 @@ export default async function AyalalPage() {
                   <span>🗓 {j.days}</span><span>👥 {j.groupSize}</span><span>⛺ {j.stay}</span>
                 </div>
                 <p className="mt-3 leading-relaxed text-muted">{j.summary}</p>
-                <span className="btn btn-primary btn-sm mt-5">Дэлгэрэнгүй үзэх →</span>
+                <span className="btn btn-primary btn-sm mt-5">Дэлгэрэнгүй үзэх</span>
               </div>
             </Link>
           ))}
