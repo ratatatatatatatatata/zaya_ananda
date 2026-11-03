@@ -4,13 +4,13 @@ body:has([data-cinematic-theme]) {
   --site-paper:#f3f5ec;
   --site-scene:url("/backgrounds/meditation-dawn.webp");
   --site-background:
-    linear-gradient(105deg,#fafbf3e6 8%,#f1f5ece0 54%,#f5f1e3b8),
+    linear-gradient(105deg,#fafbf38c 8%,#f1f5ec59 54%,#f5f1e326),
     var(--site-scene) center / cover no-repeat;
   --site-background-soft:
-    radial-gradient(ellipse at 90% 5%,#eee4c663,transparent 60%),
-    linear-gradient(130deg,#f8faf4,#e7eee4);
+    linear-gradient(115deg,#f8faf49e 6%,#e7eee470 50%,#eee4c633),
+    var(--site-scene) center 65% / cover no-repeat;
   --site-background-header:
-    linear-gradient(100deg,#fafbf1e6 0%,#f1f4eac9 48%,#ece8d68c),
+    linear-gradient(100deg,#fafbf199 0%,#f1f4ea66 48%,#ece8d629),
     var(--site-scene) center 48% / cover no-repeat;
   background:var(--site-background-soft);
 }
@@ -43,11 +43,11 @@ body:has([data-cinematic-theme]) .cinema-auth {
 }
 body:has([data-cinematic-theme]) .cinema-auth > [aria-hidden] { display:none; }
 body:has([data-cinematic-theme]) .discovery-hero-wash {
-  background:linear-gradient(90deg,#142f29e8,#203c327a 60%,#203c3214),linear-gradient(0deg,#142f297a,transparent 65%);
+  background:linear-gradient(90deg,#142f29c7,#203c3259 60%,#203c320a),linear-gradient(0deg,#142f297a,transparent 65%);
 }
 @media(max-width:767px) {
   body:has([data-cinematic-theme]) {
     --site-scene:url("/backgrounds/meditation-dawn-mobile.webp");
-    --site-background:linear-gradient(145deg,#fafbf2eb,#edf3e8cf),var(--site-scene) center / cover no-repeat;
+    --site-background:linear-gradient(145deg,#fafbf299,#edf3e859),var(--site-scene) center / cover no-repeat;
   }
 }
