@@ -5,7 +5,9 @@
 .controls button[aria-pressed=true] { background:#514a3f; color:#fff; border-color:#514a3f; }
 .wall { --card-width:clamp(184px,15.6vw,280px); --gap:clamp(12px,1.1vw,20px); display:grid; gap:var(--gap); container-type:inline-size; }
 .viewport { overflow-x:auto; overflow-y:hidden; padding:5px 0; scrollbar-width:thin; scrollbar-color:#b9aa90 transparent; overscroll-behavior-x:contain; cursor:grab; }
-.viewport[data-animated=true] { overflow:hidden; touch-action:pan-y pinch-zoom; }
+/* A transformed loop must not also become a native scroll container: browser
+   focus/drag autoscroll would add a second offset and expose an empty edge. */
+.viewport[data-animated=true] { overflow:clip; touch-action:pan-y pinch-zoom; user-select:none; }
 .viewport[data-animated=true] .track { will-change:transform; }
 .viewport[data-dragging=true] { cursor:grabbing; user-select:none; }
 .viewport img { user-select:none; -webkit-user-drag:none; }

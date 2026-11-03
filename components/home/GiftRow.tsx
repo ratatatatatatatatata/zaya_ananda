@@ -38,6 +38,8 @@ export function GiftRow({ children, paused, browsing, moving, reverse, duration,
       { transform: "translate3d(-50%, 0, 0)" },
     ], { duration: duration * 1000, iterations: Infinity, easing: "linear", direction: reverse ? "reverse" : "normal" });
     animation.current = drift;
+    // Clear any native offset left by keyboard focus or the non-animated view.
+    if (viewport.current) { viewport.current.scrollLeft = 0; viewport.current.scrollTop = 0; }
     if (stopped.current) drift.pause();
     return () => { drift.cancel(); animation.current = null; };
   }, [browsing, reduced, moving, reverse, duration]);
@@ -61,6 +63,8 @@ export function GiftRow({ children, paused, browsing, moving, reverse, duration,
     const period = track.current ? track.current.getBoundingClientRect().width / 2 : 0;
     if (!drift || !period) { if (viewport.current) viewport.current.scrollLeft = left; return; }
     drift.pause();
+    // The animation is the only horizontal position for an infinite row.
+    if (viewport.current) { viewport.current.scrollLeft = 0; viewport.current.scrollTop = 0; }
     const progress = wrap(left, period) / period;
     drift.currentTime = (reverse ? 1 - progress : progress) * duration * 1000;
   }
@@ -82,6 +86,10 @@ export function GiftRow({ children, paused, browsing, moving, reverse, duration,
 
   return <div ref={viewport} className={wall.viewport} data-moving={moving} data-animated={moving && !browsing && !reduced}
     role="region" aria-label={label} tabIndex={browsing ? -1 : 0}
+    onScroll={event => {
+      // Fallback for browsers that treat overflow:clip as overflow:hidden.
+      if (animation.current) { event.currentTarget.scrollLeft = 0; event.currentTarget.scrollTop = 0; }
+    }}
     onFocusCapture={event => {
       setFocused(true);
       animation.current?.pause();
@@ -98,6 +106,8 @@ export function GiftRow({ children, paused, browsing, moving, reverse, duration,
       suppressClick.current = false;
       if (browsing || (event.pointerType === "mouse" && event.button !== 0)) return;
       if (!animation.current && event.pointerType !== "mouse") return;
+      // Prevent native focus/selection autoscroll while dragging a card.
+      if (animation.current && event.pointerType === "mouse") event.preventDefault();
       animation.current?.pause();
       drag.current = { id: event.pointerId, x: event.clientX, y: event.clientY, left: position(), moved: false };
     }}
