@@ -54,3 +54,12 @@
 .description { margin:0; padding:24px 26px; font-size:.95rem; line-height:1.8; white-space:pre-line; }
 @media(max-width:600px) { .wall { --card-width:164px; --gap:12px; }.cardCopy { padding:14px; gap:7px; }.cardCopy strong { font-size:1rem; }.controls button { min-height:40px; padding:8px 12px; font-size:.75rem; }.dialog { width:calc(100vw - 16px); max-height:calc(100dvh - 24px); border-radius:14px; }.dialogHeader { padding:16px; gap:12px; }.description { padding:18px; }.dialogHeader h2 { font-size:1rem; } }
 @media(prefers-reduced-motion:reduce) { .track { animation:none; transform:none; }.viewport { min-width:0; max-width:100%; overflow-x:auto; }.group { min-width:0; }.wall [data-duplicate=true],.wall [data-copy="1"] { display:none; }.card { transition:none; } }
+
+/* Expand inside the selected row; keep its loop mounted at the same position. */
+.rowSlot { display:grid; grid-template-columns:minmax(0,1fr); min-width:0; overflow-anchor:none; }
+.rowCards,.inlinePlayer { grid-area:1 / 1; min-width:0; }
+.rowSlot[data-expanded=true] .rowCards { visibility:hidden; pointer-events:none; }
+.inlinePlayer { position:relative; align-self:start; justify-self:center; width:min(100%,980px); border:1px solid #d7d1c7; border-radius:10px; background:#faf9f7; color:#3d382f; overflow:hidden; box-shadow:0 14px 40px #514a3f16; }
+.inlinePlayer .dialogHeader { padding:14px 20px; }
+.inlinePlayer .dialogHeader h2 { font-size:clamp(1rem,1.7vw,1.3rem); }
+@media(max-width:600px) { .inlinePlayer .dialogHeader { padding:12px; gap:12px; } }

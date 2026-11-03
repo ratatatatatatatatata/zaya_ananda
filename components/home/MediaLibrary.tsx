@@ -3,7 +3,6 @@
 import { isSectionReel } from "@/lib/section-reels";
 import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { collectPublicMedia, giftCategory, type GiftCategory } from "@/lib/public-media";
 import { embedSrc } from "@/lib/video-embed";
 import { RichBody } from "@/components/RichBody";
@@ -19,6 +18,8 @@ const TABS: { id: GiftCategory; title: string }[] = [
 ];
 type Gift = { id: string; title: string; poster: string; category: GiftCategory; url?: string; summary?: string; article?: CmsItem };
 
+type GiftSelection = { gift: Gift; shelf: string; row: number; trigger: HTMLButtonElement };
+
 function MediaArtwork({ src, large = false }: { src: string; large?: boolean }) {
   const [failed, setFailed] = useState(false);
   const source = failed ? "/video/temple.jpg" : src;
@@ -32,9 +33,14 @@ export function MediaLibrary({ items, categorized = false }: { items: CmsItem[];
     id: item.id, title: item.title, poster: item.image || item.images?.[0] || "/video/meditation.jpg", category: giftCategory(item), article: item,
   }))];
   const [tab, setTab] = useState(0);
-  const [activeGift, setActiveGift] = useState<Gift | null>(null);
+  const [activeGift, setActiveGift] = useState<GiftSelection | null>(null);
   const id = useId();
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const closeGift = () => {
+    const trigger = activeGift?.trigger;
+    setActiveGift(null);
+    requestAnimationFrame(() => trigger?.focus({ preventScroll: true }));
+  };
   const visible = categorized ? gifts.filter(gift => gift.category === TABS[tab].id) : gifts;
   return <div className={styles.library}>
     {categorized && <div className={styles.tabs} role="tablist" aria-label="Гэгээн бэлэг">
@@ -49,13 +55,12 @@ export function MediaLibrary({ items, categorized = false }: { items: CmsItem[];
       }}>{item.title}</button>)}
     </div>}
     {categorized ? TABS.map((item,index) => <div key={item.id} role="tabpanel" id={`${id}-panel-${index}`} aria-labelledby={`${id}-tab-${index}`} hidden={tab !== index} tabIndex={0}>
-      {tab === index && <GiftShelf key={item.id} gifts={visible} title={item.title} modalOpen={!!activeGift} onOpen={setActiveGift} />}
-    </div>) : <div className={styles.sections}>{TABS.map(category => <GiftShelf key={category.id} gifts={gifts.filter(gift => gift.category === category.id)} title={category.title} modalOpen={!!activeGift} onOpen={setActiveGift} />)}</div>}
-    {activeGift && <GiftDialog gift={activeGift} onClose={() => setActiveGift(null)} />}
+      {tab === index && <GiftShelf key={item.id} gifts={visible} title={item.title} selection={activeGift} onOpen={setActiveGift} onClose={closeGift} />}
+    </div>) : <div className={styles.sections}>{TABS.map(category => <GiftShelf key={category.id} gifts={gifts.filter(gift => gift.category === category.id)} title={category.title} selection={activeGift} onOpen={setActiveGift} onClose={closeGift} />)}</div>}
   </div>;
 }
 
-function GiftShelf({ gifts, title, modalOpen, onOpen }: { gifts: Gift[]; title: string; modalOpen: boolean; onOpen: (gift: Gift) => void }) {
+function GiftShelf({ gifts, title, selection, onOpen, onClose }: { gifts: Gift[]; title: string; selection: GiftSelection | null; onOpen: (selection: GiftSelection) => void; onClose: () => void }) {
   const [paused, setPaused] = useState(false);
   const [browsing, setBrowsing] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -68,26 +73,32 @@ function GiftShelf({ gifts, title, modalOpen, onOpen }: { gifts: Gift[]; title: 
         {!browsing && <button type="button" aria-pressed={paused} aria-label={paused ? `${title} — хөдөлгөөн үргэлжлүүлэх` : `${title} — хөдөлгөөн зогсоох`} onClick={() => setPaused(value => !value)}><span aria-hidden>{paused ? "▷" : "Ⅱ"}</span> {paused ? "Үргэлжлүүлэх" : "Түр зогсоох"}</button>}
       </div>}
     </div>
-    {!gifts.length ? <p className="media-empty">{title} агуулга удахгүй нэмэгдэнэ.</p> : <div className={wall.wall} data-paused={paused || modalOpen} data-browsing={browsing} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+    {!gifts.length ? <p className="media-empty">{title} агуулга удахгүй нэмэгдэнэ.</p> : <div className={wall.wall} data-paused={paused || !!selection} data-browsing={browsing} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
       {rows.map((row, rowIndex) => {
         const moving = row.length > 1;
         // Repeat a short row enough to cover wide screens; duplicates are not keyboard stops.
         const repetitions = moving ? Math.max(1, Math.ceil(8 / row.length)) : 1;
         const strip = Array.from({ length: repetitions }, () => row).flat();
-        return <GiftRow key={rowIndex} paused={paused || modalOpen || hovered} browsing={browsing} moving={moving} reverse={rowIndex === 1} duration={strip.length * 7} label={`${title} — ${rowIndex + 1}-р мөр, хоёр тийш гүйлгэх`} onManual={() => setPaused(true)}>
+        const expanded = selection?.shelf === title && selection.row === rowIndex;
+        return <div key={rowIndex} className={wall.rowSlot} data-expanded={expanded}>
+          <div className={wall.rowCards} aria-hidden={expanded ? true : undefined}>
+          <GiftRow paused={paused || !!selection || hovered} browsing={browsing} moving={moving} reverse={rowIndex === 1} duration={strip.length * 7} label={`${title} — ${rowIndex + 1}-р мөр, хоёр тийш гүйлгэх`} onManual={() => setPaused(true)}>
             {[0, ...(moving ? [1] : [])].map(copy => <div key={copy} className={wall.group} aria-hidden={copy === 1 ? true : undefined} data-copy={copy}>
-              {strip.map((item, index) => <GiftCard key={`${item.id}-${index}`} gift={item} duplicate={copy === 1 || index >= row.length} onOpen={onOpen} />)}
+              {strip.map((item, index) => <GiftCard key={`${item.id}-${index}`} gift={item} duplicate={copy === 1 || index >= row.length} onOpen={(gift, trigger) => onOpen({ gift, trigger, shelf: title, row: rowIndex })} />)}
             </div>)}
-        </GiftRow>;
+          </GiftRow>
+          </div>
+          {expanded && <GiftPlayer key={selection.gift.id} gift={selection.gift} onClose={onClose} />}
+        </div>;
       })}
     </div>}
   </section>;
 }
 
-function GiftCard({ gift, duplicate, onOpen }: { gift: Gift; duplicate: boolean; onOpen: (gift: Gift) => void }) {
+function GiftCard({ gift, duplicate, onOpen }: { gift: Gift; duplicate: boolean; onOpen: (gift: Gift, trigger: HTMLButtonElement) => void }) {
   const episode = gift.title.match(/^Ananda\s+Podcast\s+Season\s*(\d+)[,\s]+Episode\s*(\d+)\s*[:–—-]\s*/i);
   const displayTitle = episode ? gift.title.slice(episode[0].length) || gift.title : gift.title;
-  return <button type="button" className={wall.card} data-duplicate={duplicate} aria-hidden={duplicate ? true : undefined} tabIndex={duplicate ? -1 : 0} aria-haspopup="dialog" aria-label={`${gift.title} — ${gift.url ? "тоглуулах" : "унших"}`} onClick={() => onOpen(gift)}>
+  return <button type="button" className={wall.card} data-duplicate={duplicate} aria-hidden={duplicate ? true : undefined} tabIndex={duplicate ? -1 : 0} aria-label={`${gift.title} — ${gift.url ? "тоглуулах" : "унших"}`} onClick={event => onOpen(gift, event.currentTarget)}>
     <span className={wall.ambience} aria-hidden><MediaArtwork key={gift.poster} src={gift.poster} /></span>
     <span className={wall.artwork}><MediaArtwork key={gift.poster} src={gift.poster} /></span>
     <span className={wall.cardIcon} aria-hidden>{gift.url ? "▶" : "↗"}</span>
@@ -95,22 +106,20 @@ function GiftCard({ gift, duplicate, onOpen }: { gift: Gift; duplicate: boolean;
   </button>;
 }
 
-function GiftDialog({ gift, onClose }: { gift: Gift; onClose: () => void }) {
-  const dialog = useRef<HTMLDialogElement>(null);
+function GiftPlayer({ gift, onClose }: { gift: Gift; onClose: () => void }) {
+  const closeButton = useRef<HTMLButtonElement>(null);
   const titleId = useId();
   const [failed, setFailed] = useState(false);
   const embed = gift.url ? embedSrc(gift.url, true) : null;
   useEffect(() => {
-    const element = dialog.current;
-    const trigger = document.activeElement as HTMLElement | null;
-    const overflow = document.body.style.overflow;
-    element?.showModal();
-    document.body.style.overflow = "hidden";
-    return () => { element?.close(); document.body.style.overflow = overflow; trigger?.focus({ preventScroll: true }); };
+    // Move keyboard focus without scrolling the page to a body-level modal.
+    closeButton.current?.focus({ preventScroll: true });
   }, []);
-  return createPortal(<dialog ref={dialog} className={wall.dialog} aria-labelledby={titleId} onCancel={event => { event.preventDefault(); onClose(); }} onClick={event => { if (event.target === event.currentTarget) onClose(); }}>
+  return <section className={wall.inlinePlayer} aria-labelledby={titleId} onKeyDown={event => {
+    if (event.key === "Escape") { event.preventDefault(); onClose(); }
+  }}>
     <div className={wall.dialogContent}>
-      <header className={wall.dialogHeader}><div><p>{TABS.find(tab => tab.id === gift.category)?.title}</p><h2 id={titleId}>{gift.title}</h2></div><button autoFocus type="button" onClick={onClose} aria-label="Хаах">×</button></header>
+      <header className={wall.dialogHeader}><div><p>{TABS.find(tab => tab.id === gift.category)?.title}</p><h2 id={titleId}>{gift.title}</h2></div><button ref={closeButton} type="button" onClick={onClose} aria-label="Хаах">×</button></header>
       <div className={wall.dialogPlayer}>
         {embed ? embed.type === "iframe" ? <iframe src={embed.src} title={gift.title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen /> : <video src={embed.src} poster={gift.poster} controls autoPlay playsInline aria-label={gift.title} onError={() => setFailed(true)} /> : <MediaArtwork src={gift.poster} large />}
       </div>
@@ -118,5 +127,5 @@ function GiftDialog({ gift, onClose }: { gift: Gift; onClose: () => void }) {
       {(gift.summary || gift.article?.summary) && <p className={wall.description}>{gift.summary || gift.article?.summary}</p>}
       {gift.article?.body && <div className={wall.description}><RichBody html={gift.article.body} i18n={gift.article.i18n} /></div>}
     </div>
-  </dialog>, document.body);
+  </section>;
 }
