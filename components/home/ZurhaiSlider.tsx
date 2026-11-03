@@ -39,7 +39,7 @@ export function ZurhaiSlider({ cards, daily, matrix, natal }: {
   const activeTitle = active?.title.toLocaleLowerCase() || "";
 
   return <div className={styles.root}>
-    <div className={styles.heading}>
+    <div className={styles.heading} data-section-heading>
       <h2 className="eyebrow-line justify-center">{tr(EYEBROW)}</h2>
       <p className="mt-3 leading-relaxed text-muted">{tr(LEAD)}</p>
     </div>

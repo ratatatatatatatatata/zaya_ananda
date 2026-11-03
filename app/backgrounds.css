@@ -51,3 +51,42 @@ body:has([data-cinematic-theme]) .discovery-hero-wash {
     --site-background:linear-gradient(145deg,#fafbf299,#edf3e859),var(--site-scene) center / cover no-repeat;
   }
 }
+
+/* Topic-specific scenes: each main section has its own visual identity. */
+body:has([data-cinematic-theme]) main :is(#gift,[data-background="gift"]) {
+  --section-scene:var(--site-scene); --section-tint:#f2f4e8;
+}
+body:has([data-cinematic-theme]) main :is(#courses,[data-background="courses"]) {
+  --section-scene:url("/video/meditation.jpg"); --section-tint:#e8efdd;
+}
+body:has([data-cinematic-theme]) main :is(#ayalal,[data-background="ayalal"]) {
+  --section-scene:url("/video/temple.jpg"); --section-tint:#eee5d6;
+}
+body:has([data-cinematic-theme]) main :is(#services,[data-background="services"]) {
+  --section-scene:url("/video/stream.jpg"); --section-tint:#e0efeb;
+}
+body:has([data-cinematic-theme]) main :is(#shop,[data-background="shop"]) {
+  --section-scene:url("/cinematic/capabilities.jpg"); --section-tint:#f0e2df;
+}
+body:has([data-cinematic-theme]) main :is(#about,[data-background="about"]) {
+  --section-scene:url("/video/stones.jpg"); --section-tint:#eee8dc;
+}
+body:has([data-cinematic-theme]) main :is(#gift,#courses,#ayalal,#services,#shop,#about,[data-background]) {
+  background:linear-gradient(105deg,#fffdf8c7 0%,#fffdf8a3 52%,#fffdf866 100%),var(--section-scene) center / cover no-repeat,var(--section-tint);
+}
+body:has([data-cinematic-theme]) main #zurhai {
+  background:linear-gradient(110deg,#10243d40,#1727430d),url("/poster_night.jpg") center 38% / cover no-repeat,#14243d;
+}
+body:has([data-cinematic-theme]) #zurhai [data-section-heading] :is(h2,p) {
+  color:#fff9e9; text-shadow:0 2px 12px #07172b;
+}
+/* An introductory surface distinct from the scenic homepage hero. */
+body:has([data-cinematic-theme]) .home-intro-video {
+  background:radial-gradient(ellipse at 10% 10%,#ead7ad55,transparent 65%),linear-gradient(120deg,#fcf8ee,#e9e2d1);
+}
+@media(max-width:767px) {
+  body:has([data-cinematic-theme]) main :is(#gift,#courses,#ayalal,#services,#shop,#about,[data-background]) {
+    background-image:linear-gradient(150deg,#fffdf8bf,#fffdf88c),var(--section-scene);
+  }
+  body:has([data-cinematic-theme]) main #zurhai { background-position:center,60% center; }
+}
