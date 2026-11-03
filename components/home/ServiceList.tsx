@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ServiceBooking } from "@/components/ServiceBooking";
+import { serviceImage } from "@/lib/service-image";
 import { itemTeachers } from "@/lib/item-teachers";
 import { ItemTeachers } from "@/components/ItemTeachers";
 import { useI18n } from "@/lib/i18n";
@@ -12,8 +13,7 @@ import type { CmsItem } from "@/lib/types";
 
 
 /** Нэг үйлчилгээний мөр — зүүн талд зураг, баруун талд бүх мэдээлэл. Цаг захиалга цонхоор нээгдэнэ. */
-function ServiceRow({ item, index }: { item: CmsItem; index: number }) {
-  const cover = item.image || item.images?.[0];
+function ServiceRow({ item, index, cover }: { item: CmsItem; index: number; cover: string }) {
   const { lang } = useI18n();
   const title = locText(lang,item.title,item.i18n,"title");
   const summary = locText(lang,item.summary,item.i18n,"summary");
@@ -137,7 +137,7 @@ export function ServiceList({ items }: { items: CmsItem[] }) {
 
   return (
     <div className="space-y-8">
-      {items.map((it, i) => <ServiceRow key={it.id} item={it} index={i} />)}
+      {items.map((it, i) => <ServiceRow key={it.id} item={it} index={i} cover={serviceImage(it, items)} />)}
     </div>
   );
 }

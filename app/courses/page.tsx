@@ -23,10 +23,10 @@ export default async function CoursesPage() {
         desc="Урсгал усны хажууд сууж буй хүн шиг — өөрийн хэмнэлээр, гэрээсээ, багшийн хөтлөлтөөр дадлагаа эхлүүлээрэй."
         cta={[{ href: "#courses", label: "Сургалтууд үзэх" }]}
       />
-      <section data-background="courses" id="courses" className="section"><div className="container-px"><CmsCoursesFilter items={items} /></div></section>
+      <section id="courses" className="section"><div className="container-px"><CmsCoursesFilter items={items} /></div></section>
 
       {/* Сэтгэлийн туяа — хичээлүүдийн доор */}
-      <section data-background="courses" id="mood" className="section scroll-mt-36 bg-surface-2"><div className="container-px">
+      <section id="mood" className="section scroll-mt-36 bg-surface-2"><div className="container-px">
         <div className="relative overflow-hidden rounded-4xl border border-line bg-surface-1 p-8 sm:p-12">
           <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full"
             style={{ background: "radial-gradient(circle, rgba(240,156,188,0.25), transparent 70%)" }} />

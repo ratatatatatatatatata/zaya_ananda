@@ -1,5 +1,6 @@
 "use client";
 
+import { serviceImage } from "@/lib/service-image";
 import { itemTeachers } from "@/lib/item-teachers";
 import Image from "next/image";
 import { HomeDetailLink as Link } from "@/components/home/HomeDetails";
@@ -27,7 +28,7 @@ export function CategoryExperience({ services, products, journeys }: { services:
     {categories.map((category, categoryIndex) => {
       const slides: Slide[] = category.id === "ayalal"
         ? journeys.map(j => ({ id:j.id, title:j.name, desc:j.summary, image:j.image || category.image, tags:[j.days,j.groupSize,j.tagline].filter(Boolean), href:`/ayalal/${encodeURIComponent(j.slug)}`, journey:j }))
-        : lists[category.id].map(item => ({ id:item.id, title:locText(lang,item.title,item.i18n,"title"), desc:locText(lang,item.summary,item.i18n,"summary") || category.desc, image:item.image || item.images?.[0] || category.image, tags:[item.category,...itemTeachers(item).map(teacher => teacher.name),typeof item.price === "number" ? formatMNT(item.price) : ""].filter((v): v is string => !!v), href:`/item/${item.id}`, item }));
+        : lists[category.id].map(item => ({ id:item.id, title:locText(lang,item.title,item.i18n,"title"), desc:locText(lang,item.summary,item.i18n,"summary") || category.desc, image:category.id === "services" ? serviceImage(item, services) : item.image || item.images?.[0] || category.image, tags:[item.category,...itemTeachers(item).map(teacher => teacher.name),typeof item.price === "number" ? formatMNT(item.price) : ""].filter((v): v is string => !!v), href:`/item/${item.id}`, item }));
       return <section key={category.id} id={category.id} className="experience-section" aria-labelledby={`experience-${category.id}`}>
         <div className="experience-heading">
           <p className="discovery-kicker">ZAYA’S ANANDA · {String(categoryIndex+5).padStart(2,"0")}</p>
@@ -101,7 +102,7 @@ function CategoryScrollStory({ slides, category, title }: { slides: Slide[]; cat
               transition={{ duration:reduced ? 0 : .55, ease:[.22,1,.36,1] }} style={{ pointerEvents:active ? "auto" : "none", zIndex:active ? 1 : 0 }}>
               <div className="experience-image">
                 <motion.div className="experience-image-motion" initial={false} animate={{opacity:active ? 1 : 0}} transition={{duration:reduced ? 0 : .9, ease:[.22,1,.36,1]}}>
-                  <Image src={slide.image} alt={slide.title} fill sizes="(max-width:767px) 100vw, 55vw" unoptimized={!slide.image.startsWith("/")} />
+                  {slide.image && <Image src={slide.image} alt={slide.title} fill sizes="(max-width:767px) 100vw, 55vw" unoptimized={!slide.image.startsWith("/")} />}
                 </motion.div>
                 <span>{title}</span>
               </div>

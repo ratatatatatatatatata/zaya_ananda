@@ -204,6 +204,3 @@
 .page .hero { background:var(--site-background-header,var(--paper)); }
 .page .dark,.page .team { background:var(--site-background-soft,var(--paper)); }
 .page .program { background:var(--site-background,var(--paper)); }
-
-/* About: natural stone and warm paper, separate from the lake sections. */
-.page { --site-background:linear-gradient(110deg,#faf7eecf,#eee8dca6),url("/video/stones.jpg") center / cover no-repeat; --site-background-soft:linear-gradient(125deg,#faf7ee,#eee8dc); --site-background-header:linear-gradient(105deg,#fffdf8d9,#eee8dc80),url("/video/stones.jpg") center / cover no-repeat; }

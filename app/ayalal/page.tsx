@@ -81,7 +81,7 @@ export default async function AyalalPage() {
       </nav>
 
       {/* Үнэт зүйлс */}
-      <section data-background="ayalal" className="section"><div className="container-px">
+      <section className="section"><div className="container-px">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="font-display text-3xl font-semibold text-ink">Энгийн жуулчлалаас юугаараа өөр вэ?</h2>
         </div>
@@ -97,7 +97,7 @@ export default async function AyalalPage() {
       </div></section>
 
       {/* Аяллын хөтөлбөрүүд — зурган карт */}
-      <section data-background="ayalal" id="tours" className="section scroll-mt-32 bg-surface-2"><div className="container-px">
+      <section id="tours" className="section scroll-mt-32 bg-surface-2"><div className="container-px">
         <h2 className="font-display text-3xl font-semibold text-ink">Аяллын хөтөлбөрүүд</h2>
         <p className="mt-2 max-w-2xl text-muted">Аялал сонгоод дарвал өдөр өдрийн хөтөлбөр, хариуцах багш, хамт явах баг зэрэг бүх мэдээлэл дэлгэрэнгүй нээгдэнэ.</p>
         {JOURNEYS.length === 0 && (
@@ -127,7 +127,7 @@ export default async function AyalalPage() {
       </div></section>
 
       {/* Энергийн газрууд */}
-      <section data-background="ayalal" id="places" className="section scroll-mt-32"><div className="container-px">
+      <section id="places" className="section scroll-mt-32"><div className="container-px">
         <h2 className="font-display text-3xl font-semibold text-ink">Энергийн газрууд</h2>
         <p className="mt-2 max-w-2xl text-muted">Монгол орны өндөр энергит, ариун дагшин нутгууд — түүх, соёлын учир холбогдол, тэнд хийх зан үйлийн хамт.</p>
         <div className="mt-10 grid gap-6 lg:grid-cols-2">
@@ -148,7 +148,7 @@ export default async function AyalalPage() {
       </div></section>
 
       {/* FAQ */}
-      <section data-background="ayalal" id="faq" className="section bg-surface-2 scroll-mt-32"><div className="container-px">
+      <section id="faq" className="section bg-surface-2 scroll-mt-32"><div className="container-px">
         <h2 className="text-center font-display text-3xl font-semibold text-ink">Түгээмэл асуултууд</h2>
         <div className="mt-8 grid items-start gap-4 lg:grid-cols-2">
           {JOURNEY_FAQ.map((f) => (

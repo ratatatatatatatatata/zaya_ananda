@@ -21,7 +21,7 @@ export default async function GiftPage() {
         title={<T k="nav.gift" />}
         desc="Podcast, зөвлөмж, бясалгал дасгал — бүх агуулгаа эндээс үзээрэй. Бүртгэлгүйгээр үзнэ."
       />
-      <section data-background="gift" className="section"><div className="container-px">
+      <section className="section"><div className="container-px">
         <MediaLibrary items={[...free, ...resources]} />
       </div></section>
     </>
