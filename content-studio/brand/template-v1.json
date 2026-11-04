@@ -1,0 +1,15 @@
+{
+  "id": "ananda-editorial-v1",
+  "status": "studio-recommendation-awaiting-user-feedback",
+  "brand_name": "Zaya’s Ananda Center",
+  "width": 1080,
+  "height": 1350,
+  "background": "#FFFFFF",
+  "logo": {"file": "logo.png", "box": [300, 18, 480, 163.2]},
+  "image_box": [0, 200, 1080, 730],
+  "headline": {"file": "Lora-variable.ttf", "family": "Lora", "weight": 500, "size": 62, "x": 84, "baseline": 1045, "line_height": 80, "max_lines": 2, "color": "#123E3B"},
+  "support": {"file": "Manrope-variable.ttf", "family": "Manrope", "weight": 450, "size": 31, "x": 87, "baseline": 1210, "color": "#52645B"},
+  "safe_right": 996,
+  "safe_bottom": 1280,
+  "rules": ["Full official logo stays at the top", "Image and copy change; geometry stays fixed", "No day number, utility label or invented slogan on artwork", "Shorten overflowing copy; never silently shrink type", "Long explanation belongs in the caption"]
+}
