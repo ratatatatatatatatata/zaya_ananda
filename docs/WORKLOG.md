@@ -17,6 +17,19 @@
 
 ---
 
+### 2026-11-04 — Claude — Нүүр хуудсанд хөдөлгөөнт, загварлаг хэсгүүд (хэрэглэгчийн шууд хүсэлт)
+- **Status:** ✅ done
+- **Branch / PR:** `claude/sleepy-heisenberg-glw4pz`
+- **Changed:** Хэрэглэгчийн өгсөн 2 гадны prompt-оос (Halloween scroll, 3D portfolio) зөвхөн техникийг авсан; тэдний asset/контентыг ашиглаагүй.
+  - Hero: гарчиг үг үгээр маскнаас дээш гарна (`CinematicLanding.tsx`), зурган дээр гэрлийн бөөмс (`components/home/HeroMotes.tsx`, canvas), үндсэн CTA соронзон эффект (`components/motion/Magnet.tsx`).
+  - Курсорыг дагах дулаан гэрэл (`components/home/LanternCursor.tsx`, зөвхөн нарийн заагч).
+  - Шинэ "Бидний зорилго" хэсэг — scroll-оор тэмдэгт бүр тодорно (`components/home/HomeManifesto.tsx`).
+  - Шинэ scroll-marquee — CMS-ийн үйлчилгээ/сургалт/бүтээгдэхүүний зургууд 2 мөрөөр эсрэг чиглэлд, `/item/[id]` рүү холбоостой (`components/home/HomeMarquee.tsx`; 4-өөс цөөн зурагтай бол харагдахгүй).
+  - `app/page.tsx` (products татах, шинэ хэсгүүд), `app/home-hero.css`, `app/tokens.css` (`--hero-mote/lantern/faint`), `data/strings.ts` (4 шинэ түлхүүр × 5 хэл).
+- **SQL / env needed:** none
+- **Checks:** `tsc` OK; `next build` OK; тест 36/37 (өмнөх reel-media #37). 320–1920px overflow 0, 5 хэл (CJK мөр таслалт засагдсан), reduced-motion үед бүх хөдөлгөөн унтарна.
+- **Notes for next agent:** Дараалал: Hero → Бидний зорилго → Marquee → Танилцуулга видео → бусад. Manifesto бичвэр `home.manifesto` түлхүүрт.
+
 ### 2026-11-04 — Claude — T-001 Нүүр хуудасны hero шинэчлэл
 - **Status:** ✅ done
 - **Branch / PR:** `claude/sleepy-heisenberg-glw4pz`

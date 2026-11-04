@@ -86,6 +86,9 @@
   --hero-media-bg: 230 227 221;
   --hero-shade: 25 23 20;
   --hero-caption-ink: 255 253 248;
+  --hero-mote: 255 238 205;
+  --hero-lantern: 255 196 130;
+  --hero-faint: 120 108 88;
 }
 
 .night {
