@@ -17,6 +17,14 @@
 
 ---
 
+### 2026-11-04 — Claude — Үүрэг: ChatGPT удирдагч (20%), Claude гүйцэтгэгч (80%)
+- **Status:** ✅ done
+- **Branch / PR:** `claude/sleepy-heisenberg-glw4pz`
+- **Changed:** `AGENTS.md` — §0 үүрэг хуваарь, §6 TASK формат, §7 REPORT формат; `docs/CHATGPT-START.md` — ChatGPT-д өгөх удирдагчийн prompt болон TASK↔REPORT урсгал.
+- **SQL / env needed:** none
+- **Checks:** зөвхөн баримт бичиг.
+- **Notes for next agent:** Цаашид ажил ChatGPT-ийн `=== TASK for Claude ===` блокоор ирнэ; Claude дуусгаад `=== REPORT from Claude ===` өгнө.
+
 ### 2026-11-04 — Claude — Хамтын ажиллагааны тохиргоо
 - **Status:** ✅ done
 - **Branch / PR:** `claude/sleepy-heisenberg-glw4pz`

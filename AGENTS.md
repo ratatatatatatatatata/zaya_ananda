@@ -7,6 +7,18 @@
 > This file is read automatically by ChatGPT Codex, and by Claude Code via `CLAUDE.md`.
 > Both agents take turns on the same repo. Before starting, read this file and the latest entries in `docs/WORKLOG.md`.
 
+## 0. Үүрэг хуваарилалт / Roles (≈ Claude 80% · ChatGPT 20%)
+
+| | ChatGPT — **удирдагч / Lead** (~20%) | Claude — **гүйцэтгэгч / Builder** (~80%) |
+|---|---|---|
+| Юу хийнэ | Хэрэглэгчийн хүслийг задлаж **даалгавар (TASK)** бичнэ, эрэмбэ тогтооно, Claude-ийн тайланг (REPORT) шалгаж дараагийн алхмыг шийднэ | Кодыг бүхэлд нь бичнэ, засна, тест/type check хийнэ, commit + push, WORKLOG бичнэ |
+| Код бичих үү | Ихэвчлэн **үгүй** — зөвхөн жижиг жишээ, интерфэйс, SQL санал | **Тийм** — repo дахь бүх өөрчлөлт |
+| Гаралт | `TASK` блок (§6) | `REPORT` блок (§7) |
+
+Урсгал: **Хэрэглэгч → ChatGPT (TASK) → Хэрэглэгч хуулж Claude-д → Claude код + REPORT → Хэрэглэгч хуулж ChatGPT-д → дараагийн TASK …**
+
+Claude TASK-ыг ChatGPT-ийн зааврыг дагаж гүйцэтгэнэ. Харин TASK нь кодын бодит байдалтай зөрчилдвөл (файл байхгүй, аюулгүй байдлын эрсдэл, дизайн системтэй зөрчилдөх) Claude хамгийн ойр зөв шийдлийг хийж, зөрүүг REPORT-ын `Deviations` хэсэгт тайлбарлана.
+
 ## 1. Эхлэхийн өмнө / Before you start
 
 1. `git fetch origin && git status` — сүүлийн өөрчлөлтийг татаж ав; өөр AI-ийн commit-ийг хэзээ ч дарж бичихгүй.
@@ -48,4 +60,43 @@ node --test tests/*.test.cjs scripts/test-*.cjs   # тестүүд (azure тес
 1. `npx tsc --noEmit` болон холбогдох тест ногоон байгаа эсэхийг шалга.
 2. `docs/WORKLOG.md`-ийн **хамгийн дээр** шинэ бичлэг нэм (доорх загвараар).
 3. Commit + push, PR линкээ хэрэглэгчид өг.
+   Claude: TASK-аар ажилласан бол хариултынхаа төгсгөлд §7 `REPORT` блок бич — хэрэглэгч үүнийг ChatGPT-д хуулж өгнө.
 4. Том өөрчлөлт бол `HANDOFF.md`-ийн холбогдох хэсгийг шинэчил.
+
+## 6. TASK формат (ChatGPT → Claude)
+
+```
+=== TASK for Claude ===
+ID: T-<дугаар>
+Goal: <нэг өгүүлбэрээр — юу болох ёстой>
+Context: <яагаад, хэрэглэгч юу хүссэн>
+Scope:
+  - <хийх зүйл 1>
+  - <хийх зүйл 2>
+Files (hint): <мэдэж байвал файлууд, жишээ: components/Header.tsx>
+Out of scope: <хүрэхгүй зүйлс>
+Acceptance:
+  - [ ] <шалгах нөхцөл 1>
+  - [ ] <шалгах нөхцөл 2>
+Priority: high | normal | low
+=== END TASK ===
+```
+
+## 7. REPORT формат (Claude → ChatGPT)
+
+```
+=== REPORT from Claude ===
+Task: T-<дугаар>
+Status: done | partial | blocked
+Branch / commit: <branch> @ <hash>
+Changed:
+  - <файл>: <юу өөрчлөгдсөн>
+Acceptance:
+  - [x] <нөхцөл 1>
+  - [ ] <нөхцөл 2 — яагаад биелээгүй>
+Deviations: <TASK-аас зөрсөн зүйл, шалтгаан; байхгүй бол none>
+SQL / env needed: <none эсвэл SQL>
+Checks: <tsc / test үр дүн>
+Questions for ChatGPT: <шийдвэр хэрэгтэй зүйл; байхгүй бол none>
+=== END REPORT ===
+```
