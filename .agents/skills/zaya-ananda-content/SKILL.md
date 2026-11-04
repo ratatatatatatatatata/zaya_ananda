@@ -23,3 +23,8 @@ Find `content-studio/` in the current repository. If working from the parent res
 For “өнөөдрийн сэдэв …” or “... сэдвээр пост бэлд”, perform the entire flow without asking the user to repeat the brand, font, logo or template. For batches, use `content-studio/themes-14-days.json` as a provisional sequence; validate each theme against the actual local sources before drafting. User feedback updates a new template version, never an existing approved asset.
 
 The workflow prepares drafts for review. Scheduling and publishing require the user's explicit platform instruction. Never claim Facebook analytics, engagement improvement, Claude connectivity or publishing without direct evidence.
+
+
+## Current design refinement — 2026-11-04, v2
+
+For new topic posts, the user's latest design-refinement request supersedes step 7's v1 renderer. Read `content-studio/README-v2.md` and use `brand/template-v2.json` with `scripts/render_post_v2.py`. This message-first layout is the current studio recommendation: full official logo top-left, two larger Lora headline lines above the photo, one short support line, and the photo filling the lower portion. Keep this geometry across themes. It is not user-approved yet. Preserve v1 files as history. Private source, respectful Mongolian, no invented claims and publishing boundaries above still apply.

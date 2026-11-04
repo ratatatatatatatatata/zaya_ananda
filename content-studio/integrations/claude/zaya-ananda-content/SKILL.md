@@ -15,3 +15,8 @@ Use `content-studio/` in the repository, or `ananda-content-studio/content-studi
 - Produce a new versioned proof and caption, inspect PNG and report exact checks. Keep user aesthetic approval separate from measurable rendering. Do not overwrite, publish, deploy or merge without applicable user instructions.
 
 The main Codex skill is `.agents/skills/zaya-ananda-content/SKILL.md`. Claude is a bounded public-material companion, not a substitute for local private-source verification.
+
+
+## Current design refinement — 2026-11-04, v2
+
+For new topic posts, the user's latest design-refinement request supersedes step 7's v1 renderer. Read `content-studio/README-v2.md` and use `brand/template-v2.json` with `scripts/render_post_v2.py`. This message-first layout is the current studio recommendation: full official logo top-left, two larger Lora headline lines above the photo, one short support line, and the photo filling the lower portion. Keep this geometry across themes. It is not user-approved yet. Preserve v1 files as history. Private source, respectful Mongolian, no invented claims and publishing boundaries above still apply.
