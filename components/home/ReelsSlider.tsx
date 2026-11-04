@@ -5,6 +5,7 @@ import Link from "next/link";
 import { embedSrc, youtubeThumb } from "@/lib/video-embed";
 import { useI18n } from "@/lib/i18n";
 import type { CmsItem, Locale } from "@/lib/types";
+import { imgSrc } from "@/lib/img";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
 
@@ -128,7 +129,7 @@ export function ReelsSlider({ items }: { items: CmsItem[] }) {
                   ) : (
                     <>
                       {r.poster
-                        ? <img src={r.poster} alt="" className="h-full w-full object-contain" />
+                        ? <img loading="lazy" decoding="async" src={imgSrc(r.poster, 640)} alt="" className="h-full w-full object-contain" />
                         : <div className="h-full w-full" style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }} />}
                       <div aria-hidden className="absolute inset-0"
                         style={{ background: "linear-gradient(to top, rgba(8,20,17,0.9) 0%, rgba(8,20,17,0.1) 55%, transparent 100%)" }} />

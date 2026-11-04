@@ -1,4 +1,5 @@
 import type { Person } from "@/data/journeys";
+import { imgSrc } from "@/lib/img";
 
 function initials(name: string) {
   return name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
@@ -8,7 +9,7 @@ function initials(name: string) {
 export function Avatar({ person, size = "lg" }: { person: Person; size?: "lg" | "sm" }) {
   const box = size === "lg" ? "h-full w-full" : "h-16 w-16";
   if (person.image) {
-    return <img src={person.image} alt={person.name} className={`${box} object-contain`} />;
+    return <img loading="lazy" decoding="async" src={imgSrc(person.image, 384)} alt={person.name} className={`${box} object-contain`} />;
   }
   return (
     <div

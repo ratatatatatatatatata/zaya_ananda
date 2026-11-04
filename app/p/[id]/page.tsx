@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getPageByIdCached } from "@/lib/repo";
-import { signedDownloadUrl } from "@/lib/supabase";
+import { signedDownloadUrlCached } from "@/lib/supabase";
 import { PageHeader } from "@/components/PageHeader";
 import { RichBody } from "@/components/RichBody";
 import { CmsText } from "@/components/CmsText";
@@ -14,7 +14,7 @@ export default async function CustomPage({ params }: { params: { id: string } })
   let videoUrl = "";
   if (page.video) {
     if (/^https?:\/\//.test(page.video)) videoUrl = page.video;
-    else { try { videoUrl = await signedDownloadUrl("lesson-videos", page.video); } catch { videoUrl = ""; } }
+    else { try { videoUrl = await signedDownloadUrlCached("lesson-videos", page.video); } catch { videoUrl = ""; } }
   }
 
   return (

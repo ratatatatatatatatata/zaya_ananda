@@ -4,6 +4,7 @@ import { useState } from "react";
 import { embedSrc, youtubeThumb } from "@/lib/video-embed";
 import { useI18n } from "@/lib/i18n";
 import type { CmsItem, Locale } from "@/lib/types";
+import { imgSrc } from "@/lib/img";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
 const WATCH = Lx("Энд үзэх", "Watch here", "여기서 보기", "ここで見る", "在此观看");
@@ -44,7 +45,7 @@ function VideoSlot({ v, active, onPlay, onClose, tr }: {
         ) : (
           <>
             {poster
-              ? <img src={poster} alt="" className="h-full w-full object-contain" />
+              ? <img loading="lazy" decoding="async" src={imgSrc(poster, 640)} alt="" className="h-full w-full object-contain" />
               : <div className="h-full w-full" style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }} />}
             <button
               type="button"

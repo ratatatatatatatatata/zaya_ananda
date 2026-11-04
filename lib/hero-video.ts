@@ -1,5 +1,5 @@
 import { getSettingsCached } from "@/lib/repo";
-import { signedDownloadUrl } from "@/lib/supabase";
+import { signedDownloadUrlCached } from "@/lib/supabase";
 import type { HeroSlot } from "@/lib/hero-slots";
 
 export { HERO_SLOTS } from "@/lib/hero-slots";
@@ -11,7 +11,7 @@ async function resolve(src: string): Promise<string | undefined> {
   if (!src) return undefined;
   if (/^https?:\/\//.test(src) || src.startsWith("data:") || src.startsWith("/")) return src;
   try {
-    return await signedDownloadUrl("lesson-videos", src);
+    return await signedDownloadUrlCached("lesson-videos", src);
   } catch {
     return undefined;
   }

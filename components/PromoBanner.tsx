@@ -5,6 +5,7 @@ import { cx } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 import { locText } from "@/lib/cms-i18n";
 import type { CmsItem } from "@/lib/types";
+import { imgSrc } from "@/lib/img";
 
 export function PromoBanner({ items }: { items: CmsItem[] }) {
   const { lang } = useI18n();
@@ -21,7 +22,7 @@ export function PromoBanner({ items }: { items: CmsItem[] }) {
   const inner = (
     <div className="relative w-full overflow-hidden rounded-3xl border border-line bg-primary-50 shadow-card">
       {p.image
-        ? <img src={p.image} alt={pTitle} className="max-h-[340px] w-full object-contain" />
+        ? <img src={imgSrc(p.image, 1200)} alt={pTitle} className="max-h-[340px] w-full object-contain" />
         : <div className="grid h-40 w-full place-items-center bg-primary-grad px-6 text-center text-2xl font-display font-semibold text-white">{pTitle}</div>}
       {p.image && (pTitle || pSummary) && (
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent p-5 sm:p-7">

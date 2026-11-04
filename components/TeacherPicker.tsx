@@ -1,6 +1,7 @@
 "use client";
 
 import type { TeacherPreset } from "@/lib/types";
+import { imgSrc } from "@/lib/img";
 
 export type TeacherDraft = TeacherPreset & { key: string };
 export const teacherDraft = (teacher: TeacherPreset): TeacherDraft => ({ ...teacher, key: crypto.randomUUID() });
@@ -16,7 +17,7 @@ export function TeacherPicker({ value, presets, onChange, onError, uploadImage }
     <div className="mt-4 space-y-4">{value.map((teacher,index) => <fieldset key={teacher.key} className="rounded-2xl border border-line bg-surface-1 p-4">
       <legend className="px-2 font-semibold text-ink">Багш {index + 1}{teacher.name ? ` — ${teacher.name}` : ""}</legend>
       <div className="flex flex-wrap items-center gap-3">
-        {teacher.image && <img src={teacher.image} alt={teacher.name} className="h-20 w-20 rounded-full object-contain" />}
+        {teacher.image && <img loading="lazy" decoding="async" src={imgSrc(teacher.image, 256)} alt={teacher.name} className="h-20 w-20 rounded-full object-contain" />}
         <label className="min-w-0 flex-1 text-sm text-muted">Багшийн зураг<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="mt-1 block w-full text-sm" onChange={async event => {
           const file = event.target.files?.[0]; event.target.value = ""; if (!file) return;
           try { update(teacher.key, { image: await uploadImage(file) }); } catch (error) { onError(error instanceof Error ? error.message : "Зураг оруулахад алдаа гарлаа."); }

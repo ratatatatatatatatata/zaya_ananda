@@ -8,6 +8,7 @@ import { formatMNT } from "@/lib/format";
 import { ZODIACS, ALL_ZODIACS_KEY } from "@/data/zodiac";
 import type { CmsItem } from "@/lib/types";
 import styles from "./ProductHoverCard.module.css";
+import { imgSrc } from "@/lib/img";
 
 // Compact previews show readable text even when the CMS body contains Word HTML.
 function previewText(value: string) {
@@ -57,7 +58,7 @@ export function ProductHoverCard({ item }: { item: CmsItem }) {
     onKeyDown={event => { if (event.key === "Escape") { event.stopPropagation(); setOpen(false); } }}>
     <div className={styles.surface} style={open ? position : undefined}>
       <div className={styles.visual}>
-        {image ? <img src={image} alt="" loading="lazy" /> : <div className={styles.placeholder} aria-hidden="true">◇</div>}
+        {image ? <img src={imgSrc(image, 828)} alt="" loading="lazy" /> : <div className={styles.placeholder} aria-hidden="true">◇</div>}
         <button type="button" className={styles.toggle} aria-label={`${title} — мэдээлэл`} aria-expanded={open} aria-controls={id} onClick={() => open ? setOpen(false) : show()}>
           <span className={styles.indicator} aria-hidden="true">{open ? "−" : "+"}</span>
         </button>

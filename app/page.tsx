@@ -4,7 +4,7 @@ import { heroMediaFor } from "@/lib/hero-video";
 import { getSettingsCached, listCmsCached } from "@/lib/repo";
 import { publicTeam } from "@/lib/public-team";
 import { itemTeachers } from "@/lib/item-teachers";
-import { signedDownloadUrl } from "@/lib/supabase";
+import { signedDownloadUrlCached } from "@/lib/supabase";
 import { HomeIntroVideo } from "@/components/home/HomeIntroVideo";
 import { HomeManifesto } from "@/components/home/HomeManifesto";
 import { HomeMarquee, type MarqueeItem } from "@/components/home/HomeMarquee";
@@ -37,7 +37,7 @@ export default async function HomePage() {
   if (settings.aboutVideo) {
     if (/^https?:\/\//.test(settings.aboutVideo)) introVideoUrl = settings.aboutVideo;
     else {
-      try { introVideoUrl = await signedDownloadUrl("lesson-videos", settings.aboutVideo); }
+      try { introVideoUrl = await signedDownloadUrlCached("lesson-videos", settings.aboutVideo); }
       catch { introVideoUrl = ""; }
     }
   }

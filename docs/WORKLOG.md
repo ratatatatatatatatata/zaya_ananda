@@ -17,6 +17,19 @@
 
 ---
 
+### 2026-11-04 — Claude — Сайтын хурдны шалгалт ба сайжруулалт (хэрэглэгчийн шууд хүсэлт)
+- **Status:** ✅ done
+- **Branch / PR:** `claude/sleepy-heisenberg-glw4pz`
+- **Changed:**
+  - **Зураг:** `lib/img.ts` `imgSrc(src, width)` — Supabase public storage зургийг `/_next/image`-ээр дамжуулж (WebP/AVIF, өргөнд тааруулсан, CDN кэш). Анхны файл өөрчлөгдөхгүй. 29 нийтийн компонентод хэрэглэсэн (карт 640–828, avatar 128–384, дэлгэрэнгүй 1200, lightbox 1920) + жагсаалтын зургуудад `loading="lazy"`. `next.config.mjs` `images` (remotePatterns `*.supabase.co/storage/v1/object/public/**`, sizes, 30 хоног TTL). data:/`/public`/signed URL хэвээр.
+  - **Signed URL кэш:** `lib/supabase.ts` `signedDownloadUrlCached` (URL 6 цаг, кэш 3 цаг; алдаатай URL кэшлэхгүй) → `lib/hero-video.ts`, `app/page.tsx`, `app/p/[id]/page.tsx`. Үр дүнд `/courses`, `/gift`, `/services`, `/shop`, `/merge` ƒ (dynamic) → ○ (ISR 300с) болсон.
+  - **Lazy зурхай:** `components/home/ZurhaiPanels.tsx` (MergeToorog, NatalChart, InlineDestinyMatrix — товч дарахад ачаална). Нүүрийн First Load JS 340 → 275 kB.
+- **SQL / env needed:** none. ⚠️ Vercel Image Optimization квот (Hobby багцад сар бүр хязгаартай) — ихэсвэл Vercel dashboard-оос хянах.
+- **Checks:** tsc OK; build OK; тест 36/37 (өмнөх #37). next start: ISR хуудсууд `x-nextjs-cache: HIT` 12–50ms; гадны host `/_next/image` → 400.
+- **Notes for next agent:**
+  - `listJourneys` нь санаатайгаар кэшгүй (`lib/journeys-db.ts` тайлбар) тул `/`, `/ayalal`, `/about`, `/teachers` dynamic хэвээр — хурдасгах бол богино (≈60с) кэш + `revalidatePath`-ийг сайн туршиж хийх тусдаа TASK.
+  - Хуучин base64 (`data:image`) CMS зургууд optimizer-оор шахагдахгүй, HTML-д шууд орно — Storage руу шилжүүлэх migration тусдаа TASK.
+
 ### 2026-11-04 — Claude — Нүүр хуудсанд хөдөлгөөнт, загварлаг хэсгүүд (хэрэглэгчийн шууд хүсэлт)
 - **Status:** ✅ done
 - **Branch / PR:** `claude/sleepy-heisenberg-glw4pz`

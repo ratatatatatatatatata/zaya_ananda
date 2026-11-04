@@ -7,6 +7,7 @@ import { TiltCard } from "@/components/motion/TiltCard";
 import { itemTeachers } from "@/lib/item-teachers";
 import { ItemTeachers } from "@/components/ItemTeachers";
 import type { CmsItem } from "@/lib/types";
+import { imgSrc } from "@/lib/img";
 
 
 /** Энергийн заслын карт — дэлгэрэнгүй хуудас руу шилжихгүй, энд дээрээ дэлгэгдэж цаг захиална. */
@@ -38,7 +39,7 @@ export function ServiceCard({ item, onOpenChange }: { item: CmsItem; onOpenChang
           >
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-[1.75rem] bg-surface-3">
               {cover ? (
-                <img src={cover} alt={item.title} className="h-full w-full object-contain transition duration-700" />
+                <img loading="lazy" decoding="async" src={imgSrc(cover, 828)} alt={item.title} className="h-full w-full object-contain transition duration-700" />
               ) : (
                 <div className="h-full w-full" style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }} />
               )}
@@ -81,7 +82,7 @@ export function ServiceCard({ item, onOpenChange }: { item: CmsItem; onOpenChang
 
             {cover && (
               <div className="relative aspect-[21/9] w-full overflow-hidden rounded-t-4xl">
-                <img src={cover} alt={item.title} className="h-full w-full object-contain" />
+                <img loading="lazy" decoding="async" src={imgSrc(cover, 828)} alt={item.title} className="h-full w-full object-contain" />
                 <div aria-hidden className="absolute inset-0"
                   style={{ background: "linear-gradient(to top, rgba(8,20,17,0.85) 0%, transparent 60%)" }} />
                 <h3 className="absolute inset-x-0 bottom-0 p-6 font-display text-2xl font-semibold text-white sm:text-3xl">{item.title}</h3>

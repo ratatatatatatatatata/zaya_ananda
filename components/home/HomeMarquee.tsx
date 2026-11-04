@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useI18n } from "@/lib/i18n";
 import { locText, type CmsI18n } from "@/lib/cms-i18n";
+import { imgSrc } from "@/lib/img";
 
 export type MarqueeItem = { id: string; title: string; image: string; i18n?: CmsI18n };
 
@@ -55,7 +56,7 @@ export function HomeMarquee({ items }: { items: MarqueeItem[] }) {
                 <Link key={`${copy}-${item.id}`} href={`/item/${item.id}`} className="zh-marquee-tile"
                   tabIndex={copy === 1 ? 0 : -1} aria-hidden={copy === 1 ? undefined : true}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={item.image} alt="" loading="lazy" decoding="async" />
+                  <img src={imgSrc(item.image, 640)} alt="" loading="lazy" decoding="async" />
                   <span>{title}</span>
                 </Link>
               );
