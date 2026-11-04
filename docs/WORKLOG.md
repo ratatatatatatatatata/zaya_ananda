@@ -17,6 +17,14 @@
 
 ---
 
+### 2026-11-04 — Claude — T-001 Нүүр хуудасны hero шинэчлэл
+- **Status:** ✅ done
+- **Branch / PR:** `claude/sleepy-heisenberg-glw4pz`
+- **Changed:** `components/cinematic/CinematicLanding.tsx` (шинэ бүтэц: текст + зураг, 2 CTA, framer-motion scroll parallax хасагдсан), `app/home-hero.css` (шинэ, `zh-hero*` классууд), `app/tokens.css` (`--hero-*` 13 токен), `app/layout.tsx` (CSS import).
+- **SQL / env needed:** none
+- **Checks:** `tsc` OK; `next build` OK (mock backend); тест 36/37 — `upload signing …` тест өмнөөс нь унасан, энэ өөрчлөлттэй холбоогүй. 320–1920px хэвтээ overflow байхгүй, 5 хэл шалгасан.
+- **Notes for next agent:** `app/cinematic.css`, `app/classic.css`, `app/responsive.css` доторх хуучин `.discovery-hero*` дүрмүүд одоо ашиглагдахгүй (`.discovery-hero-stats`, `.discovery-kicker` бусад хэсэгт ашиглагдсаар байгаа тул тэдгээрийг бүү устга). Цэвэрлэх бол тусдаа TASK болго. Унасан тест: `tests/reel-media.test.cjs` #37.
+
 ### 2026-11-04 — Claude — Үүрэг: ChatGPT удирдагч (20%), Claude гүйцэтгэгч (80%)
 - **Status:** ✅ done
 - **Branch / PR:** `claude/sleepy-heisenberg-glw4pz`

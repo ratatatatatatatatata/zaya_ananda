@@ -71,6 +71,21 @@
   --grad-magic: linear-gradient(115deg, #17987F 0%, #4E9E7E 32%, #C2884A 66%, #C2603D 100%);
   --shadow-tint: 46 62 44;
   --focus-offset: 255 255 255;
+
+  /* home hero — зөвхөн нүүр хуудасны hero (app/home-hero.css) */
+  --hero-bg: 248 246 241;
+  --hero-ink: 45 41 35;
+  --hero-ink-soft: 120 108 88;
+  --hero-muted: 98 92 82;
+  --hero-accent: 128 106 70;
+  --hero-line: 203 186 152;
+  --hero-cta-bg: 81 71 55;
+  --hero-cta-bg-hover: 62 54 44;
+  --hero-cta-ink: 255 253 248;
+  --hero-focus: 141 114 71;
+  --hero-media-bg: 230 227 221;
+  --hero-shade: 25 23 20;
+  --hero-caption-ink: 255 253 248;
 }
 
 .night {
