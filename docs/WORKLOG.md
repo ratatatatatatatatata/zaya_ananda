@@ -17,6 +17,14 @@
 
 ---
 
+### 2026-11-05 — Claude — Нүүр хуудаснаас scroll-marquee хассан (хэрэглэгчийн хүсэлт)
+- **Status:** ✅ done
+- **Branch / PR:** `claude/sleepy-heisenberg-glw4pz`
+- **Changed:** "Бидний ертөнц / Засал, сургалт, ариун бэлгүүд" зургийн туузыг бүрэн хассан: `components/home/HomeMarquee.tsx` устгасан, `app/page.tsx` (render + products татах хасагдсан), `app/home-hero.css` (marquee CSS), `data/strings.ts` (`home.marqueeEyebrow/Title` × 5 хэл). Дараалал: Hero → Бидний зорилго → Танилцуулга видео → бусад.
+- **SQL / env needed:** none
+- **Checks:** tsc OK; хөтөч дээр алдаагүй, overflow 0.
+- **Notes for next agent:** Хэрэглэгч marquee-г хүсээгүй — нүүр хуудсанд CMS зургийн тууз дахин бүү нэм.
+
 ### 2026-11-04 — Claude — Сайтын хурдны шалгалт ба сайжруулалт (хэрэглэгчийн шууд хүсэлт)
 - **Status:** ✅ done
 - **Branch / PR:** `claude/sleepy-heisenberg-glw4pz`
