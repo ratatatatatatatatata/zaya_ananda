@@ -5,6 +5,7 @@ import Link from "next/link";
 import { formatMNT, cx } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 import { locText, type CmsI18n } from "@/lib/cms-i18n";
+import { imgSrc } from "@/lib/img";
 
 export type TeacherClass = {
   id: string;
@@ -54,7 +55,7 @@ export function TeacherClasses({ classes }: { classes: TeacherClass[] }) {
             <div className={cx("grid transition-all duration-300", isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}>
               <div className="overflow-hidden">
                 <div className="flex flex-col gap-4 border-t border-line px-5 py-5 sm:flex-row">
-                  {c.image && <img src={c.image} alt="" className="h-36 w-full rounded-xl object-contain sm:w-56" />}
+                  {c.image && <img loading="lazy" decoding="async" src={imgSrc(c.image, 384)} alt="" className="h-36 w-full rounded-xl object-contain sm:w-56" />}
                   <div className="min-w-0 flex-1">
                     {summary && <p className="leading-relaxed text-muted">{summary}</p>}
                     <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">

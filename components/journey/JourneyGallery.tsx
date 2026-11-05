@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import type { Journey } from "@/data/journeys";
 import styles from "./JourneyGallery.module.css";
+import { imgSrc } from "@/lib/img";
 
 export function JourneyGallery({ journey, headingLevel = 2, layout = "compact" }: { journey: Journey; headingLevel?: 2 | 3; layout?: "compact" | "wide" }) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -33,7 +34,7 @@ export function JourneyGallery({ journey, headingLevel = 2, layout = "compact" }
   return <section aria-label="Аяллын зургууд" className={`${styles.gallery} ${layout === "wide" ? styles.wide : ""}`}>
     <Heading className="font-display text-3xl font-semibold text-ink sm:text-4xl">Аяллын зургууд</Heading>
     <figure id={stageId} className={styles.stage}>
-      <img src={selected.image} alt={selected.caption || `Аяллын зураг ${index + 1}`} loading="lazy" />
+      <img src={imgSrc(selected.image, 1920)} alt={selected.caption || `Аяллын зураг ${index + 1}`} loading="lazy" />
       <figcaption className={styles.caption} aria-live="polite" aria-atomic="true">
         <span>{selected.caption}</span><span className={styles.count}>{index + 1} / {images.length}</span>
       </figcaption>
@@ -49,7 +50,7 @@ export function JourneyGallery({ journey, headingLevel = 2, layout = "compact" }
         {images.map((photo, photoIndex) => <button key={photo.image} type="button" className={styles.thumbnail}
           onClick={() => select(photoIndex)} aria-pressed={photoIndex === index} aria-controls={stageId}
           aria-label={`Аяллын зураг ${photoIndex + 1} сонгох`} title={photo.caption}>
-          <img src={photo.image} alt="" loading="lazy" />
+          <img src={imgSrc(photo.image, 384)} alt="" loading="lazy" />
         </button>)}
       </div>
       <button type="button" className={styles.arrow} onClick={() => select(index + 1)} aria-label="Дараах зураг" aria-controls={stageId}>›</button>

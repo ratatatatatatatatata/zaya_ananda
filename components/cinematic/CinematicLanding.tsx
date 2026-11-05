@@ -1,25 +1,54 @@
 "use client";
 
-import { useRef } from "react";
-import { LazyMotion, domAnimation, m, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import Link from "next/link";
+import { Fragment } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { HeroMedia } from "@/lib/hero-video";
 import { FadingVideo } from "./FadingVideo";
+import { HeroMotes } from "@/components/home/HeroMotes";
+import { Magnet } from "@/components/motion/Magnet";
 
+/** Мөрийг үгээр нь хувааж, үг бүрийг маскнаас доороос дээш гаргана (CSS animation). */
+function RiseLine({ text, start }: { text: string; start: number }) {
+  return <span aria-hidden="true">{text.split(/\s+/).filter(Boolean).map((w, i) => (
+    <Fragment key={i}>{i > 0 && " "}<span className="zh-word"><span style={{ animationDelay: `${(start + i) * 90 + 200}ms` }}>{w}</span></span></Fragment>
+  ))}</span>;
+}
+
+/** Нүүр хуудасны hero — desktop дээр текст/зураг хоёр багана, mobile дээр текстийн дараа зураг.
+ *  Өнгө нь app/tokens.css доторх `--hero-*` токеноор, загвар нь app/home-hero.css-д. */
 export function CinematicLanding({ media }: { media?: HeroMedia }) {
   const { t, tl } = useI18n();
-  const reduced = useReducedMotion();
-  const hero = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: hero, offset: ["start start", "end start"] });
-  const imageY = useTransform(scrollYProgress, [0,1], [0,95]);
-  const titleY = useTransform(scrollYProgress, [0,.8], [0,-38]);
-  return <LazyMotion features={domAnimation}>
-    <section ref={hero} className="discovery-hero" aria-labelledby="discovery-home-heading">
-      <div className="discovery-hero-frame">
-        <m.div className="discovery-hero-copy" style={reduced ? undefined : { y: titleY }}><p className="discovery-kicker">ZAYA’S ANANDA CENTER</p><h1 id="discovery-home-heading">{[t("home.heroTitleLine1"),t("home.heroTitleLine2")].map((line,i) => <span key={i}>{line}</span>)}</h1><div className="discovery-hero-summary"><p className="discovery-intro">{t("home.heroDescription")}</p></div>
-        </m.div>
-        <m.div className="discovery-hero-visual"><m.div className="discovery-hero-parallax" style={reduced ? undefined : { y: imageY }}><FadingVideo src={media?.kind === "video" ? media.url : "/video/meditation.mp4"} poster="/video/meditation.jpg" image={media?.kind === "image" ? media.url : undefined} hero showToggle={false}/></m.div><div className="discovery-hero-wash" aria-hidden="true"/><div className="discovery-hero-foot"><span>{tl("Өөртэйгөө ойртох нэг алхам.")}</span><span>INNER BALANCE</span></div></m.div>
+  return (
+    <section className="zh-hero" aria-labelledby="discovery-home-heading">
+      <div className="zh-hero-inner">
+        <div className="zh-hero-copy">
+          <p className="zh-hero-kicker">ZAYA’S ANANDA CENTER</p>
+          <h1 id="discovery-home-heading" className="zh-hero-title" aria-label={`${t("home.heroTitleLine1")} ${t("home.heroTitleLine2")}`}>
+            <RiseLine text={t("home.heroTitleLine1")} start={0} />
+            <RiseLine text={t("home.heroTitleLine2")} start={t("home.heroTitleLine1").split(/\s+/).length} />
+          </h1>
+          <p className="zh-hero-lead">{t("home.heroDescription")}</p>
+          <div className="zh-hero-actions">
+            <Magnet><Link href="/courses" className="zh-hero-cta zh-hero-cta--primary">{t("home.heroStart")}</Link></Magnet>
+            <Link href="/ayalal" className="zh-hero-cta zh-hero-cta--ghost">
+              {t("home.heroJourney")}
+              <svg aria-hidden="true" viewBox="0 0 20 20" width="16" height="16"><path d="M4 10h11m-4-4 4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </Link>
+          </div>
+        </div>
+        <figure className="zh-hero-visual">
+          <FadingVideo
+            src={media?.kind === "video" ? media.url : "/video/meditation.mp4"}
+            poster="/video/meditation.jpg"
+            image={media?.kind === "image" ? media.url : undefined}
+            hero
+            showToggle={false}
+          />
+          <HeroMotes />
+          <figcaption className="zh-hero-caption">{tl("Өөртэйгөө ойртох нэг алхам.")}</figcaption>
+        </figure>
       </div>
     </section>
-  </LazyMotion>;
+  );
 }

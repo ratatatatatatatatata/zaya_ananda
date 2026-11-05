@@ -5,11 +5,9 @@ import { HomeDetails } from "./home/HomeDetails";
 import { CategoryExperience } from "./home/CategoryExperience";
 import { T, Tr } from "./T";
 import { PathsHighlight } from "./home/PathsHighlight";
-import { MergeToorog } from "./MergeToorog";
 import { SectionZoom } from "./home/SectionZoom";
+import { LazyMergeToorog, LazyNatalChart, LazyInlineDestinyMatrix } from "./home/ZurhaiPanels";
 import { ZurhaiSlider } from "./home/ZurhaiSlider";
-import { InlineDestinyMatrix } from "./matrix/InlineDestinyMatrix";
-import { NatalChart } from "./zurhai/NatalChart";
 import { HomeAbout } from "./home/HomeAbout";
 import { listJourneysCached } from "@/lib/journeys-db";
 import type { Locale } from "@/lib/types";
@@ -53,7 +51,7 @@ export async function HomeSections() {
       <section id="zurhai" className="section activity-section scroll-mt-36">
         <SectionBackdrop src="/poster_night.jpg" centered position="center 35%" />
         <div className="container-px">
-        <ZurhaiSlider cards={settings.zurhaiCards} daily={<MergeToorog />} matrix={<InlineDestinyMatrix />} natal={<NatalChart />} />
+        <ZurhaiSlider cards={settings.zurhaiCards} daily={<LazyMergeToorog />} matrix={<LazyInlineDestinyMatrix />} natal={<LazyNatalChart />} />
       </div></section>
 
       {/* Хоёр гол зам — сургалт ба сүнслэг аялал */}

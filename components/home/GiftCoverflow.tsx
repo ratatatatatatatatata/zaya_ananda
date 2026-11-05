@@ -7,6 +7,7 @@ import { TiltCard } from "../motion/TiltCard";
 import { embedSrc, youtubeThumb } from "@/lib/video-embed";
 import { useI18n } from "@/lib/i18n";
 import type { CmsItem, Locale } from "@/lib/types";
+import { imgSrc } from "@/lib/img";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
 const EMPTY = Lx(
@@ -58,7 +59,7 @@ function GiftCard({ reel }: { reel: Reel }) {
         ) : (
           <button type="button" onClick={() => setOpen(true)} aria-label={reel.title} className="absolute inset-0 h-full w-full">
             {reel.poster ? (
-              <img src={reel.poster} alt={reel.title} className="h-full w-full object-contain transition duration-700" />
+              <img loading="lazy" decoding="async" src={imgSrc(reel.poster, 640)} alt={reel.title} className="h-full w-full object-contain transition duration-700" />
             ) : (
               <div className="h-full w-full" style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }} />
             )}

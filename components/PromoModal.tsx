@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import { locText } from "@/lib/cms-i18n";
 import type { CmsItem, Locale } from "@/lib/types";
+import { imgSrc } from "@/lib/img";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
 
@@ -113,7 +114,7 @@ export function PromoModal() {
           <Wrap p={main} className="block overflow-hidden rounded-2xl">
             <div className="relative">
               {main.image ? (
-                <img src={main.image} alt={mainTitle} className="max-h-[32rem] w-full object-contain" />
+                <img src={imgSrc(main.image, 1200)} alt={mainTitle} className="max-h-[32rem] w-full object-contain" />
               ) : (
                 <div className="grid min-h-[20rem] w-full place-items-center px-6 text-center"
                   style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#155248 55%,#2BC8BB)" }}>
@@ -142,7 +143,7 @@ export function PromoModal() {
                 return (
                   <Wrap key={p.id} p={p} className="group block overflow-hidden rounded-2xl border border-line bg-surface-2 transition hover:-translate-y-0.5 hover:shadow-sm">
                     {p.image ? (
-                      <img src={p.image} alt={t} className="h-32 w-full object-contain transition duration-500" />
+                      <img loading="lazy" decoding="async" src={imgSrc(p.image, 384)} alt={t} className="h-32 w-full object-contain transition duration-500" />
                     ) : (
                       <div className="h-32 w-full" style={{ backgroundImage: "linear-gradient(140deg,#0F2B26,#2BC8BB)" }} />
                     )}

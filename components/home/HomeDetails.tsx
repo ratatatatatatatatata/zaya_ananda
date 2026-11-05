@@ -9,6 +9,7 @@ import { locText } from "@/lib/cms-i18n";
 import type { CmsItem } from "@/lib/types";
 import type { Journey } from "@/data/journeys";
 import styles from "./HomeDetails.module.css";
+import { imgSrc } from "@/lib/img";
 
 const DetailContent = dynamic(() => import("./HomeDetailContent"), { loading: () => <p>Ачаалж байна…</p> });
 const DetailsContext = createContext<((href: string) => boolean) | null>(null);
@@ -46,9 +47,9 @@ export function HomeDetails({ items, journeys, children }: { items: CmsItem[]; j
     {path && <DetailDialog title={title} onClose={() => setPath(null)}>
       {category ? <div className={styles.list}>
         {category.kind ? items.filter(value => value.kind === category.kind).map(value => <button key={value.id} type="button" onClick={() => open(`/item/${value.id}`)}>
-          {value.image && <img src={value.image} alt="" />}<span><strong>{locText(lang,value.title,value.i18n,"title")}</strong><span>{locText(lang,value.summary,value.i18n,"summary")}</span></span><span aria-hidden>→</span>
+          {value.image && <img loading="lazy" decoding="async" src={imgSrc(value.image, 256)} alt="" />}<span><strong>{locText(lang,value.title,value.i18n,"title")}</strong><span>{locText(lang,value.summary,value.i18n,"summary")}</span></span><span aria-hidden>→</span>
         </button>) : journeys.map(value => <button key={value.id} type="button" onClick={() => open(`/ayalal/${encodeURIComponent(value.slug)}`)}>
-          {value.image && <img src={value.image} alt="" />}<span><strong>{value.name}</strong><span>{value.summary}</span></span><span aria-hidden>→</span>
+          {value.image && <img loading="lazy" decoding="async" src={imgSrc(value.image, 256)} alt="" />}<span><strong>{value.name}</strong><span>{value.summary}</span></span><span aria-hidden>→</span>
         </button>)}
       </div> : <DetailContent key={path} item={item} journey={journey} />}
     </DetailDialog>}

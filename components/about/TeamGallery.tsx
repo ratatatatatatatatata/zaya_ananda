@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type ReactNode, type CSSProperties } from "react";
 import styles from "./TeamGallery.module.css";
+import { imgSrc } from "@/lib/img";
 
 type Member = { name: string; image?: string; role?: ReactNode; info?: ReactNode; focus?: number };
 
@@ -29,7 +30,7 @@ function MemberCard({ member }: { member: Member }) {
     return () => window.removeEventListener("resize", close);
   }, [open]);
   const portrait = member.image
-    ? <img src={member.image} alt="" loading="lazy" className={styles.photo} style={{ objectPosition: `50% ${member.focus ?? 50}%` }} />
+    ? <img src={imgSrc(member.image, 640)} alt="" loading="lazy" className={styles.photo} style={{ objectPosition: `50% ${member.focus ?? 50}%` }} />
     : <span className={styles.placeholder} aria-hidden="true">{member.name.trim().split(/\s+/).map(part => part[0]).slice(0, 2).join("")}</span>;
   return <article ref={card} className={styles.card} data-open={open}
     onPointerEnter={event => { if (event.pointerType === "mouse") show(); }}

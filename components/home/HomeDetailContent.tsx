@@ -14,13 +14,14 @@ import { CourseLessons } from "@/components/CourseLessons";
 import { JourneyRegistration } from "@/components/journey/JourneyRegistration";
 import { DestinationGallery } from "@/components/journey/DestinationGallery";
 import styles from "./HomeDetails.module.css";
+import { imgSrc } from "@/lib/img";
 
 export default function HomeDetailContent({ item, journey: j }: { item?: CmsItem; journey?: Journey }) {
   if (item?.kind === "product") return <HomeProductDetail key={item.id} item={item} />;
   if (item) {
     const images = Array.from(new Set([item.image, ...(item.images || [])].filter((value): value is string => !!value)));
     return <div className={styles.detail}>
-      {images.length > 0 && <div className={styles.gallery} aria-label="Зургийн цомог">{images.map(src => <img key={src} src={src} alt={item.title} />)}</div>}
+      {images.length > 0 && <div className={styles.gallery} aria-label="Зургийн цомог">{images.map(src => <img loading="lazy" decoding="async" key={src} src={imgSrc(src, 1200)} alt={item.title} />)}</div>}
       {item.kind === "service" && <p>{[item.category, typeof item.price === "number" ? formatMNT(item.price) : ""].filter(Boolean).join(" · ")}</p>}
       {item.summary && <p>{item.summary}</p>}
       {item.body && <RichBody html={item.body} i18n={item.i18n} />}
@@ -32,7 +33,7 @@ export default function HomeDetailContent({ item, journey: j }: { item?: CmsItem
   }
   if (!j) return null;
   return <div className={styles.detail}>
-    {j.image && <div className={styles.gallery}><img src={j.image} alt={j.name} /></div>}
+    {j.image && <div className={styles.gallery}><img loading="lazy" decoding="async" src={imgSrc(j.image, 1200)} alt={j.name} /></div>}
     <p>{j.tagline}</p><p>{j.summary}</p>
     <dl className="grid gap-4 sm:grid-cols-2">{[["Хугацаа",j.days],["Бүлэг",j.groupSize],["Тээвэр",j.transport],["Байр",j.stay],["Хэнд зориулсан",j.audience],["Үнэ",j.price],["Үнэд багтсан",j.included],["Үнэд багтаагүй",j.excluded]].filter(([,value]) => value).map(([label,value]) => <div key={label}><dt className="font-semibold">{label}</dt><dd className="mt-1 whitespace-pre-line">{value}</dd></div>)}</dl>
     <section className={styles.program}><h3>Аяллын хөтөлбөр</h3>{j.itinerary.map((day,index) => <article key={index}><p>{day.label}</p><h3>{day.title}</h3><p>{day.text}</p>{day.bullets && <ul className="mt-3 list-disc pl-5">{day.bullets.map((text,i) => <li key={i}>{text}</li>)}</ul>}{day.image && <img src={day.image} alt={day.title} />}</article>)}</section>

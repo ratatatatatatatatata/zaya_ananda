@@ -10,6 +10,7 @@ import { ItemVideos } from "@/components/ItemVideos";
 import { RichBody } from "@/components/RichBody";
 import { ProductBuyBox } from "@/components/ProductBuyBox";
 import styles from "./HomeProductDetail.module.css";
+import { imgSrc } from "@/lib/img";
 
 export function HomeProductDetail({ item }: { item: CmsItem }) {
   const { lang } = useI18n();
@@ -23,11 +24,11 @@ export function HomeProductDetail({ item }: { item: CmsItem }) {
   return <div className={styles.product}>
     <div className={`${styles.overview} ${images.length ? styles.withImages : ""}`}>
       {images.length > 0 && <section className={styles.gallery} aria-label="Бүтээгдэхүүний зургууд">
-        <div className={styles.mainImage}><img src={images[active]} alt={`${item.title} — зураг ${active + 1}`} /></div>
+        <div className={styles.mainImage}><img src={imgSrc(images[active], 1200)} alt={`${item.title} — зураг ${active + 1}`} /></div>
         {images.length > 1 && <>
           <p className={styles.imageCount} aria-live="polite">{active + 1} / {images.length}</p>
           <div className={styles.thumbnails} aria-label="Зураг сонгох">
-            {images.map((src, index) => <button key={src} type="button" aria-label={`${index + 1}-р зургийг үзэх`} aria-pressed={index === active} onClick={() => setSelected(index)}><img src={src} alt="" loading="lazy" /></button>)}
+            {images.map((src, index) => <button key={src} type="button" aria-label={`${index + 1}-р зургийг үзэх`} aria-pressed={index === active} onClick={() => setSelected(index)}><img src={imgSrc(src, 256)} alt="" loading="lazy" /></button>)}
           </div>
         </>}
       </section>}

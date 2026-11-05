@@ -8,6 +8,7 @@ import { locText } from "@/lib/cms-i18n";
 import { formatMNT } from "@/lib/format";
 import styles from "./LevelCourses.module.css";
 import type { CmsItem, Locale, TeacherPreset } from "@/lib/types";
+import { imgSrc } from "@/lib/img";
 
 const Lx = (mn: string, en: string, ko: string, ja: string, zh: string): Record<Locale, string> => ({ mn, en, ko, ja, zh });
 
@@ -93,14 +94,14 @@ export function LevelCourses({ courses }: { courses: LevelCourse[] }) {
           {selectedCourses.map(course => <article key={course.id} className={styles.course}>
             <Link href={"/item/" + course.id} className={styles.courseLink}>
               <div className={styles.photo}>
-                {course.image ? <img src={course.image} alt="" loading="lazy" /> : <span aria-hidden>✦</span>}
+                {course.image ? <img src={imgSrc(course.image, 640)} alt="" loading="lazy" /> : <span aria-hidden>✦</span>}
               </div>
               <div className={styles.courseInfo}>
                 <h4>{locText(lang,course.title,course.i18n,"title")}</h4>
                 {course.summary && <p className={styles.summary}>{locText(lang,course.summary,course.i18n,"summary")}</p>}
                 {!!course.teachers?.length && <ul className={styles.teachers}>
                   {course.teachers.map(teacher => <li key={teacher.name}>
-                    {teacher.image && <img src={teacher.image} alt="" loading="lazy" />}
+                    {teacher.image && <img src={imgSrc(teacher.image, 128)} alt="" loading="lazy" />}
                     <span>{teacher.name}</span>
                   </li>)}
                 </ul>}

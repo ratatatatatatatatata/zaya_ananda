@@ -1,4 +1,5 @@
 // Lightweight Supabase (PostgREST) client using fetch — no extra dependency.
+import { unstable_cache } from "next/cache";
 const URL = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "").replace(/\/+$/, "");
 const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
@@ -104,6 +105,19 @@ export async function signedDownloadUrl(bucket: string, path: string, expiresIn 
   const data = (await storageReq(`object/sign/${bucket}/${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expiresIn }) })) as { signedURL?: string };
   return fullStorageUrl(data?.signedURL || "");
 }
+
+/** Нийтийн хуудсуудын (hero, танилцуулга видео, цэсний хуудас) signed URL-ийг 3 цаг кэшлэнэ.
+ *  URL 6 цаг хүчинтэй тул кэшлэгдсэн (мөн ISR-ээр хуучирсан хуудсанд орсон) хаяг дор хаяж 3 цаг ажиллана; хуудас бүрт Supabase руу дахин хандахгүй,
+ *  хаяг тогтмол болохоор хөтөч видеог кэшлэж чадна. Төлбөртэй хичээлд ашиглахгүй. */
+export const signedDownloadUrlCached = unstable_cache(
+  async (bucket: string, path: string) => {
+    const url = await signedDownloadUrl(bucket, path, 21600);
+    if (!/[?&]token=/.test(url)) throw new Error("Signed URL үүссэнгүй"); // алдаатай хаягийг кэшлэхгүй
+    return url;
+  },
+  ["signed-download-url"],
+  { revalidate: 10800 },
+);
 
 export async function deleteObjects(bucket: string, paths: string[]): Promise<void> {
   await storageReq(`object/${bucket}`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prefixes: paths }) });

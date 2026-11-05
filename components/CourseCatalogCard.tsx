@@ -8,6 +8,7 @@ import { CategoryGlyph } from "./CategoryGlyph";
 import { themeFor } from "@/data/theme-map";
 import type { CmsItem } from "@/lib/types";
 import styles from "./CourseCatalogCard.module.css";
+import { imgSrc } from "@/lib/img";
 
 export function CourseCatalogCard({ item }: { item: CmsItem }) {
   const { lang, tl } = useI18n();
@@ -17,7 +18,7 @@ export function CourseCatalogCard({ item }: { item: CmsItem }) {
   const modes: Record<string, string> = { online: "Онлайн сургалт", tankhim: "Танхимын сургалт", both: "Онлайн + Танхим" };
   return <Link href={`/item/${item.id}`} className={styles.card}>
     <div className={styles.media}>
-      {item.image ? <img src={item.image} alt="" loading="lazy" /> : <div className={styles.placeholder}>
+      {item.image ? <img src={imgSrc(item.image, 828)} alt="" loading="lazy" /> : <div className={styles.placeholder}>
         <CategoryGlyph glyph={theme.glyph} from={theme.from} to={theme.to} className="h-16 w-16" id={`catalog-${item.id}`} />
       </div>}
     </div>

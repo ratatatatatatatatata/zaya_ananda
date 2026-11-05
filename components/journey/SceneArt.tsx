@@ -1,4 +1,5 @@
 import type { Scene } from "@/data/journeys";
+import { imgSrc } from "@/lib/img";
 
 const PALETTE: Record<Scene, { sky: [string, string, string]; land: string[]; accent: string }> = {
   gobi: { sky: ["#2C1E3D", "#7C4A46", "#E0995A"], land: ["#8B5E42", "#6A452F", "#4A2E20"], accent: "#FFD79A" },
@@ -99,6 +100,6 @@ export function SceneArt({ scene, className = "" }: { scene: Scene; className?: 
 
 /** Зураг байвал зураг, үгүй бол процедур дүрслэл */
 export function JourneyImage({ src, scene, alt, className = "" }: { src?: string; scene: Scene; alt: string; className?: string }) {
-  if (src) return <img src={src} alt={alt} className={className} />;
+  if (src) return <img loading="lazy" decoding="async" src={imgSrc(src, 1200)} alt={alt} className={className} />;
   return <SceneArt scene={scene} className={className} />;
 }

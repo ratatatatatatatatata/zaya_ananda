@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { imgSrc } from "@/lib/img";
 
 /** Зургийн галерей — үндсэн зураг, жижиг зургууд, дарахад томруулж харах lightbox. */
 export function ImageGallery({ images, alt = "" }: { images: string[]; alt?: string }) {
@@ -24,7 +25,7 @@ export function ImageGallery({ images, alt = "" }: { images: string[]; alt?: str
   return (
     <div className="mb-6">
       <button type="button" onClick={() => setZoom(true)} className="group relative block w-full cursor-zoom-in overflow-hidden rounded-3xl">
-        <img src={images[active]} alt={alt} className="max-h-[520px] w-full object-contain transition duration-300" />
+        <img src={imgSrc(images[active], 1200)} alt={alt} className="max-h-[520px] w-full object-contain transition duration-300" />
         <span className="absolute bottom-3 right-3 rounded-full bg-black/55 px-3 py-1.5 text-sm font-semibold text-white shadow">🔍 Томруулж харах</span>
       </button>
       {images.length > 1 && (
@@ -32,7 +33,7 @@ export function ImageGallery({ images, alt = "" }: { images: string[]; alt?: str
           {images.map((img, i) => (
             <button key={i} type="button" onClick={() => setActive(i)}
               className={"h-20 w-28 shrink-0 overflow-hidden rounded-xl border-2 transition " + (i === active ? "border-primary-500" : "border-transparent opacity-70 hover:opacity-100")}>
-              <img src={img} alt="" className="h-full w-full object-contain" />
+              <img loading="lazy" decoding="async" src={imgSrc(img, 256)} alt="" className="h-full w-full object-contain" />
             </button>
           ))}
         </div>
@@ -49,7 +50,7 @@ export function ImageGallery({ images, alt = "" }: { images: string[]; alt?: str
                 onClick={(e) => { e.stopPropagation(); setActive((a) => (a + 1) % images.length); }} aria-label="Дараах">›</button>
             </>
           )}
-          <img src={images[active]} alt={alt} className="max-h-[92vh] max-w-[95vw] rounded-2xl object-contain" onClick={(e) => e.stopPropagation()} />
+          <img src={imgSrc(images[active], 1920)} alt={alt} className="max-h-[92vh] max-w-[95vw] rounded-2xl object-contain" onClick={(e) => e.stopPropagation()} />
         </div>
       )}
     </div>

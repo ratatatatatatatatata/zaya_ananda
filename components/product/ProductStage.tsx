@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cx } from "@/lib/format";
+import { imgSrc } from "@/lib/img";
 
 /** Бүтээгдэхүүний амьд тайз — жинхэнэ зургийг 2.5D гүнтэй, тавцан + бодит сүүдэр,
  *  зөөлөн тусгал, заагчийн хязгаартай хазайлт (±4°/±7°), гэрлийн урсгал,
@@ -104,7 +105,7 @@ export function ProductStage({ images, alt = "" }: { images: string[]; alt?: str
         {/* Зураг — гүнтэй шилжилт */}
         <div ref={imgWrap} className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-surface-4 transition-transform duration-300 ease-out will-change-transform" style={{ transformStyle: "preserve-3d" }} data-stage-img>
           {prev !== null && !failed[prev] && (
-            <img key={"p" + prev} src={images[prev]} alt="" aria-hidden className="absolute inset-0 h-full w-full object-contain" style={{ animation: "zaStageOut 0.6s ease forwards" }} />
+            <img key={"p" + prev} src={imgSrc(images[prev], 1200)} alt="" aria-hidden className="absolute inset-0 h-full w-full object-contain" style={{ animation: "zaStageOut 0.6s ease forwards" }} />
           )}
           {failed[active] ? (
             <div className="grid h-full w-full place-items-center bg-gradient-to-br from-surface-1 to-surface-4 text-center">
@@ -117,7 +118,7 @@ export function ProductStage({ images, alt = "" }: { images: string[]; alt?: str
           ) : (
             <img
               key={"a" + active}
-              src={src}
+              src={imgSrc(src, 1200)}
               alt={alt}
               onError={() => setFailed((f) => ({ ...f, [active]: true }))}
               className="h-full w-full cursor-zoom-in object-contain"
@@ -139,7 +140,7 @@ export function ProductStage({ images, alt = "" }: { images: string[]; alt?: str
         {/* Тусгал */}
         <div aria-hidden className="pointer-events-none relative mx-6 h-14 overflow-hidden opacity-30" style={{ transform: "scaleY(-1)" }}>
           {!failed[active] && (
-            <img src={src} alt="" className="h-auto w-full rounded-3xl object-contain blur-[3px]" style={{ maskImage: "linear-gradient(to top, rgba(0,0,0,0.5), transparent 70%)", WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,0.5), transparent 70%)" }} />
+            <img src={imgSrc(src, 1200)} alt="" className="h-auto w-full rounded-3xl object-contain blur-[3px]" style={{ maskImage: "linear-gradient(to top, rgba(0,0,0,0.5), transparent 70%)", WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,0.5), transparent 70%)" }} />
           )}
         </div>
 
@@ -153,7 +154,7 @@ export function ProductStage({ images, alt = "" }: { images: string[]; alt?: str
           {images.map((img, i) => (
             <button key={i} type="button" onClick={() => pick(i)} aria-label={`Зураг ${i + 1}`}
               aria-current={i === active} className={cx("focus-ring h-20 w-28 shrink-0 overflow-hidden rounded-xl border-2 transition", i === active ? "border-primary-500 shadow-glow" : "border-line/60 opacity-70 hover:opacity-100")}>
-              <img src={img} alt="" className="h-full w-full object-contain" />
+              <img loading="lazy" decoding="async" src={imgSrc(img, 256)} alt="" className="h-full w-full object-contain" />
             </button>
           ))}
         </div>
@@ -169,7 +170,7 @@ export function ProductStage({ images, alt = "" }: { images: string[]; alt?: str
               <button type="button" className="focus-ring tap-target absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-xl text-white hover:bg-white/25" onClick={(e) => { e.stopPropagation(); go(1); }} aria-label="Дараах">›</button>
             </>
           )}
-          <img src={src} alt={alt} className="max-h-[92vh] max-w-[95vw] rounded-2xl object-contain" onClick={(e) => e.stopPropagation()} />
+          <img src={imgSrc(src, 1920)} alt={alt} className="max-h-[92vh] max-w-[95vw] rounded-2xl object-contain" onClick={(e) => e.stopPropagation()} />
         </div>
       )}
     </div>

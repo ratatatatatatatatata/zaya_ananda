@@ -9,6 +9,7 @@ import { themeFor } from "@/data/theme-map";
 import { CategoryGlyph } from "./CategoryGlyph";
 import { ZODIACS, ALL_ZODIACS_KEY } from "@/data/zodiac";
 import type { CmsItem } from "@/lib/types";
+import { imgSrc } from "@/lib/img";
 
 const modeLabel: Record<string, string> = { online: "Онлайн сургалт", tankhim: "Танхимын сургалт", both: "Онлайн + Танхим" };
 
@@ -36,7 +37,7 @@ export function CmsCard({ item }: { item: CmsItem }) {
       <Link href={"/item/" + item.id} className="glass-lux group flex h-full flex-col">
         {item.image && (
           <div className="relative h-60 w-full overflow-hidden">
-            <img src={item.image} alt="" className="h-full w-full object-contain transition duration-500" />
+            <img loading="lazy" decoding="async" src={imgSrc(item.image, 828)} alt="" className="h-full w-full object-contain transition duration-500" />
             {stoneZodiacs.length > 0 && (
               <div className="absolute left-3 top-3 flex flex-wrap gap-1">
                 {stoneZodiacs.map((z) => (
@@ -61,7 +62,7 @@ export function CmsCard({ item }: { item: CmsItem }) {
     <Link href={"/item/" + item.id} className="glass-lux group flex h-full flex-col">
       {item.image && (
         <div className="relative h-56 w-full overflow-hidden">
-          <img src={item.image} alt="" className="h-full w-full object-contain transition duration-500" />
+          <img loading="lazy" decoding="async" src={imgSrc(item.image, 828)} alt="" className="h-full w-full object-contain transition duration-500" />
           {cat && <span className="absolute left-3 top-3 rounded-full bg-[#15302C]/80 px-3 py-1 text-xs font-semibold text-white shadow-sm backdrop-blur-sm">{cat}</span>}
         </div>
       )}

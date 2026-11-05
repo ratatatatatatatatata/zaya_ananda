@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { imgSrc } from "@/lib/img";
 
 type Partner = { logo: string; name: string };
 
@@ -27,7 +28,7 @@ export function PartnersGrid({ eyebrow, title, partners }: {
                   className="flex h-28 items-center justify-center rounded-3xl border border-line bg-surface-1 p-6 grayscale transition hover:grayscale-0 hover:border-primary-400/40"
                 >
                   {p.logo
-                    ? <img src={p.logo} alt={p.name || "Хамтрагч"} className="max-h-12 w-auto object-contain opacity-80" />
+                    ? <img loading="lazy" decoding="async" src={imgSrc(p.logo, 256)} alt={p.name || "Хамтрагч"} className="max-h-12 w-auto object-contain opacity-80" />
                     : <span className="text-sm font-semibold text-muted">{p.name || "Хамтрагч"}</span>}
                 </div>
               ))

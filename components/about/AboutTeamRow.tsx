@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { imgSrc } from "@/lib/img";
 
 type Member = { name: string; image?: string; role?: ReactNode; info?: ReactNode; focus?: number };
 
@@ -20,8 +21,8 @@ function TeamCard({ m, onOpen }: { m: Member; onOpen: () => void }) {
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden rounded-3xl border border-white/12 bg-white/5">
         {m.image ? (
-          <img
-            src={m.image}
+          <img loading="lazy" decoding="async"
+            src={imgSrc(m.image, 640)}
             alt=""
             className="h-full w-full object-contain transition duration-700"
             style={{ objectPosition: "50% " + (m.focus ?? 50) + "%" }}
@@ -65,7 +66,7 @@ function BioModal({ m, onClose }: { m: Member; onClose: () => void }) {
         </button>
         <div className="relative aspect-[3/4] w-full overflow-hidden sm:aspect-auto sm:h-full">
           {m.image ? (
-            <img src={m.image} alt="" className="h-full w-full object-contain" style={{ objectPosition: "50% " + (m.focus ?? 50) + "%" }} />
+            <img loading="lazy" decoding="async" src={imgSrc(m.image, 640)} alt="" className="h-full w-full object-contain" style={{ objectPosition: "50% " + (m.focus ?? 50) + "%" }} />
           ) : (
             <div className="grid h-full w-full place-items-center text-5xl font-display font-semibold text-ink/40"
               style={{ backgroundImage: "linear-gradient(150deg,#0F2B26,#1E2A1C)" }}>

@@ -3,6 +3,14 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  // CMS-ийн анхны (10MB хүртэл) зургуудыг харуулахдаа жижигрүүлж WebP/AVIF болгоно — lib/img.ts
+  images: {
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [{ protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/**" }],
+    deviceSizes: [640, 828, 1200, 1920],
+    imageSizes: [128, 256, 384],
+    minimumCacheTTL: 60 * 60 * 24 * 30,
+  },
   async headers() {
     return [
       {
