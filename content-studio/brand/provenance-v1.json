@@ -1,0 +1,28 @@
+{
+  "logo": {
+    "source": "Existing official centre logo, also present in repository public/brand/zaya-ananda-white.webp",
+    "original_sha256": "a62b79b9292c9da6f1cbf4ed7bbba71bc1b22de70201dd989aa7a20ef1b4622a",
+    "png_sha256": "d5cc27861118932d8cc84d1c1eedff59283060d3b2c5f7ecff42f82836489d9b",
+    "pixel_identity_verified": true,
+    "background": "opaque white",
+    "owner": "Zaya’s Ananda Center"
+  },
+  "fonts": {
+    "Lora": {
+      "source": "https://github.com/google/fonts/tree/main/ofl/lora",
+      "license": "SIL OFL 1.1",
+      "sha256": "822a6621ccbe8d97d20ac88c1c41f5615c9c2c202eaa75f272cd452aac6475a7"
+    },
+    "Manrope": {
+      "source": "Previously obtained Manrope distribution; bundled original OFL license",
+      "license": "SIL OFL 1.1",
+      "sha256": "3ae11c49db0455a3cc33e37d380f20fdb8c7f8b41dc07625c177e3d87a9d6ae6"
+    }
+  },
+  "example_image": {
+    "source": "Previously AI-generated pine illustration",
+    "teacher_or_student_depiction": false,
+    "sha256": "56572aa1ddc692708eec668a0a01a1033619dfda8f55fdb8f0422fc7b03fc662"
+  },
+  "design_status": "studio-recommendation-not-user-approved"
+}

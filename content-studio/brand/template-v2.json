@@ -1,0 +1,27 @@
+{
+  "id": "ananda-message-first-v2",
+  "status": "studio-recommendation-not-user-approved",
+  "parent_template": "ananda-editorial-v1",
+  "brand_name": "Zaya’s Ananda Center",
+  "canvas": [1080, 1350],
+  "logo_box": [72, 24, 400, 136],
+  "image_box": [0, 534, 1080, 816],
+  "image_crop": "xMidYMax slice",
+  "headline": {
+    "file": "Lora-variable.ttf", "family": "Lora", "weight": 500,
+    "size": 82, "x": 72, "baselines": [278, 384],
+    "colors": ["#30223D", "#00858A"], "safe_box": [68, 190, 1008, 408]
+  },
+  "support": {
+    "file": "Manrope-variable.ttf", "family": "Manrope", "weight": 450,
+    "size": 31, "x": 76, "baseline": 464,
+    "color": "#4C5C59", "safe_box": [72, 414, 1008, 487]
+  },
+  "rules": [
+    "Full original logo at the very top, aligned with the copy column",
+    "Message is read before the image",
+    "One template across topics; change only image and copy",
+    "Two headline lines maximum; no automatic font shrinking",
+    "All previous template versions preserved"
+  ]
+}
